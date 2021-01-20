@@ -1,6 +1,7 @@
 package COVID_AgentBasedSimulation.Model.Data.Safegraph;
 
 import COVID_AgentBasedSimulation.Model.Structure.Brand;
+import COVID_AgentBasedSimulation.Model.Structure.CensusTract;
 import COVID_AgentBasedSimulation.Model.Structure.City;
 import COVID_AgentBasedSimulation.Model.Structure.Place;
 import COVID_AgentBasedSimulation.Model.Structure.State;
@@ -48,18 +49,30 @@ public class PatternsRecordProcessed {
 //    public String date_range_start;//Start time for measurement period in ISO 8601 format of YYYY-MM-DDTHH:mm:SS�hh:mm (local time with offset from GMT).
     public LocalDateTime date_range_start;
     
-    public String date_range_end;//End time for measurement period in ISO 8601 format of YYYY-MM-DDTHH:mm:SS�hh:mm (local time with offset from GMT). The end time will be the last day of the month at 12 a.m. local time.
+//    public String date_range_end;//End time for measurement period in ISO 8601 format of YYYY-MM-DDTHH:mm:SS�hh:mm (local time with offset from GMT). The end time will be the last day of the month at 12 a.m. local time.
+    public LocalDateTime date_range_end;
+    
     public int raw_visit_counts;
     public int raw_visitor_counts;//Unique visits
     public int[] visits_by_day;//The number of visits to the POI each day (local time) over the covered time period. (30 days)
-    public String poi_cbg;//The census block group the POI is located within. (CENSUS TRACT)
-    public ArrayList<HashMap<String,Integer>> visitor_home_cbgs;//A mapping of census block groups to the number of visitors to the POI whose home is in that census block group.
-    public ArrayList<HashMap<String,Integer>> visitor_daytime_cbgs;//A mapping of census block groups to the number of visitors to the POI whose primary daytime location between 9 am - 5 pm is in that census block group.
+//    public String poi_cbg;//The census block group the POI is located within. (CENSUS TRACT)
+    public CensusTract poi_cbg;
+    
+//    public ArrayList<HashMap<String,Integer>> visitor_home_cbgs;//A mapping of census block groups to the number of visitors to the POI whose home is in that census block group.
+    public ArrayList<HashMap<CensusTract,Integer>> visitor_home_cbgs;
+    
+//    public ArrayList<HashMap<String,Integer>> visitor_daytime_cbgs;//A mapping of census block groups to the number of visitors to the POI whose primary daytime location between 9 am - 5 pm is in that census block group.
+    public ArrayList<HashMap<CensusTract,Integer>> visitor_daytime_cbgs;
+    
     public int distance_from_home;//Median distance from home travelled by visitors (of visitors whose home we have identified) in meters.
     public double median_dwell;//Median minimum dwell time in minutes.
     public ArrayList<HashMap<String,Integer>> bucketed_dwell_times;//Key is range of minutes and value is number of visits that were within that duration.
-    public ArrayList<HashMap<String,Integer>> related_same_day_brand;//Other brands that the visitors to this POI visited on the same day as the visit to this POI where customer overlap differs by at least 5% from the SafeGraph national average. The mapping has the brand as the key. The value shown for each brand is a percentage representing the median of the following calculation for each day in the month
-    public ArrayList<HashMap<String,Integer>> related_same_month_brand;//Other brands that the visitors to this POI visited in the same month as the visit to this POI where customer overlap differs by at least 5% from the SafeGraph national average. The value shown for each brand is a percentage representing
+//    public ArrayList<HashMap<String,Integer>> related_same_day_brand;//Other brands that the visitors to this POI visited on the same day as the visit to this POI where customer overlap differs by at least 5% from the SafeGraph national average. The mapping has the brand as the key. The value shown for each brand is a percentage representing the median of the following calculation for each day in the month
+    public ArrayList<HashMap<Brand,Integer>> related_same_day_brand;
+    
+//    public ArrayList<HashMap<String,Integer>> related_same_month_brand;//Other brands that the visitors to this POI visited in the same month as the visit to this POI where customer overlap differs by at least 5% from the SafeGraph national average. The value shown for each brand is a percentage representing
+    public ArrayList<HashMap<Brand,Integer>> related_same_month_brand;
+    
     public int[] popularity_by_hour;//A mapping of hour of day to the number of visits in each hour over the course of the date range in local time. First element in the array corresponds to the hour of midnight to 1 am. (24 hours)
     public ArrayList<HashMap<String,Integer>> popularity_by_day;//A mapping of day of week to the number of visits on each day (local time) in the course of the date range. (7 days with day of the week names)
     public String device_type;//The number of visitors to the POI that are using android vs. ios.
