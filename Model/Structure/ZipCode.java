@@ -12,4 +12,6 @@ package COVID_AgentBasedSimulation.Model.Structure;
  */
 public class ZipCode {
     public int code;
+    public float lat;
+    public float lon;
 }
