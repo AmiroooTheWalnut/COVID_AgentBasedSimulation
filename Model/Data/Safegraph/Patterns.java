@@ -35,23 +35,13 @@ import org.json.JSONObject;
  * @author user
  */
 public class Patterns implements Serializable {
-
     static final long serialVersionUID = softwareVersion;
-
-    String[] standardHeaderNames = new String[]{"placekey", "safegraph_place_id", "parent_placekey",
-        "parent_safegraph_place_id", "location_name", "street_address", "city", "region", "postal_code",
-        "safegraph_brand_ids", "brands", "date_range_start", "date_range_end", "raw_visit_counts",
-        "raw_visitor_counts", "visits_by_day", "poi_cbg", "visitor_home_cbgs", "visitor_daytime_cbgs",
-        "visitor_country_of_origin", "distance_from_home", "median_dwell", "bucketed_dwell_times",
-        "related_same_day_brand", "related_same_month_brand", "popularity_by_hour", "popularity_by_day",
-        "device_type", "carrier_name"};
 
     public String name;
 
     public ArrayList<PatternsRecordProcessed> records;
-    public transient ArrayList<PatternsRecordProcessed> recordsProcessed;
 
-    public void readMultiplePatternData(String directoryName, String patternName, boolean isParallel, int numCPU) {
+    public void preprocessMonthPatterns(String directoryName, String patternName, boolean isParallel, int numCPU) {
         name = patternName;
         records = new ArrayList();
         File directory = new File(directoryName);
@@ -101,7 +91,6 @@ public class Patterns implements Serializable {
             patterns = null;
             System.out.println("Data read: " + i);
         }
-
     }
 
     public ArrayList<PatternsRecordProcessed> readData(String fileName, boolean isParallel, int numCPU) {
@@ -111,9 +100,6 @@ public class Patterns implements Serializable {
             CsvReader cSVReader = new CsvReader();
             cSVReader.setContainsHeader(true);
             CsvContainer data = cSVReader.read(patternFile, StandardCharsets.UTF_8);
-            PatternsRecordProcessed tempPatternRow = new PatternsRecordProcessed();
-            List<String> header = data.getHeader();
-
             if (isParallel == true) {
                 int numProcessors = numCPU;
                 if (numProcessors > Runtime.getRuntime().availableProcessors()) {
@@ -141,21 +127,21 @@ public class Patterns implements Serializable {
                     recordsLocal.addAll(parallelPatternParsers[i].records);
                 }
             } else {
-                String[] safegraphPatternFieldNames = new String[tempPatternRow.getClass().getFields().length];
-                for (int i = 0; i < safegraphPatternFieldNames.length; i++) {
-                    safegraphPatternFieldNames[i] = tempPatternRow.getClass().getFields()[i].getName();
-                }
-                String[] safegraphPatternFieldTypeNames = new String[tempPatternRow.getClass().getFields().length];
-                for (int i = 0; i < safegraphPatternFieldTypeNames.length; i++) {
-                    safegraphPatternFieldTypeNames[i] = tempPatternRow.getClass().getFields()[i].getType().getName();
-                }
                 int counter = 0;
                 int largerCounter = 0;
                 int counterInterval = 1000;
                 for (int i = 0; i < data.getRowCount(); i++) {
                     CsvRow row = data.getRow(i);
                     PatternsRecordProcessed patternsRecordProcessed = new PatternsRecordProcessed();
-                    String field = row.getField("date_range_start");
+                    String field = row.getField("placeKey");
+                    if (field.length() > 0) {
+                        patternsRecordProcessed.placeKey=field;
+                    }
+                    field = row.getField("poi_cbg");
+                    if (field.length() > 0) {
+                        patternsRecordProcessed.poi_cbg=Long.parseLong(field);
+                    }
+                    field = row.getField("date_range_start");
                     if (field.length() > 0) {
                         int startOffset = Integer.parseInt(field.substring(19, 21));
                         DateTimeFormatter startFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")

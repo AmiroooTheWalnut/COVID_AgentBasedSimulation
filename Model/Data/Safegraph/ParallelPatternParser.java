@@ -24,7 +24,6 @@ import org.json.JSONObject;
  * @author user
  */
 public class ParallelPatternParser extends ParallelProcessor {
-
     public ArrayList<PatternsRecordProcessed> records;
     CsvContainer myData;
     int myThreadIndex;
@@ -41,16 +40,6 @@ public class ParallelPatternParser extends ParallelProcessor {
                 System.out.println(myStartIndex);
                 System.out.println(myEndIndex);
                 ArrayList<PatternsRecordProcessed> localRecords=new ArrayList();
-                PatternsRecordRaw tempPatternRow = new PatternsRecordRaw();
-                List<String> header = myData.getHeader();
-                String[] safegraphPatternFieldNames=new String[tempPatternRow.getClass().getFields().length];
-                for(int i=0;i<safegraphPatternFieldNames.length;i++){
-                    safegraphPatternFieldNames[i]=tempPatternRow.getClass().getFields()[i].getName();
-                }
-                String[] safegraphPatternFieldTypeNames=new String[tempPatternRow.getClass().getFields().length];
-                for(int i=0;i<safegraphPatternFieldTypeNames.length;i++){
-                    safegraphPatternFieldTypeNames[i]=tempPatternRow.getClass().getFields()[i].getType().getName();
-                }
                 int counter=0;
                 int largerCounter=0;
                 int counterInterval=1000;

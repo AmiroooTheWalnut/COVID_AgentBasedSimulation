@@ -5,15 +5,15 @@
  */
 package COVID_AgentBasedSimulation.GUI;
 
-import COVID_AgentBasedSimulation.Model.Data.Safegraph.AllPatterns;
-import COVID_AgentBasedSimulation.Model.Data.Safegraph.Patterns;
+import COVID_AgentBasedSimulation.Model.Data.Safegraph.AllSafegraphPlaces;
+import COVID_AgentBasedSimulation.Model.Data.Safegraph.SafegraphPlaces;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.Safegraph;
 
 /**
  *
  * @author user
  */
-public class ManualLoadSafegraphDialog extends javax.swing.JDialog {
+public class ManualLoadPlacesDialog extends javax.swing.JDialog {
 
     MainFrame myParent;
     String[] patternsList;
@@ -21,14 +21,14 @@ public class ManualLoadSafegraphDialog extends javax.swing.JDialog {
     /**
      * Creates new form ManualLoadSafegraphDialog
      */
-    public ManualLoadSafegraphDialog(java.awt.Frame parent, boolean modal) {
+    public ManualLoadPlacesDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         myParent = (MainFrame) parent;
     }
 
     public void refreshList() {
-        patternsList = AllPatterns.detectAllPatterns("./datasets/");
+        patternsList = AllSafegraphPlaces.detectAllPlaces("./datasets/");
         jList1.setModel(new javax.swing.AbstractListModel() {
             @Override
             public int getSize() {
@@ -78,12 +78,12 @@ public class ManualLoadSafegraphDialog extends javax.swing.JDialog {
                 .addContainerGap()
                 .addComponent(jButton1)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 284, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 390, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 363, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton1)
                 .addContainerGap())
@@ -93,17 +93,11 @@ public class ManualLoadSafegraphDialog extends javax.swing.JDialog {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(94, Short.MAX_VALUE))
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
@@ -111,61 +105,19 @@ public class ManualLoadSafegraphDialog extends javax.swing.JDialog {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         if (jList1.getSelectedIndex() > -1) {
-            Patterns patterns = Safegraph.loadPatternsKryo("./datasets/" + jList1.getSelectedValue() + "/processedData.bin");
+            SafegraphPlaces safegraphPlaces = Safegraph.loadSafegraphPlacesKryo("./datasets/" + jList1.getSelectedValue() + "/processedData.bin");
             boolean isUnique = true;
             for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.patternsList.size(); i++) {
-                if (myParent.mainModel.safegraph.allPatterns.patternsList.get(i).name.equals(patterns.name)) {
+                if (myParent.mainModel.safegraph.allPatterns.patternsList.get(i).name.equals(safegraphPlaces.name)) {
                     isUnique = false;
                 }
             }
             if (isUnique == true) {
-                myParent.mainModel.safegraph.allPatterns.patternsList.add(patterns);
+                myParent.mainModel.safegraph.allSafegraphPlaces.safegraphPlacesList.add(safegraphPlaces);
                 myParent.refreshPatternsList();
             }
         }
     }//GEN-LAST:event_jButton1ActionPerformed
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(ManualLoadSafegraphDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(ManualLoadSafegraphDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(ManualLoadSafegraphDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(ManualLoadSafegraphDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the dialog */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                ManualLoadSafegraphDialog dialog = new ManualLoadSafegraphDialog(new javax.swing.JFrame(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    @Override
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;

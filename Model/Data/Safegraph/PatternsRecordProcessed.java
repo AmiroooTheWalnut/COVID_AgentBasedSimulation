@@ -18,11 +18,11 @@ import java.util.HashMap;
  * @author user
  */
 public class PatternsRecordProcessed implements Serializable {
-    
     static final long serialVersionUID = softwareVersion;
     
     public transient SafegraphPlace place;
     public String placeKey;
+    public long poi_cbg;
 //    public SafegraphPlace parent_place;//NEEDS TO KNOW ALL PLACES BEFOREHAND!
 //    public ArrayList<Brand> brands;
     public LocalDateTime date_range_start;

@@ -7,7 +7,6 @@ package COVID_AgentBasedSimulation.Model.Data.Safegraph;
 
 import static COVID_AgentBasedSimulation.Model.MainModel.softwareVersion;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -15,16 +14,16 @@ import java.util.ArrayList;
  *
  * @author user
  */
-public class AllPatterns implements Serializable {
+public class AllSafegraphPlaces implements Serializable {
     static final long serialVersionUID = softwareVersion;
-    public ArrayList<Patterns> patternsList;
+    public ArrayList<SafegraphPlaces> safegraphPlacesList;
     
-    public static String[] detectAllPatterns(String directoryString){
+    public static String[] detectAllPlaces(String directoryString){
         File directory=new File(directoryString);
         String[] fileDirectoryList = directory.list();
         ArrayList<String> detectedDirectoriesArrayList=new ArrayList();
         for(int i=0;i<fileDirectoryList.length;i++){
-            if(fileDirectoryList[i].toLowerCase().contains("patterns")){
+            if(fileDirectoryList[i].toLowerCase().contains("core_poi")){
                 detectedDirectoriesArrayList.add(fileDirectoryList[i]);
             }
         }
@@ -34,9 +33,5 @@ public class AllPatterns implements Serializable {
         }
         return detectedDirectories;
     }
-    
-    
-    
-    
     
 }

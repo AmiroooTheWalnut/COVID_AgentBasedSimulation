@@ -5,22 +5,22 @@
  */
 package COVID_AgentBasedSimulation.GUI;
 
-import COVID_AgentBasedSimulation.Model.Data.Safegraph.AllPatterns;
-import COVID_AgentBasedSimulation.Model.Data.Safegraph.Patterns;
+import COVID_AgentBasedSimulation.Model.Data.Safegraph.AllSafegraphPlaces;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.Safegraph;
+import COVID_AgentBasedSimulation.Model.Data.Safegraph.SafegraphPlaces;
 
 /**
  *
  * @author user
  */
-public class ManualCompressSafegraphDialog extends javax.swing.JDialog {
+public class ManualCompressPlacesDialog extends javax.swing.JDialog {
 
-    String[] patternsList;
+    String[] placesList;
     
     /**
      * Creates new form ManualCompressDialog
      */
-    public ManualCompressSafegraphDialog(java.awt.Frame parent, boolean modal) {
+    public ManualCompressPlacesDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         jSpinner1.setModel(new javax.swing.SpinnerNumberModel(Runtime.getRuntime().availableProcessors()/2, 1, Runtime.getRuntime().availableProcessors(), 1));
@@ -71,12 +71,12 @@ public class ManualCompressSafegraphDialog extends javax.swing.JDialog {
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(103, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 329, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 353, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jSpinner1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -90,17 +90,11 @@ public class ManualCompressSafegraphDialog extends javax.swing.JDialog {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(79, Short.MAX_VALUE))
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
@@ -108,66 +102,23 @@ public class ManualCompressSafegraphDialog extends javax.swing.JDialog {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         if(jList1.getSelectedIndex()>-1){
-            Patterns patterns=new Patterns();
-            patterns.readMultiplePatternData("./datasets/"+jList1.getSelectedValue(),jList1.getSelectedValue(),true,(int)jSpinner1.getValue());
-            Safegraph.savePatternsKryo("./datasets/"+jList1.getSelectedValue()+"/processedData", patterns);
+            SafegraphPlaces safegraphPlaces=new SafegraphPlaces();
+            safegraphPlaces.preprocessMonthCorePlaces("./datasets/"+jList1.getSelectedValue(),jList1.getSelectedValue(),true,(int)jSpinner1.getValue());
+            Safegraph.saveSafegraphPlacesKryo("./datasets/"+jList1.getSelectedValue()+"/processedData", safegraphPlaces);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     public void refreshList(){
-        patternsList=AllPatterns.detectAllPatterns("./datasets/");
+        placesList=AllSafegraphPlaces.detectAllPlaces("./datasets/");
         jList1.setModel(new javax.swing.AbstractListModel() {
             @Override
             public int getSize() {
-                return patternsList.length;
+                return placesList.length;
             }
 
             @Override
             public Object getElementAt(int index) {
-                return patternsList[index];
-            }
-        });
-    }
-    
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(ManualCompressSafegraphDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(ManualCompressSafegraphDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(ManualCompressSafegraphDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(ManualCompressSafegraphDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-        //</editor-fold>
-
-        /* Create and display the dialog */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                ManualCompressSafegraphDialog dialog = new ManualCompressSafegraphDialog(new javax.swing.JFrame(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    @Override
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
+                return placesList[index];
             }
         });
     }

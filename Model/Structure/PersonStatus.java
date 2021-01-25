@@ -1,5 +1,7 @@
 package COVID_AgentBasedSimulation.Model.Structure;
 
+import java.io.Serializable;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -10,7 +12,7 @@ package COVID_AgentBasedSimulation.Model.Structure;
  *
  * @author user
  */
-public class PersonStatus {
+public class PersonStatus implements Serializable {
     public static byte HEALTHY=0;
     public static byte INFECTED=1;
 }

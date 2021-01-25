@@ -5,16 +5,52 @@
  */
 package COVID_AgentBasedSimulation.Model.Structure;
 
+import static COVID_AgentBasedSimulation.Model.MainModel.softwareVersion;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  *
  * @author user
  */
-public class CensusTract {
+public class CensusTract implements Serializable {
+    static final long serialVersionUID = softwareVersion;
     public int id;
+    public float lat;
+    public float lon;
     public float size;
-    ArrayList<CensusBlock> censusBlocks;
+    public transient boolean isLatLonCalculated=false;
+    public ArrayList<CensusBlock> censusBlocks;
+    
+    public void getLatLonSizeFromChildren(){
+        float minLat = Float.MAX_VALUE;
+        float maxLat = -Float.MAX_VALUE;
+        float minLon = Float.MAX_VALUE;
+        float maxLon = -Float.MAX_VALUE;
+        float latCumulative=0;
+        float lonCumulative=0;
+        for (int i = 0; i < censusBlocks.size(); i++) {
+            float childLat = censusBlocks.get(i).lat;
+            float childLon = censusBlocks.get(i).lon;
+            if (childLat > maxLat) {
+                maxLat = childLat;
+            }
+            if (childLat < minLat) {
+                minLat = childLat;
+            }
+            if (childLon > maxLon) {
+                maxLon = childLon;
+            }
+            if (childLon < minLon) {
+                minLon = childLon;
+            }
+            latCumulative=latCumulative+childLat;
+            lonCumulative=lonCumulative+childLon;
+        }
+        lat = latCumulative / (float)censusBlocks.size();
+        lon = lonCumulative / (float)censusBlocks.size();
+        size = Math.max(maxLat - minLat, maxLon - minLon);
+    }
     
     public boolean isNewCensusBlockUnique(long input) {
         if (censusBlocks == null) {

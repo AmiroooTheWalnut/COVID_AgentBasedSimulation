@@ -1,5 +1,7 @@
 package COVID_AgentBasedSimulation.Model.Structure;
 
+import static COVID_AgentBasedSimulation.Model.MainModel.softwareVersion;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /*
@@ -11,13 +13,49 @@ import java.util.ArrayList;
  *
  * @author user
  */
-public class Country {
-
+public class Country implements Serializable {
+    static final long serialVersionUID = softwareVersion;
     public String name;
     public float lat;
     public float lon;
-    ArrayList<State> states;
+    public float size;
+    public transient boolean isLatLonCalculated=false;
+    public ArrayList<State> states;
 
+    public void getLatLonSizeFromChildren(){
+        float minLat = Float.MAX_VALUE;
+        float maxLat = -Float.MAX_VALUE;
+        float minLon = Float.MAX_VALUE;
+        float maxLon = -Float.MAX_VALUE;
+        float latCumulative=0;
+        float lonCumulative=0;
+        for (int i = 0; i < states.size(); i++) {
+            if(states.get(i).isLatLonCalculated==false){
+                states.get(i).getLatLonSizeFromChildren();
+                states.get(i).isLatLonCalculated=true;
+            }
+            float childLat = states.get(i).lat;
+            float childLon = states.get(i).lon;
+            if (childLat > maxLat) {
+                maxLat = childLat;
+            }
+            if (childLat < minLat) {
+                minLat = childLat;
+            }
+            if (childLon > maxLon) {
+                maxLon = childLon;
+            }
+            if (childLon < minLon) {
+                minLon = childLon;
+            }
+            latCumulative=latCumulative+childLat;
+            lonCumulative=lonCumulative+childLon;
+        }
+        lat = latCumulative / (float)states.size();
+        lon = lonCumulative / (float)states.size();
+        size = Math.max(maxLat - minLat, maxLon - minLon);
+    }
+    
     public boolean isNewStateUnique(String input) {
         if (states == null) {
             states = new ArrayList();

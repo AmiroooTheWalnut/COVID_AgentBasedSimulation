@@ -1,6 +1,8 @@
 package COVID_AgentBasedSimulation.Model.Structure;
 
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.SafegraphPlace;
+import static COVID_AgentBasedSimulation.Model.MainModel.softwareVersion;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /*
@@ -14,7 +16,8 @@ import java.util.ArrayList;
  *
  * @author user
  */
-public class CensusBlock {
+public class CensusBlock implements Serializable {
+    static final long serialVersionUID = softwareVersion;
     public long id;
     public float lat;
     public float lon;

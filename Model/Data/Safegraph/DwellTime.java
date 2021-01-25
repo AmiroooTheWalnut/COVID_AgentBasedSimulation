@@ -5,12 +5,15 @@
  */
 package COVID_AgentBasedSimulation.Model.Data.Safegraph;
 
+import static COVID_AgentBasedSimulation.Model.MainModel.softwareVersion;
+import java.io.Serializable;
+
 /**
  *
  * @author user
  */
-public class DwellTime {
-
+public class DwellTime implements Serializable {
+    static final long serialVersionUID = softwareVersion;
     public int number;
     public short[] dwellDuration;//FIRST INDEX IS START SECOND INDEX IS END FOR THE RANGE OF DWELL TIME IN MINUTES
 

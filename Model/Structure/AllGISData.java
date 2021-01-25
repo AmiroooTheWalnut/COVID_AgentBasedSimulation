@@ -5,6 +5,7 @@
  */
 package COVID_AgentBasedSimulation.Model.Structure;
 
+import static COVID_AgentBasedSimulation.Model.MainModel.softwareVersion;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryo.util.DefaultInstantiatorStrategy;
@@ -14,6 +15,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,8 +27,8 @@ import org.objenesis.strategy.StdInstantiatorStrategy;
  *
  * @author user
  */
-public class AllGISData {
-
+public class AllGISData implements Serializable {
+    static final long serialVersionUID = softwareVersion;
     public ArrayList<Country> countries;
 
     public void processUSData(String geographyFile) {
@@ -81,6 +83,9 @@ public class AllGISData {
                     System.out.println("Num rows read: " + largerCounter * counterInterval);
                 }
             }
+            for(int i=0;i<countries.size();i++){
+                countries.get(i).getLatLonSizeFromChildren();
+            }
             AllGISData.saveAllGISDataKryo("./datasets/ProcessedGeoData", this);
         } catch (IOException ex) {
             Logger.getLogger(AllGISData.class.getName()).log(Level.SEVERE, null, ex);
@@ -92,6 +97,8 @@ public class AllGISData {
         float maxLat = Float.MIN_VALUE;
         float minLon = Float.MAX_VALUE;
         float maxLon = Float.MIN_VALUE;
+        float latCumulative=0;
+        float lonCumulative=0;
         for (int i = 0; i < input.length(); i++) {
             float lat = input.getJSONArray(i).getNumber(0).floatValue();
             float lon = input.getJSONArray(i).getNumber(1).floatValue();
@@ -107,10 +114,12 @@ public class AllGISData {
             if (lon < minLon) {
                 minLon = lon;
             }
+            latCumulative=latCumulative+lat;
+            lonCumulative=lonCumulative+lon;
         }
         float[] results = new float[3];
-        results[0] = (maxLat + minLat) / 2f;
-        results[1] = (maxLon + minLon) / 2f;
+        results[0] = latCumulative / (float)input.length();
+        results[1] = lonCumulative / (float)input.length();
         results[2] = Math.max(maxLat - minLat, maxLon - minLon);
         return results;
     }

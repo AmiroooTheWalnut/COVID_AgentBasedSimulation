@@ -1,5 +1,7 @@
 package COVID_AgentBasedSimulation.Model.Structure;
 
+import static COVID_AgentBasedSimulation.Model.MainModel.softwareVersion;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /*
@@ -11,14 +13,50 @@ import java.util.ArrayList;
  *
  * @author user
  */
-public class State {
-
+public class State implements Serializable {
+    static final long serialVersionUID = softwareVersion;
     public String name;
     public byte id;
     public float lat;
     public float lon;
+    public float size;
+    public transient boolean isLatLonCalculated=false;
     public ArrayList<County> counties;
-
+    
+    public void getLatLonSizeFromChildren(){
+        float minLat = Float.MAX_VALUE;
+        float maxLat = -Float.MAX_VALUE;
+        float minLon = Float.MAX_VALUE;
+        float maxLon = -Float.MAX_VALUE;
+        float latCumulative=0;
+        float lonCumulative=0;
+        for (int i = 0; i < counties.size(); i++) {
+            if(counties.get(i).isLatLonCalculated==false){
+                counties.get(i).getLatLonSizeFromChildren();
+                counties.get(i).isLatLonCalculated=true;
+            }
+            float childLat = counties.get(i).lat;
+            float childLon = counties.get(i).lon;
+            if (childLat > maxLat) {
+                maxLat = childLat;
+            }
+            if (childLat < minLat) {
+                minLat = childLat;
+            }
+            if (childLon > maxLon) {
+                maxLon = childLon;
+            }
+            if (childLon < minLon) {
+                minLon = childLon;
+            }
+            latCumulative=latCumulative+childLat;
+            lonCumulative=lonCumulative+childLon;
+        }
+        lat = latCumulative / (float)counties.size();
+        lon = lonCumulative / (float)counties.size();
+        size = Math.max(maxLat - minLat, maxLon - minLon);
+    }
+    
     public boolean isNewCountyUnique(String input) {
         if (counties == null) {
             counties = new ArrayList();
@@ -77,7 +115,7 @@ public class State {
             return true;
         } else {
             for (int i = 0; i < counties.size(); i++) {
-                if (counties.get(i).fipsCode == input) {
+                if (counties.get(i).id == input) {
                     return false;
                 }
             }
@@ -91,7 +129,7 @@ public class State {
             return null;
         } else {
             for (int i = 0; i < counties.size(); i++) {
-                if (counties.get(i).fipsCode == input) {
+                if (counties.get(i).id == input) {
                     return counties.get(i);
                 }
             }
@@ -103,18 +141,18 @@ public class State {
         if (counties == null) {
             counties = new ArrayList();
             County temp = new County();
-            temp.fipsCode = input;
+            temp.id = input;
             counties.add(temp);
             return counties.get(0);
         } else {
             for (int i = 0; i < counties.size(); i++) {
-                if (counties.get(i).fipsCode == input) {
+                if (counties.get(i).id == input) {
                     return counties.get(i);
                 }
             }
         }
         County temp = new County();
-        temp.fipsCode = input;
+        temp.id = input;
         counties.add(temp);
         return counties.get(counties.size() - 1);
     }

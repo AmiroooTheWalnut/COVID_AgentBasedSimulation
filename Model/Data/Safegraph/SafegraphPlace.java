@@ -1,6 +1,8 @@
 package COVID_AgentBasedSimulation.Model.Data.Safegraph;
 
+import static COVID_AgentBasedSimulation.Model.MainModel.softwareVersion;
 import COVID_AgentBasedSimulation.Model.Structure.CensusBlock;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /*
@@ -13,18 +15,18 @@ import java.util.ArrayList;
  *
  * @author user
  */
-public class SafegraphPlace {
+public class SafegraphPlace implements Serializable {
+    static final long serialVersionUID = softwareVersion;
 //    public String id;//DROPPED IT IS GOING TO BE DEPRECIATED
+    public transient SafegraphPlace parent;
     public String placeKey;
-    public SafegraphPlace parent;
     public float lat;
     public float lon;
     public ArrayList<Brand> brands;
     public Category category;
     // SUB CATEGORY IS DROPPED
     public int naics_code;
-    public CensusBlock censusBlock;
-    public long censusBlockId;
+    public transient CensusBlock censusBlock;
 //    public String location_name;//DROPPED
 //    public String street_address;//DROPPED
 //    public City city;
