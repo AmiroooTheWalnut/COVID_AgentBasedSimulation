@@ -16,7 +16,7 @@ import java.util.ArrayList;
  */
 public class AllSafegraphPlaces implements Serializable {
     static final long serialVersionUID = softwareVersion;
-    public ArrayList<SafegraphPlaces> safegraphPlacesList;
+    public ArrayList<SafegraphPlaces> monthlySafegraphPlacesList;
     
     public static String[] detectAllPlaces(String directoryString){
         File directory=new File(directoryString);

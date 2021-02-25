@@ -106,14 +106,29 @@ public class ManualLoadPatternsDialog extends javax.swing.JDialog {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         if (jList1.getSelectedIndex() > -1) {
             Patterns patterns = Safegraph.loadPatternsKryo("./datasets/" + jList1.getSelectedValue() + "/processedData.bin");
+            System.out.println("PATTERNS SIZE: "+patterns.patternRecords.size());
+            double avg_num_visitors=0;
+            for(int i=0;i<patterns.patternRecords.size();i++){
+                avg_num_visitors=avg_num_visitors+patterns.patternRecords.get(i).raw_visitor_counts;
+            }
+            avg_num_visitors=avg_num_visitors/(double)patterns.patternRecords.size();
+            System.out.println("PATTERNS AVERAGE VISITORS: "+avg_num_visitors);
+            
+            double avg_num_visits=0;
+            for(int i=0;i<patterns.patternRecords.size();i++){
+                avg_num_visits=avg_num_visits+patterns.patternRecords.get(i).raw_visit_counts;
+            }
+            avg_num_visits=avg_num_visits/(double)patterns.patternRecords.size();
+            System.out.println("PATTERNS AVERAGE VISITS: "+avg_num_visits);
+            
             boolean isUnique = true;
-            for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.patternsList.size(); i++) {
-                if (myParent.mainModel.safegraph.allPatterns.patternsList.get(i).name.equals(patterns.name)) {
+            for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.size(); i++) {
+                if (myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).name.equals(patterns.name)) {
                     isUnique = false;
                 }
             }
             if (isUnique == true) {
-                myParent.mainModel.safegraph.allPatterns.patternsList.add(patterns);
+                myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.add(patterns);
                 myParent.refreshPatternsList();
             }
         }

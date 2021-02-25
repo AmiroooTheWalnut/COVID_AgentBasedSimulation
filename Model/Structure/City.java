@@ -14,10 +14,7 @@ import java.io.Serializable;
  *
  * @author user
  */
-public class City implements Serializable {
+public class City extends Marker implements Serializable {
     static final long serialVersionUID = softwareVersion;
     public String name;
-    public float lat;
-    public float lon;
-    public float size;
 }

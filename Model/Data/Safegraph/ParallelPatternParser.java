@@ -11,11 +11,10 @@ import esmaieeli.utilities.taskThreading.ParallelProcessor;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -37,8 +36,8 @@ public class ParallelPatternParser extends ParallelProcessor {
         myThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                System.out.println(myStartIndex);
-                System.out.println(myEndIndex);
+                System.out.println("Thread: "+threadIndex+" startIndex: "+myStartIndex);
+                System.out.println("Thread: "+threadIndex+" endIndex: "+myEndIndex);
                 ArrayList<PatternsRecordProcessed> localRecords=new ArrayList();
                 int counter=0;
                 int largerCounter=0;
@@ -46,13 +45,29 @@ public class ParallelPatternParser extends ParallelProcessor {
                 for (int i = myStartIndex; i < myEndIndex; i++) {
                     CsvRow row = myData.getRow(i);
                     PatternsRecordProcessed patternsRecordProcessed = new PatternsRecordProcessed();
-                    String field = row.getField("date_range_start");
+                    String field = row.getField("placekey");
+                    if (field == null) {
+                        field = row.getField("safegraph_place_id");
+                        if (field.length() > 0) {
+                            patternsRecordProcessed.placeKey = field;
+                        }
+                    } else {
+                        if (field.length() > 0) {
+                            patternsRecordProcessed.placeKey = field;
+                        }
+                    }
+                    field = row.getField("poi_cbg");
+                    if (field.length() > 0) {
+                        patternsRecordProcessed.poi_cbg = Long.parseLong(field);
+                    }
+                    field = row.getField("date_range_start");
                     if (field.length() > 0) {
                         int startOffset = Integer.parseInt(field.substring(19, 21));
                         DateTimeFormatter startFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
-                                .withZone(ZoneId.ofOffset("GMT", ZoneOffset.ofHours(startOffset)));
+                                .withZone(ZoneId.ofOffset("UTC", ZoneOffset.ofHours(startOffset)));
                         LocalDateTime startDate = LocalDateTime.parse(field.substring(0, 19), startFormatter);
-                        patternsRecordProcessed.date_range_start = startDate;
+                        ZonedDateTime zonedStartDate = startDate.atZone(ZoneOffset.ofHours(startOffset));
+                        patternsRecordProcessed.date_range_start = zonedStartDate;
                     }
 
                     field = row.getField("date_range_end");
@@ -61,7 +76,8 @@ public class ParallelPatternParser extends ParallelProcessor {
                         DateTimeFormatter endFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
                                 .withZone(ZoneId.ofOffset("GMT", ZoneOffset.ofHours(endOffset)));
                         LocalDateTime endDate = LocalDateTime.parse(field.substring(0, 19), endFormatter);
-                        patternsRecordProcessed.date_range_end = endDate;
+                        ZonedDateTime zonedEndDate = endDate.atZone(ZoneOffset.ofHours(endOffset));
+                        patternsRecordProcessed.date_range_end = zonedEndDate;
                     }
 
                     field = row.getField("raw_visit_counts");
@@ -90,9 +106,9 @@ public class ParallelPatternParser extends ParallelProcessor {
                         try {
                             JSONObject object = new JSONObject(field);
                             JSONArray names = object.names();
-                            HashMap<Long, Integer> temp = new HashMap();
+                            ArrayList<LongIntTuple> temp = new ArrayList();
                             for (int k = 0; k < names.length(); k++) {
-                                temp.put(Long.parseLong(names.getString(k)), object.getInt(names.getString(k)));
+                                temp.add(new LongIntTuple(Long.parseLong(names.getString(k)), object.getInt(names.getString(k))));
                             }
                             patternsRecordProcessed.visitor_home_cbgs = temp;
                         } catch (Exception ex) {
@@ -105,9 +121,9 @@ public class ParallelPatternParser extends ParallelProcessor {
                         try {
                             JSONObject object = new JSONObject(field);
                             JSONArray names = object.names();
-                            HashMap<Long, Integer> temp = new HashMap();
+                            ArrayList<LongIntTuple> temp = new ArrayList();
                             for (int k = 0; k < names.length(); k++) {
-                                temp.put(Long.parseLong(names.getString(k)), object.getInt(names.getString(k)));
+                                temp.add(new LongIntTuple(Long.parseLong(names.getString(k)), object.getInt(names.getString(k))));
                             }
                             patternsRecordProcessed.visitor_daytime_cbgs = temp;
                         } catch (Exception ex) {
@@ -185,11 +201,11 @@ public class ParallelPatternParser extends ParallelProcessor {
                         }
                     }
                     localRecords.add(patternsRecordProcessed);
-                    counter=counter+1;
-                    if(counter>counterInterval){
-                        largerCounter=largerCounter+1;
-                        counter=0;
-                        System.out.println("Thread number: "+myThreadIndex+" num rows read: "+largerCounter*counterInterval);
+                    counter = counter + 1;
+                    if (counter > counterInterval) {
+                        largerCounter = largerCounter + 1;
+                        counter = 0;
+                        System.out.println("Num rows read: " + largerCounter * counterInterval);
                     }
                 }
                 records.addAll(localRecords);

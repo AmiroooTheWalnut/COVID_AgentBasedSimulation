@@ -13,14 +13,11 @@ import java.util.ArrayList;
  *
  * @author user
  */
-public class CensusTract implements Serializable {
+public class CensusTract extends Marker implements Serializable {
     static final long serialVersionUID = softwareVersion;
     public int id;
-    public float lat;
-    public float lon;
-    public float size;
     public transient boolean isLatLonCalculated=false;
-    public ArrayList<CensusBlock> censusBlocks;
+    public ArrayList<CensusBlockGroup> censusBlocks;
     
     public void getLatLonSizeFromChildren(){
         float minLat = Float.MAX_VALUE;
@@ -66,7 +63,7 @@ public class CensusTract implements Serializable {
         return true;
     }
     
-    public CensusBlock findCensusBlock(long input) {
+    public CensusBlockGroup findCensusBlock(long input) {
         if (censusBlocks == null) {
             censusBlocks = new ArrayList();
             return null;
@@ -80,10 +77,10 @@ public class CensusTract implements Serializable {
         return null;
     }
     
-    public CensusBlock findAndInsertCensusBlock(long input) {
+    public CensusBlockGroup findAndInsertCensusBlock(long input) {
         if (censusBlocks == null) {
             censusBlocks = new ArrayList();
-            CensusBlock temp = new CensusBlock();
+            CensusBlockGroup temp = new CensusBlockGroup();
             temp.id = input;
             censusBlocks.add(temp);
             return censusBlocks.get(0);
@@ -94,7 +91,7 @@ public class CensusTract implements Serializable {
                 }
             }
         }
-        CensusBlock temp = new CensusBlock();
+        CensusBlockGroup temp = new CensusBlockGroup();
         temp.id = input;
         censusBlocks.add(temp);
         return censusBlocks.get(censusBlocks.size()-1);

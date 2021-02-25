@@ -14,5 +14,6 @@ import java.io.Serializable;
  */
 public class Person implements Serializable {
     public int index;
-    public PersonStatus personStatus;
+    public PersonStatus personStatus=new PersonStatus();
+    public CensusBlockGroup home;
 }

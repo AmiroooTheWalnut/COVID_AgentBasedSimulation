@@ -5,7 +5,9 @@
  */
 package COVID_AgentBasedSimulation.GUI;
 
+import COVID_AgentBasedSimulation.Model.Structure.Marker;
 import de.fhpotsdam.unfolding.geo.Location;
+import java.util.ArrayList;
 
 /**
  *
@@ -14,19 +16,32 @@ import de.fhpotsdam.unfolding.geo.Location;
 public class PreviewDialog extends javax.swing.JDialog {
 
     MainFrame myParent;
-    
+
+    Location oldLocationDebugging;
+
     /**
      * Creates new form PreviewDialog
      */
     public PreviewDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        myParent=(MainFrame)parent;
+        myParent = (MainFrame) parent;
         refreshLists();
-        
+        ArrayList<String> result = myParent.mainModel.safegraph.checkMonthAvailability();
+        jList6.setModel(new javax.swing.AbstractListModel() {
+            @Override
+            public int getSize() {
+                return result.size();
+            }
+
+            @Override
+            public Object getElementAt(int index) {
+                return result.get(index);
+            }
+        });
     }
-    
-    public void refreshLists(){
+
+    public void refreshLists() {
         jList1.setModel(new javax.swing.AbstractListModel() {
             @Override
             public int getSize() {
@@ -67,7 +82,10 @@ public class PreviewDialog extends javax.swing.JDialog {
         jPanel6 = new javax.swing.JPanel();
         jScrollPane6 = new javax.swing.JScrollPane();
         jList6 = new javax.swing.JList<>();
-        jButton1 = new javax.swing.JButton();
+        jSlider1 = new javax.swing.JSlider();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -89,7 +107,7 @@ public class PreviewDialog extends javax.swing.JDialog {
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 366, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 460, Short.MAX_VALUE)
         );
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("State/Province"));
@@ -156,9 +174,14 @@ public class PreviewDialog extends javax.swing.JDialog {
             .addComponent(jScrollPane4)
         );
 
-        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Census block"));
+        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Census block group"));
 
         jList5.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jList5.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                jList5ValueChanged(evt);
+            }
+        });
         jScrollPane5.setViewportView(jList5);
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
@@ -174,25 +197,36 @@ public class PreviewDialog extends javax.swing.JDialog {
 
         jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Month"));
 
+        jList6.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                jList6ValueChanged(evt);
+            }
+        });
         jScrollPane6.setViewportView(jList6);
 
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
         jPanel6Layout.setHorizontalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 176, Short.MAX_VALUE)
+            .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 251, Short.MAX_VALUE)
+            .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 337, Short.MAX_VALUE)
         );
 
-        jButton1.setText("jButton1");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+        jSlider1.setValue(4);
+        jSlider1.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                jSlider1StateChanged(evt);
             }
         });
+
+        jLabel1.setText("jLabel1");
+
+        jLabel2.setText("Size:");
+
+        jLabel3.setText("jLabel3");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -208,14 +242,18 @@ public class PreviewDialog extends javax.swing.JDialog {
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jSlider1, javax.swing.GroupLayout.DEFAULT_SIZE, 186, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton1)
-                        .addContainerGap())))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel3)))
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -226,8 +264,14 @@ public class PreviewDialog extends javax.swing.JDialog {
             .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jSlider1, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton1)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(jLabel3))
                 .addContainerGap())
         );
 
@@ -235,76 +279,184 @@ public class PreviewDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jList1ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList1ValueChanged
-        jList2.setModel(new javax.swing.AbstractListModel() {
-            @Override
-            public int getSize() {
-                return myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.size();
-            }
+        if (jList1.getSelectedIndex() > -1) {
+            myParent.child.isShowGISMarkers=true;
+            jList2.clearSelection();
+            jList3.clearSelection();
+            jList4.clearSelection();
+            jList5.clearSelection();
+            jList2.setModel(new javax.swing.AbstractListModel() {
+                @Override
+                public int getSize() {
+                    if (jList1.getSelectedIndex() > -1) {
+                        return myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.size();
+                    } else {
+                        return 0;
+                    }
+                }
 
-            @Override
-            public Object getElementAt(int index) {
-                return myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(index).name;
+                @Override
+                public Object getElementAt(int index) {
+                    if (jList1.getSelectedIndex() > -1) {
+                        return myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(index).name;
+                    } else {
+                        return null;
+                    }
+                }
+            });
+
+            Location loc = new Location(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).lon, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).lat);
+            myParent.child.panZoomTo(loc, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).size);
+            jLabel3.setText(String.valueOf(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).size));
+            String[] childrenNames = new String[myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.size()];
+            ArrayList<Marker> markers = new ArrayList();
+            for (int i = 0; i < childrenNames.length; i++) {
+                childrenNames[i] = myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(i).name;
+                markers.add(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(i));
             }
-        });
-//        myParent.child.map.zoom(8f);
-//        Location loc=new Location(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).lat, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).lon);
-//        myParent.child.panTo(loc);
-//        myParent.child.map.zoom(8f);
+            myParent.child.setDrawingMarkers(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()), markers, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).name, childrenNames,null);
+        }
     }//GEN-LAST:event_jList1ValueChanged
 
     private void jList2ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList2ValueChanged
-        jList3.setModel(new javax.swing.AbstractListModel() {
-            @Override
-            public int getSize() {
-                return myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.size();
-            }
+        if (jList1.getSelectedIndex() > -1 && jList2.getSelectedIndex() > -1) {
+            jList3.clearSelection();
+            jList4.clearSelection();
+            jList5.clearSelection();
+            jList3.setModel(new javax.swing.AbstractListModel() {
+                @Override
+                public int getSize() {
+                    if (jList1.getSelectedIndex() > -1 && jList2.getSelectedIndex() > -1) {
+                        return myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.size();
+                    } else {
+                        return 0;
+                    }
+                }
 
-            @Override
-            public Object getElementAt(int index) {
-                return myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(index).name;
+                @Override
+
+                public Object getElementAt(int index) {
+                    if (jList1.getSelectedIndex() > -1 && jList2.getSelectedIndex() > -1) {
+                        return myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(index).name;
+                    } else {
+                        return null;
+                    }
+                }
             }
-        });
-//        myParent.child.map.zoomTo(6f);
-//        Location loc=new Location(0,0);
-//        myParent.child.panTo(loc);
-//        myParent.child.map.panTo(0, 0);
+            );
+
+            Location loc = new Location(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).lon, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).lat);
+            myParent.child.panZoomTo(loc, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).size);
+            jLabel3.setText(String.valueOf(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).size));
+            String[] childrenNames = new String[myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.size()];
+            ArrayList<Marker> markers = new ArrayList();
+            for (int i = 0; i < childrenNames.length; i++) {
+                childrenNames[i] = myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(i).name;
+                markers.add(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(i));
+            }
+            myParent.child.setDrawingMarkers(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()), markers, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).name, childrenNames,null);
+        }
     }//GEN-LAST:event_jList2ValueChanged
 
     private void jList3ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList3ValueChanged
-        jList4.setModel(new javax.swing.AbstractListModel() {
-            @Override
-            public int getSize() {
-                return myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.size();
-            }
+        if (jList1.getSelectedIndex() > -1 && jList2.getSelectedIndex() > -1 && jList3.getSelectedIndex() > -1) {
+            jList4.clearSelection();
+            jList5.clearSelection();
+            jList4.setModel(new javax.swing.AbstractListModel() {
+                @Override
+                public int getSize() {
+                    if (jList1.getSelectedIndex() > -1 && jList2.getSelectedIndex() > -1 && jList3.getSelectedIndex() > -1) {
+                        return myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.size();
+                    } else {
+                        return 0;
+                    }
+                }
 
-            @Override
-            public Object getElementAt(int index) {
-                return myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(index).id;
+                @Override
+                public Object getElementAt(int index) {
+                    if (jList1.getSelectedIndex() > -1 && jList2.getSelectedIndex() > -1 && jList3.getSelectedIndex() > -1) {
+                        return myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(index).id;
+                    } else {
+                        return null;
+                    }
+                }
+            });
+
+            Location loc = new Location(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).lon, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).lat);
+            myParent.child.panZoomTo(loc, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).size);
+            jLabel3.setText(String.valueOf(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).size));
+            String[] childrenNames = new String[myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.size()];
+            ArrayList<Marker> markers = new ArrayList();
+            for (int i = 0; i < childrenNames.length; i++) {
+                childrenNames[i] = String.valueOf(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(i).id);
+                markers.add(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(i));
             }
-        });
+            myParent.child.setDrawingMarkers(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()), markers, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).name, childrenNames,null);
+        }
     }//GEN-LAST:event_jList3ValueChanged
 
     private void jList4ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList4ValueChanged
-        jList5.setModel(new javax.swing.AbstractListModel() {
-            @Override
-            public int getSize() {
-                return myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.size();
-            }
+        if (jList1.getSelectedIndex() > -1 && jList2.getSelectedIndex() > -1 && jList3.getSelectedIndex() > -1 && jList4.getSelectedIndex() > -1) {
+            jList5.clearSelection();
+            jList5.setModel(new javax.swing.AbstractListModel() {
+                @Override
+                public int getSize() {
+                    if (jList1.getSelectedIndex() > -1 && jList2.getSelectedIndex() > -1 && jList3.getSelectedIndex() > -1 && jList4.getSelectedIndex() > -1) {
+                        return myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.size();
+                    } else {
+                        return 0;
+                    }
+                }
 
-            @Override
-            public Object getElementAt(int index) {
-                return myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.get(index).id;
+                @Override
+                public Object getElementAt(int index) {
+                    if (jList1.getSelectedIndex() > -1 && jList2.getSelectedIndex() > -1 && jList3.getSelectedIndex() > -1 && jList4.getSelectedIndex() > -1) {
+                        return myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.get(index).id;
+                    } else {
+                        return null;
+                    }
+                }
+            });
+
+            Location loc = new Location(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).lon, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).lat);
+            myParent.child.panZoomTo(loc, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).size);
+            jLabel3.setText(String.valueOf(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).size));
+            String[] childrenNames = new String[myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.size()];
+            ArrayList<Marker> markers = new ArrayList();
+            for (int i = 0; i < childrenNames.length; i++) {
+                childrenNames[i] = String.valueOf(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.get(i).id);
+                markers.add(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.get(i));
             }
-        });
+            myParent.child.setDrawingMarkers(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()), markers, String.valueOf(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).id), childrenNames,null);
+        }
     }//GEN-LAST:event_jList4ValueChanged
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        myParent.child.map.zoomAndPanTo(0, 0, 6);
-    }//GEN-LAST:event_jButton1ActionPerformed
+    private void jList6ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList6ValueChanged
+
+    }//GEN-LAST:event_jList6ValueChanged
+
+    private void jSlider1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSlider1StateChanged
+        oldLocationDebugging=myParent.child.map.getCenter();
+        float sliderZoom = (((int) jSlider1.getValue() / 100f) * (16 - 1)) + 1;
+        jLabel1.setText(String.valueOf(sliderZoom));
+        myParent.child.map.zoomTo(sliderZoom);
+        myParent.child.map.panTo(oldLocationDebugging);
+    }//GEN-LAST:event_jSlider1StateChanged
+
+    private void jList5ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList5ValueChanged
+        if (jList1.getSelectedIndex() > -1 && jList2.getSelectedIndex() > -1 && jList3.getSelectedIndex() > -1 && jList4.getSelectedIndex() > -1 && jList5.getSelectedIndex() > -1) {
+            Location loc = new Location(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.get(jList5.getSelectedIndex()).lon, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.get(jList5.getSelectedIndex()).lat);
+            myParent.child.panZoomTo(loc, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.get(jList5.getSelectedIndex()).size);
+            jLabel3.setText(String.valueOf(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.get(jList5.getSelectedIndex()).size));
+            myParent.child.setDrawingMarkers(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.get(jList5.getSelectedIndex()), null, String.valueOf(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.get(jList5.getSelectedIndex()).id), null,null);
+        }
+    }//GEN-LAST:event_jList5ValueChanged
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JList<String> jList1;
     private javax.swing.JList<String> jList2;
     private javax.swing.JList<String> jList3;
@@ -323,5 +475,6 @@ public class PreviewDialog extends javax.swing.JDialog {
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
+    private javax.swing.JSlider jSlider1;
     // End of variables declaration//GEN-END:variables
 }

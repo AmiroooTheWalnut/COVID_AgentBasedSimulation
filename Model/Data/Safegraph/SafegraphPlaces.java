@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,14 +27,14 @@ public class SafegraphPlaces implements Serializable {
 
     static final long serialVersionUID = softwareVersion;
 
-    public ArrayList<SafegraphPlace> records;
+    public ArrayList<SafegraphPlace> placesRecords;
     public String name;
     public Categories categories;
     public Brands brands;
 
     public void preprocessMonthCorePlaces(String directoryName, String patternName, boolean isParallel, int numCPU) {
         name = patternName;
-        records = new ArrayList();
+        placesRecords = new ArrayList();
         categories=new Categories();
         brands=new Brands();
         File directory = new File(directoryName);
@@ -69,20 +70,29 @@ public class SafegraphPlaces implements Serializable {
             }
             if (isRawBinFound == false) {
                 ArrayList<SafegraphPlace> recordsLocal = readData(cSVfileList[i].getAbsolutePath(), isParallel, numCPU);
-                records = recordsLocal;
+                placesRecords = recordsLocal;
                 Safegraph.saveSafegraphPlacesKryo(directoryName + "/ProcessedData_" + cSVfileList[i].getName(), this);
-                records.clear();
+                placesRecords.clear();
             }
         }
 
         File[] binFileListRecheck = directory.listFiles(binFilesFilter);
-        records = new ArrayList();
+        placesRecords = new ArrayList();
         for (int i = 0; i < binFileListRecheck.length; i++) {
             SafegraphPlaces safegraphPlaces = Safegraph.loadSafegraphPlacesKryo(binFileListRecheck[i].getPath());
-            records.addAll(safegraphPlaces.records);
+            placesRecords.addAll(safegraphPlaces.placesRecords);
             safegraphPlaces = null;
             System.out.println("Data read: " + i);
         }
+//        for(int i=0;i<20;i++){
+//            System.out.println(records.get(i).placeKey);
+//        }
+//        System.out.println("***");
+        Collections.sort(placesRecords);
+//        for(int i=0;i<20;i++){
+//            System.out.println(records.get(i).placeKey);
+//        }
+//        System.out.println("$$$");
     }
 
     public ArrayList<SafegraphPlace> readData(String fileName, boolean isParallel, int numCPU) {
@@ -129,9 +139,18 @@ public class SafegraphPlaces implements Serializable {
                     CsvRow row = data.getRow(i);
                     SafegraphPlace safegraphPlaceProcessed = new SafegraphPlace();
                     String field = row.getField("placekey");
-                    if (field.length() > 0) {
-                        safegraphPlaceProcessed.placeKey = field;
+                    
+                    if (field == null) {
+                        field = row.getField("safegraph_place_id");
+                        if (field.length() > 0) {
+                            safegraphPlaceProcessed.placeKey = field;
+                        }
+                    } else {
+                        if (field.length() > 0) {
+                            safegraphPlaceProcessed.placeKey = field;
+                        }
                     }
+                    
                     field = row.getField("latitude");
                     if (field.length() > 0) {
                         safegraphPlaceProcessed.lat = Float.parseFloat(field);

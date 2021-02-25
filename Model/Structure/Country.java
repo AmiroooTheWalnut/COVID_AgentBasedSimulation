@@ -13,12 +13,9 @@ import java.util.ArrayList;
  *
  * @author user
  */
-public class Country implements Serializable {
+public class Country extends Marker implements Serializable {
     static final long serialVersionUID = softwareVersion;
     public String name;
-    public float lat;
-    public float lon;
-    public float size;
     public transient boolean isLatLonCalculated=false;
     public ArrayList<State> states;
 

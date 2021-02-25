@@ -16,12 +16,9 @@ import java.util.ArrayList;
  *
  * @author user
  */
-public class CensusBlock implements Serializable {
+public class CensusBlockGroup extends Marker implements Serializable {
     static final long serialVersionUID = softwareVersion;
     public long id;
-    public float lat;
-    public float lon;
-    public float size;
     
     public Country country;
     public State state;

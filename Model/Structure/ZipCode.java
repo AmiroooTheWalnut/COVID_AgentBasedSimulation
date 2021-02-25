@@ -13,9 +13,7 @@ import java.io.Serializable;
  *
  * @author user
  */
-public class ZipCode implements Serializable {
+public class ZipCode extends Marker implements Serializable {
     static final long serialVersionUID = softwareVersion;
     public int code;
-    public float lat;
-    public float lon;
 }

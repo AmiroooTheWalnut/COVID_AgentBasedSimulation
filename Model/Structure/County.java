@@ -14,13 +14,10 @@ import java.util.ArrayList;
  *
  * @author user
  */
-public class County implements Serializable {
+public class County extends Marker implements Serializable {
     static final long serialVersionUID = softwareVersion;
     public String name;
     public int id;
-    public float lat;
-    public float lon;
-    public float size;
     public transient boolean isLatLonCalculated=false;
     public ArrayList<City> cities;
     public ArrayList<ZipCode> zipcodes;

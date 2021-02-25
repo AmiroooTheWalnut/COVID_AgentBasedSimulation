@@ -17,7 +17,7 @@ import java.util.ArrayList;
  */
 public class AllPatterns implements Serializable {
     static final long serialVersionUID = softwareVersion;
-    public ArrayList<Patterns> patternsList;
+    public ArrayList<Patterns> monthlyPatternsList;
     
     public static String[] detectAllPatterns(String directoryString){
         File directory=new File(directoryString);
@@ -34,9 +34,5 @@ public class AllPatterns implements Serializable {
         }
         return detectedDirectories;
     }
-    
-    
-    
-    
     
 }

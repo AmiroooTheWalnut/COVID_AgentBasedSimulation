@@ -1,7 +1,8 @@
 package COVID_AgentBasedSimulation.Model.Data.Safegraph;
 
 import static COVID_AgentBasedSimulation.Model.MainModel.softwareVersion;
-import COVID_AgentBasedSimulation.Model.Structure.CensusBlock;
+import COVID_AgentBasedSimulation.Model.Structure.AllGISData;
+import COVID_AgentBasedSimulation.Model.Structure.CensusBlockGroup;
 import de.siegmar.fastcsv.reader.CsvContainer;
 import de.siegmar.fastcsv.reader.CsvReader;
 import de.siegmar.fastcsv.reader.CsvRow;
@@ -10,16 +11,14 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
-import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.json.JSONArray;
@@ -35,15 +34,16 @@ import org.json.JSONObject;
  * @author user
  */
 public class Patterns implements Serializable {
+
     static final long serialVersionUID = softwareVersion;
 
     public String name;
 
-    public ArrayList<PatternsRecordProcessed> records;
+    public ArrayList<PatternsRecordProcessed> patternRecords;
 
     public void preprocessMonthPatterns(String directoryName, String patternName, boolean isParallel, int numCPU) {
         name = patternName;
-        records = new ArrayList();
+        patternRecords = new ArrayList();
         File directory = new File(directoryName);
 
         FileFilter binFilesFilter = new FileFilter() {
@@ -77,20 +77,29 @@ public class Patterns implements Serializable {
             }
             if (isRawBinFound == false) {
                 ArrayList<PatternsRecordProcessed> recordsLocal = readData(cSVfileList[i].getAbsolutePath(), isParallel, numCPU);
-                records = recordsLocal;
+                patternRecords = recordsLocal;
                 Safegraph.savePatternsKryo(directoryName + "/ProcessedData_" + cSVfileList[i].getName(), this);
-                records.clear();
+                patternRecords.clear();
             }
         }
 
         File[] binFileListRecheck = directory.listFiles(binFilesFilter);
-        records = new ArrayList();
+        patternRecords = new ArrayList();
         for (int i = 0; i < binFileListRecheck.length; i++) {
             Patterns patterns = Safegraph.loadPatternsKryo(binFileListRecheck[i].getPath());
-            records.addAll(patterns.records);
+            patternRecords.addAll(patterns.patternRecords);
             patterns = null;
             System.out.println("Data read: " + i);
         }
+//        for(int i=0;i<20;i++){
+//            System.out.println(records.get(i).placeKey);
+//        }
+//        System.out.println("***");
+        Collections.sort(patternRecords);
+//        for(int i=0;i<20;i++){
+//            System.out.println(records.get(i).placeKey);
+//        }
+//        System.out.println("$$$");
     }
 
     public ArrayList<PatternsRecordProcessed> readData(String fileName, boolean isParallel, int numCPU) {
@@ -108,9 +117,9 @@ public class Patterns implements Serializable {
                 ParallelPatternParser parallelPatternParsers[] = new ParallelPatternParser[numProcessors];
 
                 for (int i = 0; i < numProcessors - 1; i++) {
-                    parallelPatternParsers[i] = new ParallelPatternParser(i,recordsLocal, data, (int) Math.floor(i * ((data.getRowCount()) / numProcessors)), (int) Math.floor((i + 1) * ((data.getRowCount()) / numProcessors)));
+                    parallelPatternParsers[i] = new ParallelPatternParser(i, recordsLocal, data, (int) Math.floor(i * ((data.getRowCount()) / numProcessors)), (int) Math.floor((i + 1) * ((data.getRowCount()) / numProcessors)));
                 }
-                parallelPatternParsers[numProcessors - 1] = new ParallelPatternParser(numProcessors - 1,recordsLocal, data, (int) Math.floor((numProcessors - 1) * ((data.getRowCount()) / numProcessors)), data.getRowCount());
+                parallelPatternParsers[numProcessors - 1] = new ParallelPatternParser(numProcessors - 1, recordsLocal, data, (int) Math.floor((numProcessors - 1) * ((data.getRowCount()) / numProcessors)), data.getRowCount());
 
                 for (int i = 0; i < numProcessors; i++) {
                     parallelPatternParsers[i].myThread.start();
@@ -133,21 +142,29 @@ public class Patterns implements Serializable {
                 for (int i = 0; i < data.getRowCount(); i++) {
                     CsvRow row = data.getRow(i);
                     PatternsRecordProcessed patternsRecordProcessed = new PatternsRecordProcessed();
-                    String field = row.getField("placeKey");
-                    if (field.length() > 0) {
-                        patternsRecordProcessed.placeKey=field;
+                    String field = row.getField("placekey");
+                    if (field == null) {
+                        field = row.getField("safegraph_place_id");
+                        if (field.length() > 0) {
+                            patternsRecordProcessed.placeKey = field;
+                        }
+                    } else {
+                        if (field.length() > 0) {
+                            patternsRecordProcessed.placeKey = field;
+                        }
                     }
                     field = row.getField("poi_cbg");
                     if (field.length() > 0) {
-                        patternsRecordProcessed.poi_cbg=Long.parseLong(field);
+                        patternsRecordProcessed.poi_cbg = Long.parseLong(field);
                     }
                     field = row.getField("date_range_start");
                     if (field.length() > 0) {
                         int startOffset = Integer.parseInt(field.substring(19, 21));
                         DateTimeFormatter startFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
-                                .withZone(ZoneId.ofOffset("GMT", ZoneOffset.ofHours(startOffset)));
+                                .withZone(ZoneId.ofOffset("UTC", ZoneOffset.ofHours(startOffset)));
                         LocalDateTime startDate = LocalDateTime.parse(field.substring(0, 19), startFormatter);
-                        patternsRecordProcessed.date_range_start = startDate;
+                        ZonedDateTime zonedStartDate = startDate.atZone(ZoneOffset.ofHours(startOffset));
+                        patternsRecordProcessed.date_range_start = zonedStartDate;
                     }
 
                     field = row.getField("date_range_end");
@@ -156,7 +173,8 @@ public class Patterns implements Serializable {
                         DateTimeFormatter endFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
                                 .withZone(ZoneId.ofOffset("GMT", ZoneOffset.ofHours(endOffset)));
                         LocalDateTime endDate = LocalDateTime.parse(field.substring(0, 19), endFormatter);
-                        patternsRecordProcessed.date_range_end = endDate;
+                        ZonedDateTime zonedEndDate = endDate.atZone(ZoneOffset.ofHours(endOffset));
+                        patternsRecordProcessed.date_range_end = zonedEndDate;
                     }
 
                     field = row.getField("raw_visit_counts");
@@ -185,9 +203,9 @@ public class Patterns implements Serializable {
                         try {
                             JSONObject object = new JSONObject(field);
                             JSONArray names = object.names();
-                            HashMap<Long, Integer> temp = new HashMap();
+                            ArrayList<LongIntTuple> temp = new ArrayList();
                             for (int k = 0; k < names.length(); k++) {
-                                temp.put(Long.parseLong(names.getString(k)), object.getInt(names.getString(k)));
+                                temp.add(new LongIntTuple(Long.parseLong(names.getString(k)), object.getInt(names.getString(k))));
                             }
                             patternsRecordProcessed.visitor_home_cbgs = temp;
                         } catch (Exception ex) {
@@ -200,9 +218,9 @@ public class Patterns implements Serializable {
                         try {
                             JSONObject object = new JSONObject(field);
                             JSONArray names = object.names();
-                            HashMap<Long, Integer> temp = new HashMap();
+                            ArrayList<LongIntTuple> temp = new ArrayList();
                             for (int k = 0; k < names.length(); k++) {
-                                temp.put(Long.parseLong(names.getString(k)), object.getInt(names.getString(k)));
+                                temp.add(new LongIntTuple(Long.parseLong(names.getString(k)), object.getInt(names.getString(k))));
                             }
                             patternsRecordProcessed.visitor_daytime_cbgs = temp;
                         } catch (Exception ex) {
@@ -279,98 +297,6 @@ public class Patterns implements Serializable {
 //                            System.out.println(ex.getMessage());
                         }
                     }
-
-//                    List<String> oneRow = data.getRow(i).getFields();
-//                    PatternsRecordProcessed patternsRecordProcessed = new PatternsRecordProcessed();
-//                    int columnCounter = 0;
-//                    for (int j = 0; j < oneRow.size(); j++) {
-//                        for (int k = 0; k < safegraphPatternFieldNames.length; k++) {
-//                            if (header.get(j).equals(safegraphPatternFieldNames[k])) {
-//                                if (oneRow.get(columnCounter).length() > 0) {
-//                                    switch (safegraphPatternFieldTypeNames[k]) {
-//                                        case "java.lang.String":
-//                                            try {
-//                                                patternsRecordProcessed.getClass().getFields()[k].set(patternsRecordProcessed, oneRow.get(columnCounter));
-//                                                columnCounter = columnCounter + 1;
-//                                            } catch (Exception ex) {
-//                                                System.out.println(oneRow.get(columnCounter));
-//                                                columnCounter = columnCounter + 1;
-//                                                System.out.println(ex.getMessage());
-//                                            }
-//                                            break;
-//                                        case "java.util.ArrayList": {
-//                                            try {
-//                                                ArrayList temp = new ArrayList(Arrays.asList(oneRow.get(columnCounter).split(",")));
-//                                                patternsRecordProcessed.getClass().getFields()[k].set(patternsRecordProcessed, temp);
-//                                                columnCounter = columnCounter + 1;
-//                                            } catch (Exception ex) {
-//                                                System.out.println(oneRow.get(columnCounter));
-//                                                columnCounter = columnCounter + 1;
-//                                                System.out.println(ex.getMessage());
-//                                            }
-//                                            break;
-//                                        }
-//                                        case "int":
-//                                            try {
-//                                                patternsRecordProcessed.getClass().getFields()[k].set(patternsRecordProcessed, Integer.parseInt(oneRow.get(columnCounter)));
-//                                                columnCounter = columnCounter + 1;
-//                                            } catch (Exception ex) {
-//                                                System.out.println(oneRow.get(columnCounter));
-//                                                columnCounter = columnCounter + 1;
-//                                                System.out.println(ex.getMessage());
-//                                            }
-//                                            break;
-//                                        case "double":
-//                                            try {
-//                                                patternsRecordProcessed.getClass().getFields()[k].set(patternsRecordProcessed, Double.parseDouble(oneRow.get(columnCounter)));
-//                                                columnCounter = columnCounter + 1;
-//                                            } catch (Exception ex) {
-//                                                System.out.println(oneRow.get(columnCounter));
-//                                                columnCounter = columnCounter + 1;
-//                                                System.out.println(ex.getMessage());
-//                                            }
-//                                            break;
-//                                        case "[I":
-//                                            try {
-//                                                String visits_by_dayStr = oneRow.get(columnCounter);
-//                                                visits_by_dayStr = visits_by_dayStr.substring(1, visits_by_dayStr.length() - 1);
-//                                                String[] visits_by_dayStrArray = visits_by_dayStr.split(",", -1);
-//                                                int[] visits_by_day = new int[visits_by_dayStrArray.length];
-//                                                for (int m = 0; m < visits_by_dayStrArray.length; m++) {
-//                                                    visits_by_day[m] = Integer.valueOf(visits_by_dayStrArray[m]);
-//                                                }
-//                                                patternsRecordProcessed.getClass().getFields()[k].set(patternsRecordProcessed, visits_by_day);
-//                                                columnCounter = columnCounter + 1;
-//                                            } catch (Exception ex) {
-//                                                System.out.println(oneRow.get(columnCounter));
-//                                                columnCounter = columnCounter + 1;
-//                                                System.out.println(ex.getMessage());
-//                                            }
-//                                            break;
-//                                        case "java.util.HashMap": {
-//                                            try {
-//                                                JSONObject object = new JSONObject(oneRow.get(columnCounter));
-//                                                HashMap<String, Object> temp = (HashMap<String, Object>) object.toMap();
-//                                                patternsRecordProcessed.getClass().getFields()[k].set(patternsRecordProcessed, temp);
-//                                                columnCounter = columnCounter + 1;
-//                                            } catch (Exception ex) {
-//                                                System.out.println(oneRow.get(columnCounter));
-//                                                columnCounter = columnCounter + 1;
-//                                                System.out.println(ex.getMessage());
-//                                            }
-//                                            break;
-//                                        }
-//                                        default:
-//                                            columnCounter = columnCounter + 1;
-//                                            break;
-//                                    }
-//                                } else {
-//                                    columnCounter = columnCounter + 1;
-//                                }
-//                                break;
-//                            }
-//                        }
-//                    }
                     recordsLocal.add(patternsRecordProcessed);
                     counter = counter + 1;
                     if (counter > counterInterval) {
@@ -386,5 +312,4 @@ public class Patterns implements Serializable {
         }
         return null;
     }
-
 }

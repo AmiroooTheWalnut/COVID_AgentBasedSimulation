@@ -13,13 +13,10 @@ import java.util.ArrayList;
  *
  * @author user
  */
-public class State implements Serializable {
+public class State extends Marker implements Serializable{
     static final long serialVersionUID = softwareVersion;
     public String name;
     public byte id;
-    public float lat;
-    public float lon;
-    public float size;
     public transient boolean isLatLonCalculated=false;
     public ArrayList<County> counties;
     
