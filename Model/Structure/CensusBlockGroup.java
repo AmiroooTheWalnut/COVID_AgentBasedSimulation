@@ -4,18 +4,14 @@ import COVID_AgentBasedSimulation.Model.Data.Safegraph.SafegraphPlace;
 import static COVID_AgentBasedSimulation.Model.MainModel.softwareVersion;
 import java.io.Serializable;
 import java.util.ArrayList;
-
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
+@Getter @Setter
 public class CensusBlockGroup extends Marker implements Serializable {
     static final long serialVersionUID = softwareVersion;
     public long id;

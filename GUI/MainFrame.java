@@ -1,9 +1,22 @@
 package COVID_AgentBasedSimulation.GUI;
 
+import COVID_AgentBasedSimulation.Model.AgentBasedModel.AgentBasedModel;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.AllPatterns;
 import COVID_AgentBasedSimulation.Model.MainModel;
 import COVID_AgentBasedSimulation.Model.Structure.AllGISData;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JFileChooser;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -17,6 +30,7 @@ import java.io.File;
 public class MainFrame extends javax.swing.JFrame {
 
     public MainModel mainModel;
+    public ProjectDefaults projectDefaults;
     public ProcessingMapRenderer child;
     public int numProcessors;
 
@@ -25,13 +39,14 @@ public class MainFrame extends javax.swing.JFrame {
      */
     public MainFrame() {
         initComponents();
-        
-        jSpinner1.setModel(new javax.swing.SpinnerNumberModel(Runtime.getRuntime().availableProcessors()/2, 1, Runtime.getRuntime().availableProcessors(), 1));
-        
-        numProcessors=(int)jSpinner1.getValue();
-        
+
+        jSpinner1.setModel(new javax.swing.SpinnerNumberModel(Runtime.getRuntime().availableProcessors() / 2, 1, Runtime.getRuntime().availableProcessors(), 1));
+
+        numProcessors = (int) jSpinner1.getValue();
+
         mainModel = new MainModel();
         mainModel.initData();
+        mainModel.initAgentBasedModel();
         File geoDataFile = new File("./datasets/ProcessedGeoData.bin");
         if (geoDataFile.exists()) {
             AllGISData geoData = MainModel.loadAllGISDataKryo("./datasets/ProcessedGeoData.bin");
@@ -39,6 +54,43 @@ public class MainFrame extends javax.swing.JFrame {
             jLabel1.setText("Geographical data loaded");
         } else {
             jLabel1.setText("<html>No processed geographical data detected.<br/>You can preprocess the data.</html>");
+        }
+
+        checkDefaults();
+    }
+
+    public void checkDefaults() {
+        projectDefaults = new ProjectDefaults();
+        File file = new File("./ABMDefaults.json");
+        if (file.exists() == true) {
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            FileReader in;
+            try {
+                in = new FileReader("./ABMDefaults.json");
+                BufferedReader br = new BufferedReader(in);
+                StringBuilder sb = new StringBuilder();
+
+                String line;
+                while ((line = br.readLine()) != null) {
+                    sb.append(line).append("\n");
+                }
+                in.close();
+
+                ProjectDefaults result = gson.fromJson(sb.toString(), ProjectDefaults.class);
+                projectDefaults = result;
+                if (projectDefaults != null) {
+                    if (projectDefaults.defaultProjectFileLocation != null) {
+                        if (projectDefaults.defaultProjectFileLocation.length() > 0) {
+                            mainModel.agentBasedModel.loadModel(projectDefaults.defaultProjectFileLocation);
+                        }
+                    }
+                }
+
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
@@ -79,6 +131,7 @@ public class MainFrame extends javax.swing.JFrame {
         jButton13 = new javax.swing.JButton();
         jButton14 = new javax.swing.JButton();
         jButton15 = new javax.swing.JButton();
+        jButton16 = new javax.swing.JButton();
         jPanel13 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         jButton5 = new javax.swing.JButton();
@@ -340,10 +393,32 @@ public class MainFrame extends javax.swing.JFrame {
         jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Project"));
 
         jButton13.setText("Load project");
+        jButton13.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton13ActionPerformed(evt);
+            }
+        });
 
         jButton14.setText("Set default project on startup");
+        jButton14.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton14ActionPerformed(evt);
+            }
+        });
 
         jButton15.setText("Save project");
+        jButton15.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton15ActionPerformed(evt);
+            }
+        });
+
+        jButton16.setText("Remove default project");
+        jButton16.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton16ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
@@ -354,7 +429,8 @@ public class MainFrame extends javax.swing.JFrame {
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jButton13)
                     .addComponent(jButton14)
-                    .addComponent(jButton15))
+                    .addComponent(jButton15)
+                    .addComponent(jButton16))
                 .addContainerGap(52, Short.MAX_VALUE))
         );
         jPanel6Layout.setVerticalGroup(
@@ -364,8 +440,10 @@ public class MainFrame extends javax.swing.JFrame {
                 .addComponent(jButton13)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton15)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 25, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
                 .addComponent(jButton14)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton16)
                 .addContainerGap())
         );
 
@@ -387,7 +465,7 @@ public class MainFrame extends javax.swing.JFrame {
                 .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jButton12)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 106, Short.MAX_VALUE)
                 .addComponent(jButton11)
                 .addContainerGap())
         );
@@ -545,7 +623,7 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton8ActionPerformed
 
     private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
-        PreviewDialog swingGui = new PreviewDialog(this,false);
+        PreviewDialog swingGui = new PreviewDialog(this, false);
         swingGui.setVisible(true);
 
         ProcessingMapRenderer sketch = new ProcessingMapRenderer(this);
@@ -561,13 +639,69 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton11ActionPerformed
 
     private void jSpinner1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinner1StateChanged
-        numProcessors=(int)jSpinner1.getValue();
+        numProcessors = (int) jSpinner1.getValue();
     }//GEN-LAST:event_jSpinner1StateChanged
 
     private void jButton12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton12ActionPerformed
-        SimulatorSettingsDialog simulatorSettingsDialog = new SimulatorSettingsDialog(mainModel, this, false);
+        SimulatorSettingsDialog simulatorSettingsDialog = new SimulatorSettingsDialog(mainModel, this, true);
         simulatorSettingsDialog.setVisible(true);
     }//GEN-LAST:event_jButton12ActionPerformed
+
+    private void jButton15ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton15ActionPerformed
+        JFileChooser fcSave = new JFileChooser(".");
+        fcSave.setAcceptAllFileFilterUsed(false);
+        int returnVal = fcSave.showSaveDialog(this);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            String saveFilePath = fcSave.getSelectedFile().getAbsolutePath();
+            mainModel.agentBasedModel.saveModel(saveFilePath);
+            mainModel.agentBasedModel.filePath = saveFilePath;
+        }
+    }//GEN-LAST:event_jButton15ActionPerformed
+
+    private void jButton13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton13ActionPerformed
+        JFileChooser fcLoad = new javax.swing.JFileChooser(".");
+        fcLoad.setAcceptAllFileFilterUsed(false);
+        int returnVal = fcLoad.showOpenDialog(this);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            String loadFilePath = fcLoad.getSelectedFile().getAbsolutePath();
+            mainModel.agentBasedModel.loadModel(loadFilePath);
+            mainModel.agentBasedModel.filePath = loadFilePath;
+        }
+    }//GEN-LAST:event_jButton13ActionPerformed
+
+    private void jButton14ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton14ActionPerformed
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        projectDefaults.defaultProjectFileLocation = mainModel.agentBasedModel.filePath;
+        String result = gson.toJson(projectDefaults);
+        BufferedWriter writer;
+        try {
+            FileWriter out = new FileWriter("./ABMDefaults.json");
+            writer = new BufferedWriter(out);
+            writer.write(result);
+
+            writer.close();
+            out.close();
+        } catch (IOException ex) {
+            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton14ActionPerformed
+
+    private void jButton16ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton16ActionPerformed
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        projectDefaults.defaultProjectFileLocation = "";
+        String result = gson.toJson(projectDefaults);
+        BufferedWriter writer;
+        try {
+            FileWriter out = new FileWriter("./ABMDefaults.json");
+            writer = new BufferedWriter(out);
+            writer.write(result);
+
+            writer.close();
+            out.close();
+        } catch (IOException ex) {
+            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton16ActionPerformed
 
     public void refreshPatternsList() {
         jList1.setModel(new javax.swing.AbstractListModel() {
@@ -626,6 +760,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JButton jButton13;
     private javax.swing.JButton jButton14;
     private javax.swing.JButton jButton15;
+    private javax.swing.JButton jButton16;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;

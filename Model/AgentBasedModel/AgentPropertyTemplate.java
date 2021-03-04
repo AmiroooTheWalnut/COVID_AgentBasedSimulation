@@ -5,11 +5,16 @@
  */
 package COVID_AgentBasedSimulation.Model.AgentBasedModel;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  *
  * @author user
  */
+@Getter @Setter
 public class AgentPropertyTemplate {
     public String propertyName;
-    public Object value;
+    public String propertyType;
+    public transient Object value;
 }

@@ -5,20 +5,12 @@
  */
 package COVID_AgentBasedSimulation.Model.AgentBasedModel;
 
-import lombok.Getter;
-import lombok.Setter;
-
 /**
  *
  * @author user
  */
-@Getter @Setter
-public class Agent {
-    int myIndex;
-    
-    public AgentTemplate myTemplate;
-    
-    public Agent(AgentTemplate passed_agentTemplate){
-        myTemplate=passed_agentTemplate;
-    }
+public class BehaviorScript{
+    public JavaScript javaScript;
+    public PythonScript pythonScript;
+    public boolean isJavaScriptActive=true;
 }

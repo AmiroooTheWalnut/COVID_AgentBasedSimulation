@@ -26,16 +26,14 @@ import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.objenesis.strategy.StdInstantiatorStrategy;
+import lombok.Getter;
+import lombok.Setter;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
+@Getter @Setter
 public class Safegraph extends Dataset implements Serializable {
 
     static final long serialVersionUID = softwareVersion;
@@ -71,7 +69,7 @@ public class Safegraph extends Dataset implements Serializable {
 
         for (int i = 0; i < PatternsRecordProcessed.class.getFields().length; i++) {
             RecordTemplate temp = new RecordTemplate();
-            temp.name = PatternsRecordProcessed.class.getFields()[i].getName();
+            temp.name = PatternsRecordProcessed.class.getFields()[i].getName()+"("+PatternsRecordProcessed.class.getFields()[i].getGenericType().getTypeName()+")";
             recordsPattern.recordTemplates.add(temp);
         }
         monthlyPatternsList.innerDatasetTemplates.add(recordsPattern);
@@ -85,7 +83,7 @@ public class Safegraph extends Dataset implements Serializable {
 
         for (int i = 0; i < SafegraphPlace.class.getFields().length; i++) {
             RecordTemplate temp = new RecordTemplate();
-            temp.name = SafegraphPlace.class.getFields()[i].getName();
+            temp.name = SafegraphPlace.class.getFields()[i].getName()+"("+SafegraphPlace.class.getFields()[i].getGenericType().getTypeName()+")";
             recordsPlace.recordTemplates.add(temp);
         }
         monthlySafegraphPlacesList.innerDatasetTemplates.add(recordsPlace);
@@ -329,23 +327,6 @@ public class Safegraph extends Dataset implements Serializable {
         Patterns patterns = loadPatternsKryo("./datasets/patterns_" + date + "/processedData.bin");
         SafegraphPlaces safegraphPlaces = loadSafegraphPlacesKryo("./datasets/core_poi_" + date + "/processedData.bin");
 
-//        for(int i=0;i<20;i++){
-//            System.out.println(patterns.records.get(i).placeKey);
-//        }
-//        System.out.println("***");
-//        for(int i=0;i<20;i++){
-//            System.out.println(patterns.records.get(i).placeKey);
-//        }
-//        System.out.println("$$$");
-//        
-//        for(int i=0;i<20;i++){
-//            System.out.println(safegraphPlaces.records.get(i).placeKey);
-//        }
-//        System.out.println("***");
-//        for(int i=0;i<20;i++){
-//            System.out.println(safegraphPlaces.records.get(i).placeKey);
-//        }
-//        System.out.println("$$$");
         System.out.println("Data loaded. Connecting patterns and places ...");
         connectPatternsAndPlaces(patterns, safegraphPlaces, allGISData, isParallel, numCPU);
         System.out.println("Connection done");
@@ -410,19 +391,23 @@ public class Safegraph extends Dataset implements Serializable {
                 for (int j = 0; j < places.placesRecords.size(); j++) {
                     int plusSign = -1;
                     int minusSign = -1;
-                    if (i + j < places.placesRecords.size()) {
+                    if (i + j + lastValidIndex< places.placesRecords.size()) {
                         plusSign = i + j + lastValidIndex;
                     }
-                    if (i - j > -1) {
+                    if (i - j + lastValidIndex> -1) {
                         minusSign = i - j + lastValidIndex;
                     }
                     if (plusSign > -1) {
+                        if(i==5306324){
+                        System.out.println("!!!!");
+                    }
+                        if(plusSign==5306324){
+                        System.out.println("!!!!");
+                    }
 //                    System.out.println("PATTERNS: "+patterns.records.get(i).placeKey);
 //                    System.out.println("PLACES: "+places.records.get(plusSign).placeKey);
                         if (patterns.patternRecords.get(i).placeKey.equals(places.placesRecords.get(plusSign).placeKey)) {
-//                    if(counter==87919){
-//                        System.out.println("!!!!");
-//                    }
+                    
                             CensusBlockGroup temp = allGISData.findCensusBlockGroup(patterns.patternRecords.get(i).poi_cbg);
                             lastValidIndex = lastValidIndex + j;
                             if (temp == null) {

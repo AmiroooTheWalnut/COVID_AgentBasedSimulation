@@ -5,18 +5,14 @@
  */
 package COVID_AgentBasedSimulation.GUI;
 
-import COVID_AgentBasedSimulation.Model.Data.Safegraph.PatternsRecordProcessed;
-import COVID_AgentBasedSimulation.Model.DatasetTemplate;
+import COVID_AgentBasedSimulation.Model.AgentBasedModel.AgentPropertyTemplate;
 import COVID_AgentBasedSimulation.Model.MainModel;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.ArrayList;
-import javafx.scene.paint.Color;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 /**
  *
@@ -25,19 +21,26 @@ import javax.swing.SwingUtilities;
 public class AgentTemplatePanel extends javax.swing.JPanel {
 
     AgentTemplateDialog myParent;
+    AgentPropertyTemplate myAgentPropertyTemplate;
     MainModel myMainModel;
+    AgentTemplatePanel thisPanel;
     boolean isSelected;
-    
+    int myIndex;
+
     /**
      * Creates new form AgentTemplatePanel
      */
-    public AgentTemplatePanel(MainModel mainModel, AgentTemplateDialog parent) {
+    public AgentTemplatePanel(MainModel mainModel, AgentTemplateDialog parent, AgentPropertyTemplate agentPropertyTemplate, int index) {
         initComponents();
-        myParent=parent;
-        myMainModel=mainModel;
+        myParent = parent;
+        myMainModel = mainModel;
+        thisPanel = this;
+        myIndex=index;
+        
+        myAgentPropertyTemplate = agentPropertyTemplate;
         jPanel3.setBackground(java.awt.Color.LIGHT_GRAY);
         jPanel3.setFocusable(true);
-        
+
         jPanel3.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -47,37 +50,71 @@ public class AgentTemplatePanel extends javax.swing.JPanel {
 
             @Override
             public void mousePressed(MouseEvent e) {
-                
+
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                
+
             }
 
             @Override
             public void mouseEntered(MouseEvent e) {
-                
+
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                
+
             }
         });
-        
+
         jPanel3.addFocusListener(new FocusListener() {
             @Override
             public void focusGained(FocusEvent e) {
+                myParent.selectedAgentTemplatePanel = thisPanel;
+                myParent.selectedAgentPropertyTemplate = myAgentPropertyTemplate;
                 isSelected = true;
                 jPanel3.setBackground(java.awt.Color.GRAY);
-//                System.out.println("FOCUSED");
+                
+                myParent.setVariableSelection(jLabel2.getText());
             }
 
             @Override
             public void focusLost(FocusEvent e) {
+                if (e.getOppositeComponent() != null) {
+                    if (e.getOppositeComponent().getName() != null) {
+                        if (!e.getOppositeComponent().getName().equals("propertyPanel")) {
+                            myParent.selectedAgentTemplatePanel = null;
+                            myParent.selectedAgentPropertyTemplate = null;
+                        }
+                    } else {
+                        myParent.selectedAgentTemplatePanel = null;
+                        myParent.selectedAgentPropertyTemplate = null;
+                    }
+                } else {
+                    myParent.selectedAgentTemplatePanel = null;
+                    myParent.selectedAgentPropertyTemplate = null;
+                }
                 jPanel3.setBackground(java.awt.Color.LIGHT_GRAY);
                 isSelected = false;
+            }
+        });
+
+        jTextField1.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                agentPropertyTemplate.propertyName = jTextField1.getText();
             }
         });
     }
@@ -110,8 +147,15 @@ public class AgentTemplatePanel extends javax.swing.JPanel {
         );
 
         jPanel3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jPanel3.setName("propertyPanel"); // NOI18N
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Property name"));
+
+        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -169,17 +213,22 @@ public class AgentTemplatePanel extends javax.swing.JPanel {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+        System.out.println("EDITTED STRINGPPP");
+        myAgentPropertyTemplate.propertyName = jTextField1.getText();
+    }//GEN-LAST:event_jTextField1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
+    public javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JTextField jTextField1;
+    public javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables
 }

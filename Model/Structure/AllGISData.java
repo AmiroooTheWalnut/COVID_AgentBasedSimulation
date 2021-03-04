@@ -25,11 +25,14 @@ import java.util.logging.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.objenesis.strategy.StdInstantiatorStrategy;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
+@Getter @Setter
 public class AllGISData extends Dataset implements Serializable {
 
     static final long serialVersionUID = softwareVersion;
@@ -58,7 +61,7 @@ public class AllGISData extends Dataset implements Serializable {
         
         for(int i=0;i<CensusBlockGroup.class.getFields().length;i++){
             RecordTemplate temp=new RecordTemplate();
-            temp.name=CensusBlockGroup.class.getFields()[i].getName();
+            temp.name=CensusBlockGroup.class.getFields()[i].getName()+"("+CensusBlockGroup.class.getFields()[i].getGenericType().getTypeName()+")";
             CensusBlockGroup.recordTemplates.add(temp);
         }
         

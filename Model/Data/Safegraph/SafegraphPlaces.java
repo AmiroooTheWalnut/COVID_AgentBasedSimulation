@@ -18,11 +18,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
+@Getter @Setter
 public class SafegraphPlaces implements Serializable {
 
     static final long serialVersionUID = softwareVersion;

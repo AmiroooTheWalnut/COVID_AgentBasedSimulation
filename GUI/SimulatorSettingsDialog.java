@@ -6,6 +6,10 @@
 package COVID_AgentBasedSimulation.GUI;
 
 import COVID_AgentBasedSimulation.Model.MainModel;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
@@ -16,15 +20,97 @@ import javax.swing.SwingUtilities;
 public class SimulatorSettingsDialog extends javax.swing.JDialog {
 
     MainModel myMainModel;
-    
+
     /**
      * Creates new form SimulatorSettingsDialog
      */
-    public SimulatorSettingsDialog(MainModel mainModel,java.awt.Frame parent, boolean modal) {
+    public SimulatorSettingsDialog(MainModel mainModel, java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        myMainModel=mainModel;
+        myMainModel = mainModel;
+        ArrayList<String> result = mainModel.safegraph.checkMonthAvailability();
+        jList6.setModel(new javax.swing.AbstractListModel() {
+            @Override
+            public int getSize() {
+                return result.size();
+            }
+
+            @Override
+            public Object getElementAt(int index) {
+                return result.get(index).substring(9);
+            }
+        });
+        jList7.setModel(new javax.swing.AbstractListModel() {
+            @Override
+            public int getSize() {
+                return result.size();
+            }
+
+            @Override
+            public Object getElementAt(int index) {
+                return result.get(index).substring(9);
+            }
+        });
+        if (myMainModel.agentBasedModel.isPatternBasedTime == false) {
+            jCheckBox2.doClick();
+        }
+//        jCheckBox2.setSelected(myMainModel.agentBasedModel.isPatternBasedTime);
+
+//        jCheckBox2ActionPerformed();
+        if (myMainModel.agentBasedModel.isPatternBasedTime == true) {
+            if (myMainModel.agentBasedModel.startTime != null) {
+                int year = myMainModel.agentBasedModel.startTime.getYear();
+                int month = myMainModel.agentBasedModel.startTime.getMonthValue();
+                String monthString = String.valueOf(month);
+                if (monthString.length() < 2) {
+                    monthString = "0" + monthString;
+                }
+                String name = year + "_" + monthString;
+                for (int i = 0; i < jList6.getModel().getSize(); i++) {
+                    if (jList6.getModel().getElementAt(i).equals(name)) {
+                        jList6.setSelectedIndex(i);
+                    }
+                }
+            }
+            if (myMainModel.agentBasedModel.endTime != null) {
+                int year = myMainModel.agentBasedModel.endTime.getYear();
+                int month = myMainModel.agentBasedModel.endTime.getMonthValue();
+                String monthString = String.valueOf(month);
+                if (monthString.length() < 2) {
+                    monthString = "0" + monthString;
+                }
+                String name = year + "_" + monthString;
+                for (int i = 0; i < jList7.getModel().getSize(); i++) {
+                    if (jList7.getModel().getElementAt(i).equals(name)) {
+                        jList7.setSelectedIndex(i);
+                    }
+                }
+            }
+        } else {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+            String formattedString = myMainModel.agentBasedModel.startTime.format(formatter);
+            jFormattedTextField1.setText(formattedString);
+
+            formattedString = myMainModel.agentBasedModel.endTime.format(formatter);
+            jFormattedTextField2.setText(formattedString);
+        }
+
+        updateAgentTemplateList();
+    }
+
+    public void updateAgentTemplateList() {
         jList1.setModel(new javax.swing.AbstractListModel() {
+            @Override
+            public int getSize() {
+                return myMainModel.agentBasedModel.agentTemplates.size();
+            }
+
+            @Override
+            public Object getElementAt(int index) {
+                return myMainModel.agentBasedModel.agentTemplates.get(index).agentTypeName;
+            }
+        });
+        jList3.setModel(new javax.swing.AbstractListModel() {
             @Override
             public int getSize() {
                 return myMainModel.agentBasedModel.agentTemplates.size();
@@ -52,19 +138,28 @@ public class SimulatorSettingsDialog extends javax.swing.JDialog {
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
-        jPanel2 = new javax.swing.JPanel();
-        jButton4 = new javax.swing.JButton();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        jList2 = new javax.swing.JList<>();
-        jLabel1 = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jButton5 = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
         jList3 = new javax.swing.JList<>();
+        jPanel11 = new javax.swing.JPanel();
+        jPanel12 = new javax.swing.JPanel();
+        jPanel6 = new javax.swing.JPanel();
+        jScrollPane6 = new javax.swing.JScrollPane();
+        jList6 = new javax.swing.JList<>();
+        jPanel13 = new javax.swing.JPanel();
+        jScrollPane7 = new javax.swing.JScrollPane();
+        jList7 = new javax.swing.JList<>();
+        jCheckBox2 = new javax.swing.JCheckBox();
+        jPanel14 = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
+        jFormattedTextField1 = new javax.swing.JFormattedTextField();
+        jLabel4 = new javax.swing.JLabel();
+        jFormattedTextField2 = new javax.swing.JFormattedTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        getContentPane().setLayout(new java.awt.GridLayout(1, 0));
+        getContentPane().setLayout(new java.awt.GridLayout(1, 3));
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Agent templates"));
 
@@ -80,6 +175,11 @@ public class SimulatorSettingsDialog extends javax.swing.JDialog {
         jButton2.setText("Delete template");
 
         jButton3.setText("Edit template");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -88,11 +188,11 @@ public class SimulatorSettingsDialog extends javax.swing.JDialog {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 257, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 341, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton1)
                             .addComponent(jButton2)
+                            .addComponent(jButton1)
                             .addComponent(jButton3))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
@@ -105,7 +205,7 @@ public class SimulatorSettingsDialog extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 262, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 309, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton2)
                 .addContainerGap())
@@ -113,48 +213,16 @@ public class SimulatorSettingsDialog extends javax.swing.JDialog {
 
         getContentPane().add(jPanel1);
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Agent initialization"));
-
-        jButton4.setText("Edit");
-
-        jScrollPane2.setViewportView(jList2);
-
-        jLabel1.setText("Agent templates:");
-
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 257, Short.MAX_VALUE)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton4)
-                            .addComponent(jLabel1))
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jButton4)
-                .addGap(18, 18, 18)
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2)
-                .addContainerGap())
-        );
-
-        getContentPane().add(jPanel2);
-
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Agent behavior"));
 
         jLabel2.setText("Agent templates:");
 
         jButton5.setText("Edit");
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
 
         jScrollPane3.setViewportView(jList3);
 
@@ -165,11 +233,11 @@ public class SimulatorSettingsDialog extends javax.swing.JDialog {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 257, Short.MAX_VALUE)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 341, Short.MAX_VALUE)
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton5)
-                            .addComponent(jLabel2))
+                            .addComponent(jLabel2)
+                            .addComponent(jButton5))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -181,38 +249,253 @@ public class SimulatorSettingsDialog extends javax.swing.JDialog {
                 .addGap(18, 18, 18)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 335, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
         getContentPane().add(jPanel3);
 
+        jPanel11.setBorder(javax.swing.BorderFactory.createTitledBorder("Start/End of simulator"));
+
+        jPanel12.setBorder(javax.swing.BorderFactory.createTitledBorder("Safegraph"));
+        jPanel12.setLayout(new javax.swing.BoxLayout(jPanel12, javax.swing.BoxLayout.Y_AXIS));
+
+        jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Available months: Select starting month"));
+
+        jList6.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        jList6.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                jList6ValueChanged(evt);
+            }
+        });
+        jScrollPane6.setViewportView(jList6);
+
+        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
+        jPanel6.setLayout(jPanel6Layout);
+        jPanel6Layout.setHorizontalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 337, Short.MAX_VALUE)
+        );
+        jPanel6Layout.setVerticalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 124, Short.MAX_VALUE)
+        );
+
+        jPanel12.add(jPanel6);
+
+        jPanel13.setBorder(javax.swing.BorderFactory.createTitledBorder("Available months: Select ending month"));
+
+        jList7.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        jList7.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                jList7ValueChanged(evt);
+            }
+        });
+        jScrollPane7.setViewportView(jList7);
+
+        javax.swing.GroupLayout jPanel13Layout = new javax.swing.GroupLayout(jPanel13);
+        jPanel13.setLayout(jPanel13Layout);
+        jPanel13Layout.setHorizontalGroup(
+            jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 337, Short.MAX_VALUE)
+        );
+        jPanel13Layout.setVerticalGroup(
+            jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 124, Short.MAX_VALUE)
+        );
+
+        jPanel12.add(jPanel13);
+
+        jCheckBox2.setSelected(true);
+        jCheckBox2.setText("Is start by safegraph");
+        jCheckBox2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCheckBox2ActionPerformed(evt);
+            }
+        });
+
+        jPanel14.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        jLabel3.setText("Start date:");
+        jLabel3.setEnabled(false);
+
+        jFormattedTextField1.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"))));
+        jFormattedTextField1.setEnabled(false);
+        jFormattedTextField1.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                jFormattedTextField1PropertyChange(evt);
+            }
+        });
+
+        jLabel4.setText("End date:");
+        jLabel4.setEnabled(false);
+
+        jFormattedTextField2.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"))));
+        jFormattedTextField2.setEnabled(false);
+        jFormattedTextField2.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                jFormattedTextField2PropertyChange(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel14Layout = new javax.swing.GroupLayout(jPanel14);
+        jPanel14.setLayout(jPanel14Layout);
+        jPanel14Layout.setHorizontalGroup(
+            jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel14Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel14Layout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jFormattedTextField1))
+                    .addGroup(jPanel14Layout.createSequentialGroup()
+                        .addComponent(jLabel4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jFormattedTextField2)))
+                .addContainerGap())
+        );
+        jPanel14Layout.setVerticalGroup(
+            jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel14Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(jFormattedTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel4)
+                    .addComponent(jFormattedTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout jPanel11Layout = new javax.swing.GroupLayout(jPanel11);
+        jPanel11.setLayout(jPanel11Layout);
+        jPanel11Layout.setHorizontalGroup(
+            jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel12, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(jPanel11Layout.createSequentialGroup()
+                .addComponent(jCheckBox2)
+                .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(jPanel14, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        jPanel11Layout.setVerticalGroup(
+            jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel11Layout.createSequentialGroup()
+                .addComponent(jCheckBox2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel12, javax.swing.GroupLayout.DEFAULT_SIZE, 315, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel14, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+
+        getContentPane().add(jPanel11);
+
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        AgentTemplateDialog agentTemplateDialog = new AgentTemplateDialog(myMainModel, (JFrame) SwingUtilities.getWindowAncestor(this), true);
+        AgentTemplateDialog agentTemplateDialog = new AgentTemplateDialog(myMainModel, this, (JFrame) SwingUtilities.getWindowAncestor(this), true, -1);
         agentTemplateDialog.setVisible(true);
-        
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        if (jList1.getSelectedIndex() > -1) {
+            AgentTemplateDialog agentTemplateDialog = new AgentTemplateDialog(myMainModel, this, (JFrame) SwingUtilities.getWindowAncestor(this), true, jList1.getSelectedIndex());
+            agentTemplateDialog.workingAgentTemplate = myMainModel.agentBasedModel.agentTemplates.get(jList1.getSelectedIndex());
+            agentTemplateDialog.updatePropertiestTemplateList();
+            agentTemplateDialog.setVisible(true);
+        }
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        if (jList3.getSelectedIndex() > -1) {
+            AgentBehaviorDialog agentBehaviorDialog = new AgentBehaviorDialog(myMainModel, (JFrame) SwingUtilities.getWindowAncestor(this), true, jList3.getSelectedIndex());
+            agentBehaviorDialog.setVisible(true);
+        }
+    }//GEN-LAST:event_jButton5ActionPerformed
+
+    private void jCheckBox2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox2ActionPerformed
+        jPanel12.setEnabled(jCheckBox2.isSelected());
+        jPanel6.setEnabled(jCheckBox2.isSelected());
+        jPanel13.setEnabled(jCheckBox2.isSelected());
+        jList6.setEnabled(jCheckBox2.isSelected());
+        jList7.setEnabled(jCheckBox2.isSelected());
+
+        jLabel3.setEnabled(!jCheckBox2.isSelected());
+        jLabel4.setEnabled(!jCheckBox2.isSelected());
+        jFormattedTextField1.setEnabled(!jCheckBox2.isSelected());
+        jFormattedTextField2.setEnabled(!jCheckBox2.isSelected());
+
+        myMainModel.agentBasedModel.isPatternBasedTime = jCheckBox2.isSelected();
+    }//GEN-LAST:event_jCheckBox2ActionPerformed
+
+    private void jList6ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList6ValueChanged
+        if (jList6.getSelectedIndex() > -1) {
+            String startPatternDate = jList6.getSelectedValue();
+            String splitted[] = startPatternDate.split("_");
+            int year = Integer.parseInt(splitted[0]);
+            int month = Integer.parseInt(splitted[1]);
+            myMainModel.agentBasedModel.startTime = ZonedDateTime.of(year, month, 01, 0, 0, 0, 0, ZoneId.of("UTC"));
+            myMainModel.agentBasedModel.startTimeString = myMainModel.agentBasedModel.startTime.toString();
+        }
+    }//GEN-LAST:event_jList6ValueChanged
+
+    private void jList7ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList7ValueChanged
+        if (jList7.getSelectedIndex() > -1) {
+            String startPatternDate = jList7.getSelectedValue();
+            String splitted[] = startPatternDate.split("_");
+            int year = Integer.parseInt(splitted[0]);
+            int month = Integer.parseInt(splitted[1]);
+            myMainModel.agentBasedModel.endTime = ZonedDateTime.of(year, month, 01, 0, 0, 0, 0, ZoneId.of("UTC"));
+            myMainModel.agentBasedModel.endTimeString = myMainModel.agentBasedModel.endTime.toString();
+        }
+    }//GEN-LAST:event_jList7ValueChanged
+
+    private void jFormattedTextField1PropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jFormattedTextField1PropertyChange
+        if (evt.getNewValue() != null) {
+            if (jFormattedTextField1.getText().length() > 0) {
+                ZonedDateTime zonedDateTime = ZonedDateTime.parse(jFormattedTextField1.getText() + "+00:00");
+                myMainModel.agentBasedModel.startTime = zonedDateTime;
+            }
+        }
+    }//GEN-LAST:event_jFormattedTextField1PropertyChange
+
+    private void jFormattedTextField2PropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jFormattedTextField2PropertyChange
+        if (evt.getNewValue() != null) {
+            if (jFormattedTextField2.getText().length() > 0) {
+                ZonedDateTime zonedDateTime = ZonedDateTime.parse(jFormattedTextField2.getText() + "+00:00");
+                myMainModel.agentBasedModel.endTime = zonedDateTime;
+            }
+        }
+    }//GEN-LAST:event_jFormattedTextField2PropertyChange
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JCheckBox jCheckBox2;
+    private javax.swing.JFormattedTextField jFormattedTextField1;
+    private javax.swing.JFormattedTextField jFormattedTextField2;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JList<String> jList1;
-    private javax.swing.JList<String> jList2;
     private javax.swing.JList<String> jList3;
+    private javax.swing.JList<String> jList6;
+    private javax.swing.JList<String> jList7;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel11;
+    private javax.swing.JPanel jPanel12;
+    private javax.swing.JPanel jPanel13;
+    private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel6;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane6;
+    private javax.swing.JScrollPane jScrollPane7;
     // End of variables declaration//GEN-END:variables
 }

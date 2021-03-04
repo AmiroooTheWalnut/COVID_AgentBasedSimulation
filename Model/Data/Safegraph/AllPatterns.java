@@ -10,11 +10,14 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.Serializable;
 import java.util.ArrayList;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  *
  * @author user
  */
+@Getter @Setter
 public class AllPatterns implements Serializable {
     static final long serialVersionUID = softwareVersion;
     public ArrayList<Patterns> monthlyPatternsList;

@@ -4,11 +4,14 @@
  * and open the template in the editor.
  */
 package COVID_AgentBasedSimulation.Model.Data.Safegraph;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  *
  * @author user
  */
+@Getter @Setter
 public class LongIntTuple {
     public long key;
     public int value;

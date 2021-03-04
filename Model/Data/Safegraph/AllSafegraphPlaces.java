@@ -9,11 +9,14 @@ import static COVID_AgentBasedSimulation.Model.MainModel.softwareVersion;
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  *
  * @author user
  */
+@Getter @Setter
 public class AllSafegraphPlaces implements Serializable {
     static final long serialVersionUID = softwareVersion;
     public ArrayList<SafegraphPlaces> monthlySafegraphPlacesList;

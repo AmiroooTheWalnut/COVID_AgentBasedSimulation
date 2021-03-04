@@ -3,15 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package COVID_AgentBasedSimulation.Model.Structure;
-import lombok.Getter;
-import lombok.Setter;
+package COVID_AgentBasedSimulation.GUI;
 
 /**
  *
- * @author Amir Mohammad Esmaieeli Sikaroudi
+ * @author user
  */
-@Getter @Setter
-public class Layer {
-    String name;
+public class ProjectDefaults {
+    public String defaultProjectFileLocation;
 }

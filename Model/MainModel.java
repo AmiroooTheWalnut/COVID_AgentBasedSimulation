@@ -1,19 +1,30 @@
 package COVID_AgentBasedSimulation.Model;
 
+import COVID_AgentBasedSimulation.Model.AgentBasedModel.Agent;
 import COVID_AgentBasedSimulation.Model.AgentBasedModel.AgentBasedModel;
+import COVID_AgentBasedSimulation.Model.AgentBasedModel.AgentTemplate;
+import COVID_AgentBasedSimulation.Model.AgentBasedModel.BehaviorScript;
+import COVID_AgentBasedSimulation.Model.AgentBasedModel.JavaScript;
+import COVID_AgentBasedSimulation.Model.AgentBasedModel.PythonScript;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.Safegraph;
 import COVID_AgentBasedSimulation.Model.Structure.AllGISData;
-import COVID_AgentBasedSimulation.Model.Structure.Person;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.util.DefaultInstantiatorStrategy;
+import groovy.lang.Binding;
+import groovy.lang.GroovyShell;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import lombok.Getter;
+import lombok.Setter;
 import org.objenesis.strategy.StdInstantiatorStrategy;
+import py4j.GatewayServer;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -24,7 +35,8 @@ import org.objenesis.strategy.StdInstantiatorStrategy;
  *
  * @author user
  */
-public class MainModel {
+@Getter @Setter
+public class MainModel extends Dataset {
 
     public static final long softwareVersion = 1L;
     static final long serialVersionUID = softwareVersion;
@@ -32,58 +44,160 @@ public class MainModel {
     public Safegraph safegraph;
     public AllGISData allGISData;
 
-    public ArrayList<Person> people;
-    public ZonedDateTime startTime;
-    
+//    public ArrayList<Person> people;
+
     public AgentBasedModel agentBasedModel;
+
+    public JavaEvaluationEngine javaEvaluationEngine;
+    public PythonEvaluationEngine pythonEvaluationEngine;
+
+    public Timer simulationTimer;
+    public TimerTask runTask;
+    public int simulationDelayTime=5000;
+    public boolean isFastForward = false;
+    
+    public boolean isStartBySafegraph = false;
+
+    public void startScriptEngines() {
+        javaEvaluationEngine = new JavaEvaluationEngine(this);
+        pythonEvaluationEngine = new PythonEvaluationEngine(this);
+    }
 
     public void initData() {
         initSafegraph();
+        allGISData = new AllGISData();
+        allGISData.setDatasetTemplate();
     }
 
-    public void initModel() {
-        startTime = safegraph.findEarliestPatternTime();
-    }
+    @Override
+    public void setDatasetTemplate() {
+        datasetTemplate = new DatasetTemplate();
+        datasetTemplate.name = "SimulationVariables";
 
-    public void run() {
-        if (people != null) {
-            if (people.size() > 0) {
+        try {
+            RecordTemplate temp = new RecordTemplate();
+            temp.name = this.getClass().getField("startTime").getName() + "(" + this.getClass().getField("startTime").getGenericType().getTypeName() + ")";
+            datasetTemplate.recordTemplates.add(temp);
 
-                System.out.println(startTime.toString());
-                Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
+            temp = new RecordTemplate();
+            temp.name = this.getClass().getField("endTime").getName() + "(" + this.getClass().getField("endTime").getGenericType().getTypeName() + ")";
+            datasetTemplate.recordTemplates.add(temp);
 
-                    }
-
-                });
-                thread.start();
-            }
+            temp = new RecordTemplate();
+            temp.name = this.getClass().getField("currentTime").getName() + "(" + this.getClass().getField("currentTime").getGenericType().getTypeName() + ")";
+            datasetTemplate.recordTemplates.add(temp);
+        } catch (NoSuchFieldException ex) {
+            Logger.getLogger(MainModel.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SecurityException ex) {
+            Logger.getLogger(MainModel.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
+    public void initAgentBasedModel() {
+        startScriptEngines();
+        agentBasedModel = new AgentBasedModel(this);
+//        agentBasedModel.agents=new ArrayList();
+        agentBasedModel.agentTemplates = new ArrayList();
+        AgentTemplate rootAgentTemplate = new AgentTemplate();
+        rootAgentTemplate.agentTypeName = "root";
+        rootAgentTemplate.constructor = new BehaviorScript();
+        rootAgentTemplate.constructor.javaScript = new JavaScript();
+        rootAgentTemplate.constructor.javaScript.script = "";
+        rootAgentTemplate.constructor.pythonScript = new PythonScript();
+        rootAgentTemplate.constructor.pythonScript.script = "";
+        rootAgentTemplate.constructor.isJavaScriptActive = true;
+
+        rootAgentTemplate.behavior = new BehaviorScript();
+        rootAgentTemplate.behavior.javaScript = new JavaScript();
+        rootAgentTemplate.behavior.javaScript.script = "";
+        rootAgentTemplate.behavior.pythonScript = new PythonScript();
+        rootAgentTemplate.behavior.pythonScript.script = "";
+        rootAgentTemplate.behavior.isJavaScriptActive = true;
+
+        rootAgentTemplate.destructor = new BehaviorScript();
+        rootAgentTemplate.destructor.javaScript = new JavaScript();
+        rootAgentTemplate.destructor.javaScript.script = "";
+        rootAgentTemplate.destructor.pythonScript = new PythonScript();
+        rootAgentTemplate.destructor.pythonScript.script = "";
+        rootAgentTemplate.destructor.isJavaScriptActive = true;
+        agentBasedModel.agentTemplates.add(rootAgentTemplate);
+    }
+
+    public void initModel(boolean isParallel, int numCPUs) {
+//        int month = agentBasedModel.startTime.getMonthValue();
+//        String monthString = String.valueOf(month);
+//        if (monthString.length() < 2) {
+//            monthString = "0" + monthString;
+//        }
+//        String dateName = agentBasedModel.startTime.getYear() + "_" +monthString;
+//        safegraph.clearPatternsPlaces();
+//        System.gc();
+//        safegraph.loadPatternsPlacesSet(dateName, allGISData, isParallel, numCPUs);//SO FAR NO PARALLEL
+        agentBasedModel.rootAgent = new Agent(agentBasedModel.agentTemplates.get(0));
+        agentBasedModel.agents = new ArrayList();
+        agentBasedModel.currentTime=agentBasedModel.startTime;
+        resetTimerTask();
+        if (agentBasedModel.rootAgent.myTemplate.constructor.isJavaScriptActive == true) {
+            javaEvaluationEngine.runScript(agentBasedModel.rootAgent.myTemplate.constructor.javaScript.script);
+        } else {
+            pythonEvaluationEngine.runScript(agentBasedModel.rootAgent.myTemplate.constructor.pythonScript.script);
+        }
+    }
     
+    public void resetTimerTask(){
+        runTask=new TimerTask() {
+            public void run() {
+                agentBasedModel.evaluateAllAgents();
+                agentBasedModel.currentTime=agentBasedModel.currentTime.plusMinutes(1);
+            }
+        };
+    }
+
+    public void resume() {
+        simulationTimer = new Timer();
+        resetTimerTask();
+        simulationTimer.schedule(runTask, 0, simulationDelayTime);
+//        if (people != null) {
+//            if (people.size() > 0) {
+//
+//                System.out.println(startTime.toString());
+//                Thread thread = new Thread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//
+//                    }
+//
+//                });
+//                thread.start();
+//            }
+//        }
+    }
+    
+    public void pause(){
+        simulationTimer.cancel();
+    }
 
     public void generatePeopleFromPatterns() {
-        people = new ArrayList();
-        int counter = 0;
-        for (int i = 0; i < safegraph.allPatterns.monthlyPatternsList.size(); i++) {
-            for (int j = 0; j < safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.size(); j++) {
-                if (safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).visitor_home_cbgs_place != null) {
-                    for (int k = 0; k < safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).visitor_home_cbgs_place.size(); k++) {
-                        Person person = new Person();
-                        person.index = counter;
-                        person.home = safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).visitor_home_cbgs_place.get(k).key;
-                        people.add(person);
-                        counter = counter + 1;
-                    }
-                }
-            }
-        }
+//        people = new ArrayList();
+//        int counter = 0;
+//        for (int i = 0; i < safegraph.allPatterns.monthlyPatternsList.size(); i++) {
+//            for (int j = 0; j < safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.size(); j++) {
+//                if (safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).visitor_home_cbgs_place != null) {
+//                    for (int k = 0; k < safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).visitor_home_cbgs_place.size(); k++) {
+//                        Person person = new Person();
+//                        person.index = counter;
+//                        person.home = safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).visitor_home_cbgs_place.get(k).key;
+//                        people.add(person);
+//                        counter = counter + 1;
+//                    }
+//                }
+//            }
+//        }
     }
 
     public void reset() {
-        generatePeopleFromPatterns();
+//        generatePeopleFromPatterns();
+
     }
 
     public static AllGISData loadAllGISDataKryo(String passed_file_path) {
@@ -125,8 +239,6 @@ public class MainModel {
         safegraph = new Safegraph();
         safegraph.initAllPatternsAllPlaces();
         safegraph.setDatasetTemplate();
-        allGISData = new AllGISData();
-        allGISData.setDatasetTemplate();
     }
 
 }

@@ -6,11 +6,14 @@
 package COVID_AgentBasedSimulation.Model.Data.Safegraph;
 
 import COVID_AgentBasedSimulation.Model.Structure.CensusBlockGroup;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  *
  * @author user
  */
+@Getter @Setter
 public class CensusBlockGroupIntegerTuple {
     public CensusBlockGroup key;
     public int value;
