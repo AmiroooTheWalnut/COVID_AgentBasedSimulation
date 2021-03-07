@@ -1,8 +1,6 @@
 package COVID_AgentBasedSimulation.Model.Data.Safegraph;
 
 import static COVID_AgentBasedSimulation.Model.MainModel.softwareVersion;
-import COVID_AgentBasedSimulation.Model.Structure.AllGISData;
-import COVID_AgentBasedSimulation.Model.Structure.CensusBlockGroup;
 import de.siegmar.fastcsv.reader.CsvContainer;
 import de.siegmar.fastcsv.reader.CsvReader;
 import de.siegmar.fastcsv.reader.CsvRow;
@@ -89,15 +87,7 @@ public class Patterns implements Serializable {
             patterns = null;
             System.out.println("Data read: " + i);
         }
-//        for(int i=0;i<20;i++){
-//            System.out.println(records.get(i).placeKey);
-//        }
-//        System.out.println("***");
         Collections.sort(patternRecords);
-//        for(int i=0;i<20;i++){
-//            System.out.println(records.get(i).placeKey);
-//        }
-//        System.out.println("$$$");
     }
 
     public ArrayList<PatternsRecordProcessed> readData(String fileName, boolean isParallel, int numCPU) {

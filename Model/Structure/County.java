@@ -10,27 +10,29 @@ import lombok.Setter;
  *
  * @author Amir Mohammad Esmaieeli Sikaroudi
  */
-@Getter @Setter
+@Getter
+@Setter
 public class County extends Marker implements Serializable {
+
     static final long serialVersionUID = softwareVersion;
     public String name;
     public int id;
-    public transient boolean isLatLonCalculated=false;
+    public transient boolean isLatLonCalculated = false;
     public ArrayList<City> cities;
     public ArrayList<ZipCode> zipcodes;
     public ArrayList<CensusTract> censusTracts;
-    
-    public void getLatLonSizeFromChildren(){
+
+    public void getLatLonSizeFromChildren() {
         float minLat = Float.MAX_VALUE;
         float maxLat = -Float.MAX_VALUE;
         float minLon = Float.MAX_VALUE;
         float maxLon = -Float.MAX_VALUE;
-        float latCumulative=0;
-        float lonCumulative=0;
+        float latCumulative = 0;
+        float lonCumulative = 0;
         for (int i = 0; i < censusTracts.size(); i++) {
-            if(censusTracts.get(i).isLatLonCalculated==false){
+            if (censusTracts.get(i).isLatLonCalculated == false) {
                 censusTracts.get(i).getLatLonSizeFromChildren();
-                censusTracts.get(i).isLatLonCalculated=true;
+                censusTracts.get(i).isLatLonCalculated = true;
             }
             float childLat = censusTracts.get(i).lat;
             float childLon = censusTracts.get(i).lon;
@@ -46,14 +48,23 @@ public class County extends Marker implements Serializable {
             if (childLon < minLon) {
                 minLon = childLon;
             }
-            latCumulative=latCumulative+childLat;
-            lonCumulative=lonCumulative+childLon;
+            latCumulative = latCumulative + childLat;
+            lonCumulative = lonCumulative + childLon;
         }
-        lat = latCumulative / (float)censusTracts.size();
-        lon = lonCumulative / (float)censusTracts.size();
+        if (cities != null) {
+            for (int i = 0; i < cities.size(); i++) {
+                if (cities.get(i).isLatLonCalculated == false) {
+                    cities.get(i).getLatLonSizeFromChildren();
+                    cities.get(i).isLatLonCalculated = true;
+                }
+            }
+        }
+
+        lat = latCumulative / (float) censusTracts.size();
+        lon = lonCumulative / (float) censusTracts.size();
         size = Math.max(maxLat - minLat, maxLon - minLon);
     }
-    
+
     public boolean isNewCityUnique(String input) {
         if (cities == null) {
             cities = new ArrayList();
@@ -67,37 +78,35 @@ public class County extends Marker implements Serializable {
         }
         return true;
     }
-    
+
     public boolean isNewZipCodeUnique(int input) {
         if (zipcodes == null) {
             zipcodes = new ArrayList();
             return true;
         } else {
             for (int i = 0; i < zipcodes.size(); i++) {
-                if (zipcodes.get(i).code==input) {
+                if (zipcodes.get(i).code == input) {
                     return false;
                 }
             }
         }
         return true;
     }
-    
+
     public boolean isNewCensusTractUnique(int input) {
         if (censusTracts == null) {
             censusTracts = new ArrayList();
             return true;
         } else {
             for (int i = 0; i < censusTracts.size(); i++) {
-                if (censusTracts.get(i).id==input) {
+                if (censusTracts.get(i).id == input) {
                     return false;
                 }
             }
         }
         return true;
     }
-    
-    
-    
+
     public City findCity(String input) {
         if (cities == null) {
             cities = new ArrayList();
@@ -111,37 +120,35 @@ public class County extends Marker implements Serializable {
         }
         return null;
     }
-    
+
     public ZipCode findZipCode(int input) {
         if (zipcodes == null) {
             zipcodes = new ArrayList();
             return null;
         } else {
             for (int i = 0; i < zipcodes.size(); i++) {
-                if (zipcodes.get(i).code==input) {
+                if (zipcodes.get(i).code == input) {
                     return zipcodes.get(i);
                 }
             }
         }
         return null;
     }
-    
+
     public CensusTract findCensusTract(int input) {
         if (censusTracts == null) {
             censusTracts = new ArrayList();
             return null;
         } else {
             for (int i = 0; i < censusTracts.size(); i++) {
-                if (censusTracts.get(i).id==input) {
+                if (censusTracts.get(i).id == input) {
                     return censusTracts.get(i);
                 }
             }
         }
         return null;
     }
-    
-    
-    
+
     public City findAndInsertCity(String input) {
         if (cities == null) {
             cities = new ArrayList();
@@ -159,9 +166,9 @@ public class County extends Marker implements Serializable {
         City temp = new City();
         temp.name = input;
         cities.add(temp);
-        return cities.get(cities.size()-1);
+        return cities.get(cities.size() - 1);
     }
-    
+
     public ZipCode findAndInsertZipCode(int input) {
         if (zipcodes == null) {
             zipcodes = new ArrayList();
@@ -171,7 +178,7 @@ public class County extends Marker implements Serializable {
             return zipcodes.get(0);
         } else {
             for (int i = 0; i < zipcodes.size(); i++) {
-                if (zipcodes.get(i).code==input) {
+                if (zipcodes.get(i).code == input) {
                     return zipcodes.get(i);
                 }
             }
@@ -179,9 +186,9 @@ public class County extends Marker implements Serializable {
         ZipCode temp = new ZipCode();
         temp.code = input;
         zipcodes.add(temp);
-        return zipcodes.get(zipcodes.size()-1);
+        return zipcodes.get(zipcodes.size() - 1);
     }
-    
+
     public CensusTract findAndInsertCensusTract(int input) {
         if (censusTracts == null) {
             censusTracts = new ArrayList();
@@ -191,7 +198,7 @@ public class County extends Marker implements Serializable {
             return censusTracts.get(0);
         } else {
             for (int i = 0; i < censusTracts.size(); i++) {
-                if (censusTracts.get(i).id==input) {
+                if (censusTracts.get(i).id == input) {
                     return censusTracts.get(i);
                 }
             }
@@ -199,10 +206,7 @@ public class County extends Marker implements Serializable {
         CensusTract temp = new CensusTract();
         temp.id = input;
         censusTracts.add(temp);
-        return censusTracts.get(censusTracts.size()-1);
+        return censusTracts.get(censusTracts.size() - 1);
     }
-    
-    
-    
-    
+
 }

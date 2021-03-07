@@ -28,7 +28,7 @@ public class ManualLoadPlacesDialog extends javax.swing.JDialog {
     }
 
     public void refreshList() {
-        patternsList = AllSafegraphPlaces.detectAllPlaces("./datasets/");
+        patternsList = AllSafegraphPlaces.detectAllPlaces("./datasets/Safegraph/FullData");
         jList1.setModel(new javax.swing.AbstractListModel() {
             @Override
             public int getSize() {
@@ -105,7 +105,7 @@ public class ManualLoadPlacesDialog extends javax.swing.JDialog {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         if (jList1.getSelectedIndex() > -1) {
-            SafegraphPlaces safegraphPlaces = Safegraph.loadSafegraphPlacesKryo("./datasets/" + jList1.getSelectedValue() + "/processedData.bin");
+            SafegraphPlaces safegraphPlaces = Safegraph.loadSafegraphPlacesKryo("./datasets/Safegraph/FullData/" + jList1.getSelectedValue() + "/processedData.bin");
             boolean isUnique = true;
             for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.size(); i++) {
                 if (myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).name.equals(safegraphPlaces.name)) {

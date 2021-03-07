@@ -22,7 +22,6 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.objenesis.strategy.StdInstantiatorStrategy;
@@ -120,13 +119,13 @@ public class Safegraph extends Dataset implements Serializable {
 
     public ArrayList<String> checkMonthAvailability() {
         ArrayList<String> availableMonths = new ArrayList();
-        String[] patternsDirectories = AllPatterns.detectAllPatterns("./datasets");
-        String[] placesDirectories = AllSafegraphPlaces.detectAllPlaces("./datasets");
+        String[] patternsDirectories = AllPatterns.detectAllPatterns("./datasets/Safegraph/FullData");
+        String[] placesDirectories = AllSafegraphPlaces.detectAllPlaces("./datasets/Safegraph/FullData");
         for (int i = 0; i < patternsDirectories.length; i++) {
             for (int j = 0; j < placesDirectories.length; j++) {
                 if (patternsDirectories[i].substring(9).equals(placesDirectories[j].substring(9))) {
-                    File processedPatterns = new File("./datasets/" + patternsDirectories[i] + "/processedData.bin");
-                    File processedPlaces = new File("./datasets/" + placesDirectories[i] + "/processedData.bin");
+                    File processedPatterns = new File("./datasets/Safegraph/FullData/" + patternsDirectories[i] + "/processedData.bin");
+                    File processedPlaces = new File("./datasets/Safegraph/FullData/" + placesDirectories[i] + "/processedData.bin");
                     if (processedPatterns.exists() && processedPlaces.exists()) {
                         availableMonths.add(patternsDirectories[i]);
                     }
@@ -324,8 +323,8 @@ public class Safegraph extends Dataset implements Serializable {
     }
 
     public void loadPatternsPlacesSet(String date, AllGISData allGISData, boolean isParallel, int numCPU) {
-        Patterns patterns = loadPatternsKryo("./datasets/patterns_" + date + "/processedData.bin");
-        SafegraphPlaces safegraphPlaces = loadSafegraphPlacesKryo("./datasets/core_poi_" + date + "/processedData.bin");
+        Patterns patterns = loadPatternsKryo("./datasets/Safegraph/FullData/patterns_" + date + "/processedData.bin");
+        SafegraphPlaces safegraphPlaces = loadSafegraphPlacesKryo("./datasets/Safegraph/FullData/core_poi_" + date + "/processedData.bin");
 
         System.out.println("Data loaded. Connecting patterns and places ...");
         connectPatternsAndPlaces(patterns, safegraphPlaces, allGISData, isParallel, numCPU);
@@ -398,14 +397,6 @@ public class Safegraph extends Dataset implements Serializable {
                         minusSign = i - j + lastValidIndex;
                     }
                     if (plusSign > -1) {
-                        if(i==5306324){
-                        System.out.println("!!!!");
-                    }
-                        if(plusSign==5306324){
-                        System.out.println("!!!!");
-                    }
-//                    System.out.println("PATTERNS: "+patterns.records.get(i).placeKey);
-//                    System.out.println("PLACES: "+places.records.get(plusSign).placeKey);
                         if (patterns.patternRecords.get(i).placeKey.equals(places.placesRecords.get(plusSign).placeKey)) {
                     
                             CensusBlockGroup temp = allGISData.findCensusBlockGroup(patterns.patternRecords.get(i).poi_cbg);
@@ -424,9 +415,6 @@ public class Safegraph extends Dataset implements Serializable {
 //                    System.out.println("PATTERNS: "+patterns.records.get(i).placeKey);
 //                    System.out.println("PLACES: "+places.records.get(minusSign).placeKey);
                         if (patterns.patternRecords.get(i).placeKey.equals(places.placesRecords.get(minusSign).placeKey)) {
-//                    if(counter==83308){
-//                        System.out.println("!!!!");
-//                    }
                             CensusBlockGroup temp = allGISData.findCensusBlockGroup(patterns.patternRecords.get(i).poi_cbg);
                             lastValidIndex = lastValidIndex - j;
                             if (temp == null) {
@@ -459,25 +447,6 @@ public class Safegraph extends Dataset implements Serializable {
                     System.out.println("Num patterns processed: " + largerCounter * counterInterval);
                 }
             }
-//        counter = 0;
-//        for (int i = 0; i < patterns.records.size(); i++) {
-//            if (patterns.records.get(i).visitor_daytime_cbgs != null) {
-//                patterns.records.get(i).visitor_daytime_cbgs_place = new ArrayList();
-//                for (int k = 0; k < patterns.records.get(i).visitor_daytime_cbgs.size(); k++) {
-//                    CensusBlockGroup temp = allGISData.findCensusBlockGroup(patterns.records.get(i).visitor_daytime_cbgs.get(k).key);
-//                    patterns.records.get(i).visitor_daytime_cbgs_place.add(new CensusBlockGroupIntegerTuple(temp, patterns.records.get(i).visitor_daytime_cbgs.get(k).value));
-//                }
-//            }
-//            if (patterns.records.get(i).visitor_home_cbgs != null) {
-//                patterns.records.get(i).visitor_home_cbgs_place = new ArrayList();
-//                for (int k = 0; k < patterns.records.get(i).visitor_home_cbgs.size(); k++) {
-//                    CensusBlockGroup temp = allGISData.findCensusBlockGroup(patterns.records.get(i).visitor_home_cbgs.get(k).key);
-//                    patterns.records.get(i).visitor_home_cbgs_place.add(new CensusBlockGroupIntegerTuple(temp, patterns.records.get(i).visitor_home_cbgs.get(k).value));
-//                }
-//            }
-//            counter = counter + 1;
-//            System.out.println("P2: " + counter);
-//        }
         }
     }
 

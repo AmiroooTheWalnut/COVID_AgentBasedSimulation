@@ -46,7 +46,7 @@ public class MainModel extends Dataset {
 
 //    public ArrayList<Person> people;
 
-    public AgentBasedModel agentBasedModel;
+    public AgentBasedModel ABM;
 
     public JavaEvaluationEngine javaEvaluationEngine;
     public PythonEvaluationEngine pythonEvaluationEngine;
@@ -95,9 +95,9 @@ public class MainModel extends Dataset {
 
     public void initAgentBasedModel() {
         startScriptEngines();
-        agentBasedModel = new AgentBasedModel(this);
+        ABM = new AgentBasedModel(this);
 //        agentBasedModel.agents=new ArrayList();
-        agentBasedModel.agentTemplates = new ArrayList();
+        ABM.agentTemplates = new ArrayList();
         AgentTemplate rootAgentTemplate = new AgentTemplate();
         rootAgentTemplate.agentTypeName = "root";
         rootAgentTemplate.constructor = new BehaviorScript();
@@ -120,7 +120,7 @@ public class MainModel extends Dataset {
         rootAgentTemplate.destructor.pythonScript = new PythonScript();
         rootAgentTemplate.destructor.pythonScript.script = "";
         rootAgentTemplate.destructor.isJavaScriptActive = true;
-        agentBasedModel.agentTemplates.add(rootAgentTemplate);
+        ABM.agentTemplates.add(rootAgentTemplate);
     }
 
     public void initModel(boolean isParallel, int numCPUs) {
@@ -133,22 +133,22 @@ public class MainModel extends Dataset {
 //        safegraph.clearPatternsPlaces();
 //        System.gc();
 //        safegraph.loadPatternsPlacesSet(dateName, allGISData, isParallel, numCPUs);//SO FAR NO PARALLEL
-        agentBasedModel.rootAgent = new Agent(agentBasedModel.agentTemplates.get(0));
-        agentBasedModel.agents = new ArrayList();
-        agentBasedModel.currentTime=agentBasedModel.startTime;
+        ABM.rootAgent = new Agent(ABM.agentTemplates.get(0));
+        ABM.agents = new ArrayList();
+        ABM.currentTime=ABM.startTime;
         resetTimerTask();
-        if (agentBasedModel.rootAgent.myTemplate.constructor.isJavaScriptActive == true) {
-            javaEvaluationEngine.runScript(agentBasedModel.rootAgent.myTemplate.constructor.javaScript.script);
+        if (ABM.rootAgent.myTemplate.constructor.isJavaScriptActive == true) {
+            javaEvaluationEngine.runScript(ABM.rootAgent.myTemplate.constructor.javaScript.script);
         } else {
-            pythonEvaluationEngine.runScript(agentBasedModel.rootAgent.myTemplate.constructor.pythonScript.script);
+            pythonEvaluationEngine.runScript(ABM.rootAgent.myTemplate.constructor.pythonScript.script);
         }
     }
     
     public void resetTimerTask(){
         runTask=new TimerTask() {
             public void run() {
-                agentBasedModel.evaluateAllAgents();
-                agentBasedModel.currentTime=agentBasedModel.currentTime.plusMinutes(1);
+                ABM.evaluateAllAgents();
+                ABM.currentTime=ABM.currentTime.plusMinutes(1);
             }
         };
     }

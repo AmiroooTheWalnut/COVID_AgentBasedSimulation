@@ -41,6 +41,8 @@ public class AgentBasedModel {
 
     public String startTimeString;
     public String endTimeString;
+    
+    public String studyScope;
 
     private transient MainModel myMainModel;
 
@@ -52,10 +54,6 @@ public class AgentBasedModel {
 
     public AgentBasedModel(MainModel mainModel) {
         myMainModel = mainModel;
-    }
-
-    public void initAgents() {
-
     }
 
     public void evaluateAllAgents() {
@@ -139,6 +137,7 @@ public class AgentBasedModel {
             agentTemplates = result.agentTemplates;
             startTimeString = result.startTimeString;
             endTimeString = result.endTimeString;
+            studyScope = result.studyScope;
             if (startTimeString.length() > 0) {
                 ZonedDateTime zonedDateTime = ZonedDateTime.parse(startTimeString);
                 startTime = zonedDateTime;

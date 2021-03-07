@@ -5,7 +5,9 @@
  */
 package COVID_AgentBasedSimulation.GUI;
 
+import COVID_AgentBasedSimulation.Model.DatasetTemplate;
 import COVID_AgentBasedSimulation.Model.MainModel;
+import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
@@ -46,6 +48,39 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
     public AgentBehaviorDialog(MainModel mainModel, java.awt.Frame parent, boolean modal, int passed_behaviorEditIndex) {
         super(parent, modal);
         initComponents();
+        expandAllNodes(jTree1);
+        
+        DefaultTreeModel modelDatasets = (DefaultTreeModel) jTree3.getModel();
+        DefaultMutableTreeNode rootDatasets = (DefaultMutableTreeNode) modelDatasets.getRoot();
+        rootDatasets.removeAllChildren();
+        modelDatasets.reload();
+
+        rootDatasets = new DefaultMutableTreeNode("Datasets");
+
+        modelDatasets.setRoot(rootDatasets);
+
+//        DefaultMutableTreeNode javaNode = new DefaultMutableTreeNode("Java");
+        DefaultMutableTreeNode safegraphNode = new DefaultMutableTreeNode("Safegraph");
+        DefaultMutableTreeNode gISDataNode = new DefaultMutableTreeNode("GISData");
+
+        rootDatasets.add(new DefaultMutableTreeNode("Object"));
+        rootDatasets.add(new DefaultMutableTreeNode("Integer"));
+        rootDatasets.add(new DefaultMutableTreeNode("Double"));
+        rootDatasets.add(new DefaultMutableTreeNode("String"));
+        rootDatasets.add(new DefaultMutableTreeNode("ArrayList"));
+
+//        root.add(javaNode);
+//        model.reload(root);
+        setDatasetTree(mainModel.safegraph.datasetTemplate, safegraphNode);
+        setDatasetTree(mainModel.allGISData.datasetTemplate, gISDataNode);
+
+        rootDatasets.add(safegraphNode);
+//        model.reload(root);
+        rootDatasets.add(gISDataNode);
+        modelDatasets.reload(rootDatasets);
+
+        expandAllNodes(jTree3);
+        
         myMainModel=mainModel;
         behaviorEditIndex=passed_behaviorEditIndex;
         jTree1.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
@@ -53,19 +88,20 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
         jTree3.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         jTree4.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         
-        DefaultTreeModel model = (DefaultTreeModel) jTree2.getModel();
-        DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
-        root.removeAllChildren();
-        model.reload();
+        DefaultTreeModel modelCurrentAgent = (DefaultTreeModel) jTree2.getModel();
+        DefaultMutableTreeNode rootCurrentAgent = (DefaultMutableTreeNode) modelCurrentAgent.getRoot();
+        rootCurrentAgent.removeAllChildren();
+        modelCurrentAgent.reload();
 
-        root = new DefaultMutableTreeNode("Properties");
+        rootCurrentAgent = new DefaultMutableTreeNode("Properties");
         
-        for(int i=0;i<myMainModel.agentBasedModel.agentTemplates.get(behaviorEditIndex).agentProperties.size();i++){
-            root = new DefaultMutableTreeNode(myMainModel.agentBasedModel.agentTemplates.get(behaviorEditIndex).agentProperties.get(i).propertyName+"["+myMainModel.agentBasedModel.agentTemplates.get(behaviorEditIndex).agentProperties.get(i).propertyType+"]");
+        for(int i=0;i<myMainModel.ABM.agentTemplates.get(behaviorEditIndex).agentProperties.size();i++){
+            rootCurrentAgent = new DefaultMutableTreeNode(myMainModel.ABM.agentTemplates.get(behaviorEditIndex).agentProperties.get(i).propertyName+"["+myMainModel.ABM.agentTemplates.get(behaviorEditIndex).agentProperties.get(i).propertyType+"]");
         }
 
-        model.setRoot(root);
+        modelCurrentAgent.setRoot(rootCurrentAgent);
         
+        expandAllNodes(jTree2);
         
         construcorJavaTextArea = new RSyntaxTextArea(20, 60);
         construcorJavaTextArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
@@ -77,15 +113,15 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
         construcorPythonTextArea.setCodeFoldingEnabled(true);
         construcorPythonScrollPane = new RTextScrollPane(construcorPythonTextArea);
         
-        if(myMainModel.agentBasedModel.agentTemplates.get(behaviorEditIndex).constructor.isJavaScriptActive==true){
-            construcorJavaTextArea.setText(myMainModel.agentBasedModel.agentTemplates.get(behaviorEditIndex).constructor.javaScript.script);
+        if(myMainModel.ABM.agentTemplates.get(behaviorEditIndex).constructor.isJavaScriptActive==true){
+            construcorJavaTextArea.setText(myMainModel.ABM.agentTemplates.get(behaviorEditIndex).constructor.javaScript.script);
             jPanel2.removeAll();
             jPanel2.add(construcorJavaScrollPane);
             jPanel2.invalidate();
             jPanel2.validate();
             jPanel2.repaint();
         }else{
-            construcorPythonTextArea.setText(myMainModel.agentBasedModel.agentTemplates.get(behaviorEditIndex).constructor.pythonScript.script);
+            construcorPythonTextArea.setText(myMainModel.ABM.agentTemplates.get(behaviorEditIndex).constructor.pythonScript.script);
             jPanel2.removeAll();
             jPanel2.add(construcorPythonScrollPane);
             jPanel2.invalidate();
@@ -104,15 +140,15 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
         behaviorPythonTextArea.setCodeFoldingEnabled(true);
         behaviorPythonScrollPane = new RTextScrollPane(behaviorPythonTextArea);
         
-        if(myMainModel.agentBasedModel.agentTemplates.get(behaviorEditIndex).behavior.isJavaScriptActive==true){
-            behaviorJavaTextArea.setText(myMainModel.agentBasedModel.agentTemplates.get(behaviorEditIndex).behavior.javaScript.script);
+        if(myMainModel.ABM.agentTemplates.get(behaviorEditIndex).behavior.isJavaScriptActive==true){
+            behaviorJavaTextArea.setText(myMainModel.ABM.agentTemplates.get(behaviorEditIndex).behavior.javaScript.script);
             jPanel4.removeAll();
             jPanel4.add(behaviorJavaScrollPane);
             jPanel4.invalidate();
             jPanel4.validate();
             jPanel4.repaint();
         }else{
-            behaviorPythonTextArea.setText(myMainModel.agentBasedModel.agentTemplates.get(behaviorEditIndex).behavior.pythonScript.script);
+            behaviorPythonTextArea.setText(myMainModel.ABM.agentTemplates.get(behaviorEditIndex).behavior.pythonScript.script);
             jPanel4.removeAll();
             jPanel4.add(behaviorPythonScrollPane);
             jPanel4.invalidate();
@@ -131,21 +167,47 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
         destructorPythonTextArea.setCodeFoldingEnabled(true);
         destructorPythonScrollPane = new RTextScrollPane(destructorPythonTextArea);
         
-        if(myMainModel.agentBasedModel.agentTemplates.get(behaviorEditIndex).destructor.isJavaScriptActive==true){
-            destructorJavaTextArea.setText(myMainModel.agentBasedModel.agentTemplates.get(behaviorEditIndex).destructor.javaScript.script);
+        if(myMainModel.ABM.agentTemplates.get(behaviorEditIndex).destructor.isJavaScriptActive==true){
+            destructorJavaTextArea.setText(myMainModel.ABM.agentTemplates.get(behaviorEditIndex).destructor.javaScript.script);
             jPanel5.removeAll();
             jPanel5.add(destructorJavaScrollPane);
             jPanel5.invalidate();
             jPanel5.validate();
             jPanel5.repaint();
         }else{
-            destructorPythonTextArea.setText(myMainModel.agentBasedModel.agentTemplates.get(behaviorEditIndex).destructor.pythonScript.script);
+            destructorPythonTextArea.setText(myMainModel.ABM.agentTemplates.get(behaviorEditIndex).destructor.pythonScript.script);
             jPanel5.removeAll();
             jPanel5.add(destructorPythonScrollPane);
             jPanel5.invalidate();
             jPanel5.validate();
             jPanel5.repaint();
             jRadioButton6.setSelected(true);
+        }
+    }
+    
+    private void expandAllNodes(JTree tree) {
+        int j = tree.getRowCount();
+        int i = 0;
+        while (i < j) {
+            tree.expandRow(i);
+            i += 1;
+            j = tree.getRowCount();
+        }
+    }
+    
+    public void setDatasetTree(DatasetTemplate datasetTemplate, DefaultMutableTreeNode treeNode) {
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode(datasetTemplate.name);
+        treeNode.add(root);
+        if (datasetTemplate.recordTemplates != null) {
+            for (int i = 0; i < datasetTemplate.recordTemplates.size(); i++) {
+
+                root.add(new DefaultMutableTreeNode(datasetTemplate.recordTemplates.get(i).name));
+            }
+        }
+        if (datasetTemplate.innerDatasetTemplates != null) {
+            for (int j = 0; j < datasetTemplate.innerDatasetTemplates.size(); j++) {
+                setDatasetTree(datasetTemplate.innerDatasetTemplates.get(j), root);
+            }
         }
     }
 
@@ -161,20 +223,6 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
         buttonGroup1 = new javax.swing.ButtonGroup();
         buttonGroup2 = new javax.swing.ButtonGroup();
         buttonGroup3 = new javax.swing.ButtonGroup();
-        jPanel10 = new javax.swing.JPanel();
-        jPanel3 = new javax.swing.JPanel();
-        jPanel11 = new javax.swing.JPanel();
-        jPanel2 = new javax.swing.JPanel();
-        jRadioButton1 = new javax.swing.JRadioButton();
-        jRadioButton2 = new javax.swing.JRadioButton();
-        jPanel12 = new javax.swing.JPanel();
-        jPanel4 = new javax.swing.JPanel();
-        jRadioButton3 = new javax.swing.JRadioButton();
-        jRadioButton4 = new javax.swing.JRadioButton();
-        jPanel13 = new javax.swing.JPanel();
-        jPanel5 = new javax.swing.JPanel();
-        jRadioButton5 = new javax.swing.JRadioButton();
-        jRadioButton6 = new javax.swing.JRadioButton();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel8 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -188,13 +236,130 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
         jPanel7 = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
         jTree4 = new javax.swing.JTree();
+        jTabbedPane2 = new javax.swing.JTabbedPane();
+        jPanel11 = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
+        jRadioButton1 = new javax.swing.JRadioButton();
+        jRadioButton2 = new javax.swing.JRadioButton();
+        jPanel12 = new javax.swing.JPanel();
+        jPanel4 = new javax.swing.JPanel();
+        jRadioButton3 = new javax.swing.JRadioButton();
+        jRadioButton4 = new javax.swing.JRadioButton();
+        jPanel13 = new javax.swing.JPanel();
+        jPanel5 = new javax.swing.JPanel();
+        jRadioButton5 = new javax.swing.JRadioButton();
+        jRadioButton6 = new javax.swing.JRadioButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        jPanel10.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder("Current agent properties"));
 
-        jPanel3.setPreferredSize(new java.awt.Dimension(700, 900));
-        jPanel3.setLayout(new java.awt.GridLayout(3, 1));
+        javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("root");
+        jTree2.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
+        jScrollPane2.setViewportView(jTree2);
+
+        javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
+        jPanel8.setLayout(jPanel8Layout);
+        jPanel8Layout.setHorizontalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 689, Short.MAX_VALUE)
+        );
+        jPanel8Layout.setVerticalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 498, Short.MAX_VALUE)
+        );
+
+        jTabbedPane1.addTab("Current agent properties", jPanel8);
+
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("All variables"));
+
+        treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("Variables and function");
+        javax.swing.tree.DefaultMutableTreeNode treeNode2 = new javax.swing.tree.DefaultMutableTreeNode("currentAgent");
+        javax.swing.tree.DefaultMutableTreeNode treeNode3 = new javax.swing.tree.DefaultMutableTreeNode("[Object]=getPropertyValue(String propertyName)");
+        treeNode2.add(treeNode3);
+        treeNode3 = new javax.swing.tree.DefaultMutableTreeNode("[]=setPropertyValue(String propertyName, Object value)");
+        treeNode2.add(treeNode3);
+        treeNode1.add(treeNode2);
+        treeNode2 = new javax.swing.tree.DefaultMutableTreeNode("rootModel[MainModel]");
+        treeNode3 = new javax.swing.tree.DefaultMutableTreeNode("safegraph[refer to data types]");
+        treeNode2.add(treeNode3);
+        treeNode3 = new javax.swing.tree.DefaultMutableTreeNode("allGISData[refer to data types]");
+        treeNode2.add(treeNode3);
+        treeNode3 = new javax.swing.tree.DefaultMutableTreeNode("ABM");
+        javax.swing.tree.DefaultMutableTreeNode treeNode4 = new javax.swing.tree.DefaultMutableTreeNode("rootAgent[Agent]");
+        javax.swing.tree.DefaultMutableTreeNode treeNode5 = new javax.swing.tree.DefaultMutableTreeNode("[Object]=getPropertyValue(String propertyName)");
+        treeNode4.add(treeNode5);
+        treeNode5 = new javax.swing.tree.DefaultMutableTreeNode("[]=setPropertyValue(String propertyName, Object value)");
+        treeNode4.add(treeNode5);
+        treeNode3.add(treeNode4);
+        treeNode4 = new javax.swing.tree.DefaultMutableTreeNode("agents[ArrayList<Agent>]");
+        treeNode3.add(treeNode4);
+        treeNode4 = new javax.swing.tree.DefaultMutableTreeNode("startTime[ZonedDateTime]");
+        treeNode3.add(treeNode4);
+        treeNode4 = new javax.swing.tree.DefaultMutableTreeNode("currentTime[ZonedDateTime]");
+        treeNode3.add(treeNode4);
+        treeNode4 = new javax.swing.tree.DefaultMutableTreeNode("endTime[ZonedDateTime]");
+        treeNode3.add(treeNode4);
+        treeNode4 = new javax.swing.tree.DefaultMutableTreeNode("[Agent]=makeAgent(String agentTemplate)");
+        treeNode3.add(treeNode4);
+        treeNode4 = new javax.swing.tree.DefaultMutableTreeNode("[]=removeAgent(Agent agent)");
+        treeNode3.add(treeNode4);
+        treeNode2.add(treeNode3);
+        treeNode1.add(treeNode2);
+        jTree1.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
+        jTree1.setLargeModel(true);
+        jScrollPane1.setViewportView(jTree1);
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 689, Short.MAX_VALUE)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 498, Short.MAX_VALUE)
+        );
+
+        jTabbedPane1.addTab("All variables", jPanel1);
+
+        jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("All data types"));
+
+        treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("root");
+        jTree3.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
+        jScrollPane3.setViewportView(jTree3);
+
+        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
+        jPanel6.setLayout(jPanel6Layout);
+        jPanel6Layout.setHorizontalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 689, Short.MAX_VALUE)
+        );
+        jPanel6Layout.setVerticalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 498, Short.MAX_VALUE)
+        );
+
+        jTabbedPane1.addTab("All data types", jPanel6);
+
+        jPanel7.setBorder(javax.swing.BorderFactory.createTitledBorder("All agent definitions"));
+
+        treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("root");
+        jTree4.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
+        jScrollPane4.setViewportView(jTree4);
+
+        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
+        jPanel7.setLayout(jPanel7Layout);
+        jPanel7Layout.setHorizontalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 689, Short.MAX_VALUE)
+        );
+        jPanel7Layout.setVerticalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 498, Short.MAX_VALUE)
+        );
+
+        jTabbedPane1.addTab("All agent definitions", jPanel7);
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Constructor"));
         jPanel2.setPreferredSize(new java.awt.Dimension(600, 300));
@@ -227,7 +392,7 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
                     .addComponent(jRadioButton1)
                     .addComponent(jRadioButton2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 589, Short.MAX_VALUE))
+                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE))
         );
         jPanel11Layout.setVerticalGroup(
             jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -237,10 +402,10 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
                 .addComponent(jRadioButton1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jRadioButton2)
-                .addContainerGap(158, Short.MAX_VALUE))
+                .addContainerGap(467, Short.MAX_VALUE))
         );
 
-        jPanel3.add(jPanel11);
+        jTabbedPane2.addTab("Constructor", jPanel11);
 
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Behavior"));
         jPanel4.setPreferredSize(new java.awt.Dimension(600, 300));
@@ -273,7 +438,7 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
                     .addComponent(jRadioButton3)
                     .addComponent(jRadioButton4))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, 589, Short.MAX_VALUE))
+                .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE))
         );
         jPanel12Layout.setVerticalGroup(
             jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -282,11 +447,11 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
                 .addComponent(jRadioButton3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jRadioButton4)
-                .addContainerGap(158, Short.MAX_VALUE))
+                .addContainerGap(467, Short.MAX_VALUE))
             .addComponent(jPanel4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
         );
 
-        jPanel3.add(jPanel12);
+        jTabbedPane2.addTab("Behavior", jPanel12);
 
         jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Destructor"));
         jPanel5.setPreferredSize(new java.awt.Dimension(600, 300));
@@ -319,7 +484,7 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
                     .addComponent(jRadioButton5)
                     .addComponent(jRadioButton6))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, 589, Short.MAX_VALUE))
+                .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE))
         );
         jPanel13Layout.setVerticalGroup(
             jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -328,122 +493,35 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
                 .addComponent(jRadioButton5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jRadioButton6)
-                .addContainerGap(158, Short.MAX_VALUE))
+                .addContainerGap(467, Short.MAX_VALUE))
             .addComponent(jPanel5, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
         );
 
-        jPanel3.add(jPanel13);
-
-        javax.swing.GroupLayout jPanel10Layout = new javax.swing.GroupLayout(jPanel10);
-        jPanel10.setLayout(jPanel10Layout);
-        jPanel10Layout.setHorizontalGroup(
-            jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 656, Short.MAX_VALUE)
-        );
-        jPanel10Layout.setVerticalGroup(
-            jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-        );
-
-        jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder("Current agent properties"));
-
-        javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("root");
-        jTree2.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
-        jScrollPane2.setViewportView(jTree2);
-
-        javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
-        jPanel8.setLayout(jPanel8Layout);
-        jPanel8Layout.setHorizontalGroup(
-            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 689, Short.MAX_VALUE)
-        );
-        jPanel8Layout.setVerticalGroup(
-            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 589, Short.MAX_VALUE)
-        );
-
-        jTabbedPane1.addTab("Current agent properties", jPanel8);
-
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("All variables"));
-
-        treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("root");
-        jTree1.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
-        jScrollPane1.setViewportView(jTree1);
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 689, Short.MAX_VALUE)
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 589, Short.MAX_VALUE)
-        );
-
-        jTabbedPane1.addTab("All variables", jPanel1);
-
-        jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("All data types"));
-
-        treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("root");
-        jTree3.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
-        jScrollPane3.setViewportView(jTree3);
-
-        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
-        jPanel6.setLayout(jPanel6Layout);
-        jPanel6Layout.setHorizontalGroup(
-            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 689, Short.MAX_VALUE)
-        );
-        jPanel6Layout.setVerticalGroup(
-            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 589, Short.MAX_VALUE)
-        );
-
-        jTabbedPane1.addTab("All data types", jPanel6);
-
-        jPanel7.setBorder(javax.swing.BorderFactory.createTitledBorder("All agent definitions"));
-
-        treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("root");
-        jTree4.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
-        jScrollPane4.setViewportView(jTree4);
-
-        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
-        jPanel7.setLayout(jPanel7Layout);
-        jPanel7Layout.setHorizontalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 689, Short.MAX_VALUE)
-        );
-        jPanel7Layout.setVerticalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 589, Short.MAX_VALUE)
-        );
-
-        jTabbedPane1.addTab("All agent definitions", jPanel7);
+        jTabbedPane2.addTab("Destructor", jPanel13);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addComponent(jPanel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jTabbedPane2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jTabbedPane1)
+            .addComponent(jTabbedPane2)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void jRadioButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton1ActionPerformed
-        if(jRadioButton1.isSelected()==true && myMainModel.agentBasedModel.agentTemplates.get(behaviorEditIndex).constructor.isJavaScriptActive==false){
-            myMainModel.agentBasedModel.agentTemplates.get(behaviorEditIndex).constructor.isJavaScriptActive=true;
-            myMainModel.agentBasedModel.agentTemplates.get(behaviorEditIndex).constructor.pythonScript.script=construcorPythonTextArea.getText();
-            construcorJavaTextArea.setText(myMainModel.agentBasedModel.agentTemplates.get(behaviorEditIndex).constructor.javaScript.script);
+        if(jRadioButton1.isSelected()==true && myMainModel.ABM.agentTemplates.get(behaviorEditIndex).constructor.isJavaScriptActive==false){
+            myMainModel.ABM.agentTemplates.get(behaviorEditIndex).constructor.isJavaScriptActive=true;
+            myMainModel.ABM.agentTemplates.get(behaviorEditIndex).constructor.pythonScript.script=construcorPythonTextArea.getText();
+            construcorJavaTextArea.setText(myMainModel.ABM.agentTemplates.get(behaviorEditIndex).constructor.javaScript.script);
             jPanel2.removeAll();
             jPanel2.add(construcorJavaScrollPane);
             jPanel2.invalidate();
@@ -453,10 +531,10 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jRadioButton1ActionPerformed
 
     private void jRadioButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton2ActionPerformed
-        if(jRadioButton2.isSelected()==true && myMainModel.agentBasedModel.agentTemplates.get(behaviorEditIndex).constructor.isJavaScriptActive==true){
-            myMainModel.agentBasedModel.agentTemplates.get(behaviorEditIndex).constructor.isJavaScriptActive=false;
-            myMainModel.agentBasedModel.agentTemplates.get(behaviorEditIndex).constructor.javaScript.script=construcorJavaTextArea.getText();
-            construcorPythonTextArea.setText(myMainModel.agentBasedModel.agentTemplates.get(behaviorEditIndex).constructor.pythonScript.script);
+        if(jRadioButton2.isSelected()==true && myMainModel.ABM.agentTemplates.get(behaviorEditIndex).constructor.isJavaScriptActive==true){
+            myMainModel.ABM.agentTemplates.get(behaviorEditIndex).constructor.isJavaScriptActive=false;
+            myMainModel.ABM.agentTemplates.get(behaviorEditIndex).constructor.javaScript.script=construcorJavaTextArea.getText();
+            construcorPythonTextArea.setText(myMainModel.ABM.agentTemplates.get(behaviorEditIndex).constructor.pythonScript.script);
             jPanel2.removeAll();
             jPanel2.add(construcorPythonScrollPane);
             jPanel2.invalidate();
@@ -466,10 +544,10 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jRadioButton2ActionPerformed
 
     private void jRadioButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton3ActionPerformed
-        if(jRadioButton3.isSelected()==true && myMainModel.agentBasedModel.agentTemplates.get(behaviorEditIndex).behavior.isJavaScriptActive==false){
-            myMainModel.agentBasedModel.agentTemplates.get(behaviorEditIndex).behavior.isJavaScriptActive=true;
-            myMainModel.agentBasedModel.agentTemplates.get(behaviorEditIndex).behavior.pythonScript.script=behaviorPythonTextArea.getText();
-            behaviorJavaTextArea.setText(myMainModel.agentBasedModel.agentTemplates.get(behaviorEditIndex).behavior.javaScript.script);
+        if(jRadioButton3.isSelected()==true && myMainModel.ABM.agentTemplates.get(behaviorEditIndex).behavior.isJavaScriptActive==false){
+            myMainModel.ABM.agentTemplates.get(behaviorEditIndex).behavior.isJavaScriptActive=true;
+            myMainModel.ABM.agentTemplates.get(behaviorEditIndex).behavior.pythonScript.script=behaviorPythonTextArea.getText();
+            behaviorJavaTextArea.setText(myMainModel.ABM.agentTemplates.get(behaviorEditIndex).behavior.javaScript.script);
             jPanel4.removeAll();
             jPanel4.add(behaviorJavaScrollPane);
             jPanel4.invalidate();
@@ -479,10 +557,10 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jRadioButton3ActionPerformed
 
     private void jRadioButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton4ActionPerformed
-        if(jRadioButton4.isSelected()==true && myMainModel.agentBasedModel.agentTemplates.get(behaviorEditIndex).behavior.isJavaScriptActive==true){
-            myMainModel.agentBasedModel.agentTemplates.get(behaviorEditIndex).behavior.isJavaScriptActive=false;
-            myMainModel.agentBasedModel.agentTemplates.get(behaviorEditIndex).behavior.javaScript.script=behaviorJavaTextArea.getText();
-            behaviorPythonTextArea.setText(myMainModel.agentBasedModel.agentTemplates.get(behaviorEditIndex).behavior.pythonScript.script);
+        if(jRadioButton4.isSelected()==true && myMainModel.ABM.agentTemplates.get(behaviorEditIndex).behavior.isJavaScriptActive==true){
+            myMainModel.ABM.agentTemplates.get(behaviorEditIndex).behavior.isJavaScriptActive=false;
+            myMainModel.ABM.agentTemplates.get(behaviorEditIndex).behavior.javaScript.script=behaviorJavaTextArea.getText();
+            behaviorPythonTextArea.setText(myMainModel.ABM.agentTemplates.get(behaviorEditIndex).behavior.pythonScript.script);
             jPanel4.removeAll();
             jPanel4.add(behaviorPythonScrollPane);
             jPanel4.invalidate();
@@ -492,10 +570,10 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jRadioButton4ActionPerformed
 
     private void jRadioButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton5ActionPerformed
-        if(jRadioButton5.isSelected()==true && myMainModel.agentBasedModel.agentTemplates.get(behaviorEditIndex).destructor.isJavaScriptActive==false){
-            myMainModel.agentBasedModel.agentTemplates.get(behaviorEditIndex).destructor.isJavaScriptActive=true;
-            myMainModel.agentBasedModel.agentTemplates.get(behaviorEditIndex).destructor.pythonScript.script=destructorPythonTextArea.getText();
-            destructorJavaTextArea.setText(myMainModel.agentBasedModel.agentTemplates.get(behaviorEditIndex).destructor.javaScript.script);
+        if(jRadioButton5.isSelected()==true && myMainModel.ABM.agentTemplates.get(behaviorEditIndex).destructor.isJavaScriptActive==false){
+            myMainModel.ABM.agentTemplates.get(behaviorEditIndex).destructor.isJavaScriptActive=true;
+            myMainModel.ABM.agentTemplates.get(behaviorEditIndex).destructor.pythonScript.script=destructorPythonTextArea.getText();
+            destructorJavaTextArea.setText(myMainModel.ABM.agentTemplates.get(behaviorEditIndex).destructor.javaScript.script);
             jPanel5.removeAll();
             jPanel5.add(destructorJavaScrollPane);
             jPanel5.invalidate();
@@ -505,10 +583,10 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jRadioButton5ActionPerformed
 
     private void jRadioButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton6ActionPerformed
-        if(jRadioButton6.isSelected()==true && myMainModel.agentBasedModel.agentTemplates.get(behaviorEditIndex).destructor.isJavaScriptActive==true){
-            myMainModel.agentBasedModel.agentTemplates.get(behaviorEditIndex).destructor.isJavaScriptActive=false;
-            myMainModel.agentBasedModel.agentTemplates.get(behaviorEditIndex).destructor.javaScript.script=destructorJavaTextArea.getText();
-            destructorPythonTextArea.setText(myMainModel.agentBasedModel.agentTemplates.get(behaviorEditIndex).destructor.pythonScript.script);
+        if(jRadioButton6.isSelected()==true && myMainModel.ABM.agentTemplates.get(behaviorEditIndex).destructor.isJavaScriptActive==true){
+            myMainModel.ABM.agentTemplates.get(behaviorEditIndex).destructor.isJavaScriptActive=false;
+            myMainModel.ABM.agentTemplates.get(behaviorEditIndex).destructor.javaScript.script=destructorJavaTextArea.getText();
+            destructorPythonTextArea.setText(myMainModel.ABM.agentTemplates.get(behaviorEditIndex).destructor.pythonScript.script);
             jPanel5.removeAll();
             jPanel5.add(destructorPythonScrollPane);
             jPanel5.invalidate();
@@ -523,12 +601,10 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
     private javax.swing.ButtonGroup buttonGroup2;
     private javax.swing.ButtonGroup buttonGroup3;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
@@ -545,6 +621,7 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JTabbedPane jTabbedPane2;
     private javax.swing.JTree jTree1;
     private javax.swing.JTree jTree2;
     private javax.swing.JTree jTree3;

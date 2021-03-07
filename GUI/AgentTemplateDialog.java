@@ -67,7 +67,7 @@ public class AgentTemplateDialog extends javax.swing.JDialog {
         root.removeAllChildren();
         model.reload();
 
-        root = new DefaultMutableTreeNode("Variables");
+        root = new DefaultMutableTreeNode("Datasets");
 
         model.setRoot(root);
 
@@ -389,7 +389,7 @@ public class AgentTemplateDialog extends javax.swing.JDialog {
             workingAgentTemplate.agentProperties.get(i).propertyName = ((AgentTemplatePanel) jPanel1.getComponent(i)).jTextField1.getText();
         }
         if (isEdit == false) {
-            myMainModel.agentBasedModel.agentTemplates.add(workingAgentTemplate);
+            myMainModel.ABM.agentTemplates.add(workingAgentTemplate);
 
             workingAgentTemplate.constructor = new BehaviorScript();
             workingAgentTemplate.constructor.javaScript = new JavaScript();
@@ -413,7 +413,7 @@ public class AgentTemplateDialog extends javax.swing.JDialog {
             workingAgentTemplate.destructor.isJavaScriptActive = true;
 
         } else {
-            myMainModel.agentBasedModel.agentTemplates.set(templateEditIndex, workingAgentTemplate);
+            myMainModel.ABM.agentTemplates.set(templateEditIndex, workingAgentTemplate);
         }
 
         myParent.updateAgentTemplateList();

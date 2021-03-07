@@ -24,4 +24,7 @@ public class AgentTemplate {
     public BehaviorScript constructor;
     public BehaviorScript destructor;
     public BehaviorScript behavior;
+    
+    
+    
 }

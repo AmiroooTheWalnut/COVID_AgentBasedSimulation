@@ -5,6 +5,7 @@
  */
 package COVID_AgentBasedSimulation.Model.Structure;
 
+import COVID_AgentBasedSimulation.Model.Data.Safegraph.Patterns;
 import COVID_AgentBasedSimulation.Model.Dataset;
 import COVID_AgentBasedSimulation.Model.DatasetTemplate;
 import static COVID_AgentBasedSimulation.Model.MainModel.softwareVersion;
@@ -12,6 +13,9 @@ import COVID_AgentBasedSimulation.Model.RecordTemplate;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryo.util.DefaultInstantiatorStrategy;
+import de.siegmar.fastcsv.reader.CsvContainer;
+import de.siegmar.fastcsv.reader.CsvReader;
+import de.siegmar.fastcsv.reader.CsvRow;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -19,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -110,13 +115,15 @@ public class AllGISData extends Dataset implements Serializable {
         System.out.println("READING STATES");
         File statesFile = new File(geographyDirectory + "/US_States.json");
         try (BufferedReader br = new BufferedReader(new FileReader(statesFile))) {
-            Country us = new Country();
-            us.name = "USA";
-            us.states = new ArrayList();
+//            Country us = new Country();
+//            us.name = "USA";
+//            us.states = new ArrayList();
             if (countries == null) {
                 countries = new ArrayList();
             }
-            countries.add(us);
+            Country us=findAndInsertCountry("USA");
+            us.states = new ArrayList();
+            
             String line;
             int counter = 0;
             int largerCounter = 0;
@@ -218,6 +225,44 @@ public class AllGISData extends Dataset implements Serializable {
             }
         } catch (IOException ex) {
             Logger.getLogger(AllGISData.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        System.out.println("READING 500 CITIES");
+        File citiesFile = new File(geographyDirectory + "/500_Cities__Census_Tract-level_Data__GIS_Friendly_Format___2018_release.csv");
+        try {
+            CsvReader cSVReader = new CsvReader();
+            cSVReader.setContainsHeader(true);
+            CsvContainer data = cSVReader.read(citiesFile, StandardCharsets.UTF_8);
+            int counter = 0;
+                int largerCounter = 0;
+                int counterInterval = 1000;
+                for (int i = 0; i < data.getRowCount(); i++) {
+                    CsvRow row = data.getRow(i);
+                    String cityName = row.getField("PlaceName");
+                    String censusTractString = row.getField("TractFIPS");
+//                    System.out.println(i);
+//                    if(i==11){
+//                        System.out.println(i);
+//                    }
+                    int censusTractID=Integer.parseInt(censusTractString.substring(censusTractString.length()-6));
+                    int countyID=Integer.parseInt(censusTractString.substring(censusTractString.length()-9,censusTractString.length()-6));
+                    byte stateID=Byte.parseByte(censusTractString.substring(0,censusTractString.length()-9));
+                    State state=countries.get(countries.size() - 1).findState(stateID);
+                    County county=state.findCounty(countyID);
+                    City city=county.findAndInsertCity(cityName);
+                    CensusTract censusTract=county.findCensusTract(censusTractID);
+                    city.findAndInsertCensusTract(censusTract);
+//                    System.out.println(i);
+                    
+                    counter = counter + 1;
+                    if (counter > counterInterval) {
+                        largerCounter = largerCounter + 1;
+                        counter = 0;
+                        System.out.println("Num rows read: " + largerCounter * counterInterval);
+                    }
+                }
+        } catch (IOException ex) {
+            Logger.getLogger(Patterns.class.getName()).log(Level.SEVERE, (String) null, ex);
         }
 
         for (int i = 0; i < countries.size(); i++) {

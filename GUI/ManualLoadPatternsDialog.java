@@ -28,7 +28,7 @@ public class ManualLoadPatternsDialog extends javax.swing.JDialog {
     }
 
     public void refreshList() {
-        patternsList = AllPatterns.detectAllPatterns("./datasets/");
+        patternsList = AllPatterns.detectAllPatterns("./datasets/Safegraph/FullData");
         jList1.setModel(new javax.swing.AbstractListModel() {
             @Override
             public int getSize() {
@@ -105,7 +105,7 @@ public class ManualLoadPatternsDialog extends javax.swing.JDialog {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         if (jList1.getSelectedIndex() > -1) {
-            Patterns patterns = Safegraph.loadPatternsKryo("./datasets/" + jList1.getSelectedValue() + "/processedData.bin");
+            Patterns patterns = Safegraph.loadPatternsKryo("./datasets/Safegraph/FullData/" + jList1.getSelectedValue() + "/processedData.bin");
             System.out.println("PATTERNS SIZE: "+patterns.patternRecords.size());
             double avg_num_visitors=0;
             for(int i=0;i<patterns.patternRecords.size();i++){

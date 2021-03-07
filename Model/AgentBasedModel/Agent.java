@@ -21,4 +21,21 @@ public class Agent {
     public Agent(AgentTemplate passed_agentTemplate){
         myTemplate=passed_agentTemplate;
     }
+    
+    public Object getPropertyValue(String propertyName){
+        for(int i=0;i<myTemplate.agentProperties.size();i++){
+            if(myTemplate.agentProperties.get(i).propertyName.equalsIgnoreCase(propertyName)){
+                return myTemplate.agentProperties.get(i).value;
+            }
+        }
+        return null;
+    }
+    
+    public void setPropertyValue(String propertyName, Object value){
+        for(int i=0;i<myTemplate.agentProperties.size();i++){
+            if(myTemplate.agentProperties.get(i).propertyName.equalsIgnoreCase(propertyName)){
+                myTemplate.agentProperties.get(i).value=value;
+            }
+        }
+    }
 }

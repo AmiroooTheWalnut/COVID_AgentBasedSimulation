@@ -477,13 +477,13 @@ public class SimulatorDialog extends javax.swing.JDialog {
         myParent.mainModel.javaEvaluationEngine.connectToConsole(jTextArea1);
         myParent.mainModel.pythonEvaluationEngine.connectToConsole(jTextArea2);
         myParent.mainModel.initModel(jCheckBox1.isSelected(), myParent.numProcessors);
-        jLabel2.setText(myParent.mainModel.agentBasedModel.startTime.toString());
+        jLabel2.setText(myParent.mainModel.ABM.startTime.toString());
         Timer refreshSimulationDialogTimer = new Timer();
         refreshSimulationDialogTimer.schedule(new TimerTask() {
             @Override
             public void run() {
 //                System.out.println("UPDATE: "+myParent.mainModel.agentBasedModel.currentTime.toString());
-                jLabel2.setText(myParent.mainModel.agentBasedModel.currentTime.toString());
+                jLabel2.setText(myParent.mainModel.ABM.currentTime.toString());
                 if(isRateChanged==true){
                     myParent.mainModel.pause();
                     myParent.mainModel.resume();
