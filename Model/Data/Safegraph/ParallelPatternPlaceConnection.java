@@ -36,40 +36,46 @@ public class ParallelPatternPlaceConnection extends ParallelProcessor {
                 int counterInterval = 100000;
                 int lastValidIndex = 0;
                 for (int i = myStartIndex; i < myEndIndex; i++) {
-                    for (int j = 0; j < places.placesRecords.size(); j++) {
-                        int plusSign = -1;
-                        int minusSign = -1;
-                        if (i + j + lastValidIndex< places.placesRecords.size()) {
-                            plusSign = i + j + lastValidIndex;
-                        }
-                        if (i - j + lastValidIndex > -1) {
-                            minusSign = i - j + lastValidIndex;
-                        }
-                        if (plusSign > -1) {
-                            if (patterns.patternRecords.get(i).placeKey.equals(places.placesRecords.get(plusSign).placeKey)) {
-                                CensusBlockGroup temp = allGISData.findCensusBlockGroup(patterns.patternRecords.get(i).poi_cbg);
-                                lastValidIndex = lastValidIndex + j;
-                                if (temp == null) {
-                                    System.out.println("CENSUS BLOCK GROUP NOT FOUND!");
-                                    break;
-                                }
-                                places.placesRecords.get(plusSign).censusBlock = temp;
-                                break;
+                    if (places != null) {
+                        for (int j = 0; j < places.placesRecords.size(); j++) {
+                            int plusSign = -1;
+                            int minusSign = -1;
+                            if (i + j + lastValidIndex < places.placesRecords.size()) {
+                                plusSign = i + j + lastValidIndex;
                             }
-                        }
-                        if (minusSign > -1) {
-                            if (patterns.patternRecords.get(i).placeKey.equals(places.placesRecords.get(minusSign).placeKey)) {
-                                CensusBlockGroup temp = allGISData.findCensusBlockGroup(patterns.patternRecords.get(i).poi_cbg);
-                                lastValidIndex = lastValidIndex - j;
-                                if (temp == null) {
-                                    System.out.println("CENSUS BLOCK GROUP NOT FOUND!");
+                            if (i - j + lastValidIndex > -1) {
+                                minusSign = i - j + lastValidIndex;
+                            }
+                            if (plusSign > -1) {
+                                if (patterns.patternRecords.get(i).placeKey.equals(places.placesRecords.get(plusSign).placeKey)) {
+                                    CensusBlockGroup temp = allGISData.findCensusBlockGroup(patterns.patternRecords.get(i).poi_cbg);
+                                    lastValidIndex = lastValidIndex + j;
+                                    if (temp == null) {
+                                        System.out.println("CENSUS BLOCK GROUP NOT FOUND!");
+                                        break;
+                                    }
+                                    places.placesRecords.get(plusSign).censusBlock = temp;
+                                    patterns.patternRecords.get(i).place = places.placesRecords.get(plusSign);
                                     break;
                                 }
-                                places.placesRecords.get(minusSign).censusBlock = temp;
-                                break;
+                            }
+                            if (minusSign > -1) {
+                                if (patterns.patternRecords.get(i).placeKey.equals(places.placesRecords.get(minusSign).placeKey)) {
+                                    CensusBlockGroup temp = allGISData.findCensusBlockGroup(patterns.patternRecords.get(i).poi_cbg);
+                                    lastValidIndex = lastValidIndex - j;
+                                    if (temp == null) {
+                                        System.out.println("CENSUS BLOCK GROUP NOT FOUND!");
+                                        break;
+                                    }
+                                    places.placesRecords.get(minusSign).censusBlock = temp;
+                                    patterns.patternRecords.get(i).place = places.placesRecords.get(minusSign);
+                                    break;
+                                }
                             }
                         }
                     }
+                    CensusBlockGroup tempCensusTract = allGISData.findCensusBlockGroup(patterns.patternRecords.get(i).poi_cbg);
+                    patterns.patternRecords.get(i).poi_cbg_censusBlock = tempCensusTract;
                     if (patterns.patternRecords.get(i).visitor_daytime_cbgs != null) {
                         for (int k = 0; k < patterns.patternRecords.get(i).visitor_daytime_cbgs.size(); k++) {
                             CensusBlockGroup temp = allGISData.findCensusBlockGroup(patterns.patternRecords.get(i).visitor_daytime_cbgs.get(k).key);

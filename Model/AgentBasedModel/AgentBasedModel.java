@@ -9,9 +9,6 @@ import COVID_AgentBasedSimulation.GUI.MainFrame;
 import COVID_AgentBasedSimulation.Model.MainModel;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
@@ -41,8 +38,9 @@ public class AgentBasedModel {
 
     public String startTimeString;
     public String endTimeString;
-    
+
     public String studyScope;
+    public transient Object studyScopeGeography;
 
     private transient MainModel myMainModel;
 
@@ -60,13 +58,13 @@ public class AgentBasedModel {
         if (rootAgent.myTemplate.behavior.isJavaScriptActive == true) {
             myMainModel.javaEvaluationEngine.runScript(rootAgent.myTemplate.behavior.javaScript.script);
         } else {
-            myMainModel.pythonEvaluationEngine.runScript(rootAgent.myTemplate.behavior.pythonScript.script);
+            myMainModel.pythonEvaluationEngine.runScript(rootAgent.myTemplate.behavior.pythonScript);
         }
         for (int i = 0; i < agents.size(); i++) {
             if (agents.get(i).myTemplate.behavior.isJavaScriptActive == true) {
                 myMainModel.javaEvaluationEngine.runScript(agents.get(i).myTemplate.behavior.javaScript.script);
             } else {
-                myMainModel.pythonEvaluationEngine.runScript(agents.get(i).myTemplate.behavior.pythonScript.script);
+                myMainModel.pythonEvaluationEngine.runScript(agents.get(i).myTemplate.behavior.pythonScript);
             }
         }
     }
@@ -88,7 +86,7 @@ public class AgentBasedModel {
             if (output.myTemplate.constructor.isJavaScriptActive == true) {
                 myMainModel.javaEvaluationEngine.runScript(output.myTemplate.constructor.javaScript.script);
             } else {
-                myMainModel.pythonEvaluationEngine.runScript(output.myTemplate.constructor.pythonScript.script);
+                myMainModel.pythonEvaluationEngine.runScript(output.myTemplate.constructor.pythonScript);
             }
             return output;
         }
@@ -98,7 +96,7 @@ public class AgentBasedModel {
         if (agent.myTemplate.destructor.isJavaScriptActive == true) {
             myMainModel.javaEvaluationEngine.runScript(agent.myTemplate.destructor.javaScript.script);
         } else {
-            myMainModel.pythonEvaluationEngine.runScript(agent.myTemplate.destructor.pythonScript.script);
+            myMainModel.pythonEvaluationEngine.runScript(agent.myTemplate.destructor.pythonScript);
         }
         agents.remove(agent.myIndex);
     }
@@ -138,6 +136,7 @@ public class AgentBasedModel {
             startTimeString = result.startTimeString;
             endTimeString = result.endTimeString;
             studyScope = result.studyScope;
+            calculateStudyScopeGeography();
             if (startTimeString.length() > 0) {
                 ZonedDateTime zonedDateTime = ZonedDateTime.parse(startTimeString);
                 startTime = zonedDateTime;
@@ -151,6 +150,80 @@ public class AgentBasedModel {
             Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void calculateStudyScopeGeography() {
+        String sections[] = studyScope.split("_");
+        int countryIndex=-1;
+        int stateIndex=-1;
+        int countyIndex=-1;
+        if (sections.length == 1) {
+            for (int i = 0; i < myMainModel.allGISData.countries.size(); i++) {
+                if (sections[0].equals(myMainModel.allGISData.countries.get(i).name)) {
+                    studyScopeGeography = myMainModel.allGISData.countries.get(i);
+                    countryIndex=i;
+                }
+            }
+        }
+        if (sections.length == 2) {
+            for (int i = 0; i < myMainModel.allGISData.countries.size(); i++) {
+                if (sections[0].equals(myMainModel.allGISData.countries.get(i).name)) {
+                    studyScopeGeography = myMainModel.allGISData.countries.get(i);
+                    countryIndex=i;
+                }
+            }
+            for (int i = 0; i < myMainModel.allGISData.countries.get(countryIndex).states.size(); i++) {
+                if (sections[1].equals(myMainModel.allGISData.countries.get(countryIndex).states.get(i).name)) {
+                    studyScopeGeography=myMainModel.allGISData.countries.get(countryIndex).states.get(i);
+                    stateIndex=i;
+                }
+            }
+        }
+        if (sections.length == 3) {
+            for (int i = 0; i < myMainModel.allGISData.countries.size(); i++) {
+                if (sections[0].equals(myMainModel.allGISData.countries.get(i).name)) {
+                    studyScopeGeography = myMainModel.allGISData.countries.get(i);
+                    countryIndex=i;
+                }
+            }
+            for (int i = 0; i < myMainModel.allGISData.countries.get(countryIndex).states.size(); i++) {
+                if (sections[1].equals(myMainModel.allGISData.countries.get(countryIndex).states.get(i).name)) {
+                    studyScopeGeography=myMainModel.allGISData.countries.get(countryIndex).states.get(i);
+                    stateIndex=i;
+                }
+            }
+            for (int i = 0; i < myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.size(); i++) {
+                if (sections[2].equals(myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(i).name)) {
+                    studyScopeGeography=myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(i);
+                    countyIndex=i;
+                }
+            }
+        }
+        if (sections.length == 4) {
+            for (int i = 0; i < myMainModel.allGISData.countries.size(); i++) {
+                if (sections[0].equals(myMainModel.allGISData.countries.get(i).name)) {
+                    studyScopeGeography = myMainModel.allGISData.countries.get(i);
+                    countryIndex=i;
+                }
+            }
+            for (int i = 0; i < myMainModel.allGISData.countries.get(countryIndex).states.size(); i++) {
+                if (sections[1].equals(myMainModel.allGISData.countries.get(countryIndex).states.get(i).name)) {
+                    studyScopeGeography=myMainModel.allGISData.countries.get(countryIndex).states.get(i);
+                    stateIndex=i;
+                }
+            }
+            for (int i = 0; i < myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.size(); i++) {
+                if (sections[2].equals(myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(i).name)) {
+                    studyScopeGeography=myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(i);
+                    countyIndex=i;
+                }
+            }
+            for (int i = 0; i < myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(countyIndex).cities.size(); i++) {
+                if (sections[3].equals(myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(countyIndex).cities.get(i).name)) {
+                    studyScopeGeography=myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(countyIndex).cities.get(i);
+                }
+            }
         }
     }
 }

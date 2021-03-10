@@ -11,7 +11,4 @@ package COVID_AgentBasedSimulation.Model.AgentBasedModel;
  */
 public class JavaScript {
     public String script;
-    
-    
-    
 }

@@ -25,7 +25,8 @@ import lombok.Setter;
  *
  * @author Amir Mohammad Esmaieeli Sikaroudi
  */
-@Getter @Setter
+@Getter
+@Setter
 public class SafegraphPlaces implements Serializable {
 
     static final long serialVersionUID = softwareVersion;
@@ -38,8 +39,8 @@ public class SafegraphPlaces implements Serializable {
     public void preprocessMonthCorePlaces(String directoryName, String patternName, boolean isParallel, int numCPU) {
         name = patternName;
         placesRecords = new ArrayList();
-        categories=new Categories();
-        brands=new Brands();
+        categories = new Categories();
+        brands = new Brands();
         File directory = new File(directoryName);
 
         FileFilter binFilesFilter = new FileFilter() {
@@ -72,10 +73,15 @@ public class SafegraphPlaces implements Serializable {
                 }
             }
             if (isRawBinFound == false) {
-                ArrayList<SafegraphPlace> recordsLocal = readData(cSVfileList[i].getAbsolutePath(), isParallel, numCPU);
-                placesRecords = recordsLocal;
-                Safegraph.saveSafegraphPlacesKryo(directoryName + "/ProcessedData_" + cSVfileList[i].getName(), this);
-                placesRecords.clear();
+                ArrayList<SafegraphPlace> recordsLocal;
+                try {
+                    recordsLocal = readData(cSVfileList[i].getCanonicalPath(), isParallel, numCPU);
+                    placesRecords = recordsLocal;
+                    Safegraph.saveSafegraphPlacesKryo(directoryName + "/ProcessedData_" + cSVfileList[i].getName(), this);
+                    placesRecords.clear();
+                } catch (IOException ex) {
+                    Logger.getLogger(SafegraphPlaces.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
 
@@ -92,6 +98,10 @@ public class SafegraphPlaces implements Serializable {
 //        }
 //        System.out.println("***");
         Collections.sort(placesRecords);
+        Safegraph.saveSafegraphPlacesKryo(directoryName + "/processedData", this);
+        for (int i = 0; i < binFileListRecheck.length; i++) {
+            binFileListRecheck[i].delete();
+        }
 //        for(int i=0;i<20;i++){
 //            System.out.println(records.get(i).placeKey);
 //        }
@@ -114,9 +124,9 @@ public class SafegraphPlaces implements Serializable {
                 ParallelSafegraphParser parallelSafegraphParsers[] = new ParallelSafegraphParser[numProcessors];
 
                 for (int i = 0; i < numProcessors - 1; i++) {
-                    parallelSafegraphParsers[i] = new ParallelSafegraphParser(i,recordsLocal, data, (int) Math.floor(i * ((data.getRowCount()) / numProcessors)), (int) Math.floor((i + 1) * ((data.getRowCount()) / numProcessors)));
+                    parallelSafegraphParsers[i] = new ParallelSafegraphParser(i, recordsLocal, data, (int) Math.floor(i * ((data.getRowCount()) / numProcessors)), (int) Math.floor((i + 1) * ((data.getRowCount()) / numProcessors)));
                 }
-                parallelSafegraphParsers[numProcessors - 1] = new ParallelSafegraphParser(numProcessors - 1,recordsLocal, data, (int) Math.floor((numProcessors - 1) * ((data.getRowCount()) / numProcessors)), data.getRowCount());
+                parallelSafegraphParsers[numProcessors - 1] = new ParallelSafegraphParser(numProcessors - 1, recordsLocal, data, (int) Math.floor((numProcessors - 1) * ((data.getRowCount()) / numProcessors)), data.getRowCount());
 
                 for (int i = 0; i < numProcessors; i++) {
                     parallelSafegraphParsers[i].myThread.start();
@@ -131,8 +141,8 @@ public class SafegraphPlaces implements Serializable {
                 }
                 for (int i = 0; i < numProcessors; i++) {
                     recordsLocal.addAll(parallelSafegraphParsers[i].records);
-                    brands=parallelSafegraphParsers[i].brands;
-                    categories=parallelSafegraphParsers[i].categories;
+                    brands = parallelSafegraphParsers[i].brands;
+                    categories = parallelSafegraphParsers[i].categories;
                 }
             } else {
                 int counter = 0;
@@ -142,7 +152,7 @@ public class SafegraphPlaces implements Serializable {
                     CsvRow row = data.getRow(i);
                     SafegraphPlace safegraphPlaceProcessed = new SafegraphPlace();
                     String field = row.getField("placekey");
-                    
+
                     if (field == null) {
                         field = row.getField("safegraph_place_id");
                         if (field.length() > 0) {
@@ -153,7 +163,7 @@ public class SafegraphPlaces implements Serializable {
                             safegraphPlaceProcessed.placeKey = field;
                         }
                     }
-                    
+
                     field = row.getField("latitude");
                     if (field.length() > 0) {
                         safegraphPlaceProcessed.lat = Float.parseFloat(field);
@@ -165,22 +175,22 @@ public class SafegraphPlaces implements Serializable {
                     field = row.getField("brands");
                     if (field.length() > 0) {
                         String[] brandsStrings = field.split(",");
-                        ArrayList<Brand> brandsGenerated=new ArrayList();
+                        ArrayList<Brand> brandsGenerated = new ArrayList();
                         for (int j = 0; j < brandsStrings.length; j++) {
-                            Brand tempBrand=brands.findAndInsertCategory(brandsStrings[j]);
+                            Brand tempBrand = brands.findAndInsertCategory(brandsStrings[j]);
                             brandsGenerated.add(tempBrand);
                         }
                         safegraphPlaceProcessed.brands = brandsGenerated;
                     }
                     field = row.getField("top_category");
                     if (field.length() > 0) {
-                        safegraphPlaceProcessed.category=categories.findAndInsertCategory(field);
+                        safegraphPlaceProcessed.category = categories.findAndInsertCategory(field);
                     }
                     field = row.getField("naics_code");
                     if (field.length() > 0) {
-                        safegraphPlaceProcessed.naics_code=Integer.parseInt(field);
+                        safegraphPlaceProcessed.naics_code = Integer.parseInt(field);
                     }
-                    
+
                     recordsLocal.add(safegraphPlaceProcessed);
                     counter = counter + 1;
                     if (counter > counterInterval) {

@@ -639,6 +639,7 @@ public class SimulatorSettingsDialog extends javax.swing.JDialog {
             listmodel = new DefaultListModel();
             jList8.setModel(listmodel);
             myMainModel.ABM.studyScope = jList2.getSelectedValue();
+            myMainModel.ABM.calculateStudyScopeGeography();
             jList4.setModel(new javax.swing.AbstractListModel() {
                 @Override
                 public int getSize() {
@@ -668,6 +669,7 @@ public class SimulatorSettingsDialog extends javax.swing.JDialog {
             DefaultListModel listmodel = new DefaultListModel();
             jList8.setModel(listmodel);
             myMainModel.ABM.studyScope = jList2.getSelectedValue() + "_" + jList4.getSelectedValue();
+            myMainModel.ABM.calculateStudyScopeGeography();
             jList5.setModel(new javax.swing.AbstractListModel() {
                 @Override
                 public int getSize() {
@@ -694,6 +696,7 @@ public class SimulatorSettingsDialog extends javax.swing.JDialog {
         if (jList2.getSelectedIndex() > -1 && jList4.getSelectedIndex() > -1 && jList5.getSelectedIndex() > -1) {
             jList8.clearSelection();
             myMainModel.ABM.studyScope = jList2.getSelectedValue() + "_" + jList4.getSelectedValue() + "_" + jList5.getSelectedValue();
+            myMainModel.ABM.calculateStudyScopeGeography();
             jList8.setModel(new javax.swing.AbstractListModel() {
                 @Override
                 public int getSize() {
@@ -727,6 +730,7 @@ public class SimulatorSettingsDialog extends javax.swing.JDialog {
     private void jList8ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList8ValueChanged
         if (jList2.getSelectedIndex() > -1 && jList4.getSelectedIndex() > -1 && jList5.getSelectedIndex() > -1 && jList8.getSelectedIndex() > -1) {
             myMainModel.ABM.studyScope = jList2.getSelectedValue() + "_" + jList4.getSelectedValue() + "_" + jList5.getSelectedValue() + "_" + jList8.getSelectedValue();
+            myMainModel.ABM.calculateStudyScopeGeography();
         }
     }//GEN-LAST:event_jList8ValueChanged
 

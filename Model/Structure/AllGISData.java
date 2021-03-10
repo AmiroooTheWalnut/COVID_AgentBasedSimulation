@@ -91,17 +91,6 @@ public class AllGISData extends Dataset implements Serializable {
             CensusTract censusTract=county.findCensusTract(censusTractID);
             CensusBlockGroup censusBlockGroup=censusTract.findCensusBlock(id);
             return censusBlockGroup;
-//            for (int j = 0; j < countries.get(i).states.size(); j++) {
-//                for (int k = 0; k < countries.get(i).states.get(j).counties.size(); k++) {
-//                    for (int l = 0; l < countries.get(i).states.get(j).counties.get(k).censusTracts.size(); l++) {
-//                        for (int m = 0; m < countries.get(i).states.get(j).counties.get(k).censusTracts.get(l).censusBlocks.size(); m++) {
-//                            if (countries.get(i).states.get(j).counties.get(k).censusTracts.get(l).censusBlocks.get(m).id == id) {
-//                                return countries.get(i).states.get(j).counties.get(k).censusTracts.get(l).censusBlocks.get(m);
-//                            }
-//                        }
-//                    }
-//                }
-//            }
         }
         return null;
     }
@@ -115,9 +104,6 @@ public class AllGISData extends Dataset implements Serializable {
         System.out.println("READING STATES");
         File statesFile = new File(geographyDirectory + "/US_States.json");
         try (BufferedReader br = new BufferedReader(new FileReader(statesFile))) {
-//            Country us = new Country();
-//            us.name = "USA";
-//            us.states = new ArrayList();
             if (countries == null) {
                 countries = new ArrayList();
             }
@@ -269,67 +255,6 @@ public class AllGISData extends Dataset implements Serializable {
             countries.get(i).getLatLonSizeFromChildren();
         }
         AllGISData.saveAllGISDataKryo("./datasets/ProcessedGeoData", this);
-    }
-
-    public void processUSData_Old(String geographyFile) {
-        File geoFile = new File(geographyFile);
-        try (BufferedReader br = new BufferedReader(new FileReader(geoFile))) {
-            Country us = new Country();
-            us.name = "USA";
-            us.states = new ArrayList();
-            if (countries == null) {
-                countries = new ArrayList();
-            }
-            countries.add(us);
-            String line;
-            int counter = 0;
-            int largerCounter = 0;
-            int counterInterval = 1000;
-            while ((line = br.readLine()) != null) {
-                if (line.contains("{ \"type\": \"Feature\", \"properties\":")) {
-                    JSONObject root = new JSONObject(line);
-                    JSONObject properties = root.getJSONObject("properties");
-                    byte stateId = Byte.parseByte(properties.getString("StateFIPS"));
-                    State state = countries.get(countries.size() - 1).findAndInsertState(stateId);
-                    if (!properties.isNull("State")) {
-                        state.name = properties.getString("State");
-                    } else {
-                        state.name = "NULL";
-                    }
-                    int countyId = Integer.parseInt(properties.getString("CountyFIPS"));
-                    County county = state.findAndInsertCounty(countyId);
-                    if (!properties.isNull("County")) {
-                        county.name = properties.getString("County");
-                    } else {
-                        county.name = "NULL";
-                    }
-                    int censusTractInt = properties.getInt("TractCode");
-                    CensusTract censusTract = county.findAndInsertCensusTract(censusTractInt);
-                    long censusBlockLong = Long.parseLong(properties.getString("CensusBlockGroup"));
-                    CensusBlockGroup censusBlock = censusTract.findAndInsertCensusBlock(censusBlockLong);
-                    censusBlock.country = countries.get(countries.size() - 1);
-                    censusBlock.state = state;
-                    censusBlock.county = county;
-                    censusBlock.censusTract = censusTract;
-                    float[] results = getSizeMiddleLatLon(root.getJSONObject("geometry").getJSONArray("coordinates").getJSONArray(0).getJSONArray(0));
-                    censusBlock.lat = results[0];
-                    censusBlock.lon = results[1];
-                    censusBlock.size = results[2];
-                }
-                counter = counter + 1;
-                if (counter > counterInterval) {
-                    largerCounter = largerCounter + 1;
-                    counter = 0;
-                    System.out.println("Num rows read: " + largerCounter * counterInterval);
-                }
-            }
-            for (int i = 0; i < countries.size(); i++) {
-                countries.get(i).getLatLonSizeFromChildren();
-            }
-            AllGISData.saveAllGISDataKryo("./datasets/ProcessedGeoData", this);
-        } catch (IOException ex) {
-            Logger.getLogger(AllGISData.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
 
     public float[] getSizeMiddleLatLon(JSONArray input) {

@@ -28,7 +28,8 @@ import lombok.Setter;
  *
  * @author user
  */
-@Getter @Setter
+@Getter
+@Setter
 public class Patterns implements Serializable {
 
     static final long serialVersionUID = softwareVersion;
@@ -72,10 +73,15 @@ public class Patterns implements Serializable {
                 }
             }
             if (isRawBinFound == false) {
-                ArrayList<PatternsRecordProcessed> recordsLocal = readData(cSVfileList[i].getAbsolutePath(), isParallel, numCPU);
-                patternRecords = recordsLocal;
-                Safegraph.savePatternsKryo(directoryName + "/ProcessedData_" + cSVfileList[i].getName(), this);
-                patternRecords.clear();
+                ArrayList<PatternsRecordProcessed> recordsLocal;
+                try {
+                    recordsLocal = readData(cSVfileList[i].getCanonicalPath(), isParallel, numCPU);
+                    patternRecords = recordsLocal;
+                    Safegraph.savePatternsKryo(directoryName + "/ProcessedData_" + cSVfileList[i].getName(), this);
+                    patternRecords.clear();
+                } catch (IOException ex) {
+                    Logger.getLogger(Patterns.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
 
@@ -88,6 +94,10 @@ public class Patterns implements Serializable {
             System.out.println("Data read: " + i);
         }
         Collections.sort(patternRecords);
+        Safegraph.savePatternsKryo(directoryName + "/processedData", this);
+        for (int i = 0; i < binFileListRecheck.length; i++) {
+            binFileListRecheck[i].delete();
+        }
     }
 
     public ArrayList<PatternsRecordProcessed> readData(String fileName, boolean isParallel, int numCPU) {

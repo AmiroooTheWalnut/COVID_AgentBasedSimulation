@@ -20,6 +20,7 @@ public class PatternsRecordProcessed implements Serializable, Comparable<Pattern
     public transient SafegraphPlace place;
     public String placeKey;
     public long poi_cbg;
+    public transient CensusBlockGroup poi_cbg_censusBlock;
 //    public SafegraphPlace parent_place;//NEEDS TO KNOW ALL PLACES BEFOREHAND!
 //    public ArrayList<Brand> brands;
     public ZonedDateTime date_range_start;

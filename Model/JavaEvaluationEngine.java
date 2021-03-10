@@ -56,6 +56,29 @@ public class JavaEvaluationEngine {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
+                    String[] lines = destination.getText().split(System.getProperty("line.separator"));
+                    if (lines.length > 1000) {
+                        StringBuffer sb = new StringBuffer();
+                        for (int i = 10; i < lines.length; i++) {
+                            sb.append(lines[i]);
+                        }
+                        String str = sb.toString();
+                        destination.setText(str);
+                    }
+                    if (destination.getText().length() > 1000) {
+                        lines = destination.getText().split(System.getProperty("line.separator"));
+                        StringBuffer sb = new StringBuffer();
+                        int maxNumLines = Math.min(10, lines.length);
+                        if (maxNumLines <= 10) {
+                            destination.setText("");
+                        } else {
+                            for (int i = maxNumLines; i < lines.length; i++) {
+                                sb.append(lines[i]);
+                            }
+                            String str = sb.toString();
+                            destination.setText(str);
+                        }
+                    }
                     destination.append(text);
                 }
             });

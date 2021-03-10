@@ -98,8 +98,8 @@ public class ManualCompressPlacesDialog extends javax.swing.JDialog {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         if(jList1.getSelectedIndex()>-1){
             SafegraphPlaces safegraphPlaces=new SafegraphPlaces();
-            safegraphPlaces.preprocessMonthCorePlaces("./datasets/Safegraph/FullData"+jList1.getSelectedValue(),jList1.getSelectedValue(),jCheckBox1.isSelected(),myParent.numProcessors);
-            Safegraph.saveSafegraphPlacesKryo("./datasets/Safegraph/FullData"+jList1.getSelectedValue()+"/processedData", safegraphPlaces);
+            safegraphPlaces.preprocessMonthCorePlaces("./datasets/Safegraph/FullData/"+jList1.getSelectedValue(),jList1.getSelectedValue(),jCheckBox1.isSelected(),myParent.numProcessors);
+            Safegraph.saveSafegraphPlacesKryo("./datasets/Safegraph/FullData/"+jList1.getSelectedValue()+"/processedData", safegraphPlaces);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 

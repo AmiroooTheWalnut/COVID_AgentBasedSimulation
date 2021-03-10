@@ -98,8 +98,7 @@ public class ManualCompressPatternsDialog extends javax.swing.JDialog {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         if(jList1.getSelectedIndex()>-1){
             Patterns patterns=new Patterns();
-            patterns.preprocessMonthPatterns("./datasets/Safegraph/FullData"+jList1.getSelectedValue(),jList1.getSelectedValue(),jCheckBox1.isSelected(),myParent.numProcessors);
-            Safegraph.savePatternsKryo("./datasets/Safegraph/FullData"+jList1.getSelectedValue()+"/processedData", patterns);
+            patterns.preprocessMonthPatterns("./datasets/Safegraph/FullData/"+jList1.getSelectedValue(),jList1.getSelectedValue(),jCheckBox1.isSelected(),myParent.numProcessors);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 

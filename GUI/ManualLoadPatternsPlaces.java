@@ -5,30 +5,30 @@
  */
 package COVID_AgentBasedSimulation.GUI;
 
-import COVID_AgentBasedSimulation.Model.Data.Safegraph.AllSafegraphPlaces;
-import COVID_AgentBasedSimulation.Model.Data.Safegraph.SafegraphPlaces;
+import COVID_AgentBasedSimulation.Model.Data.Safegraph.AllPatterns;
+import COVID_AgentBasedSimulation.Model.Data.Safegraph.Patterns;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.Safegraph;
 
 /**
  *
  * @author user
  */
-public class ManualLoadPlacesDialog extends javax.swing.JDialog {
+public class ManualLoadPatternsPlaces extends javax.swing.JDialog {
 
     MainFrame myParent;
     String[] patternsList;
-
+    
     /**
-     * Creates new form ManualLoadSafegraphDialog
+     * Creates new form ManualLoadPatternsPlaces
      */
-    public ManualLoadPlacesDialog(java.awt.Frame parent, boolean modal) {
+    public ManualLoadPatternsPlaces(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         myParent = (MainFrame) parent;
     }
-
+    
     public void refreshList() {
-        patternsList = AllSafegraphPlaces.detectAllPlaces("./datasets/Safegraph/FullData");
+        patternsList = AllPatterns.detectAllPatterns("./datasets/Safegraph/FullData");
         jList1.setModel(new javax.swing.AbstractListModel() {
             @Override
             public int getSize() {
@@ -52,23 +52,22 @@ public class ManualLoadPlacesDialog extends javax.swing.JDialog {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        jButton1 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jList1 = new javax.swing.JList<>();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Patterns"));
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Patterns and places"));
 
-        jButton1.setText("Load compressed raw data");
-        jButton1.setToolTipText("");
+        jScrollPane1.setViewportView(jList1);
+
+        jButton1.setText("Load compressed files");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
             }
         });
-
-        jScrollPane1.setViewportView(jList1);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -78,12 +77,12 @@ public class ManualLoadPlacesDialog extends javax.swing.JDialog {
                 .addContainerGap()
                 .addComponent(jButton1)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 390, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 385, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 363, Short.MAX_VALUE)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 362, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton1)
                 .addContainerGap())
@@ -105,19 +104,41 @@ public class ManualLoadPlacesDialog extends javax.swing.JDialog {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         if (jList1.getSelectedIndex() > -1) {
-            SafegraphPlaces safegraphPlaces = Safegraph.loadSafegraphPlacesKryo("./datasets/Safegraph/FullData/" + jList1.getSelectedValue() + "/processedData.bin");
-            boolean isUnique = true;
-            for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.size(); i++) {
-                if (myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).name.equals(safegraphPlaces.name)) {
-                    isUnique = false;
-                }
-            }
-            if (isUnique == true) {
-                myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.add(safegraphPlaces);
-                myParent.refreshPlacesList();
-            }
+            myParent.mainModel.safegraph.clearPatternsPlaces();
+            String temp[]=jList1.getSelectedValue().split("_");
+            myParent.mainModel.safegraph.loadPatternsPlacesSet(temp[1]+"_"+temp[2], myParent.mainModel.allGISData, "FullData", true, myParent.numProcessors);
+            myParent.refreshPatternsList();
+            myParent.refreshPlacesList();
+                    
+//            Patterns patterns = Safegraph.loadPatternsKryo("./datasets/Safegraph/FullData/" + jList1.getSelectedValue() + "/processedData.bin");
+//            System.out.println("PATTERNS SIZE: "+patterns.patternRecords.size());
+//            double avg_num_visitors=0;
+//            for(int i=0;i<patterns.patternRecords.size();i++){
+//                avg_num_visitors=avg_num_visitors+patterns.patternRecords.get(i).raw_visitor_counts;
+//            }
+//            avg_num_visitors=avg_num_visitors/(double)patterns.patternRecords.size();
+//            System.out.println("PATTERNS AVERAGE VISITORS: "+avg_num_visitors);
+//            
+//            double avg_num_visits=0;
+//            for(int i=0;i<patterns.patternRecords.size();i++){
+//                avg_num_visits=avg_num_visits+patterns.patternRecords.get(i).raw_visit_counts;
+//            }
+//            avg_num_visits=avg_num_visits/(double)patterns.patternRecords.size();
+//            System.out.println("PATTERNS AVERAGE VISITS: "+avg_num_visits);
+//            
+//            boolean isUnique = true;
+//            for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.size(); i++) {
+//                if (myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).name.equals(patterns.name)) {
+//                    isUnique = false;
+//                }
+//            }
+//            if (isUnique == true) {
+//                myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.add(patterns);
+//                myParent.refreshPatternsList();
+//            }
         }
     }//GEN-LAST:event_jButton1ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;

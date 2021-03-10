@@ -21,6 +21,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.SwingUtilities;
 import lombok.Getter;
 import lombok.Setter;
 import org.objenesis.strategy.StdInstantiatorStrategy;
@@ -35,7 +36,8 @@ import py4j.GatewayServer;
  *
  * @author user
  */
-@Getter @Setter
+@Getter
+@Setter
 public class MainModel extends Dataset {
 
     public static final long softwareVersion = 1L;
@@ -45,7 +47,6 @@ public class MainModel extends Dataset {
     public AllGISData allGISData;
 
 //    public ArrayList<Person> people;
-
     public AgentBasedModel ABM;
 
     public JavaEvaluationEngine javaEvaluationEngine;
@@ -53,10 +54,21 @@ public class MainModel extends Dataset {
 
     public Timer simulationTimer;
     public TimerTask runTask;
-    public int simulationDelayTime=5000;
+    public int simulationDelayTime = 5000;
     public boolean isFastForward = false;
-    
+
+    public int currentMonth = -1;
+
     public boolean isStartBySafegraph = false;
+
+    public transient int numCPUs = 1;
+
+    public boolean isPause = false;
+    public boolean isRunning = false;
+    
+    public int newSimulationDelayTime=-2;
+
+    private Thread thread;
 
     public void startScriptEngines() {
         javaEvaluationEngine = new JavaEvaluationEngine(this);
@@ -124,39 +136,93 @@ public class MainModel extends Dataset {
     }
 
     public void initModel(boolean isParallel, int numCPUs) {
-//        int month = agentBasedModel.startTime.getMonthValue();
-//        String monthString = String.valueOf(month);
-//        if (monthString.length() < 2) {
-//            monthString = "0" + monthString;
-//        }
-//        String dateName = agentBasedModel.startTime.getYear() + "_" +monthString;
-//        safegraph.clearPatternsPlaces();
-//        System.gc();
-//        safegraph.loadPatternsPlacesSet(dateName, allGISData, isParallel, numCPUs);//SO FAR NO PARALLEL
+        int month = ABM.startTime.getMonthValue();
+        currentMonth = month;
+        String monthString = String.valueOf(month);
+        if (monthString.length() < 2) {
+            monthString = "0" + monthString;
+        }
+        String dateName = ABM.startTime.getYear() + "_" + monthString;
+        safegraph.clearPatternsPlaces();
+        System.gc();
+        safegraph.loadPatternsPlacesSet(dateName, allGISData, ABM.studyScope, isParallel, numCPUs);//SO FAR NO PARALLEL
         ABM.rootAgent = new Agent(ABM.agentTemplates.get(0));
         ABM.agents = new ArrayList();
-        ABM.currentTime=ABM.startTime;
+        ABM.currentTime = ABM.startTime;
         resetTimerTask();
+        pythonEvaluationEngine.saveAllPythonScripts(ABM.agentTemplates);
         if (ABM.rootAgent.myTemplate.constructor.isJavaScriptActive == true) {
             javaEvaluationEngine.runScript(ABM.rootAgent.myTemplate.constructor.javaScript.script);
         } else {
-            pythonEvaluationEngine.runScript(ABM.rootAgent.myTemplate.constructor.pythonScript.script);
+            pythonEvaluationEngine.runScript(ABM.rootAgent.myTemplate.constructor.pythonScript);
         }
     }
-    
-    public void resetTimerTask(){
-        runTask=new TimerTask() {
+
+    public void resetTimerTask() {
+        runTask = new TimerTask() {
             public void run() {
+                int month = ABM.startTime.getMonthValue();
+                if (currentMonth != month) {
+                    String monthString = String.valueOf(month);
+                    if (monthString.length() < 2) {
+                        monthString = "0" + monthString;
+                    }
+                    String yearStr = String.valueOf(ABM.startTime.getYear());
+                    safegraph.clearPatternsPlaces();
+                    System.gc();
+                    safegraph.requestDataset(allGISData, ABM.studyScope, yearStr, monthString, true, numCPUs);
+                    currentMonth = month;
+                }
                 ABM.evaluateAllAgents();
-                ABM.currentTime=ABM.currentTime.plusMinutes(1);
+                ABM.currentTime = ABM.currentTime.plusMinutes(1);
             }
         };
     }
 
+    public void fastForward() {
+        thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (isPause == false) {
+                    int month = ABM.startTime.getMonthValue();
+                    if (currentMonth != month) {
+                        String monthString = String.valueOf(month);
+                        if (monthString.length() < 2) {
+                            monthString = "0" + monthString;
+                        }
+                        String yearStr = String.valueOf(ABM.startTime.getYear());
+                        safegraph.clearPatternsPlaces();
+                        System.gc();
+                        safegraph.requestDataset(allGISData, ABM.studyScope, yearStr, monthString, true, numCPUs);
+                        currentMonth = month;
+                    }
+                    ABM.evaluateAllAgents();
+                    ABM.currentTime = ABM.currentTime.plusMinutes(1);
+                    System.out.println(isPause);
+                }
+                isPause = false;
+                isRunning = false;
+            }
+        });
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                thread.start();
+            }
+        });
+
+    }
+
     public void resume() {
-        simulationTimer = new Timer();
-        resetTimerTask();
-        simulationTimer.schedule(runTask, 0, simulationDelayTime);
+        if (simulationDelayTime > -1) {
+            simulationTimer = new Timer();
+            resetTimerTask();
+            simulationTimer.schedule(runTask, 0, simulationDelayTime);
+        } else {
+            fastForward();
+        }
+        isRunning = true;
+
 //        if (people != null) {
 //            if (people.size() > 0) {
 //
@@ -172,9 +238,27 @@ public class MainModel extends Dataset {
 //            }
 //        }
     }
-    
-    public void pause(){
-        simulationTimer.cancel();
+
+    public void pause() {
+        if (simulationDelayTime > -1) {
+            if (simulationTimer != null) {
+                simulationTimer.cancel();
+                isRunning = false;
+            }
+        } else {
+            isPause = true;
+            while (isRunning == true) {
+                try {
+                    System.out.println("Waiting to pause fastforward run!");
+                    Thread.sleep(1 * 100);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(MainModel.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+        if(newSimulationDelayTime>-2){
+            simulationDelayTime=newSimulationDelayTime;
+        }
     }
 
     public void generatePeopleFromPatterns() {

@@ -18,8 +18,8 @@ import java.util.TimerTask;
 public class SimulatorDialog extends javax.swing.JDialog {
 
     MainFrame myParent;
-    
-    boolean isRateChanged=false;
+
+    boolean isRateChanged = false;
 
     /**
      * Creates new form Simulator
@@ -460,10 +460,11 @@ public class SimulatorDialog extends javax.swing.JDialog {
 
     private void jToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
         if (jToggleButton1.getText().equals("Run")) {
+            myParent.mainModel.isPause = false;
             jToggleButton1.setText("Pause");
             myParent.mainModel.resume();
-
         } else if (jToggleButton1.getText().equals("Pause")) {
+            myParent.mainModel.isPause = true;
             myParent.mainModel.pause();
             jToggleButton1.setText("Run");
         }
@@ -484,14 +485,14 @@ public class SimulatorDialog extends javax.swing.JDialog {
             public void run() {
 //                System.out.println("UPDATE: "+myParent.mainModel.agentBasedModel.currentTime.toString());
                 jLabel2.setText(myParent.mainModel.ABM.currentTime.toString());
-                if(isRateChanged==true){
+                if (isRateChanged == true) {
                     myParent.mainModel.pause();
                     myParent.mainModel.resume();
-                    isRateChanged=false;
+                    isRateChanged = false;
                 }
             }
         }, 0, 1000);
-        
+
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jToggleButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton2ActionPerformed
@@ -551,45 +552,61 @@ public class SimulatorDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jToggleButton3ActionPerformed
 
     private void jRadioButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton1ActionPerformed
-        if(myParent.mainModel.simulationDelayTime!=5000){
-            isRateChanged=true;
+        if (myParent.mainModel.isRunning == true) {
+            myParent.mainModel.newSimulationDelayTime = 5000;
+            isRateChanged = true;
+        } else {
+            myParent.mainModel.simulationDelayTime = 5000;
         }
-        myParent.mainModel.simulationDelayTime = 5000;
+
     }//GEN-LAST:event_jRadioButton1ActionPerformed
 
     private void jRadioButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton2ActionPerformed
-        if(myParent.mainModel.simulationDelayTime!=2000){
-            isRateChanged=true;
-        }
         myParent.mainModel.simulationDelayTime = 2000;
+        if (myParent.mainModel.isRunning == true) {
+            isRateChanged = true;
+        }
+
     }//GEN-LAST:event_jRadioButton2ActionPerformed
 
     private void jRadioButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton3ActionPerformed
-        if(myParent.mainModel.simulationDelayTime!=1000){
-            isRateChanged=true;
+        if (myParent.mainModel.isRunning == true) {
+            myParent.mainModel.newSimulationDelayTime = 1000;
+            isRateChanged = true;
+        } else {
+            myParent.mainModel.simulationDelayTime = 1000;
         }
-        myParent.mainModel.simulationDelayTime = 1000;
+
     }//GEN-LAST:event_jRadioButton3ActionPerformed
 
     private void jRadioButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton4ActionPerformed
-        if(myParent.mainModel.simulationDelayTime!=500){
-            isRateChanged=true;
+        if (myParent.mainModel.isRunning == true) {
+            myParent.mainModel.newSimulationDelayTime = 500;
+            isRateChanged = true;
+        } else {
+            myParent.mainModel.simulationDelayTime = 500;
         }
-        myParent.mainModel.simulationDelayTime = 500;
+
     }//GEN-LAST:event_jRadioButton4ActionPerformed
 
     private void jRadioButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton5ActionPerformed
-        if(myParent.mainModel.simulationDelayTime!=250){
-            isRateChanged=true;
+        if (myParent.mainModel.isRunning == true) {
+            myParent.mainModel.newSimulationDelayTime = 250;
+            isRateChanged = true;
+        } else {
+            myParent.mainModel.simulationDelayTime = 250;
         }
-        myParent.mainModel.simulationDelayTime = 250;
+
     }//GEN-LAST:event_jRadioButton5ActionPerformed
 
     private void jRadioButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton6ActionPerformed
-        if(myParent.mainModel.simulationDelayTime!=10){
-            isRateChanged=true;
+        if (myParent.mainModel.isRunning == true) {
+            myParent.mainModel.newSimulationDelayTime = -1;
+            isRateChanged = true;
+        } else {
+            myParent.mainModel.simulationDelayTime = -1;
         }
-        myParent.mainModel.simulationDelayTime = 10;
+
     }//GEN-LAST:event_jRadioButton6ActionPerformed
 
 
