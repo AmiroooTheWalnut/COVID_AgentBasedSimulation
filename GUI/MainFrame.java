@@ -10,6 +10,7 @@ import COVID_AgentBasedSimulation.Model.MainModel;
 import COVID_AgentBasedSimulation.Model.Structure.AllGISData;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import java.awt.event.WindowListener;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -20,6 +21,8 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import processing.awt.PSurfaceAWT.SmoothCanvas;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -46,9 +49,9 @@ public class MainFrame extends javax.swing.JFrame {
         jSpinner1.setModel(new javax.swing.SpinnerNumberModel(Runtime.getRuntime().availableProcessors() / 2, 1, Runtime.getRuntime().availableProcessors(), 1));
 
         numProcessors = (int) jSpinner1.getValue();
-        
+
         mainModel = new MainModel();
-        mainModel.numCPUs=numProcessors;
+        mainModel.numCPUs = numProcessors;
         mainModel.initData();
         mainModel.initAgentBasedModel();
         File geoDataFile = new File("./datasets/ProcessedGeoData.bin");
@@ -133,6 +136,7 @@ public class MainFrame extends javax.swing.JFrame {
         jButton17 = new javax.swing.JButton();
         jCheckBox1 = new javax.swing.JCheckBox();
         jButton18 = new javax.swing.JButton();
+        jButton19 = new javax.swing.JButton();
         jPanel12 = new javax.swing.JPanel();
         jButton11 = new javax.swing.JButton();
         jButton12 = new javax.swing.JButton();
@@ -256,8 +260,9 @@ public class MainFrame extends javax.swing.JFrame {
             .addGroup(jPanel8Layout.createSequentialGroup()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel8Layout.setVerticalGroup(
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -393,10 +398,17 @@ public class MainFrame extends javax.swing.JFrame {
         jCheckBox1.setSelected(true);
         jCheckBox1.setText("Manual");
 
-        jButton18.setText("Load pattern places");
+        jButton18.setText("Load pattern places orig");
         jButton18.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton18ActionPerformed(evt);
+            }
+        });
+
+        jButton19.setText("Load pattern places study");
+        jButton19.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton19ActionPerformed(evt);
             }
         });
 
@@ -411,6 +423,8 @@ public class MainFrame extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jButton18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton19)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton17)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -427,7 +441,8 @@ public class MainFrame extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton17)
                     .addComponent(jCheckBox1)
-                    .addComponent(jButton18))
+                    .addComponent(jButton18)
+                    .addComponent(jButton19))
                 .addContainerGap())
         );
 
@@ -693,22 +708,16 @@ public class MainFrame extends javax.swing.JFrame {
     private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
         PreviewDialog swingGui = new PreviewDialog(this, false);
         swingGui.setVisible(true);
-
-        ProcessingMapRenderer sketch = new ProcessingMapRenderer(this);
-        sketch.startRendering();
     }//GEN-LAST:event_jButton10ActionPerformed
 
     private void jButton11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton11ActionPerformed
         SimulatorDialog simulatorDialog = new SimulatorDialog(this, false);
         simulatorDialog.setVisible(true);
-
-        ProcessingMapRenderer sketch = new ProcessingMapRenderer(this);
-        sketch.startRendering();
     }//GEN-LAST:event_jButton11ActionPerformed
 
     private void jSpinner1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinner1StateChanged
         numProcessors = (int) jSpinner1.getValue();
-        mainModel.numCPUs=numProcessors;
+        mainModel.numCPUs = numProcessors;
     }//GEN-LAST:event_jSpinner1StateChanged
 
     private void jButton12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton12ActionPerformed
@@ -802,7 +811,7 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton17ActionPerformed
 
     private void jButton18ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton18ActionPerformed
-        ManualLoadPatternsPlaces manualLoadPatternsPlaces = new ManualLoadPatternsPlaces(this, false);
+        ManualLoadPatternsPlaces manualLoadPatternsPlaces = new ManualLoadPatternsPlaces(this, false, "FullData");
         manualLoadPatternsPlaces.setVisible(true);
         manualLoadPatternsPlaces.refreshList();
     }//GEN-LAST:event_jButton18ActionPerformed
@@ -823,6 +832,12 @@ public class MainFrame extends javax.swing.JFrame {
 //            Safegraph.saveSafegraphPlacesKryo("./datasets/Safegraph/FullData/" + placesList[i] + "/processedData", safegraphPlaces);
         }
     }//GEN-LAST:event_jButton7ActionPerformed
+
+    private void jButton19ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton19ActionPerformed
+        ManualLoadPatternsPlaces manualLoadPatternsPlaces = new ManualLoadPatternsPlaces(this, false, mainModel.ABM.studyScope);
+        manualLoadPatternsPlaces.setVisible(true);
+        manualLoadPatternsPlaces.refreshList();
+    }//GEN-LAST:event_jButton19ActionPerformed
 
     public void refreshPatternsList() {
         jList1.setModel(new javax.swing.AbstractListModel() {
@@ -898,6 +913,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JButton jButton16;
     private javax.swing.JButton jButton17;
     private javax.swing.JButton jButton18;
+    private javax.swing.JButton jButton19;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;

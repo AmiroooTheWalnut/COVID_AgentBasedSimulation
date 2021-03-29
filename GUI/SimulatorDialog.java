@@ -29,8 +29,10 @@ public class SimulatorDialog extends javax.swing.JDialog {
         initComponents();
         myParent = (MainFrame) parent;
 
-        //jFormattedTextField1.
         refreshLists();
+
+        ProcessingMapRenderer sketch = new ProcessingMapRenderer(myParent, jPanel14);
+        sketch.startRendering();
     }
 
     public void refreshLists() {
@@ -43,6 +45,18 @@ public class SimulatorDialog extends javax.swing.JDialog {
             @Override
             public Object getElementAt(int index) {
                 return myParent.mainModel.allGISData.countries.get(index).name;
+            }
+        });
+
+        jList6.setModel(new javax.swing.AbstractListModel() {
+            @Override
+            public int getSize() {
+                return myParent.mainModel.ABM.agentTemplates.size();
+            }
+
+            @Override
+            public Object getElementAt(int index) {
+                return myParent.mainModel.ABM.agentTemplates.get(index).agentTypeName;
             }
         });
     }
@@ -75,7 +89,14 @@ public class SimulatorDialog extends javax.swing.JDialog {
         jToggleButton2 = new javax.swing.JToggleButton();
         jToggleButton3 = new javax.swing.JToggleButton();
         jTabbedPane1 = new javax.swing.JTabbedPane();
+        jPanel10 = new javax.swing.JPanel();
+        jScrollPane8 = new javax.swing.JScrollPane();
+        jList6 = new javax.swing.JList<>();
+        jPanel15 = new javax.swing.JPanel();
+        jScrollPane9 = new javax.swing.JScrollPane();
+        jList7 = new javax.swing.JList<>();
         jPanel9 = new javax.swing.JPanel();
+        jTabbedPane2 = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jList1 = new javax.swing.JList<>();
@@ -85,13 +106,15 @@ public class SimulatorDialog extends javax.swing.JDialog {
         jPanel3 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         jList3 = new javax.swing.JList<>();
+        jPanel16 = new javax.swing.JPanel();
+        jScrollPane10 = new javax.swing.JScrollPane();
+        jList8 = new javax.swing.JList<>();
         jPanel4 = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
         jList4 = new javax.swing.JList<>();
         jPanel5 = new javax.swing.JPanel();
         jScrollPane5 = new javax.swing.JScrollPane();
         jList5 = new javax.swing.JList<>();
-        jPanel10 = new javax.swing.JPanel();
         jPanel11 = new javax.swing.JPanel();
         jPanel12 = new javax.swing.JPanel();
         jScrollPane6 = new javax.swing.JScrollPane();
@@ -99,6 +122,8 @@ public class SimulatorDialog extends javax.swing.JDialog {
         jPanel13 = new javax.swing.JPanel();
         jScrollPane7 = new javax.swing.JScrollPane();
         jTextArea2 = new javax.swing.JTextArea();
+        jPanel17 = new javax.swing.JPanel();
+        jPanel14 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -197,12 +222,12 @@ public class SimulatorDialog extends javax.swing.JDialog {
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel7Layout.createSequentialGroup()
                 .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButton2)
                     .addGroup(jPanel7Layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel2))
-                    .addComponent(jButton2))
-                .addGap(0, 0, Short.MAX_VALUE))
+                        .addComponent(jLabel2)))
+                .addGap(0, 142, Short.MAX_VALUE))
             .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(jPanel7Layout.createSequentialGroup()
                 .addComponent(jToggleButton1)
@@ -231,6 +256,7 @@ public class SimulatorDialog extends javax.swing.JDialog {
 
         jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder("Visualization"));
 
+        jToggleButton2.setSelected(true);
         jToggleButton2.setText("Show GIS markers");
         jToggleButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -238,7 +264,8 @@ public class SimulatorDialog extends javax.swing.JDialog {
             }
         });
 
-        jToggleButton3.setText("Show individuals");
+        jToggleButton3.setSelected(true);
+        jToggleButton3.setText("Show agents templates");
         jToggleButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jToggleButton3ActionPerformed(evt);
@@ -264,11 +291,56 @@ public class SimulatorDialog extends javax.swing.JDialog {
                 .addGap(0, 14, Short.MAX_VALUE))
         );
 
+        jPanel10.setBorder(javax.swing.BorderFactory.createTitledBorder("Agent templates"));
+
+        jList6.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                jList6ValueChanged(evt);
+            }
+        });
+        jScrollPane8.setViewportView(jList6);
+
+        javax.swing.GroupLayout jPanel10Layout = new javax.swing.GroupLayout(jPanel10);
+        jPanel10.setLayout(jPanel10Layout);
+        jPanel10Layout.setHorizontalGroup(
+            jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 347, Short.MAX_VALUE)
+        );
+        jPanel10Layout.setVerticalGroup(
+            jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 525, Short.MAX_VALUE)
+        );
+
+        jTabbedPane1.addTab("Agent templates", jPanel10);
+
+        jPanel15.setBorder(javax.swing.BorderFactory.createTitledBorder("Agents"));
+
+        jList7.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                jList7ValueChanged(evt);
+            }
+        });
+        jScrollPane9.setViewportView(jList7);
+
+        javax.swing.GroupLayout jPanel15Layout = new javax.swing.GroupLayout(jPanel15);
+        jPanel15.setLayout(jPanel15Layout);
+        jPanel15Layout.setHorizontalGroup(
+            jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane9, javax.swing.GroupLayout.DEFAULT_SIZE, 347, Short.MAX_VALUE)
+        );
+        jPanel15Layout.setVerticalGroup(
+            jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane9, javax.swing.GroupLayout.DEFAULT_SIZE, 525, Short.MAX_VALUE)
+        );
+
+        jTabbedPane1.addTab("Agents", jPanel15);
+
         jPanel9.setBorder(javax.swing.BorderFactory.createTitledBorder("GISData"));
         jPanel9.setLayout(new javax.swing.BoxLayout(jPanel9, javax.swing.BoxLayout.LINE_AXIS));
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Country"));
 
+        jList1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jList1.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
                 jList1ValueChanged(evt);
@@ -280,17 +352,18 @@ public class SimulatorDialog extends javax.swing.JDialog {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 128, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 330, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 323, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 459, Short.MAX_VALUE)
         );
 
-        jPanel9.add(jPanel1);
+        jTabbedPane2.addTab("Country", jPanel1);
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("State/Province"));
 
+        jList2.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jList2.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
                 jList2ValueChanged(evt);
@@ -302,82 +375,110 @@ public class SimulatorDialog extends javax.swing.JDialog {
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 133, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 330, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 323, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 459, Short.MAX_VALUE)
         );
 
-        jPanel9.add(jPanel2);
+        jTabbedPane2.addTab("State/Province", jPanel2);
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("County"));
 
+        jList3.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jList3.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                jList3ValueChanged(evt);
+            }
+        });
         jScrollPane3.setViewportView(jList3);
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 134, Short.MAX_VALUE)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 330, Short.MAX_VALUE)
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 323, Short.MAX_VALUE)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 459, Short.MAX_VALUE)
         );
 
-        jPanel9.add(jPanel3);
+        jTabbedPane2.addTab("County", jPanel3);
+
+        jPanel16.setBorder(javax.swing.BorderFactory.createTitledBorder("City"));
+
+        jList8.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jList8.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                jList8ValueChanged(evt);
+            }
+        });
+        jScrollPane10.setViewportView(jList8);
+
+        javax.swing.GroupLayout jPanel16Layout = new javax.swing.GroupLayout(jPanel16);
+        jPanel16.setLayout(jPanel16Layout);
+        jPanel16Layout.setHorizontalGroup(
+            jPanel16Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane10, javax.swing.GroupLayout.DEFAULT_SIZE, 330, Short.MAX_VALUE)
+        );
+        jPanel16Layout.setVerticalGroup(
+            jPanel16Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane10, javax.swing.GroupLayout.DEFAULT_SIZE, 459, Short.MAX_VALUE)
+        );
+
+        jTabbedPane2.addTab("City", jPanel16);
 
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Census tract"));
 
+        jList4.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jList4.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                jList4ValueChanged(evt);
+            }
+        });
         jScrollPane4.setViewportView(jList4);
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 135, Short.MAX_VALUE)
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 330, Short.MAX_VALUE)
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 323, Short.MAX_VALUE)
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 459, Short.MAX_VALUE)
         );
 
-        jPanel9.add(jPanel4);
+        jTabbedPane2.addTab("Census tract", jPanel4);
 
         jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Census block group"));
 
+        jList5.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jList5.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                jList5ValueChanged(evt);
+            }
+        });
         jScrollPane5.setViewportView(jList5);
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 134, Short.MAX_VALUE)
+            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 330, Short.MAX_VALUE)
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 323, Short.MAX_VALUE)
+            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 459, Short.MAX_VALUE)
         );
 
-        jPanel9.add(jPanel5);
+        jTabbedPane2.addTab("Census block group", jPanel5);
+
+        jPanel9.add(jTabbedPane2);
 
         jTabbedPane1.addTab("GISData", jPanel9);
-
-        jPanel10.setBorder(javax.swing.BorderFactory.createTitledBorder("Agents"));
-
-        javax.swing.GroupLayout jPanel10Layout = new javax.swing.GroupLayout(jPanel10);
-        jPanel10.setLayout(jPanel10Layout);
-        jPanel10Layout.setHorizontalGroup(
-            jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 727, Short.MAX_VALUE)
-        );
-        jPanel10Layout.setVerticalGroup(
-            jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 345, Short.MAX_VALUE)
-        );
-
-        jTabbedPane1.addTab("Agents", jPanel10);
 
         jPanel11.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jPanel11.setLayout(new java.awt.GridLayout(2, 1));
@@ -394,14 +495,14 @@ public class SimulatorDialog extends javax.swing.JDialog {
             jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel12Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE)
+                .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 174, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel12Layout.setVerticalGroup(
             jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel12Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 184, Short.MAX_VALUE)
+                .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 274, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -419,18 +520,44 @@ public class SimulatorDialog extends javax.swing.JDialog {
             jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel13Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE)
+                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 174, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel13Layout.setVerticalGroup(
             jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel13Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 184, Short.MAX_VALUE)
+                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 274, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
         jPanel11.add(jPanel13);
+
+        jPanel14.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jPanel14.addHierarchyBoundsListener(new java.awt.event.HierarchyBoundsListener() {
+            public void ancestorMoved(java.awt.event.HierarchyEvent evt) {
+            }
+            public void ancestorResized(java.awt.event.HierarchyEvent evt) {
+                jPanel14AncestorResized(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel17Layout = new javax.swing.GroupLayout(jPanel17);
+        jPanel17.setLayout(jPanel17Layout);
+        jPanel17Layout.setHorizontalGroup(
+            jPanel17Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel17Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel14, javax.swing.GroupLayout.DEFAULT_SIZE, 515, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanel17Layout.setVerticalGroup(
+            jPanel17Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel17Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel14, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -443,7 +570,10 @@ public class SimulatorDialog extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanel11, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel17, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
@@ -451,8 +581,11 @@ public class SimulatorDialog extends javax.swing.JDialog {
                 .addComponent(jTabbedPane1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel7, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jPanel11, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                .addComponent(jPanel17, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pack();
@@ -485,6 +618,35 @@ public class SimulatorDialog extends javax.swing.JDialog {
             public void run() {
 //                System.out.println("UPDATE: "+myParent.mainModel.agentBasedModel.currentTime.toString());
                 jLabel2.setText(myParent.mainModel.ABM.currentTime.toString());
+                if (jList6.getSelectedIndex() > -1) {
+                    ArrayList lats = new ArrayList();
+                    ArrayList lons = new ArrayList();
+                    for (int i = 0; i < myParent.mainModel.ABM.agents.size(); i++) {
+//                        if(myParent.mainModel.ABM.agents.get(i)==null){
+//                            System.out.println(myParent.mainModel.ABM.agents.get(i));
+//                        }
+                        if (myParent.mainModel.ABM.agents.get(i).myTemplate.agentTypeName.equals(jList6.getSelectedValue())) {
+                            Float lat = null;
+                            Float lon = null;
+                            for (int j = 0; j < myParent.mainModel.ABM.agents.get(i).myTemplate.agentProperties.size(); j++) {
+                                if (myParent.mainModel.ABM.agents.get(i).myTemplate.agentProperties.get(j).propertyName.equals("lat")) {
+                                    lat = (Float) myParent.mainModel.ABM.agents.get(i).myTemplate.agentProperties.get(j).value;
+                                }
+                                if (myParent.mainModel.ABM.agents.get(i).myTemplate.agentProperties.get(j).propertyName.equals("lon")) {
+                                    lon = (Float) myParent.mainModel.ABM.agents.get(i).myTemplate.agentProperties.get(j).value;
+                                }
+                            }
+                            if(lat!=null && lon!=null){
+                                lats.add(lat);
+                                lons.add(lon);
+                            }
+                        }
+                    }
+                    myParent.child.setDrawingAgentTemplatesMarkers(lats, lons);
+                }
+                if (jList7.getSelectedIndex() > -1) {
+                    
+                }
                 if (isRateChanged == true) {
                     myParent.mainModel.pause();
                     myParent.mainModel.resume();
@@ -496,7 +658,7 @@ public class SimulatorDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jToggleButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton2ActionPerformed
-        myParent.child.isShowGISMarkers = true;
+        myParent.child.isShowGISMarkers = jToggleButton2.isSelected();
     }//GEN-LAST:event_jToggleButton2ActionPerformed
 
     private void jList1ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList1ValueChanged
@@ -539,16 +701,52 @@ public class SimulatorDialog extends javax.swing.JDialog {
 //                    individuals.add(myParent.mainModel.people.get(i).home);
 //                }
 //            }
-            myParent.child.setDrawingMarkers(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()), markers, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).name, childrenNames, null);
+            myParent.child.setDrawingGISMarkers(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()), markers, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).name, childrenNames);
         }
     }//GEN-LAST:event_jList1ValueChanged
 
     private void jList2ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList2ValueChanged
+        if (jList1.getSelectedIndex() > -1 && jList2.getSelectedIndex() > -1) {
+            jList3.clearSelection();
+            jList4.clearSelection();
+            jList5.clearSelection();
+            jList8.clearSelection();
+            jList3.setModel(new javax.swing.AbstractListModel() {
+                @Override
+                public int getSize() {
+                    if (jList1.getSelectedIndex() > -1 && jList2.getSelectedIndex() > -1) {
+                        return myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.size();
+                    } else {
+                        return 0;
+                    }
+                }
 
+                @Override
+
+                public Object getElementAt(int index) {
+                    if (jList1.getSelectedIndex() > -1 && jList2.getSelectedIndex() > -1) {
+                        return myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(index).name;
+                    } else {
+                        return null;
+                    }
+                }
+            }
+            );
+
+            Location loc = new Location(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).lon, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).lat);
+            myParent.child.panZoomTo(loc, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).size);
+            String[] childrenNames = new String[myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.size()];
+            ArrayList<Marker> markers = new ArrayList();
+            for (int i = 0; i < childrenNames.length; i++) {
+                childrenNames[i] = myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(i).name;
+                markers.add(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(i));
+            }
+            myParent.child.setDrawingGISMarkers(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()), markers, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).name, childrenNames);
+        }
     }//GEN-LAST:event_jList2ValueChanged
 
     private void jToggleButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton3ActionPerformed
-        myParent.child.isShowIndividuals = true;
+        myParent.child.isShowAgentMarkers = jToggleButton3.isSelected();
     }//GEN-LAST:event_jToggleButton3ActionPerformed
 
     private void jRadioButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton1ActionPerformed
@@ -609,6 +807,169 @@ public class SimulatorDialog extends javax.swing.JDialog {
 
     }//GEN-LAST:event_jRadioButton6ActionPerformed
 
+    private void jList3ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList3ValueChanged
+        if (jList1.getSelectedIndex() > -1 && jList2.getSelectedIndex() > -1 && jList3.getSelectedIndex() > -1) {
+            jList4.clearSelection();
+            jList5.clearSelection();
+            jList8.clearSelection();
+            jList4.setModel(new javax.swing.AbstractListModel() {
+                @Override
+                public int getSize() {
+                    if (jList1.getSelectedIndex() > -1 && jList2.getSelectedIndex() > -1 && jList3.getSelectedIndex() > -1) {
+                        return myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.size();
+                    } else {
+                        return 0;
+                    }
+                }
+
+                @Override
+                public Object getElementAt(int index) {
+                    if (jList1.getSelectedIndex() > -1 && jList2.getSelectedIndex() > -1 && jList3.getSelectedIndex() > -1) {
+                        return myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(index).id;
+                    } else {
+                        return null;
+                    }
+                }
+            });
+
+            jList8.setModel(new javax.swing.AbstractListModel() {
+                @Override
+                public int getSize() {
+                    if (jList1.getSelectedIndex() > -1 && jList2.getSelectedIndex() > -1 && jList3.getSelectedIndex() > -1) {
+                        if (myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities != null) {
+                            return myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.size();
+                        } else {
+                            return 0;
+                        }
+                    } else {
+                        return 0;
+                    }
+                }
+
+                @Override
+                public Object getElementAt(int index) {
+                    if (jList1.getSelectedIndex() > -1 && jList2.getSelectedIndex() > -1 && jList3.getSelectedIndex() > -1) {
+                        if (myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities != null) {
+                            return myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(index).name;
+                        } else {
+                            return 0;
+                        }
+                    } else {
+                        return null;
+                    }
+                }
+            });
+
+            Location loc = new Location(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).lon, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).lat);
+            myParent.child.panZoomTo(loc, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).size);
+            String[] childrenNames = new String[myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.size()];
+            ArrayList<Marker> markers = new ArrayList();
+            for (int i = 0; i < childrenNames.length; i++) {
+                childrenNames[i] = String.valueOf(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(i).id);
+                markers.add(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(i));
+            }
+            myParent.child.setDrawingGISMarkers(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()), markers, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).name, childrenNames);
+        }
+    }//GEN-LAST:event_jList3ValueChanged
+
+    private void jList4ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList4ValueChanged
+        if (jList1.getSelectedIndex() > -1 && jList2.getSelectedIndex() > -1 && jList3.getSelectedIndex() > -1 && jList4.getSelectedIndex() > -1) {
+            jList5.clearSelection();
+            jList5.setModel(new javax.swing.AbstractListModel() {
+                @Override
+                public int getSize() {
+                    if (jList1.getSelectedIndex() > -1 && jList2.getSelectedIndex() > -1 && jList3.getSelectedIndex() > -1 && jList4.getSelectedIndex() > -1) {
+                        return myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.size();
+                    } else {
+                        return 0;
+                    }
+                }
+
+                @Override
+                public Object getElementAt(int index) {
+                    if (jList1.getSelectedIndex() > -1 && jList2.getSelectedIndex() > -1 && jList3.getSelectedIndex() > -1 && jList4.getSelectedIndex() > -1) {
+                        return myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.get(index).id;
+                    } else {
+                        return null;
+                    }
+                }
+            });
+
+            Location loc = new Location(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).lon, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).lat);
+            myParent.child.panZoomTo(loc, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).size);
+            String[] childrenNames = new String[myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.size()];
+            ArrayList<Marker> markers = new ArrayList();
+            for (int i = 0; i < childrenNames.length; i++) {
+                childrenNames[i] = String.valueOf(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.get(i).id);
+                markers.add(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.get(i));
+            }
+            myParent.child.setDrawingGISMarkers(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()), markers, String.valueOf(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).id), childrenNames);
+        }
+    }//GEN-LAST:event_jList4ValueChanged
+
+    private void jList5ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList5ValueChanged
+        if (jList1.getSelectedIndex() > -1 && jList2.getSelectedIndex() > -1 && jList3.getSelectedIndex() > -1 && jList4.getSelectedIndex() > -1 && jList5.getSelectedIndex() > -1) {
+            Location loc = new Location(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.get(jList5.getSelectedIndex()).lon, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.get(jList5.getSelectedIndex()).lat);
+            myParent.child.panZoomTo(loc, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.get(jList5.getSelectedIndex()).size);
+            myParent.child.setDrawingGISMarkers(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.get(jList5.getSelectedIndex()), null, String.valueOf(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.get(jList5.getSelectedIndex()).id), null);
+        }
+    }//GEN-LAST:event_jList5ValueChanged
+
+    private void jList8ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList8ValueChanged
+        if (jList1.getSelectedIndex() > -1 && jList2.getSelectedIndex() > -1 && jList3.getSelectedIndex() > -1 && jList8.getSelectedIndex() > -1) {
+            jList4.clearSelection();
+            jList5.clearSelection();
+
+            jList4.setModel(new javax.swing.AbstractListModel() {
+                @Override
+                public int getSize() {
+                    if (jList1.getSelectedIndex() > -1 && jList2.getSelectedIndex() > -1 && jList3.getSelectedIndex() > -1 && jList8.getSelectedIndex() > -1) {
+                        return myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList8.getSelectedIndex()).censusTracts.size();
+                    } else {
+                        return 0;
+                    }
+                }
+
+                @Override
+                public Object getElementAt(int index) {
+                    if (jList1.getSelectedIndex() > -1 && jList2.getSelectedIndex() > -1 && jList3.getSelectedIndex() > -1 && jList8.getSelectedIndex() > -1) {
+                        return myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList8.getSelectedIndex()).censusTracts.get(index).id;
+                    } else {
+                        return null;
+                    }
+                }
+            });
+
+            Location loc = new Location(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList8.getSelectedIndex()).lon, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList8.getSelectedIndex()).lat);
+            myParent.child.panZoomTo(loc, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList8.getSelectedIndex()).size);
+            String[] childrenNames = new String[myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList8.getSelectedIndex()).censusTracts.size()];
+            ArrayList<Marker> markers = new ArrayList();
+            for (int i = 0; i < childrenNames.length; i++) {
+                childrenNames[i] = String.valueOf(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList8.getSelectedIndex()).censusTracts.get(i).id);
+                markers.add(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList8.getSelectedIndex()).censusTracts.get(i));
+            }
+            myParent.child.setDrawingGISMarkers(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList8.getSelectedIndex()), markers, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList8.getSelectedIndex()).name, childrenNames);
+        }
+    }//GEN-LAST:event_jList8ValueChanged
+
+    private void jPanel14AncestorResized(java.awt.event.HierarchyEvent evt) {//GEN-FIRST:event_jPanel14AncestorResized
+//        if (myParent != null) {
+//            if (myParent.child != null) {
+//                if (myParent.child.mySurface != null) {
+//                    myParent.child.mySurface.setSize(jPanel14.getWidth(), jPanel14.getHeight());
+//                }
+//            }
+//        }
+    }//GEN-LAST:event_jPanel14AncestorResized
+
+    private void jList6ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList6ValueChanged
+
+    }//GEN-LAST:event_jList6ValueChanged
+
+    private void jList7ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList7ValueChanged
+
+    }//GEN-LAST:event_jList7ValueChanged
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
@@ -622,11 +983,18 @@ public class SimulatorDialog extends javax.swing.JDialog {
     private javax.swing.JList<String> jList3;
     private javax.swing.JList<String> jList4;
     private javax.swing.JList<String> jList5;
+    private javax.swing.JList<String> jList6;
+    private javax.swing.JList<String> jList7;
+    private javax.swing.JList<String> jList8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
+    public javax.swing.JPanel jPanel14;
+    private javax.swing.JPanel jPanel15;
+    private javax.swing.JPanel jPanel16;
+    private javax.swing.JPanel jPanel17;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -642,13 +1010,17 @@ public class SimulatorDialog extends javax.swing.JDialog {
     private javax.swing.JRadioButton jRadioButton5;
     private javax.swing.JRadioButton jRadioButton6;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane10;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
+    private javax.swing.JScrollPane jScrollPane8;
+    private javax.swing.JScrollPane jScrollPane9;
     private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JTabbedPane jTabbedPane2;
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextArea jTextArea2;
     private javax.swing.JToggleButton jToggleButton1;

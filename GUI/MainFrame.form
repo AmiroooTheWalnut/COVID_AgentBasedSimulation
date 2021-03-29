@@ -69,6 +69,8 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jButton18" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
+                  <Component id="jButton19" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
                   <Component id="jButton17" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jCheckBox1" min="-2" max="-2" attributes="0"/>
@@ -88,6 +90,7 @@
                       <Component id="jButton17" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jCheckBox1" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jButton18" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jButton19" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -111,8 +114,9 @@
                       <Component id="jPanel2" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jPanel3" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="14" max="32767" attributes="0"/>
                   </Group>
-                  <Component id="jPanel4" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="jPanel4" alignment="0" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
@@ -494,10 +498,18 @@
         </Component>
         <Component class="javax.swing.JButton" name="jButton18">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Load pattern places"/>
+            <Property name="text" type="java.lang.String" value="Load pattern places orig"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton18ActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JButton" name="jButton19">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Load pattern places study"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton19ActionPerformed"/>
           </Events>
         </Component>
       </SubComponents>

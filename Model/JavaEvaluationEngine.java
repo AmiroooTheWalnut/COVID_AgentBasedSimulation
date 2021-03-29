@@ -5,11 +5,16 @@
  */
 package COVID_AgentBasedSimulation.Model;
 
+import COVID_AgentBasedSimulation.Model.AgentBasedModel.AgentTemplate;
 import groovy.lang.Binding;
+import groovy.lang.GroovyCodeSource;
 import groovy.lang.GroovyShell;
+import groovy.lang.Script;
+import groovy.transform.CompileStatic;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
@@ -25,17 +30,40 @@ public class JavaEvaluationEngine {
 
     public JavaEvaluationEngine(MainModel mainModel) {
         mainBinding = new Binding();
-        mainBinding.setVariable("root", mainModel);
+        mainBinding.setVariable("modelRoot", mainModel);
+        //mainBinding.setVariable("agentRoot", mainModel.ABM.currentEvaluatingAgent);
         mainShell = new GroovyShell(mainBinding);
+        //mainShell.setProperty(property, mainModel);
+    }
+    
+    public void parseAllScripts(ArrayList<AgentTemplate> agentTemplates){
+        for (int i = 0; i < agentTemplates.size(); i++) {
+            if(agentTemplates.get(i).constructor.isJavaScriptActive==true){
+                agentTemplates.get(i).constructor.javaScript.parsedScript=mainShell.parse(agentTemplates.get(i).constructor.javaScript.script);
+            }
+            if(agentTemplates.get(i).behavior.isJavaScriptActive==true){
+                agentTemplates.get(i).behavior.javaScript.parsedScript=mainShell.parse(agentTemplates.get(i).behavior.javaScript.script);
+            }
+            if(agentTemplates.get(i).destructor.isJavaScriptActive==true){
+                agentTemplates.get(i).destructor.javaScript.parsedScript=mainShell.parse(agentTemplates.get(i).destructor.javaScript.script);
+            }
+        }
     }
 
     public void connectToConsole(JTextArea console) {
-        myConsole = new JTextAreaOutputStream(console);
-        mainShell.setProperty("out", new PrintStream(myConsole));
+//        myConsole = new JTextAreaOutputStream(console);
+//        mainShell.setProperty("out", new PrintStream(myConsole));
     }
 
+    /*
+    RUN RAW TEXT SCRIPT
+    */
     public void runScript(String script) {
         mainShell.evaluate(script);
+    }
+    
+    public void runParsedScript(Script script){
+        script.run();
     }
 
     public class JTextAreaOutputStream extends OutputStream {

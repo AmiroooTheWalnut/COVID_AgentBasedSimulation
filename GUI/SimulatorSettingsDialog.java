@@ -234,6 +234,11 @@ public class SimulatorSettingsDialog extends javax.swing.JDialog {
         });
 
         jButton2.setText("Delete template");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         jButton3.setText("Edit template");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
@@ -733,6 +738,13 @@ public class SimulatorSettingsDialog extends javax.swing.JDialog {
             myMainModel.ABM.calculateStudyScopeGeography();
         }
     }//GEN-LAST:event_jList8ValueChanged
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        if (jList1.getSelectedIndex() > -1) {
+            myMainModel.ABM.agentTemplates.remove(jList1.getSelectedIndex());
+            updateAgentTemplateList();
+        }
+    }//GEN-LAST:event_jButton2ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

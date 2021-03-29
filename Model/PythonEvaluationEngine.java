@@ -7,11 +7,14 @@ package COVID_AgentBasedSimulation.Model;
 
 import COVID_AgentBasedSimulation.Model.AgentBasedModel.AgentTemplate;
 import COVID_AgentBasedSimulation.Model.AgentBasedModel.PythonScript;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -39,13 +42,13 @@ public class PythonEvaluationEngine {
     }
 
     public void saveAllPythonScripts(ArrayList<AgentTemplate> input) {
-        File file=new File(".");
-        for(int i=0;i<file.listFiles().length;i++){
-            if(file.listFiles()[i].getName().contains("tempPython_")){
+        File file = new File(".");
+        for (int i = 0; i < file.listFiles().length; i++) {
+            if (file.listFiles()[i].getName().contains("tempPython_")) {
                 file.listFiles()[i].delete();
             }
         }
-        
+
         for (int i = 0; i < input.size(); i++) {
             if (input.get(i).constructor.isJavaScriptActive == false) {
                 saveScript(input.get(i).constructor.pythonScript);
@@ -62,7 +65,8 @@ public class PythonEvaluationEngine {
     public void saveScript(PythonScript pythonScript) {
         String header = "from py4j.java_gateway import JavaGateway\n"
                 + "gateway = JavaGateway()\n"
-                + "root = gateway.entry_point\n";
+                + "modelRoot = gateway.entry_point\n"
+                + "agentRoot = modelRoot.getABM().getCurrentEvaluatingAgent()";
         String script = header + pythonScript.script;
         BufferedWriter writer;
         try {
@@ -90,44 +94,66 @@ public class PythonEvaluationEngine {
         }
     }
 
+    public void print(String input) {
+
+    }
+
     public void runScript(PythonScript pythonScript) {
         File file = new File(pythonScript.generatedScriptLocation);
         if (file.exists()) {
             String runCommand = "\"C:/ProgramData/Anaconda3/envs/BucketRenormalization_pycharm/python.exe\" " + pythonScript.generatedScriptLocation;
             try {
                 Process process = Runtime.getRuntime().exec(runCommand);
-                if (myConsole != null) {
-                    String[] lines = myConsole.getText().split(System.getProperty("line.separator"));
-                    if (lines.length > 1000) {
-                        StringBuffer sb = new StringBuffer();
-                        for (int i = 10; i < lines.length; i++) {
-                            sb.append(lines[i]);
-                        }
-                        String str = sb.toString();
-                        myConsole.setText(str);
-                    }
-                    if (myConsole.getText().length() > 1000) {
-                        lines = myConsole.getText().split(System.getProperty("line.separator"));
-                        StringBuffer sb = new StringBuffer();
-                        int maxNumLines = Math.min(10, lines.length);
-                        if (maxNumLines <= 10) {
-                            myConsole.setText("");
-                        } else {
-                            for (int i = maxNumLines; i < lines.length; i++) {
-                                sb.append(lines[i]);
-                            }
-                            String str = sb.toString();
-                            myConsole.setText(str);
-                        }
-                    }
-
-                    InputStream stdout = process.getInputStream();
-                    Scanner scanner = new Scanner(stdout);
-                    while (scanner.hasNextLine()) {
-                        String str = scanner.nextLine();
-                        myConsole.append(str + "\n");
-                    }
-                }
+                /*
+                GETTING PROCESS OUTPUT IS TOO EXPENSIVE!
+                 */
+//                if (myConsole != null) {
+//                    String[] lines = myConsole.getText().split(System.getProperty("line.separator"));
+//                    if (lines.length > 1000) {
+//                        StringBuffer sb = new StringBuffer();
+//                        for (int i = 10; i < lines.length; i++) {
+//                            sb.append(lines[i]);
+//                        }
+//                        String str = sb.toString();
+//                        myConsole.setText(str);
+//                    }
+//                    if (myConsole.getText().length() > 1000) {
+//                        lines = myConsole.getText().split(System.getProperty("line.separator"));
+//                        StringBuffer sb = new StringBuffer();
+//                        int maxNumLines = Math.min(10, lines.length);
+//                        if (maxNumLines <= 10) {
+//                            myConsole.setText("");
+//                        } else {
+//                            for (int i = maxNumLines; i < lines.length; i++) {
+//                                sb.append(lines[i]);
+//                            }
+//                            String str = sb.toString();
+//                            myConsole.setText(str);
+//                        }
+//                    }
+//
+//                    InputStream stdout = process.getInputStream();
+//
+//                    final byte[] buf = new byte[1000];
+//                    while (stdout.read(buf) != -1) {
+//                        String s = new String(buf, StandardCharsets.US_ASCII);
+//                        myConsole.append(s);
+////                        cnt++;
+//                    }
+//                    stdout.close();
+//
+////                    BufferedReader br = new BufferedReader(new InputStreamReader(stdout));
+////                    String thisLine;
+////                    while ((thisLine = br.readLine()) != null) {
+////                        myConsole.append(thisLine + "\n");
+////                    }
+//
+////                    Scanner scanner = new Scanner(stdout);
+////                    while (scanner.hasNextLine()) {
+////                        String str = scanner.nextLine();
+////                        myConsole.append(str + "\n");
+////                    }
+//                }
             } catch (IOException ex) {
                 Logger.getLogger(PythonEvaluationEngine.class.getName()).log(Level.SEVERE, null, ex);
             }

@@ -19,6 +19,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
@@ -45,7 +46,7 @@ public class MainModel extends Dataset {
 
     public Safegraph safegraph;
     public AllGISData allGISData;
-
+    
 //    public ArrayList<Person> people;
     public AgentBasedModel ABM;
 
@@ -106,8 +107,8 @@ public class MainModel extends Dataset {
     }
 
     public void initAgentBasedModel() {
-        startScriptEngines();
         ABM = new AgentBasedModel(this);
+        startScriptEngines();
 //        agentBasedModel.agents=new ArrayList();
         ABM.agentTemplates = new ArrayList();
         AgentTemplate rootAgentTemplate = new AgentTemplate();
@@ -136,6 +137,7 @@ public class MainModel extends Dataset {
     }
 
     public void initModel(boolean isParallel, int numCPUs) {
+        javaEvaluationEngine.parseAllScripts(ABM.agentTemplates);
         int month = ABM.startTime.getMonthValue();
         currentMonth = month;
         String monthString = String.valueOf(month);
@@ -145,14 +147,17 @@ public class MainModel extends Dataset {
         String dateName = ABM.startTime.getYear() + "_" + monthString;
         safegraph.clearPatternsPlaces();
         System.gc();
-        safegraph.loadPatternsPlacesSet(dateName, allGISData, ABM.studyScope, isParallel, numCPUs);//SO FAR NO PARALLEL
+        safegraph.loadPatternsPlacesSet(dateName, allGISData, ABM.studyScope, isParallel, numCPUs);
         ABM.rootAgent = new Agent(ABM.agentTemplates.get(0));
-        ABM.agents = new ArrayList();
+        ABM.agents = new CopyOnWriteArrayList();
         ABM.currentTime = ABM.startTime;
         resetTimerTask();
         pythonEvaluationEngine.saveAllPythonScripts(ABM.agentTemplates);
         if (ABM.rootAgent.myTemplate.constructor.isJavaScriptActive == true) {
-            javaEvaluationEngine.runScript(ABM.rootAgent.myTemplate.constructor.javaScript.script);
+            
+            //javaEvaluationEngine.runScript(ABM.rootAgent.myTemplate.constructor.javaScript.script);
+            
+            javaEvaluationEngine.runParsedScript(ABM.rootAgent.myTemplate.constructor.javaScript.parsedScript);
         } else {
             pythonEvaluationEngine.runScript(ABM.rootAgent.myTemplate.constructor.pythonScript);
         }
@@ -198,7 +203,7 @@ public class MainModel extends Dataset {
                     }
                     ABM.evaluateAllAgents();
                     ABM.currentTime = ABM.currentTime.plusMinutes(1);
-                    System.out.println(isPause);
+//                    System.out.println(isPause);
                 }
                 isPause = false;
                 isRunning = false;

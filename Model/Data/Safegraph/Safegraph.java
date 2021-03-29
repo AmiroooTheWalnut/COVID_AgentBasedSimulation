@@ -512,9 +512,14 @@ public class Safegraph extends Dataset implements Serializable {
                     if (patterns.patternRecords.get(i).place == null) {
                         System.out.println("!!!!!!!!");
                     }
-                    if (patterns.patternRecords.get(i).place.censusBlock.censusTract.id == city.censusTracts.get(j).id) {
-                        output.patternRecords.add(patterns.patternRecords.get(i));
-                        break;
+                    if (patterns.patternRecords.get(i).place.censusBlock.state.name.equals(city.censusTracts.get(j).censusBlocks.get(0).state.name)) {
+                        if (patterns.patternRecords.get(i).place.censusBlock.county.id == city.censusTracts.get(j).censusBlocks.get(0).county.id){
+                            if (patterns.patternRecords.get(i).place.censusBlock.censusTract.id == city.censusTracts.get(j).id){
+                                //System.out.println(city.censusTracts.get(j).censusBlocks.get(0).state.name);
+                                output.patternRecords.add(patterns.patternRecords.get(i));
+                                break;
+                            }
+                        }
                     }
                 }
             }

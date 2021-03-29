@@ -17,6 +17,23 @@ import lombok.Setter;
 @Getter @Setter
 public class AgentTemplate {
     
+    public AgentTemplate(){
+        
+    }
+    
+    public AgentTemplate(AgentTemplate copied){
+        this.agentTypeName=copied.agentTypeName;
+        ArrayList<AgentPropertyTemplate> temp=new ArrayList(copied.agentProperties);
+        for(int i=0;i<temp.size();i++){
+            AgentPropertyTemplate tempP = new AgentPropertyTemplate(temp.get(i));
+            temp.set(i, tempP);
+        }
+        this.agentProperties=temp;
+        //this.constructor=copied.constructor;
+        //this.destructor=copied.destructor;
+        //this.behavior=copied.behavior;
+    }
+    
     public String agentTypeName;
     
     public ArrayList<AgentPropertyTemplate> agentProperties=new ArrayList();

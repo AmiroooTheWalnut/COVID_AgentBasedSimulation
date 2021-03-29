@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import lombok.Getter;
@@ -25,7 +26,7 @@ import lombok.Setter;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 @Getter
 @Setter
@@ -34,7 +35,7 @@ public class AgentBasedModel {
     public transient String filePath;
     public ArrayList<AgentTemplate> agentTemplates = new ArrayList();
     public transient Agent rootAgent;
-    public transient ArrayList<Agent> agents;
+    public transient CopyOnWriteArrayList<Agent> agents;
 
     public String startTimeString;
     public String endTimeString;
@@ -43,6 +44,9 @@ public class AgentBasedModel {
     public transient Object studyScopeGeography;
 
     private transient MainModel myMainModel;
+
+    public transient Agent currentEvaluatingAgent[] = new Agent[1];
+    public transient Agent oldCurrentEvaluatingAgent[] = new Agent[1];
 
     public transient ZonedDateTime startTime;
     public transient ZonedDateTime currentTime;
@@ -55,46 +59,84 @@ public class AgentBasedModel {
     }
 
     public void evaluateAllAgents() {
-        if (rootAgent.myTemplate.behavior.isJavaScriptActive == true) {
-            myMainModel.javaEvaluationEngine.runScript(rootAgent.myTemplate.behavior.javaScript.script);
-        } else {
-            myMainModel.pythonEvaluationEngine.runScript(rootAgent.myTemplate.behavior.pythonScript);
-        }
-        for (int i = 0; i < agents.size(); i++) {
-            if (agents.get(i).myTemplate.behavior.isJavaScriptActive == true) {
-                myMainModel.javaEvaluationEngine.runScript(agents.get(i).myTemplate.behavior.javaScript.script);
+        try {
+            currentEvaluatingAgent[0] = rootAgent;
+            if (rootAgent.myTemplate.behavior.isJavaScriptActive == true) {
+                //myMainModel.javaEvaluationEngine.runScript(rootAgent.myTemplate.behavior.javaScript.script);
+                
+                myMainModel.javaEvaluationEngine.runParsedScript(rootAgent.myTemplate.behavior.javaScript.parsedScript);
+                
             } else {
-                myMainModel.pythonEvaluationEngine.runScript(agents.get(i).myTemplate.behavior.pythonScript);
+                myMainModel.pythonEvaluationEngine.runScript(rootAgent.myTemplate.behavior.pythonScript);
             }
+            for (int i = 0; i < agents.size(); i++) {
+                currentEvaluatingAgent[0] = agents.get(i);
+                if (agents.get(i).myTemplate.behavior.isJavaScriptActive == true) {
+                    //myMainModel.javaEvaluationEngine.runScript(agents.get(i).myTemplate.behavior.javaScript.script);
+                    
+                    myMainModel.javaEvaluationEngine.runParsedScript(agents.get(i).myTemplate.behavior.javaScript.parsedScript);
+                } else {
+                    myMainModel.pythonEvaluationEngine.runScript(agents.get(i).myTemplate.behavior.pythonScript);
+                }
+            }
+        } catch (Exception ex) {
+            System.out.println("ERROR ON AGENT TYPE:");
+            System.out.println(currentEvaluatingAgent[0].myTemplate.agentTypeName);
+            System.out.println("ERROR ON AGENT INDEX:");
+            System.out.println(currentEvaluatingAgent[0].myIndex);
+            ex.printStackTrace();
         }
     }
 
+    public Agent getCurrentAgent() {
+        return currentEvaluatingAgent[0];
+    }
+
     public Agent makeAgent(String agentTemplate) {
-        AgentTemplate template = null;
-        for (int i = 0; i < agentTemplates.size(); i++) {
-            if (agentTemplates.get(i).agentTypeName.equals(agentTemplate)) {
-                template = agentTemplates.get(i);
+        try {
+            AgentTemplate template = null;
+            for (int i = 0; i < agentTemplates.size(); i++) {
+                if (agentTemplates.get(i).agentTypeName.equals(agentTemplate)) {
+                    template = agentTemplates.get(i);
+                    break;
+                }
             }
-        }
-        if (template == null) {
-            System.out.println("ERROR: MAKE AGENT: AGENT TEMPLATE NOT FOUND");
-            return null;
-        } else {
-            Agent output = new Agent(template);
-            output.myIndex = agents.size();
-            agents.add(output);
-            if (output.myTemplate.constructor.isJavaScriptActive == true) {
-                myMainModel.javaEvaluationEngine.runScript(output.myTemplate.constructor.javaScript.script);
+            if (template == null) {
+                System.out.println("ERROR: MAKE AGENT: AGENT TEMPLATE NOT FOUND");
+                return null;
             } else {
-                myMainModel.pythonEvaluationEngine.runScript(output.myTemplate.constructor.pythonScript);
+                AgentTemplate copiedTemplate = new AgentTemplate(template);
+                copiedTemplate.constructor=template.constructor;
+                copiedTemplate.behavior=template.behavior;
+                copiedTemplate.destructor=template.destructor;
+                Agent output = new Agent(copiedTemplate);
+                output.myIndex = agents.size();
+                agents.add(output);
+                oldCurrentEvaluatingAgent[0] = currentEvaluatingAgent[0];
+                currentEvaluatingAgent = new Agent[1];
+                currentEvaluatingAgent[0] = output;
+                if (output.myTemplate.constructor.isJavaScriptActive == true) {
+                    //myMainModel.javaEvaluationEngine.runScript(output.myTemplate.constructor.javaScript.script);
+                    
+                    myMainModel.javaEvaluationEngine.runParsedScript(output.myTemplate.constructor.javaScript.parsedScript);
+                } else {
+                    myMainModel.pythonEvaluationEngine.runScript(output.myTemplate.constructor.pythonScript);
+                }
+                currentEvaluatingAgent[0] = oldCurrentEvaluatingAgent[0];
+                return output;
             }
-            return output;
+        } catch (Exception ex) {
+
         }
+        currentEvaluatingAgent[0] = oldCurrentEvaluatingAgent[0];
+        return null;
     }
 
     public void removeAgent(Agent agent) {
         if (agent.myTemplate.destructor.isJavaScriptActive == true) {
-            myMainModel.javaEvaluationEngine.runScript(agent.myTemplate.destructor.javaScript.script);
+            //myMainModel.javaEvaluationEngine.runScript(agent.myTemplate.destructor.javaScript.script);
+            
+            myMainModel.javaEvaluationEngine.runParsedScript(agent.myTemplate.destructor.javaScript.parsedScript);
         } else {
             myMainModel.pythonEvaluationEngine.runScript(agent.myTemplate.destructor.pythonScript);
         }
@@ -155,14 +197,14 @@ public class AgentBasedModel {
 
     public void calculateStudyScopeGeography() {
         String sections[] = studyScope.split("_");
-        int countryIndex=-1;
-        int stateIndex=-1;
-        int countyIndex=-1;
+        int countryIndex = -1;
+        int stateIndex = -1;
+        int countyIndex = -1;
         if (sections.length == 1) {
             for (int i = 0; i < myMainModel.allGISData.countries.size(); i++) {
                 if (sections[0].equals(myMainModel.allGISData.countries.get(i).name)) {
                     studyScopeGeography = myMainModel.allGISData.countries.get(i);
-                    countryIndex=i;
+                    countryIndex = i;
                 }
             }
         }
@@ -170,13 +212,13 @@ public class AgentBasedModel {
             for (int i = 0; i < myMainModel.allGISData.countries.size(); i++) {
                 if (sections[0].equals(myMainModel.allGISData.countries.get(i).name)) {
                     studyScopeGeography = myMainModel.allGISData.countries.get(i);
-                    countryIndex=i;
+                    countryIndex = i;
                 }
             }
             for (int i = 0; i < myMainModel.allGISData.countries.get(countryIndex).states.size(); i++) {
                 if (sections[1].equals(myMainModel.allGISData.countries.get(countryIndex).states.get(i).name)) {
-                    studyScopeGeography=myMainModel.allGISData.countries.get(countryIndex).states.get(i);
-                    stateIndex=i;
+                    studyScopeGeography = myMainModel.allGISData.countries.get(countryIndex).states.get(i);
+                    stateIndex = i;
                 }
             }
         }
@@ -184,19 +226,19 @@ public class AgentBasedModel {
             for (int i = 0; i < myMainModel.allGISData.countries.size(); i++) {
                 if (sections[0].equals(myMainModel.allGISData.countries.get(i).name)) {
                     studyScopeGeography = myMainModel.allGISData.countries.get(i);
-                    countryIndex=i;
+                    countryIndex = i;
                 }
             }
             for (int i = 0; i < myMainModel.allGISData.countries.get(countryIndex).states.size(); i++) {
                 if (sections[1].equals(myMainModel.allGISData.countries.get(countryIndex).states.get(i).name)) {
-                    studyScopeGeography=myMainModel.allGISData.countries.get(countryIndex).states.get(i);
-                    stateIndex=i;
+                    studyScopeGeography = myMainModel.allGISData.countries.get(countryIndex).states.get(i);
+                    stateIndex = i;
                 }
             }
             for (int i = 0; i < myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.size(); i++) {
                 if (sections[2].equals(myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(i).name)) {
-                    studyScopeGeography=myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(i);
-                    countyIndex=i;
+                    studyScopeGeography = myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(i);
+                    countyIndex = i;
                 }
             }
         }
@@ -204,24 +246,24 @@ public class AgentBasedModel {
             for (int i = 0; i < myMainModel.allGISData.countries.size(); i++) {
                 if (sections[0].equals(myMainModel.allGISData.countries.get(i).name)) {
                     studyScopeGeography = myMainModel.allGISData.countries.get(i);
-                    countryIndex=i;
+                    countryIndex = i;
                 }
             }
             for (int i = 0; i < myMainModel.allGISData.countries.get(countryIndex).states.size(); i++) {
                 if (sections[1].equals(myMainModel.allGISData.countries.get(countryIndex).states.get(i).name)) {
-                    studyScopeGeography=myMainModel.allGISData.countries.get(countryIndex).states.get(i);
-                    stateIndex=i;
+                    studyScopeGeography = myMainModel.allGISData.countries.get(countryIndex).states.get(i);
+                    stateIndex = i;
                 }
             }
             for (int i = 0; i < myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.size(); i++) {
                 if (sections[2].equals(myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(i).name)) {
-                    studyScopeGeography=myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(i);
-                    countyIndex=i;
+                    studyScopeGeography = myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(i);
+                    countyIndex = i;
                 }
             }
             for (int i = 0; i < myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(countyIndex).cities.size(); i++) {
                 if (sections[3].equals(myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(countyIndex).cities.get(i).name)) {
-                    studyScopeGeography=myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(countyIndex).cities.get(i);
+                    studyScopeGeography = myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(countyIndex).cities.get(i);
                 }
             }
         }

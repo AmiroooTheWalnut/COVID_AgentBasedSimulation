@@ -14,6 +14,17 @@ import lombok.Setter;
  */
 @Getter @Setter
 public class AgentPropertyTemplate {
+    
+    public AgentPropertyTemplate(){
+        
+    }
+    
+    public AgentPropertyTemplate(AgentPropertyTemplate copied){
+        propertyName=copied.propertyName;
+        propertyType=copied.propertyType;
+        value=copied.value;
+    }
+    
     public String propertyName;
     public String propertyType;
     public transient Object value;

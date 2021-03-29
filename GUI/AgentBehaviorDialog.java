@@ -23,25 +23,25 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
 
     private int behaviorEditIndex;
     MainModel myMainModel;
-    
+
     RTextScrollPane construcorJavaScrollPane;
     RTextScrollPane construcorPythonScrollPane;
-    
+
     RTextScrollPane behaviorJavaScrollPane;
     RTextScrollPane behaviorPythonScrollPane;
-    
+
     RTextScrollPane destructorJavaScrollPane;
     RTextScrollPane destructorPythonScrollPane;
-    
+
     RSyntaxTextArea construcorJavaTextArea;
     RSyntaxTextArea construcorPythonTextArea;
-    
+
     RSyntaxTextArea behaviorJavaTextArea;
     RSyntaxTextArea behaviorPythonTextArea;
-    
+
     RSyntaxTextArea destructorJavaTextArea;
     RSyntaxTextArea destructorPythonTextArea;
-    
+
     /**
      * Creates new form AgentBehaviorDialog
      */
@@ -49,7 +49,7 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         expandAllNodes(jTree1);
-        
+
         DefaultTreeModel modelDatasets = (DefaultTreeModel) jTree3.getModel();
         DefaultMutableTreeNode rootDatasets = (DefaultMutableTreeNode) modelDatasets.getRoot();
         rootDatasets.removeAllChildren();
@@ -80,47 +80,66 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
         modelDatasets.reload(rootDatasets);
 
         expandAllNodes(jTree3);
-        
-        myMainModel=mainModel;
-        behaviorEditIndex=passed_behaviorEditIndex;
+
+        myMainModel = mainModel;
+        behaviorEditIndex = passed_behaviorEditIndex;
         jTree1.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         jTree2.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         jTree3.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         jTree4.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-        
+
         DefaultTreeModel modelCurrentAgent = (DefaultTreeModel) jTree2.getModel();
         DefaultMutableTreeNode rootCurrentAgent = (DefaultMutableTreeNode) modelCurrentAgent.getRoot();
         rootCurrentAgent.removeAllChildren();
         modelCurrentAgent.reload();
 
         rootCurrentAgent = new DefaultMutableTreeNode("Properties");
-        
-        for(int i=0;i<myMainModel.ABM.agentTemplates.get(behaviorEditIndex).agentProperties.size();i++){
-            rootCurrentAgent = new DefaultMutableTreeNode(myMainModel.ABM.agentTemplates.get(behaviorEditIndex).agentProperties.get(i).propertyName+"["+myMainModel.ABM.agentTemplates.get(behaviorEditIndex).agentProperties.get(i).propertyType+"]");
+
+        for (int i = 0; i < myMainModel.ABM.agentTemplates.get(behaviorEditIndex).agentProperties.size(); i++) {
+            rootCurrentAgent.add(new DefaultMutableTreeNode(myMainModel.ABM.agentTemplates.get(behaviorEditIndex).agentProperties.get(i).propertyName + "[" + myMainModel.ABM.agentTemplates.get(behaviorEditIndex).agentProperties.get(i).propertyType + "]"));
         }
 
         modelCurrentAgent.setRoot(rootCurrentAgent);
-        
+
         expandAllNodes(jTree2);
-        
+
+        DefaultTreeModel modelAgentTemplates = (DefaultTreeModel) jTree4.getModel();
+        DefaultMutableTreeNode rootAgentTemplates = (DefaultMutableTreeNode) modelAgentTemplates.getRoot();
+        rootAgentTemplates.removeAllChildren();
+        modelAgentTemplates.reload();
+
+        rootAgentTemplates = new DefaultMutableTreeNode("All Properties");
+
+        for (int i = 0; i < myMainModel.ABM.agentTemplates.size(); i++) {
+            DefaultMutableTreeNode temp = new DefaultMutableTreeNode(myMainModel.ABM.agentTemplates.get(i).agentTypeName);
+            rootAgentTemplates.add(temp);
+            for (int j = 0; j < myMainModel.ABM.agentTemplates.get(i).agentProperties.size(); j++) {
+                temp.add(new DefaultMutableTreeNode(myMainModel.ABM.agentTemplates.get(i).agentProperties.get(j).propertyName + "[" + myMainModel.ABM.agentTemplates.get(i).agentProperties.get(j).propertyType + "]"));
+            }
+        }
+
+        modelAgentTemplates.setRoot(rootAgentTemplates);
+
+        expandAllNodes(jTree4);
+
         construcorJavaTextArea = new RSyntaxTextArea(20, 60);
         construcorJavaTextArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
         construcorJavaTextArea.setCodeFoldingEnabled(true);
         construcorJavaScrollPane = new RTextScrollPane(construcorJavaTextArea);
-        
+
         construcorPythonTextArea = new RSyntaxTextArea(20, 60);
         construcorPythonTextArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_PYTHON);
         construcorPythonTextArea.setCodeFoldingEnabled(true);
         construcorPythonScrollPane = new RTextScrollPane(construcorPythonTextArea);
-        
-        if(myMainModel.ABM.agentTemplates.get(behaviorEditIndex).constructor.isJavaScriptActive==true){
+
+        if (myMainModel.ABM.agentTemplates.get(behaviorEditIndex).constructor.isJavaScriptActive == true) {
             construcorJavaTextArea.setText(myMainModel.ABM.agentTemplates.get(behaviorEditIndex).constructor.javaScript.script);
             jPanel2.removeAll();
             jPanel2.add(construcorJavaScrollPane);
             jPanel2.invalidate();
             jPanel2.validate();
             jPanel2.repaint();
-        }else{
+        } else {
             construcorPythonTextArea.setText(myMainModel.ABM.agentTemplates.get(behaviorEditIndex).constructor.pythonScript.script);
             jPanel2.removeAll();
             jPanel2.add(construcorPythonScrollPane);
@@ -129,25 +148,25 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
             jPanel2.repaint();
             jRadioButton2.setSelected(true);
         }
-        
+
         behaviorJavaTextArea = new RSyntaxTextArea(20, 60);
         behaviorJavaTextArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
         behaviorJavaTextArea.setCodeFoldingEnabled(true);
         behaviorJavaScrollPane = new RTextScrollPane(behaviorJavaTextArea);
-        
+
         behaviorPythonTextArea = new RSyntaxTextArea(20, 60);
         behaviorPythonTextArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_PYTHON);
         behaviorPythonTextArea.setCodeFoldingEnabled(true);
         behaviorPythonScrollPane = new RTextScrollPane(behaviorPythonTextArea);
-        
-        if(myMainModel.ABM.agentTemplates.get(behaviorEditIndex).behavior.isJavaScriptActive==true){
+
+        if (myMainModel.ABM.agentTemplates.get(behaviorEditIndex).behavior.isJavaScriptActive == true) {
             behaviorJavaTextArea.setText(myMainModel.ABM.agentTemplates.get(behaviorEditIndex).behavior.javaScript.script);
             jPanel4.removeAll();
             jPanel4.add(behaviorJavaScrollPane);
             jPanel4.invalidate();
             jPanel4.validate();
             jPanel4.repaint();
-        }else{
+        } else {
             behaviorPythonTextArea.setText(myMainModel.ABM.agentTemplates.get(behaviorEditIndex).behavior.pythonScript.script);
             jPanel4.removeAll();
             jPanel4.add(behaviorPythonScrollPane);
@@ -156,25 +175,25 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
             jPanel4.repaint();
             jRadioButton4.setSelected(true);
         }
-        
+
         destructorJavaTextArea = new RSyntaxTextArea(20, 60);
         destructorJavaTextArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
         destructorJavaTextArea.setCodeFoldingEnabled(true);
         destructorJavaScrollPane = new RTextScrollPane(destructorJavaTextArea);
-        
+
         destructorPythonTextArea = new RSyntaxTextArea(20, 60);
         destructorPythonTextArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_PYTHON);
         destructorPythonTextArea.setCodeFoldingEnabled(true);
         destructorPythonScrollPane = new RTextScrollPane(destructorPythonTextArea);
-        
-        if(myMainModel.ABM.agentTemplates.get(behaviorEditIndex).destructor.isJavaScriptActive==true){
+
+        if (myMainModel.ABM.agentTemplates.get(behaviorEditIndex).destructor.isJavaScriptActive == true) {
             destructorJavaTextArea.setText(myMainModel.ABM.agentTemplates.get(behaviorEditIndex).destructor.javaScript.script);
             jPanel5.removeAll();
             jPanel5.add(destructorJavaScrollPane);
             jPanel5.invalidate();
             jPanel5.validate();
             jPanel5.repaint();
-        }else{
+        } else {
             destructorPythonTextArea.setText(myMainModel.ABM.agentTemplates.get(behaviorEditIndex).destructor.pythonScript.script);
             jPanel5.removeAll();
             jPanel5.add(destructorPythonScrollPane);
@@ -184,7 +203,7 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
             jRadioButton6.setSelected(true);
         }
     }
-    
+
     private void expandAllNodes(JTree tree) {
         int j = tree.getRowCount();
         int i = 0;
@@ -194,13 +213,12 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
             j = tree.getRowCount();
         }
     }
-    
+
     public void setDatasetTree(DatasetTemplate datasetTemplate, DefaultMutableTreeNode treeNode) {
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(datasetTemplate.name);
         treeNode.add(root);
         if (datasetTemplate.recordTemplates != null) {
             for (int i = 0; i < datasetTemplate.recordTemplates.size(); i++) {
-
                 root.add(new DefaultMutableTreeNode(datasetTemplate.recordTemplates.get(i).name));
             }
         }
@@ -262,7 +280,7 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
         jPanel8.setLayout(jPanel8Layout);
         jPanel8Layout.setHorizontalGroup(
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 689, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 583, Short.MAX_VALUE)
         );
         jPanel8Layout.setVerticalGroup(
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -314,7 +332,7 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 689, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 583, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -333,7 +351,7 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
         jPanel6.setLayout(jPanel6Layout);
         jPanel6Layout.setHorizontalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 689, Short.MAX_VALUE)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 583, Short.MAX_VALUE)
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -352,7 +370,7 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
         jPanel7.setLayout(jPanel7Layout);
         jPanel7Layout.setHorizontalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 689, Short.MAX_VALUE)
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 583, Short.MAX_VALUE)
         );
         jPanel7Layout.setVerticalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -392,7 +410,7 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
                     .addComponent(jRadioButton1)
                     .addComponent(jRadioButton2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE))
+                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 694, Short.MAX_VALUE))
         );
         jPanel11Layout.setVerticalGroup(
             jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -438,7 +456,7 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
                     .addComponent(jRadioButton3)
                     .addComponent(jRadioButton4))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE))
+                .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, 694, Short.MAX_VALUE))
         );
         jPanel12Layout.setVerticalGroup(
             jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -484,7 +502,7 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
                     .addComponent(jRadioButton5)
                     .addComponent(jRadioButton6))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE))
+                .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, 694, Short.MAX_VALUE))
         );
         jPanel13Layout.setVerticalGroup(
             jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -504,9 +522,9 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addComponent(jTabbedPane2)
+                .addComponent(jTabbedPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 766, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 600, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -518,9 +536,9 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jRadioButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton1ActionPerformed
-        if(jRadioButton1.isSelected()==true && myMainModel.ABM.agentTemplates.get(behaviorEditIndex).constructor.isJavaScriptActive==false){
-            myMainModel.ABM.agentTemplates.get(behaviorEditIndex).constructor.isJavaScriptActive=true;
-            myMainModel.ABM.agentTemplates.get(behaviorEditIndex).constructor.pythonScript.script=construcorPythonTextArea.getText();
+        if (jRadioButton1.isSelected() == true && myMainModel.ABM.agentTemplates.get(behaviorEditIndex).constructor.isJavaScriptActive == false) {
+            myMainModel.ABM.agentTemplates.get(behaviorEditIndex).constructor.isJavaScriptActive = true;
+            myMainModel.ABM.agentTemplates.get(behaviorEditIndex).constructor.pythonScript.script = construcorPythonTextArea.getText();
             construcorJavaTextArea.setText(myMainModel.ABM.agentTemplates.get(behaviorEditIndex).constructor.javaScript.script);
             jPanel2.removeAll();
             jPanel2.add(construcorJavaScrollPane);
@@ -531,9 +549,9 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jRadioButton1ActionPerformed
 
     private void jRadioButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton2ActionPerformed
-        if(jRadioButton2.isSelected()==true && myMainModel.ABM.agentTemplates.get(behaviorEditIndex).constructor.isJavaScriptActive==true){
-            myMainModel.ABM.agentTemplates.get(behaviorEditIndex).constructor.isJavaScriptActive=false;
-            myMainModel.ABM.agentTemplates.get(behaviorEditIndex).constructor.javaScript.script=construcorJavaTextArea.getText();
+        if (jRadioButton2.isSelected() == true && myMainModel.ABM.agentTemplates.get(behaviorEditIndex).constructor.isJavaScriptActive == true) {
+            myMainModel.ABM.agentTemplates.get(behaviorEditIndex).constructor.isJavaScriptActive = false;
+            myMainModel.ABM.agentTemplates.get(behaviorEditIndex).constructor.javaScript.script = construcorJavaTextArea.getText();
             construcorPythonTextArea.setText(myMainModel.ABM.agentTemplates.get(behaviorEditIndex).constructor.pythonScript.script);
             jPanel2.removeAll();
             jPanel2.add(construcorPythonScrollPane);
@@ -544,9 +562,9 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jRadioButton2ActionPerformed
 
     private void jRadioButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton3ActionPerformed
-        if(jRadioButton3.isSelected()==true && myMainModel.ABM.agentTemplates.get(behaviorEditIndex).behavior.isJavaScriptActive==false){
-            myMainModel.ABM.agentTemplates.get(behaviorEditIndex).behavior.isJavaScriptActive=true;
-            myMainModel.ABM.agentTemplates.get(behaviorEditIndex).behavior.pythonScript.script=behaviorPythonTextArea.getText();
+        if (jRadioButton3.isSelected() == true && myMainModel.ABM.agentTemplates.get(behaviorEditIndex).behavior.isJavaScriptActive == false) {
+            myMainModel.ABM.agentTemplates.get(behaviorEditIndex).behavior.isJavaScriptActive = true;
+            myMainModel.ABM.agentTemplates.get(behaviorEditIndex).behavior.pythonScript.script = behaviorPythonTextArea.getText();
             behaviorJavaTextArea.setText(myMainModel.ABM.agentTemplates.get(behaviorEditIndex).behavior.javaScript.script);
             jPanel4.removeAll();
             jPanel4.add(behaviorJavaScrollPane);
@@ -557,9 +575,9 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jRadioButton3ActionPerformed
 
     private void jRadioButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton4ActionPerformed
-        if(jRadioButton4.isSelected()==true && myMainModel.ABM.agentTemplates.get(behaviorEditIndex).behavior.isJavaScriptActive==true){
-            myMainModel.ABM.agentTemplates.get(behaviorEditIndex).behavior.isJavaScriptActive=false;
-            myMainModel.ABM.agentTemplates.get(behaviorEditIndex).behavior.javaScript.script=behaviorJavaTextArea.getText();
+        if (jRadioButton4.isSelected() == true && myMainModel.ABM.agentTemplates.get(behaviorEditIndex).behavior.isJavaScriptActive == true) {
+            myMainModel.ABM.agentTemplates.get(behaviorEditIndex).behavior.isJavaScriptActive = false;
+            myMainModel.ABM.agentTemplates.get(behaviorEditIndex).behavior.javaScript.script = behaviorJavaTextArea.getText();
             behaviorPythonTextArea.setText(myMainModel.ABM.agentTemplates.get(behaviorEditIndex).behavior.pythonScript.script);
             jPanel4.removeAll();
             jPanel4.add(behaviorPythonScrollPane);
@@ -570,9 +588,9 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jRadioButton4ActionPerformed
 
     private void jRadioButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton5ActionPerformed
-        if(jRadioButton5.isSelected()==true && myMainModel.ABM.agentTemplates.get(behaviorEditIndex).destructor.isJavaScriptActive==false){
-            myMainModel.ABM.agentTemplates.get(behaviorEditIndex).destructor.isJavaScriptActive=true;
-            myMainModel.ABM.agentTemplates.get(behaviorEditIndex).destructor.pythonScript.script=destructorPythonTextArea.getText();
+        if (jRadioButton5.isSelected() == true && myMainModel.ABM.agentTemplates.get(behaviorEditIndex).destructor.isJavaScriptActive == false) {
+            myMainModel.ABM.agentTemplates.get(behaviorEditIndex).destructor.isJavaScriptActive = true;
+            myMainModel.ABM.agentTemplates.get(behaviorEditIndex).destructor.pythonScript.script = destructorPythonTextArea.getText();
             destructorJavaTextArea.setText(myMainModel.ABM.agentTemplates.get(behaviorEditIndex).destructor.javaScript.script);
             jPanel5.removeAll();
             jPanel5.add(destructorJavaScrollPane);
@@ -583,9 +601,9 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jRadioButton5ActionPerformed
 
     private void jRadioButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton6ActionPerformed
-        if(jRadioButton6.isSelected()==true && myMainModel.ABM.agentTemplates.get(behaviorEditIndex).destructor.isJavaScriptActive==true){
-            myMainModel.ABM.agentTemplates.get(behaviorEditIndex).destructor.isJavaScriptActive=false;
-            myMainModel.ABM.agentTemplates.get(behaviorEditIndex).destructor.javaScript.script=destructorJavaTextArea.getText();
+        if (jRadioButton6.isSelected() == true && myMainModel.ABM.agentTemplates.get(behaviorEditIndex).destructor.isJavaScriptActive == true) {
+            myMainModel.ABM.agentTemplates.get(behaviorEditIndex).destructor.isJavaScriptActive = false;
+            myMainModel.ABM.agentTemplates.get(behaviorEditIndex).destructor.javaScript.script = destructorJavaTextArea.getText();
             destructorPythonTextArea.setText(myMainModel.ABM.agentTemplates.get(behaviorEditIndex).destructor.pythonScript.script);
             jPanel5.removeAll();
             jPanel5.add(destructorPythonScrollPane);

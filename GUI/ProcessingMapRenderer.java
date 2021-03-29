@@ -6,13 +6,22 @@
 package COVID_AgentBasedSimulation.GUI;
 
 import COVID_AgentBasedSimulation.Model.Structure.Marker;
+import com.jogamp.newt.awt.NewtCanvasAWT;
+import com.jogamp.newt.opengl.GLWindow;
 import de.fhpotsdam.unfolding.UnfoldingMap;
 import de.fhpotsdam.unfolding.geo.Location;
 import de.fhpotsdam.unfolding.marker.SimplePointMarker;
 import de.fhpotsdam.unfolding.utils.MapUtils;
 import de.fhpotsdam.unfolding.utils.ScreenPosition;
+import java.awt.Frame;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import processing.awt.PSurfaceAWT;
+import processing.awt.PSurfaceAWT.SmoothCanvas;
 import processing.core.PApplet;
+import processing.core.PSurface;
 
 /**
  *
@@ -21,35 +30,82 @@ import processing.core.PApplet;
 public class ProcessingMapRenderer extends PApplet {
 
     UnfoldingMap map;
-    MainFrame parent;
+    MainFrame parentMainFrame;
+    JPanel parentPanel;
+    PSurface mySurface;
     MapSources mapSources;
+
+    //FOR GIS STUFF
     Location drawingItemLocation;
     ArrayList<Location> drawingChildrenLocations;
-    ArrayList<Location> drawingIndividuals;
     String drawingName;
     String[] drawingChildrenNames;
+    //FOR GIS STUFF
+
+    //FOR AGENT_TEMPLATE STUFF
+    ArrayList<Location> drawingAgentTemplateLocations;
+    //FOR AGENT_TEMPLATE STUFF
+
+    //FOR INDIVIDUAL AGENT
+    Location drawingIndividualAgent;
+    //FOR INDIVIDUAL AGENT
 
     boolean isPan = false;
     boolean isReadyPan = false;
     boolean isShowText = false;
 
-    boolean isShowGISMarkers = false;
-    boolean isShowIndividuals = false;
+    boolean isShowGISMarkers = true;
+    boolean isShowAgentMarkers = true;
+
+    ProcessingMapRenderer thisRenderer;
 
     ProcessingMapRenderer() {
     }
 
-    ProcessingMapRenderer(MainFrame mainFrame) {
-        this.parent = mainFrame;
+    ProcessingMapRenderer(MainFrame mainFrame, JPanel parent) {
+        parentMainFrame = mainFrame;
+        parentPanel = parent;
     }
 
     @Override
     public void settings() {
-        size(1000, 1000, "processing.opengl.PGraphics3D");
+        size(parentPanel.getWidth(), parentPanel.getHeight(), "processing.opengl.PGraphics3D");
+        
     }
 
     @Override
     public void setup() {
+        mySurface = surface;
+//        frame.setResizable(true);
+//        surface.setResizable(true);
+        //get the SmoothCanvas that holds the PSurface
+//        SmoothCanvas smoothCanvas = (SmoothCanvas) surface.getNative();
+        
+        GLWindow glWindow = (GLWindow) surface.getNative();
+        glWindow.setPosition(0, 0);
+        
+        NewtCanvasAWT newtCanvasAWT = new NewtCanvasAWT(glWindow); 
+//        newtCanvasAWT.setLocation(0, 0);
+//        newtCanvasAWT.setBounds(0, 0, 200, 200);
+        parentPanel.add(newtCanvasAWT);
+        
+        parentPanel.invalidate();
+        parentPanel.revalidate();
+
+
+        //SmoothCanvas can be used as a Component
+//        parentPanel.add(smoothCanvas);
+        
+//        glWindow.destroy();
+
+//        Frame myFrame = ((PSurfaceAWT.SmoothCanvas) ((PSurfaceAWT) surface).getNative()).getFrame();
+//        JFrame a = (JFrame) myFrame;
+//        a.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+//        removeExitEvent(getSurface());
+
+//        a.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+
         mapSources = new MapSources(this);
 
 //        for (int i = 0; i < mapSources.maps.size(); i++) {
@@ -63,19 +119,23 @@ public class ProcessingMapRenderer extends PApplet {
         map = ((MapSourse) mapSources.maps.get(3)).map;
         MapUtils.createDefaultEventDispatcher(this, new UnfoldingMap[]{this.map});
 
-        parent.child = this;
+        parentMainFrame.child = this;
     }
 
     @Override
     public void draw() {
-        background(0);
+        background(100);
         map.draw();
+        
         if (isShowGISMarkers == true) {
             drawGISMarkers();
         }
-        if (isShowIndividuals == true) {
-            drawIndividualMarkers();
+        if (isShowAgentMarkers == true) {
+            drawIndividualMarker();
+            drawAgentTemplatesMarker();
         }
+        
+        
 //        if (isPan == true) {
 //            isPan = false;
 //            isReadyPan = true;
@@ -90,7 +150,7 @@ public class ProcessingMapRenderer extends PApplet {
         map.zoomTo(getZoomConverted(size));
     }
 
-    public void setDrawingMarkers(Marker input, ArrayList<Marker> children, String inputName, String[] childrenNames, ArrayList<Marker> individuals) {
+    public void setDrawingGISMarkers(Marker input, ArrayList<Marker> children, String inputName, String[] childrenNames) {
         drawingItemLocation = new Location(input.lon, input.lat);
         drawingChildrenLocations = new ArrayList();
         if (children != null) {
@@ -102,15 +162,17 @@ public class ProcessingMapRenderer extends PApplet {
         }
         drawingName = inputName;
         drawingChildrenNames = childrenNames;
-        
-        drawingIndividuals=new ArrayList();
-        if (individuals != null) {
-            for (int i = 0; i < individuals.size(); i++) {
-                drawingIndividuals.add(new Location(individuals.get(i).lon+(Math.random()-0.5d)*individuals.get(i).size/5f, individuals.get(i).lat+(Math.random()-0.5d)*individuals.get(i).size/5f));
-            }
-        } else {
-            drawingIndividuals = null;
+    }
+
+    public void setDrawingAgentTemplatesMarkers(ArrayList<Float> lats, ArrayList<Float> lons) {
+        drawingAgentTemplateLocations = new ArrayList();
+        for (int i = 0; i < lats.size(); i++) {
+            drawingAgentTemplateLocations.add(new Location(lons.get(i), lats.get(i)));
         }
+    }
+    
+    public void setDrawingAgetnMarker(float lat, float lon){
+        drawingIndividualAgent=new Location(lat,lon);
     }
 
     public void drawGISMarkers() {
@@ -137,16 +199,25 @@ public class ProcessingMapRenderer extends PApplet {
             }
         }
     }
-    
-    public void drawIndividualMarkers() {
-        if (drawingIndividuals != null) {
-            for (int i = 0; i < drawingIndividuals.size(); i++) {
-                SimplePointMarker locSM = new SimplePointMarker(drawingIndividuals.get(i));
+
+    public void drawAgentTemplatesMarker() {
+        if (drawingAgentTemplateLocations != null) {
+            for (int i = 0; i < drawingAgentTemplateLocations.size(); i++) {
+                SimplePointMarker locSM = new SimplePointMarker(drawingAgentTemplateLocations.get(i));
                 ScreenPosition scLocPos = locSM.getScreenPosition(map);
-                stroke(0,0,0,0);
-                fill(180.0F, 0.0F, 0.0F, 80.0F);
-                ellipse(scLocPos.x, scLocPos.y, 10, 10);
+                fill(0.0F, 200.0F, 0.0F, 100.0F);
+                ellipse(scLocPos.x, scLocPos.y, 30, 30);
             }
+        }
+    }
+
+    public void drawIndividualMarker() {
+        if (drawingIndividualAgent != null) {
+            SimplePointMarker locSM = new SimplePointMarker(drawingIndividualAgent);
+            ScreenPosition scLocPos = locSM.getScreenPosition(map);
+            stroke(0, 0, 0, 0);
+            fill(180.0F, 0.0F, 0.0F, 80.0F);
+            ellipse(scLocPos.x, scLocPos.y, 10, 10);
         }
     }
 
@@ -156,8 +227,25 @@ public class ProcessingMapRenderer extends PApplet {
         return f;
     }
 
+    public void removeExitEvent(final PSurface surf) {
+        final java.awt.Window win
+                = ((processing.awt.PSurfaceAWT.SmoothCanvas) surf.getNative()).getFrame();
+
+        for (final java.awt.event.WindowListener evt : win.getWindowListeners()) {
+            win.removeWindowListener(evt);
+        }
+    }
+
     public void startRendering() {
-        String[] myArgs = {""};
-        PApplet.runSketch(myArgs, this);
+        thisRenderer = this;
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String[] myArgs = {""};
+                PApplet.runSketch(myArgs, thisRenderer);
+            }
+        });
+
+        thread.start();
     }
 }

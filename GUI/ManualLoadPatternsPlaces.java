@@ -18,17 +18,20 @@ public class ManualLoadPatternsPlaces extends javax.swing.JDialog {
     MainFrame myParent;
     String[] patternsList;
     
+    String loadScope;
+    
     /**
      * Creates new form ManualLoadPatternsPlaces
      */
-    public ManualLoadPatternsPlaces(java.awt.Frame parent, boolean modal) {
+    public ManualLoadPatternsPlaces(java.awt.Frame parent, boolean modal, String passed_loadScope) {
         super(parent, modal);
         initComponents();
         myParent = (MainFrame) parent;
+        loadScope=passed_loadScope;
     }
     
     public void refreshList() {
-        patternsList = AllPatterns.detectAllPatterns("./datasets/Safegraph/FullData");
+        patternsList = AllPatterns.detectAllPatterns("./datasets/Safegraph/"+loadScope);
         jList1.setModel(new javax.swing.AbstractListModel() {
             @Override
             public int getSize() {
@@ -106,7 +109,7 @@ public class ManualLoadPatternsPlaces extends javax.swing.JDialog {
         if (jList1.getSelectedIndex() > -1) {
             myParent.mainModel.safegraph.clearPatternsPlaces();
             String temp[]=jList1.getSelectedValue().split("_");
-            myParent.mainModel.safegraph.loadPatternsPlacesSet(temp[1]+"_"+temp[2], myParent.mainModel.allGISData, "FullData", true, myParent.numProcessors);
+            myParent.mainModel.safegraph.loadPatternsPlacesSet(temp[1]+"_"+temp[2], myParent.mainModel.allGISData, loadScope, true, myParent.numProcessors);
             myParent.refreshPatternsList();
             myParent.refreshPlacesList();
                     

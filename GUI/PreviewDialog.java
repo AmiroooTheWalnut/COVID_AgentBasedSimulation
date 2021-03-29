@@ -39,6 +39,9 @@ public class PreviewDialog extends javax.swing.JDialog {
                 return result.get(index);
             }
         });
+        
+        ProcessingMapRenderer pt = new ProcessingMapRenderer(myParent,jPanel7);
+        pt.startRendering();
     }
 
     public void refreshLists() {
@@ -64,14 +67,7 @@ public class PreviewDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel6 = new javax.swing.JPanel();
-        jScrollPane6 = new javax.swing.JScrollPane();
-        jList6 = new javax.swing.JList<>();
-        jSlider1 = new javax.swing.JSlider();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jPanel7 = new javax.swing.JPanel();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jList1 = new javax.swing.JList<>();
@@ -90,8 +86,170 @@ public class PreviewDialog extends javax.swing.JDialog {
         jPanel5 = new javax.swing.JPanel();
         jScrollPane5 = new javax.swing.JScrollPane();
         jList5 = new javax.swing.JList<>();
+        jPanel7 = new javax.swing.JPanel();
+        jPanel9 = new javax.swing.JPanel();
+        jPanel6 = new javax.swing.JPanel();
+        jScrollPane6 = new javax.swing.JScrollPane();
+        jList6 = new javax.swing.JList<>();
+        jSlider1 = new javax.swing.JSlider();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Country"));
+
+        jList1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jList1.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                jList1ValueChanged(evt);
+            }
+        });
+        jScrollPane1.setViewportView(jList1);
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 652, Short.MAX_VALUE)
+        );
+
+        jTabbedPane1.addTab("Country", jPanel1);
+
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("State/Province"));
+
+        jList2.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jList2.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                jList2ValueChanged(evt);
+            }
+        });
+        jScrollPane2.setViewportView(jList2);
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 652, Short.MAX_VALUE)
+        );
+
+        jTabbedPane1.addTab("State/Province", jPanel2);
+
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("County"));
+
+        jList3.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jList3.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                jList3ValueChanged(evt);
+            }
+        });
+        jScrollPane3.setViewportView(jList3);
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 652, Short.MAX_VALUE)
+        );
+
+        jTabbedPane1.addTab("County", jPanel3);
+
+        jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder("City"));
+
+        jList7.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jList7.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                jList7ValueChanged(evt);
+            }
+        });
+        jScrollPane7.setViewportView(jList7);
+
+        javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
+        jPanel8.setLayout(jPanel8Layout);
+        jPanel8Layout.setHorizontalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)
+        );
+        jPanel8Layout.setVerticalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane7, javax.swing.GroupLayout.Alignment.TRAILING)
+        );
+
+        jTabbedPane1.addTab("City", jPanel8);
+
+        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Census tract"));
+
+        jList4.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jList4.setToolTipText("");
+        jList4.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                jList4ValueChanged(evt);
+            }
+        });
+        jScrollPane4.setViewportView(jList4);
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 652, Short.MAX_VALUE)
+        );
+
+        jTabbedPane1.addTab("Census tract", jPanel4);
+
+        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Census block group"));
+
+        jList5.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jList5.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                jList5ValueChanged(evt);
+            }
+        });
+        jScrollPane5.setViewportView(jList5);
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane5)
+        );
+
+        jTabbedPane1.addTab("Census block group", jPanel5);
+
+        jPanel7.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jPanel7.setMinimumSize(new java.awt.Dimension(200, 200));
+        jPanel7.setPreferredSize(new java.awt.Dimension(893, 1000));
+        jPanel7.addHierarchyBoundsListener(new java.awt.event.HierarchyBoundsListener() {
+            public void ancestorMoved(java.awt.event.HierarchyEvent evt) {
+            }
+            public void ancestorResized(java.awt.event.HierarchyEvent evt) {
+                jPanel7AncestorResized(evt);
+            }
+        });
+        jPanel7.setLayout(new java.awt.BorderLayout());
+
+        jPanel9.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Month"));
 
@@ -110,7 +268,7 @@ public class PreviewDialog extends javax.swing.JDialog {
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 337, Short.MAX_VALUE)
+            .addComponent(jScrollPane6)
         );
 
         jSlider1.setValue(4);
@@ -126,180 +284,56 @@ public class PreviewDialog extends javax.swing.JDialog {
 
         jLabel3.setText("jLabel3");
 
-        jPanel7.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        jPanel7.setLayout(new java.awt.GridLayout());
-
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Country"));
-
-        jList1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        jList1.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
-            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-                jList1ValueChanged(evt);
-            }
-        });
-        jScrollPane1.setViewportView(jList1);
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 147, Short.MAX_VALUE)
+        javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
+        jPanel9.setLayout(jPanel9Layout);
+        jPanel9Layout.setHorizontalGroup(
+            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(jPanel9Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel9Layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel3)
+                        .addGap(0, 138, Short.MAX_VALUE))
+                    .addGroup(jPanel9Layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jSlider1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 478, Short.MAX_VALUE)
+        jPanel9Layout.setVerticalGroup(
+            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel9Layout.createSequentialGroup()
+                .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jSlider1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(jLabel3))
+                .addContainerGap())
         );
-
-        jPanel7.add(jPanel1);
-
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("State/Province"));
-
-        jList2.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        jList2.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
-            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-                jList2ValueChanged(evt);
-            }
-        });
-        jScrollPane2.setViewportView(jList2);
-
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 147, Short.MAX_VALUE)
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 478, Short.MAX_VALUE)
-        );
-
-        jPanel7.add(jPanel2);
-
-        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("County"));
-
-        jList3.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        jList3.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
-            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-                jList3ValueChanged(evt);
-            }
-        });
-        jScrollPane3.setViewportView(jList3);
-
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 147, Short.MAX_VALUE)
-        );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 478, Short.MAX_VALUE)
-        );
-
-        jPanel7.add(jPanel3);
-
-        jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder("City"));
-
-        jList7.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
-            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-                jList7ValueChanged(evt);
-            }
-        });
-        jScrollPane7.setViewportView(jList7);
-
-        javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
-        jPanel8.setLayout(jPanel8Layout);
-        jPanel8Layout.setHorizontalGroup(
-            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 147, Short.MAX_VALUE)
-        );
-        jPanel8Layout.setVerticalGroup(
-            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane7, javax.swing.GroupLayout.Alignment.TRAILING)
-        );
-
-        jPanel7.add(jPanel8);
-
-        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Census tract"));
-
-        jList4.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        jList4.setToolTipText("");
-        jList4.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
-            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-                jList4ValueChanged(evt);
-            }
-        });
-        jScrollPane4.setViewportView(jList4);
-
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 147, Short.MAX_VALUE)
-        );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 478, Short.MAX_VALUE)
-        );
-
-        jPanel7.add(jPanel4);
-
-        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Census block group"));
-
-        jList5.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        jList5.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
-            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-                jList5ValueChanged(evt);
-            }
-        });
-        jScrollPane5.setViewportView(jList5);
-
-        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
-        jPanel5.setLayout(jPanel5Layout);
-        jPanel5Layout.setHorizontalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 147, Short.MAX_VALUE)
-        );
-        jPanel5Layout.setVerticalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane5)
-        );
-
-        jPanel7.add(jPanel5);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, 962, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 294, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jSlider1, javax.swing.GroupLayout.DEFAULT_SIZE, 186, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel2)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel3)))
-                        .addGap(0, 0, Short.MAX_VALUE))))
+                .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jSlider1, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(jLabel3))
-                .addContainerGap())
-            .addComponent(jPanel7, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jTabbedPane1)
+            .addComponent(jPanel7, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+            .addComponent(jPanel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
@@ -307,7 +341,6 @@ public class PreviewDialog extends javax.swing.JDialog {
 
     private void jList1ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList1ValueChanged
         if (jList1.getSelectedIndex() > -1) {
-            myParent.child.isShowGISMarkers = true;
             jList2.clearSelection();
             jList3.clearSelection();
             jList4.clearSelection();
@@ -342,7 +375,7 @@ public class PreviewDialog extends javax.swing.JDialog {
                 childrenNames[i] = myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(i).name;
                 markers.add(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(i));
             }
-            myParent.child.setDrawingMarkers(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()), markers, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).name, childrenNames, null);
+            myParent.child.setDrawingGISMarkers(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()), markers, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).name, childrenNames);
         }
     }//GEN-LAST:event_jList1ValueChanged
 
@@ -383,7 +416,7 @@ public class PreviewDialog extends javax.swing.JDialog {
                 childrenNames[i] = myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(i).name;
                 markers.add(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(i));
             }
-            myParent.child.setDrawingMarkers(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()), markers, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).name, childrenNames, null);
+            myParent.child.setDrawingGISMarkers(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()), markers, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).name, childrenNames);
         }
     }//GEN-LAST:event_jList2ValueChanged
 
@@ -449,7 +482,7 @@ public class PreviewDialog extends javax.swing.JDialog {
                 childrenNames[i] = String.valueOf(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(i).id);
                 markers.add(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(i));
             }
-            myParent.child.setDrawingMarkers(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()), markers, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).name, childrenNames, null);
+            myParent.child.setDrawingGISMarkers(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()), markers, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).name, childrenNames);
         }
     }//GEN-LAST:event_jList3ValueChanged
 
@@ -485,7 +518,7 @@ public class PreviewDialog extends javax.swing.JDialog {
                 childrenNames[i] = String.valueOf(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.get(i).id);
                 markers.add(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.get(i));
             }
-            myParent.child.setDrawingMarkers(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()), markers, String.valueOf(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).id), childrenNames, null);
+            myParent.child.setDrawingGISMarkers(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()), markers, String.valueOf(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).id), childrenNames);
         }
     }//GEN-LAST:event_jList4ValueChanged
 
@@ -506,7 +539,7 @@ public class PreviewDialog extends javax.swing.JDialog {
             Location loc = new Location(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.get(jList5.getSelectedIndex()).lon, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.get(jList5.getSelectedIndex()).lat);
             myParent.child.panZoomTo(loc, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.get(jList5.getSelectedIndex()).size);
             jLabel3.setText(String.valueOf(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.get(jList5.getSelectedIndex()).size));
-            myParent.child.setDrawingMarkers(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.get(jList5.getSelectedIndex()), null, String.valueOf(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.get(jList5.getSelectedIndex()).id), null, null);
+            myParent.child.setDrawingGISMarkers(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.get(jList5.getSelectedIndex()), null, String.valueOf(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.get(jList5.getSelectedIndex()).id), null);
         }
     }//GEN-LAST:event_jList5ValueChanged
 
@@ -544,9 +577,19 @@ public class PreviewDialog extends javax.swing.JDialog {
                 childrenNames[i] = String.valueOf(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList7.getSelectedIndex()).censusTracts.get(i).id);
                 markers.add(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList7.getSelectedIndex()).censusTracts.get(i));
             }
-            myParent.child.setDrawingMarkers(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList7.getSelectedIndex()), markers, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList7.getSelectedIndex()).name, childrenNames, null);
+            myParent.child.setDrawingGISMarkers(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList7.getSelectedIndex()), markers, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList7.getSelectedIndex()).name, childrenNames);
         }
     }//GEN-LAST:event_jList7ValueChanged
+
+    private void jPanel7AncestorResized(java.awt.event.HierarchyEvent evt) {//GEN-FIRST:event_jPanel7AncestorResized
+//        if (myParent != null) {
+//            if (myParent.child != null) {
+//                if (myParent.child.mySurface != null) {
+//                    myParent.child.mySurface.setSize(jPanel7.getWidth(), jPanel7.getHeight());
+//                }
+//            }
+//        }
+    }//GEN-LAST:event_jPanel7AncestorResized
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -566,8 +609,9 @@ public class PreviewDialog extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel7;
+    public javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
@@ -576,5 +620,6 @@ public class PreviewDialog extends javax.swing.JDialog {
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JSlider jSlider1;
+    private javax.swing.JTabbedPane jTabbedPane1;
     // End of variables declaration//GEN-END:variables
 }
