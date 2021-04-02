@@ -14,6 +14,7 @@ import lombok.Setter;
 @Getter @Setter
 public class SafegraphPlace implements Serializable, Comparable<SafegraphPlace> {
     static final long serialVersionUID = softwareVersion;
+    
 //    public String id;//DROPPED IT IS GOING TO BE DEPRECIATED
     public transient SafegraphPlace parent;
     public String placeKey;

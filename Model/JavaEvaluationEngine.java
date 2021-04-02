@@ -26,7 +26,7 @@ public class JavaEvaluationEngine {
 
     public Binding mainBinding;
     public GroovyShell mainShell;
-    public JTextAreaOutputStream myConsole;
+    public JTextAreaOutputStream myConsole;   
 
     public JavaEvaluationEngine(MainModel mainModel) {
         mainBinding = new Binding();

@@ -52,6 +52,17 @@ public class Safegraph extends Dataset implements Serializable {
         startingDate = findEarliestPatternTime();
         endingDate = findLatestPatternTime();
     }
+    
+    @Override
+    public void requestDatasetRange(AllGISData allGISData, String project, String years[], String months[][], boolean isParallel, int numCPU){
+        for(int i=0;i<years.length;i++){
+            for(int j=0;j<months[i].length;j++){
+                loadPatternsPlacesSet(years[i] + "_" + months[i][j], allGISData, project, isParallel, numCPU);
+            }
+        }
+        startingDate = findEarliestPatternTime();
+        endingDate = findLatestPatternTime();
+    }
 
     @Override
     public void setDatasetTemplate() {

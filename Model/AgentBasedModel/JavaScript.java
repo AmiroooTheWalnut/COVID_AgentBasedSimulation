@@ -12,6 +12,6 @@ import groovy.lang.Script;
  * @author user
  */
 public class JavaScript {
-    public Script parsedScript;
+    public transient Script parsedScript;
     public String script;
 }
