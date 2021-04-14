@@ -63,9 +63,9 @@ public class AgentBasedModel {
             currentEvaluatingAgent[0] = rootAgent;
             if (rootAgent.myTemplate.behavior.isJavaScriptActive == true) {
                 //myMainModel.javaEvaluationEngine.runScript(rootAgent.myTemplate.behavior.javaScript.script);
-                
+
                 myMainModel.javaEvaluationEngine.runParsedScript(rootAgent.myTemplate.behavior.javaScript.parsedScript);
-                
+
             } else {
                 myMainModel.pythonEvaluationEngine.runScript(rootAgent.myTemplate.behavior.pythonScript);
             }
@@ -73,7 +73,7 @@ public class AgentBasedModel {
                 currentEvaluatingAgent[0] = agents.get(i);
                 if (agents.get(i).myTemplate.behavior.isJavaScriptActive == true) {
                     //myMainModel.javaEvaluationEngine.runScript(agents.get(i).myTemplate.behavior.javaScript.script);
-                    
+
                     myMainModel.javaEvaluationEngine.runParsedScript(agents.get(i).myTemplate.behavior.javaScript.parsedScript);
                 } else {
                     myMainModel.pythonEvaluationEngine.runScript(agents.get(i).myTemplate.behavior.pythonScript);
@@ -106,9 +106,9 @@ public class AgentBasedModel {
                 return null;
             } else {
                 AgentTemplate copiedTemplate = new AgentTemplate(template);
-                copiedTemplate.constructor=template.constructor;
-                copiedTemplate.behavior=template.behavior;
-                copiedTemplate.destructor=template.destructor;
+                copiedTemplate.constructor = template.constructor;
+                copiedTemplate.behavior = template.behavior;
+                copiedTemplate.destructor = template.destructor;
                 Agent output = new Agent(copiedTemplate);
                 output.myIndex = agents.size();
                 agents.add(output);
@@ -117,7 +117,7 @@ public class AgentBasedModel {
                 currentEvaluatingAgent[0] = output;
                 if (output.myTemplate.constructor.isJavaScriptActive == true) {
                     //myMainModel.javaEvaluationEngine.runScript(output.myTemplate.constructor.javaScript.script);
-                    
+
                     myMainModel.javaEvaluationEngine.runParsedScript(output.myTemplate.constructor.javaScript.parsedScript);
                 } else {
                     myMainModel.pythonEvaluationEngine.runScript(output.myTemplate.constructor.pythonScript);
@@ -135,7 +135,7 @@ public class AgentBasedModel {
     public void removeAgent(Agent agent) {
         if (agent.myTemplate.destructor.isJavaScriptActive == true) {
             //myMainModel.javaEvaluationEngine.runScript(agent.myTemplate.destructor.javaScript.script);
-            
+
             myMainModel.javaEvaluationEngine.runParsedScript(agent.myTemplate.destructor.javaScript.parsedScript);
         } else {
             myMainModel.pythonEvaluationEngine.runScript(agent.myTemplate.destructor.pythonScript);
@@ -196,76 +196,84 @@ public class AgentBasedModel {
     }
 
     public void calculateStudyScopeGeography() {
-        String sections[] = studyScope.split("_");
-        int countryIndex = -1;
-        int stateIndex = -1;
-        int countyIndex = -1;
-        if (sections.length == 1) {
-            for (int i = 0; i < myMainModel.allGISData.countries.size(); i++) {
-                if (sections[0].equals(myMainModel.allGISData.countries.get(i).name)) {
-                    studyScopeGeography = myMainModel.allGISData.countries.get(i);
-                    countryIndex = i;
+        if (myMainModel.allGISData != null) {
+            if (myMainModel.allGISData.countries != null) {
+                String sections[] = studyScope.split("_");
+                int countryIndex = -1;
+                int stateIndex = -1;
+                int countyIndex = -1;
+                if (sections.length == 1) {
+                    for (int i = 0; i < myMainModel.allGISData.countries.size(); i++) {
+                        if (sections[0].equals(myMainModel.allGISData.countries.get(i).name)) {
+                            studyScopeGeography = myMainModel.allGISData.countries.get(i);
+                            countryIndex = i;
+                        }
+                    }
                 }
-            }
-        }
-        if (sections.length == 2) {
-            for (int i = 0; i < myMainModel.allGISData.countries.size(); i++) {
-                if (sections[0].equals(myMainModel.allGISData.countries.get(i).name)) {
-                    studyScopeGeography = myMainModel.allGISData.countries.get(i);
-                    countryIndex = i;
+                if (sections.length == 2) {
+                    for (int i = 0; i < myMainModel.allGISData.countries.size(); i++) {
+                        if (sections[0].equals(myMainModel.allGISData.countries.get(i).name)) {
+                            studyScopeGeography = myMainModel.allGISData.countries.get(i);
+                            countryIndex = i;
+                        }
+                    }
+                    for (int i = 0; i < myMainModel.allGISData.countries.get(countryIndex).states.size(); i++) {
+                        if (sections[1].equals(myMainModel.allGISData.countries.get(countryIndex).states.get(i).name)) {
+                            studyScopeGeography = myMainModel.allGISData.countries.get(countryIndex).states.get(i);
+                            stateIndex = i;
+                        }
+                    }
                 }
-            }
-            for (int i = 0; i < myMainModel.allGISData.countries.get(countryIndex).states.size(); i++) {
-                if (sections[1].equals(myMainModel.allGISData.countries.get(countryIndex).states.get(i).name)) {
-                    studyScopeGeography = myMainModel.allGISData.countries.get(countryIndex).states.get(i);
-                    stateIndex = i;
+                if (sections.length == 3) {
+                    for (int i = 0; i < myMainModel.allGISData.countries.size(); i++) {
+                        if (sections[0].equals(myMainModel.allGISData.countries.get(i).name)) {
+                            studyScopeGeography = myMainModel.allGISData.countries.get(i);
+                            countryIndex = i;
+                        }
+                    }
+                    for (int i = 0; i < myMainModel.allGISData.countries.get(countryIndex).states.size(); i++) {
+                        if (sections[1].equals(myMainModel.allGISData.countries.get(countryIndex).states.get(i).name)) {
+                            studyScopeGeography = myMainModel.allGISData.countries.get(countryIndex).states.get(i);
+                            stateIndex = i;
+                        }
+                    }
+                    for (int i = 0; i < myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.size(); i++) {
+                        if (sections[2].equals(myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(i).name)) {
+                            studyScopeGeography = myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(i);
+                            countyIndex = i;
+                        }
+                    }
                 }
-            }
-        }
-        if (sections.length == 3) {
-            for (int i = 0; i < myMainModel.allGISData.countries.size(); i++) {
-                if (sections[0].equals(myMainModel.allGISData.countries.get(i).name)) {
-                    studyScopeGeography = myMainModel.allGISData.countries.get(i);
-                    countryIndex = i;
+                if (sections.length == 4) {
+                    for (int i = 0; i < myMainModel.allGISData.countries.size(); i++) {
+                        if (sections[0].equals(myMainModel.allGISData.countries.get(i).name)) {
+                            studyScopeGeography = myMainModel.allGISData.countries.get(i);
+                            countryIndex = i;
+                        }
+                    }
+                    for (int i = 0; i < myMainModel.allGISData.countries.get(countryIndex).states.size(); i++) {
+                        if (sections[1].equals(myMainModel.allGISData.countries.get(countryIndex).states.get(i).name)) {
+                            studyScopeGeography = myMainModel.allGISData.countries.get(countryIndex).states.get(i);
+                            stateIndex = i;
+                        }
+                    }
+                    for (int i = 0; i < myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.size(); i++) {
+                        if (sections[2].equals(myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(i).name)) {
+                            studyScopeGeography = myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(i);
+                            countyIndex = i;
+                        }
+                    }
+                    for (int i = 0; i < myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(countyIndex).cities.size(); i++) {
+                        if (sections[3].equals(myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(countyIndex).cities.get(i).name)) {
+                            studyScopeGeography = myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(countyIndex).cities.get(i);
+                        }
+                    }
                 }
+            } else {
+                System.out.println("GEOGRAPHY DATA IS UNAVAILABLE TO GET CASE STUDY'S GEOGRAPHY. calculateStudyScopeGeography SKIPPED!");
             }
-            for (int i = 0; i < myMainModel.allGISData.countries.get(countryIndex).states.size(); i++) {
-                if (sections[1].equals(myMainModel.allGISData.countries.get(countryIndex).states.get(i).name)) {
-                    studyScopeGeography = myMainModel.allGISData.countries.get(countryIndex).states.get(i);
-                    stateIndex = i;
-                }
-            }
-            for (int i = 0; i < myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.size(); i++) {
-                if (sections[2].equals(myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(i).name)) {
-                    studyScopeGeography = myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(i);
-                    countyIndex = i;
-                }
-            }
-        }
-        if (sections.length == 4) {
-            for (int i = 0; i < myMainModel.allGISData.countries.size(); i++) {
-                if (sections[0].equals(myMainModel.allGISData.countries.get(i).name)) {
-                    studyScopeGeography = myMainModel.allGISData.countries.get(i);
-                    countryIndex = i;
-                }
-            }
-            for (int i = 0; i < myMainModel.allGISData.countries.get(countryIndex).states.size(); i++) {
-                if (sections[1].equals(myMainModel.allGISData.countries.get(countryIndex).states.get(i).name)) {
-                    studyScopeGeography = myMainModel.allGISData.countries.get(countryIndex).states.get(i);
-                    stateIndex = i;
-                }
-            }
-            for (int i = 0; i < myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.size(); i++) {
-                if (sections[2].equals(myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(i).name)) {
-                    studyScopeGeography = myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(i);
-                    countyIndex = i;
-                }
-            }
-            for (int i = 0; i < myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(countyIndex).cities.size(); i++) {
-                if (sections[3].equals(myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(countyIndex).cities.get(i).name)) {
-                    studyScopeGeography = myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(countyIndex).cities.get(i);
-                }
-            }
+        } else {
+            System.out.println("GEOGRAPHY DATA IS UNAVAILABLE TO GET CASE STUDY'S GEOGRAPHY. calculateStudyScopeGeography SKIPPED!");
         }
     }
 }

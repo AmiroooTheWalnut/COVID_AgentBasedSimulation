@@ -15,7 +15,8 @@ import COVID_AgentBasedSimulation.Model.Data.Safegraph.Safegraph;
  */
 public class ManualLoadPatternsPlaces extends javax.swing.JDialog {
 
-    MainFrame myParent;
+    MainFrame myMainFrameParent;
+    SafeGraphPreprocessDialog myParent;
     String[] patternsList;
     
     String loadScope;
@@ -23,10 +24,11 @@ public class ManualLoadPatternsPlaces extends javax.swing.JDialog {
     /**
      * Creates new form ManualLoadPatternsPlaces
      */
-    public ManualLoadPatternsPlaces(java.awt.Frame parent, boolean modal, String passed_loadScope) {
+    public ManualLoadPatternsPlaces(java.awt.Frame parent, boolean modal, String passed_loadScope, SafeGraphPreprocessDialog passed_SafeGraphPreprocessDialog) {
         super(parent, modal);
         initComponents();
-        myParent = (MainFrame) parent;
+        myMainFrameParent = (MainFrame) parent;
+        myParent=passed_SafeGraphPreprocessDialog;
         loadScope=passed_loadScope;
     }
     
@@ -109,7 +111,7 @@ public class ManualLoadPatternsPlaces extends javax.swing.JDialog {
         if (jList1.getSelectedIndex() > -1) {
             myParent.mainModel.safegraph.clearPatternsPlaces();
             String temp[]=jList1.getSelectedValue().split("_");
-            myParent.mainModel.safegraph.loadPatternsPlacesSet(temp[1]+"_"+temp[2], myParent.mainModel.allGISData, loadScope, true, myParent.numProcessors);
+            myParent.mainModel.safegraph.loadPatternsPlacesSet(temp[1]+"_"+temp[2], myParent.mainModel.allGISData, loadScope, true, myMainFrameParent.numProcessors);
             myParent.refreshPatternsList();
             myParent.refreshPlacesList();
                     

@@ -55,9 +55,11 @@ public class Safegraph extends Dataset implements Serializable {
     
     @Override
     public void requestDatasetRange(AllGISData allGISData, String project, String years[], String months[][], boolean isParallel, int numCPU){
+        clearPatternsPlaces();
         for(int i=0;i<years.length;i++){
             for(int j=0;j<months[i].length;j++){
                 loadPatternsPlacesSet(years[i] + "_" + months[i][j], allGISData, project, isParallel, numCPU);
+                //connectPatternsAndPlaces(allPatterns.monthlyPatternsList.get(allPatterns.monthlyPatternsList.size()-1),allSafegraphPlaces.monthlySafegraphPlacesList.get(allSafegraphPlaces.monthlySafegraphPlacesList.size()-1),allGISData,isParallel,numCPU);
             }
         }
         startingDate = findEarliestPatternTime();
@@ -181,6 +183,7 @@ public class Safegraph extends Dataset implements Serializable {
         kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.LongIntTuple.class);
         kryo.setReferences(true);
         kryo.setInstantiatorStrategy(new DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
+//        kryo.setInstantiatorStrategy(new Kryo.DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
         kryo.register(java.time.ZonedDateTime.class);
         kryo.register(COVID_AgentBasedSimulation.Model.DatasetTemplate.class);
         kryo.register(COVID_AgentBasedSimulation.Model.RecordTemplate.class);
@@ -206,6 +209,7 @@ public class Safegraph extends Dataset implements Serializable {
         kryo.register(java.lang.String.class);
         kryo.setReferences(true);
         kryo.setInstantiatorStrategy(new DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
+//        kryo.setInstantiatorStrategy(new Kryo.DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
         kryo.register(java.time.ZonedDateTime.class);
         kryo.register(COVID_AgentBasedSimulation.Model.DatasetTemplate.class);
         kryo.register(COVID_AgentBasedSimulation.Model.RecordTemplate.class);
@@ -250,6 +254,7 @@ public class Safegraph extends Dataset implements Serializable {
         kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.LongIntTuple.class);
         kryo.setReferences(true);
         kryo.setInstantiatorStrategy(new DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
+//        kryo.setInstantiatorStrategy(new Kryo.DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
         kryo.register(java.time.ZonedDateTime.class);
         kryo.register(COVID_AgentBasedSimulation.Model.DatasetTemplate.class);
         kryo.register(COVID_AgentBasedSimulation.Model.RecordTemplate.class);
@@ -281,6 +286,7 @@ public class Safegraph extends Dataset implements Serializable {
         kryo.register(java.lang.String.class);
         kryo.setReferences(true);
         kryo.setInstantiatorStrategy(new DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
+//        kryo.setInstantiatorStrategy(new Kryo.DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
         kryo.register(java.time.ZonedDateTime.class);
         kryo.register(COVID_AgentBasedSimulation.Model.DatasetTemplate.class);
         kryo.register(COVID_AgentBasedSimulation.Model.RecordTemplate.class);
@@ -321,6 +327,7 @@ public class Safegraph extends Dataset implements Serializable {
     public void saveAllPatternsKryo(String passed_file_path) {
         Kryo kryo = new Kryo();
         kryo.setInstantiatorStrategy(new DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
+//        kryo.setInstantiatorStrategy(new Kryo.DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
         Output output;
         try {
             output = new Output(new FileOutputStream(passed_file_path + ".bin"));
@@ -371,6 +378,7 @@ public class Safegraph extends Dataset implements Serializable {
     }
 
     public void connectPatternsAndPlaces(Patterns patterns, SafegraphPlaces places, AllGISData allGISData, boolean isParallel, int numCPU) {
+        //System.out.println(patterns.patternRecords);
         for (int i = patterns.patternRecords.size() - 1; i >= 0; i--) {
             if (patterns.patternRecords.get(i).poi_cbg == 0) {
                 patterns.patternRecords.remove(i);
@@ -521,7 +529,9 @@ public class Safegraph extends Dataset implements Serializable {
             for (int i = 0; i < patterns.patternRecords.size(); i++) {
                 for (int j = 0; j < city.censusTracts.size(); j++) {
                     if (patterns.patternRecords.get(i).place == null) {
-                        System.out.println("!!!!!!!!");
+                        patterns.patternRecords.remove(i);
+                        i=i-1;
+                        continue;
                     }
                     if (patterns.patternRecords.get(i).place.censusBlock.state.name.equals(city.censusTracts.get(j).censusBlocks.get(0).state.name)) {
                         if (patterns.patternRecords.get(i).place.censusBlock.county.id == city.censusTracts.get(j).censusBlocks.get(0).county.id){

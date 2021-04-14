@@ -308,6 +308,7 @@ public class MainModel extends Dataset {
         kryo.register(java.time.ZonedDateTime.class);
         kryo.setReferences(true);
         kryo.setInstantiatorStrategy(new DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
+//        kryo.setInstantiatorStrategy(new Kryo.DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
         kryo.register(java.time.ZonedDateTime.class);
         kryo.register(COVID_AgentBasedSimulation.Model.DatasetTemplate.class);
         kryo.register(COVID_AgentBasedSimulation.Model.RecordTemplate.class);

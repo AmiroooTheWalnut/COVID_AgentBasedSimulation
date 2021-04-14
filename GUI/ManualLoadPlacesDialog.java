@@ -15,16 +15,18 @@ import COVID_AgentBasedSimulation.Model.Data.Safegraph.Safegraph;
  */
 public class ManualLoadPlacesDialog extends javax.swing.JDialog {
 
-    MainFrame myParent;
+    MainFrame myMainFrameParent;
+    SafeGraphPreprocessDialog myParent;
     String[] patternsList;
 
     /**
      * Creates new form ManualLoadSafegraphDialog
      */
-    public ManualLoadPlacesDialog(java.awt.Frame parent, boolean modal) {
+    public ManualLoadPlacesDialog(java.awt.Frame parent, boolean modal, SafeGraphPreprocessDialog passed_SafeGraphPreprocessDialog) {
         super(parent, modal);
         initComponents();
-        myParent = (MainFrame) parent;
+        myMainFrameParent = (MainFrame) parent;
+        myParent=passed_SafeGraphPreprocessDialog;
     }
 
     public void refreshList() {
