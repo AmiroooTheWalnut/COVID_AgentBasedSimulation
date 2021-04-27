@@ -18,6 +18,8 @@ public class State extends Marker implements Serializable{
     public transient boolean isLatLonCalculated=false;
     public ArrayList<County> counties;
     
+    public Country country;
+    
     public void getLatLonSizeFromChildren(){
         float minLat = Float.MAX_VALUE;
         float maxLat = -Float.MAX_VALUE;

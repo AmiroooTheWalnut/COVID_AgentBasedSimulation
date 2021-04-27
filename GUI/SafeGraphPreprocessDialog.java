@@ -12,6 +12,8 @@ import COVID_AgentBasedSimulation.Model.Data.Safegraph.Safegraph;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.SafegraphPlaces;
 import COVID_AgentBasedSimulation.Model.MainModel;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -21,15 +23,19 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
 
     MainFrame myParent;
     MainModel mainModel;
-    
+
+    String[] patternsList;
+
     /**
      * Creates new form SafeGraphPreprocessDialog
      */
     public SafeGraphPreprocessDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        myParent=(MainFrame)parent;
-        mainModel=myParent.mainModel;
+        myParent = (MainFrame) parent;
+        mainModel = myParent.mainModel;
+
+        refreshYearMonthList();
     }
 
     /**
@@ -41,6 +47,8 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jLabel2 = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
         jButton18 = new javax.swing.JButton();
         jButton19 = new javax.swing.JButton();
         jButton17 = new javax.swing.JButton();
@@ -66,6 +74,20 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
         jPanel11 = new javax.swing.JPanel();
         jButton8 = new javax.swing.JButton();
         jButton9 = new javax.swing.JButton();
+        jPanel6 = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        jButton5 = new javax.swing.JButton();
+        jPanel7 = new javax.swing.JPanel();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        jList5 = new javax.swing.JList<>();
+        jPanel12 = new javax.swing.JPanel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jList3 = new javax.swing.JList<>();
+
+        jLabel2.setText("jLabel2");
+
+        jLabel1.setText("jLabel1");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -93,7 +115,7 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
         jCheckBox1.setSelected(true);
         jCheckBox1.setText("Manual");
 
-        jPanel1.setLayout(new javax.swing.BoxLayout(jPanel1, javax.swing.BoxLayout.LINE_AXIS));
+        jPanel1.setLayout(new java.awt.GridLayout());
 
         jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder("Patterns"));
 
@@ -196,7 +218,7 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(14, 69, Short.MAX_VALUE))
+                .addGap(14, 118, Short.MAX_VALUE))
             .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel8Layout.setVerticalGroup(
@@ -268,7 +290,7 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 296, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 318, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -313,7 +335,7 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
                 .addComponent(jPanel10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel11, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 55, Short.MAX_VALUE))
+                .addGap(0, 90, Short.MAX_VALUE))
         );
         jPanel9Layout.setVerticalGroup(
             jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -321,11 +343,92 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
                 .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jPanel11, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(10, 10, 10)
                 .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jPanel1.add(jPanel9);
+
+        jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Generate travel matrix"));
+
+        jLabel3.setText("Scope:");
+
+        jLabel4.setText("Empty");
+
+        jButton5.setText("Generate matrix");
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
+
+        jPanel7.setBorder(javax.swing.BorderFactory.createTitledBorder("Years and months"));
+
+        jScrollPane5.setViewportView(jList5);
+
+        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
+        jPanel7.setLayout(jPanel7Layout);
+        jPanel7Layout.setHorizontalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 382, javax.swing.GroupLayout.PREFERRED_SIZE)
+        );
+        jPanel7Layout.setVerticalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 229, Short.MAX_VALUE)
+        );
+
+        jPanel12.setBorder(javax.swing.BorderFactory.createTitledBorder("Granuality"));
+
+        jList3.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { "country", "state", "county", "censustract", "censusblockgroup" };
+            public int getSize() { return strings.length; }
+            public String getElementAt(int i) { return strings[i]; }
+        });
+        jList3.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jScrollPane3.setViewportView(jList3);
+
+        javax.swing.GroupLayout jPanel12Layout = new javax.swing.GroupLayout(jPanel12);
+        jPanel12.setLayout(jPanel12Layout);
+        jPanel12Layout.setHorizontalGroup(
+            jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane3)
+        );
+        jPanel12Layout.setVerticalGroup(
+            jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 98, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
+        jPanel6.setLayout(jPanel6Layout);
+        jPanel6Layout.setHorizontalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel3)
+                    .addComponent(jLabel4)
+                    .addComponent(jButton5))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel12, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        jPanel6Layout.setVerticalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel4)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton5)
+                .addContainerGap())
+        );
+
+        jPanel1.add(jPanel6);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -341,12 +444,12 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jCheckBox1)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 729, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 464, Short.MAX_VALUE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton17)
@@ -441,7 +544,59 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_jButton17ActionPerformed
 
-    
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        ArrayList<String> years = new ArrayList();
+        ArrayList<ArrayList<String>> months = new ArrayList();
+        List<String> selectedValues = jList5.getSelectedValuesList();
+        for (int i = 0; i < selectedValues.size(); i++) {
+            String[] splitted = selectedValues.get(i).split("_");
+
+            boolean isYearUnique = true;
+            int yearIndex = -1;
+            for (int j = 0; j < years.size(); j++) {
+                if (splitted[1].equals(years.get(j))) {
+                    isYearUnique = false;
+                    yearIndex = j;
+                }
+            }
+            if (isYearUnique == true) {
+                years.add(splitted[1]);
+                ArrayList yearMonths = new ArrayList();
+                yearMonths.add(splitted[2]);
+                months.add(yearMonths);
+            } else {
+                boolean isMonthUnique = true;
+                //int monthIndex = -1;
+                for (int j = 0; j < months.get(yearIndex).size(); j++) {
+                    if (splitted[2].equals(months.get(yearIndex).get(j))) {
+                        isMonthUnique = false;
+                        //monthIndex = j;
+                    }
+                }
+                if (isMonthUnique == true) {
+                    months.get(yearIndex).add(splitted[2]);
+                }else{
+                    
+                }
+            }
+        }
+
+        String yearsArray[] = new String[years.size()];
+        for (int i = 0; i < years.size(); i++) {
+            yearsArray[i]=years.get(i);
+        }
+        
+        String monthsArray[][] = new String[years.size()][];
+        for (int i = 0; i < months.size(); i++) {
+            monthsArray[i]=new String[months.get(i).size()];
+            for (int j = 0; j < months.get(i).size(); j++) {
+                monthsArray[i][j]=months.get(i).get(j);
+            }
+        }
+        
+        myParent.mainModel.safegraph.writeTravelMatrix(myParent.mainModel.ABM.studyScopeGeography, jList3.getSelectedValue(), yearsArray, monthsArray, myParent.mainModel.allGISData, true, myParent.numProcessors);
+    }//GEN-LAST:event_jButton5ActionPerformed
+
     public void refreshPatternsList() {
         jList1.setModel(new javax.swing.AbstractListModel() {
             @Override
@@ -470,6 +625,21 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
         });
     }
 
+    public void refreshYearMonthList() {
+        patternsList = AllPatterns.detectAllPatterns("./datasets/Safegraph/FullData");
+        jList5.setModel(new javax.swing.AbstractListModel() {
+            @Override
+            public int getSize() {
+                return patternsList.length;
+            }
+
+            @Override
+            public Object getElementAt(int index) {
+                return patternsList[index];
+            }
+        });
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton17;
@@ -478,23 +648,35 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
     private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton8;
     private javax.swing.JButton jButton9;
     private javax.swing.JCheckBox jCheckBox1;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JList<String> jList1;
     private javax.swing.JList<String> jList2;
+    private javax.swing.JList<String> jList3;
+    private javax.swing.JList<String> jList5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
+    private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane5;
     // End of variables declaration//GEN-END:variables
 }

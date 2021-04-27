@@ -22,6 +22,10 @@ public class CensusTract extends Marker implements Serializable {
     public transient boolean isLatLonCalculated=false;
     public ArrayList<CensusBlockGroup> censusBlocks;
     
+    public Country country;
+    public State state;
+    public County county;
+    
     public void getLatLonSizeFromChildren(){
         float minLat = Float.MAX_VALUE;
         float maxLat = -Float.MAX_VALUE;

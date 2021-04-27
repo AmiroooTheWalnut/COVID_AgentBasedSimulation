@@ -6,10 +6,12 @@ import static COVID_AgentBasedSimulation.Model.MainModel.softwareVersion;
 import COVID_AgentBasedSimulation.Model.RecordTemplate;
 import COVID_AgentBasedSimulation.Model.Structure.AllGISData;
 import COVID_AgentBasedSimulation.Model.Structure.CensusBlockGroup;
+import COVID_AgentBasedSimulation.Model.Structure.CensusTract;
 import COVID_AgentBasedSimulation.Model.Structure.City;
 import COVID_AgentBasedSimulation.Model.Structure.Country;
 import COVID_AgentBasedSimulation.Model.Structure.County;
 import COVID_AgentBasedSimulation.Model.Structure.State;
+import de.siegmar.fastcsv.writer.CsvWriter;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
@@ -18,6 +20,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -52,12 +55,12 @@ public class Safegraph extends Dataset implements Serializable {
         startingDate = findEarliestPatternTime();
         endingDate = findLatestPatternTime();
     }
-    
+
     @Override
-    public void requestDatasetRange(AllGISData allGISData, String project, String years[], String months[][], boolean isParallel, int numCPU){
+    public void requestDatasetRange(AllGISData allGISData, String project, String years[], String months[][], boolean isParallel, int numCPU) {
         clearPatternsPlaces();
-        for(int i=0;i<years.length;i++){
-            for(int j=0;j<months[i].length;j++){
+        for (int i = 0; i < years.length; i++) {
+            for (int j = 0; j < months[i].length; j++) {
                 loadPatternsPlacesSet(years[i] + "_" + months[i][j], allGISData, project, isParallel, numCPU);
                 //connectPatternsAndPlaces(allPatterns.monthlyPatternsList.get(allPatterns.monthlyPatternsList.size()-1),allSafegraphPlaces.monthlySafegraphPlacesList.get(allSafegraphPlaces.monthlySafegraphPlacesList.size()-1),allGISData,isParallel,numCPU);
             }
@@ -340,20 +343,20 @@ public class Safegraph extends Dataset implements Serializable {
 
     public void clearPatternsPlaces() {
         if (allPatterns != null) {
-            allPatterns.monthlyPatternsList.clear();
+            allPatterns.monthlyPatternsList = null;
         } else {
             allPatterns = new AllPatterns();
         }
         if (allSafegraphPlaces != null) {
-            allSafegraphPlaces.monthlySafegraphPlacesList.clear();
+            allSafegraphPlaces.monthlySafegraphPlacesList = null;
         } else {
             allSafegraphPlaces = new AllSafegraphPlaces();
         }
     }
 
     public void loadPatternsPlacesSet(String date, AllGISData allGISData, String project, boolean isParallel, int numCPU) {
-        Patterns patterns = loadPatternsKryo("./datasets/Safegraph/"+project+"/patterns_" + date + "/processedData.bin");
-        SafegraphPlaces safegraphPlaces = loadSafegraphPlacesKryo("./datasets/Safegraph/"+project+"/core_poi_" + date + "/processedData.bin");
+        Patterns patterns = loadPatternsKryo("./datasets/Safegraph/" + project + "/patterns_" + date + "/processedData.bin");
+        SafegraphPlaces safegraphPlaces = loadSafegraphPlacesKryo("./datasets/Safegraph/" + project + "/core_poi_" + date + "/processedData.bin");
 
         System.out.println("Data loaded");
         System.out.println("Connecting patterns and places ...");
@@ -361,7 +364,12 @@ public class Safegraph extends Dataset implements Serializable {
         System.out.println("Connection done");
         if (patterns != null) {
             if (allPatterns != null) {
-                allPatterns.monthlyPatternsList.add(patterns);
+                if (allPatterns.monthlyPatternsList != null) {
+                    allPatterns.monthlyPatternsList.add(patterns);
+                } else {
+                    allPatterns.monthlyPatternsList = new ArrayList();
+                    allPatterns.monthlyPatternsList.add(patterns);
+                }
             } else {
                 allPatterns = new AllPatterns();
                 allPatterns.monthlyPatternsList.add(patterns);
@@ -369,7 +377,12 @@ public class Safegraph extends Dataset implements Serializable {
         }
         if (safegraphPlaces != null) {
             if (allSafegraphPlaces != null) {
-                allSafegraphPlaces.monthlySafegraphPlacesList.add(safegraphPlaces);
+                if (allSafegraphPlaces.monthlySafegraphPlacesList != null) {
+                    allSafegraphPlaces.monthlySafegraphPlacesList.add(safegraphPlaces);
+                } else {
+                    allSafegraphPlaces.monthlySafegraphPlacesList = new ArrayList();
+                    allSafegraphPlaces.monthlySafegraphPlacesList.add(safegraphPlaces);
+                }
             } else {
                 allSafegraphPlaces = new AllSafegraphPlaces();
                 allSafegraphPlaces.monthlySafegraphPlacesList.add(safegraphPlaces);
@@ -530,18 +543,61 @@ public class Safegraph extends Dataset implements Serializable {
                 for (int j = 0; j < city.censusTracts.size(); j++) {
                     if (patterns.patternRecords.get(i).place == null) {
                         patterns.patternRecords.remove(i);
-                        i=i-1;
+                        i = i - 1;
                         continue;
                     }
                     if (patterns.patternRecords.get(i).place.censusBlock.state.name.equals(city.censusTracts.get(j).censusBlocks.get(0).state.name)) {
-                        if (patterns.patternRecords.get(i).place.censusBlock.county.id == city.censusTracts.get(j).censusBlocks.get(0).county.id){
-                            if (patterns.patternRecords.get(i).place.censusBlock.censusTract.id == city.censusTracts.get(j).id){
+                        if (patterns.patternRecords.get(i).place.censusBlock.county.id == city.censusTracts.get(j).censusBlocks.get(0).county.id) {
+                            if (patterns.patternRecords.get(i).place.censusBlock.censusTract.id == city.censusTracts.get(j).id) {
                                 //System.out.println(city.censusTracts.get(j).censusBlocks.get(0).state.name);
                                 output.patternRecords.add(patterns.patternRecords.get(i));
                                 break;
                             }
                         }
                     }
+                }
+            }
+        }
+        return output;
+    }
+
+    public ArrayList<CensusBlockGroup> getCBGsFromCaseStudy(Object restriction) {
+        ArrayList<CensusBlockGroup> output = new ArrayList();
+        if (restriction instanceof Country) {
+            Country temp = ((Country) restriction);
+            for (int i = 0; i < temp.states.size(); i++) {
+                for (int j = 0; j < temp.states.get(i).counties.size(); j++) {
+                    for (int k = 0; k < temp.states.get(i).counties.get(j).censusTracts.size(); k++) {
+                        for (int m = 0; m < temp.states.get(i).counties.get(j).censusTracts.get(k).censusBlocks.size(); m++) {
+                            output.add(temp.states.get(i).counties.get(j).censusTracts.get(k).censusBlocks.get(m));
+                        }
+                    }
+                }
+            }
+        }
+        if (restriction instanceof State) {
+            State temp = ((State) restriction);
+            for (int j = 0; j < temp.counties.size(); j++) {
+                for (int k = 0; k < temp.counties.get(j).censusTracts.size(); k++) {
+                    for (int m = 0; m < temp.counties.get(j).censusTracts.get(k).censusBlocks.size(); m++) {
+                        output.add(temp.counties.get(j).censusTracts.get(k).censusBlocks.get(m));
+                    }
+                }
+            }
+        }
+        if (restriction instanceof County) {
+            County temp = ((County) restriction);
+            for (int k = 0; k < temp.censusTracts.size(); k++) {
+                for (int m = 0; m < temp.censusTracts.get(k).censusBlocks.size(); m++) {
+                    output.add(temp.censusTracts.get(k).censusBlocks.get(m));
+                }
+            }
+        }
+        if (restriction instanceof City) {
+            City temp = ((City) restriction);
+            for (int k = 0; k < temp.censusTracts.size(); k++) {
+                for (int m = 0; m < temp.censusTracts.get(k).censusBlocks.size(); m++) {
+                    output.add(temp.censusTracts.get(k).censusBlocks.get(m));
                 }
             }
         }
@@ -596,6 +652,454 @@ public class Safegraph extends Dataset implements Serializable {
             }
         }
         return output;
+    }
+
+    public void writeTravelMatrix(Object scope, String granuality, String years[], String months[][], AllGISData allGISData, boolean isParallel, int numCPU) {
+        ArrayList items = new ArrayList();
+        ArrayList<ArrayList<Integer>> matrix = new ArrayList();
+        if (scope instanceof Country) {
+            Country castedScope = ((Country) scope);
+            if (granuality.equals("state")) {
+                for (int i = 0; i < castedScope.states.size(); i++) {
+                    items.add(castedScope.states.get(i));
+                }
+
+            } else if (granuality.equals("county")) {
+                for (int i = 0; i < castedScope.states.size(); i++) {
+                    for (int j = 0; j < castedScope.states.get(i).counties.size(); j++) {
+                        items.add(castedScope.states.get(i).counties.get(j));
+                    }
+                }
+
+            } else if (granuality.equals("censustract")) {
+                for (int i = 0; i < castedScope.states.size(); i++) {
+                    for (int j = 0; j < castedScope.states.get(i).counties.size(); j++) {
+                        for (int k = 0; k < castedScope.states.get(i).counties.get(j).censusTracts.size(); k++) {
+                            items.add(castedScope.states.get(i).counties.get(j).censusTracts.get(k));
+                        }
+                    }
+                }
+
+            } else if (granuality.equals("censusblockgroup")) {
+                for (int i = 0; i < castedScope.states.size(); i++) {
+                    for (int j = 0; j < castedScope.states.get(i).counties.size(); j++) {
+                        for (int k = 0; k < castedScope.states.get(i).counties.get(j).censusTracts.size(); k++) {
+                            for (int m = 0; m < castedScope.states.get(i).counties.get(j).censusTracts.get(k).censusBlocks.size(); m++) {
+                                items.add(castedScope.states.get(i).counties.get(j).censusTracts.get(k).censusBlocks.get(m));
+                            }
+                        }
+                    }
+                }
+
+            }
+        } else if (scope instanceof State) {
+            State castedScope = ((State) scope);
+            if (granuality.equals("county")) {
+                for (int j = 0; j < castedScope.counties.size(); j++) {
+                    items.add(castedScope.counties.get(j));
+                }
+
+            } else if (granuality.equals("censustract")) {
+                for (int j = 0; j < castedScope.counties.size(); j++) {
+                    for (int k = 0; k < castedScope.counties.get(j).censusTracts.size(); k++) {
+                        items.add(castedScope.counties.get(j).censusTracts.get(k));
+                    }
+                }
+
+            } else if (granuality.equals("censusblockgroup")) {
+                for (int j = 0; j < castedScope.counties.size(); j++) {
+                    for (int k = 0; k < castedScope.counties.get(j).censusTracts.size(); k++) {
+                        for (int m = 0; m < castedScope.counties.get(j).censusTracts.get(k).censusBlocks.size(); m++) {
+                            items.add(castedScope.counties.get(j).censusTracts.get(k).censusBlocks.get(m));
+                        }
+                    }
+                }
+
+            }
+        } else if (scope instanceof County) {
+            County castedScope = ((County) scope);
+            if (granuality.equals("censustract")) {
+                for (int k = 0; k < castedScope.censusTracts.size(); k++) {
+                    items.add(castedScope.censusTracts.get(k));
+                }
+
+            } else if (granuality.equals("censusblockgroup")) {
+                for (int k = 0; k < castedScope.censusTracts.size(); k++) {
+                    for (int m = 0; m < castedScope.censusTracts.get(k).censusBlocks.size(); m++) {
+                        items.add(castedScope.censusTracts.get(k).censusBlocks.get(m));
+                    }
+                }
+
+            }
+        }
+
+        for (int i = 0; i < items.size(); i++) {
+            matrix.add(new ArrayList());
+            for (int j = 0; j < items.size(); j++) {
+                matrix.get(i).add(0);
+            }
+        }
+
+        int counter = 0;
+        for (int i = 0; i < years.length; i++) {
+            for (int j = 0; j < months[i].length; j++) {
+                loadPatternsPlacesSet(years[i] + "_" + months[i][j], allGISData, "FullData", isParallel, numCPU);
+                processOneMonth(allPatterns.monthlyPatternsList.get(0), items, matrix, scope, granuality);
+                clearPatternsPlaces();
+                System.gc();
+                counter = counter + 1;
+            }
+        }
+
+        try {
+            FileWriter myWriter = new FileWriter("travelMatrix_directed.csv");
+            for (int i = 0; i < matrix.size(); i++) {
+                for (int j = 0; j < matrix.get(i).size(); j++) {
+                    myWriter.write(String.valueOf(matrix.get(i).get(j) / counter));
+                    if (j != matrix.get(i).size() - 1) {
+                        myWriter.write(",");
+                    }
+                }
+                myWriter.write("\n");
+            }
+            myWriter.close();
+            System.out.println("Successfully wrote to the file.");
+        } catch (IOException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
+
+        try {
+            FileWriter myWriter = new FileWriter("travelMatrix_undirected.csv");
+            for (int i = 0; i < matrix.size(); i++) {
+                for (int j = 0; j < matrix.get(i).size(); j++) {
+                    if (i == j) {
+                        myWriter.write("0");
+                    } else {
+                        int avg = (matrix.get(i).get(j) + matrix.get(j).get(i)) / 2;
+                        myWriter.write(String.valueOf(avg));
+                    }
+
+                    if (j != matrix.get(i).size() - 1) {
+                        myWriter.write(",");
+                    }
+                }
+                myWriter.write("\n");
+            }
+            myWriter.close();
+            System.out.println("Successfully wrote to the file.");
+        } catch (IOException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
+
+        try {
+            FileWriter myWriter = new FileWriter("indices_information.csv");
+            for (int i = 0; i < items.size(); i++) {
+                if (granuality.equals("state")) {
+                    myWriter.write(((State)(items.get(i))).name);
+                }else if (granuality.equals("county")) {
+                    myWriter.write(((County)(items.get(i))).name);
+                }else if (granuality.equals("censustract")) {
+                    myWriter.write(String.valueOf(((CensusTract)(items.get(i))).id));
+                }else if (granuality.equals("censusblockgroup")) {
+                    myWriter.write(String.valueOf(((CensusBlockGroup)(items.get(i))).id));
+                }
+                
+                if (i != matrix.size() - 1) {
+                    myWriter.write(",");
+                }
+
+                myWriter.write("\n");
+            }
+            myWriter.close();
+            System.out.println("Successfully wrote to the file.");
+        } catch (IOException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
+    }
+
+    private ArrayList<ArrayList<Integer>> processOneMonth(Patterns monthPatterns, ArrayList items, ArrayList<ArrayList<Integer>> matrix, Object scope, String granuality) {
+        if (scope instanceof Country) {
+            Country castedScope = ((Country) scope);
+            if (granuality.equals("state")) {
+                for (int i = 0; i < monthPatterns.patternRecords.size(); i++) {
+                    if (monthPatterns.patternRecords.get(i).poi_cbg_censusBlock.country.name.equals(castedScope.name)) {
+                        if (monthPatterns.patternRecords.get(i).visitor_home_cbgs_place != null) {
+                            for (int j = 0; j < monthPatterns.patternRecords.get(i).visitor_home_cbgs_place.size(); j++) {
+                                if (monthPatterns.patternRecords.get(i).visitor_home_cbgs_place.get(j).getKey().country.name.equals(castedScope.name)) {
+                                    int sourceIndex = -1;
+                                    int destIndex = -1;
+                                    for (int k = 0; k < items.size(); k++) {
+                                        if (((State) items.get(k)).id == monthPatterns.patternRecords.get(i).poi_cbg_censusBlock.state.id) {
+                                            sourceIndex = k;
+                                            break;
+                                        }
+                                    }
+                                    for (int k = 0; k < items.size(); k++) {
+                                        if (((State) items.get(k)).id == monthPatterns.patternRecords.get(i).visitor_home_cbgs_place.get(j).getKey().state.id) {
+                                            destIndex = k;
+                                            break;
+                                        }
+                                    }
+                                    if (sourceIndex >= 0 && destIndex >= 0) {
+                                        matrix.get(sourceIndex).set(destIndex, matrix.get(sourceIndex).get(destIndex) + monthPatterns.patternRecords.get(i).visitor_home_cbgs_place.get(j).value);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+            } else if (granuality.equals("county")) {
+                for (int i = 0; i < monthPatterns.patternRecords.size(); i++) {
+                    if (monthPatterns.patternRecords.get(i).poi_cbg_censusBlock.country.name.equals(castedScope.name)) {
+                        if (monthPatterns.patternRecords.get(i).visitor_home_cbgs_place != null) {
+                            for (int j = 0; j < monthPatterns.patternRecords.get(i).visitor_home_cbgs_place.size(); j++) {
+                                if (monthPatterns.patternRecords.get(i).visitor_home_cbgs_place.get(j).getKey().country.name.equals(castedScope.name)) {
+                                    int sourceIndex = -1;
+                                    int destIndex = -1;
+                                    for (int k = 0; k < items.size(); k++) {
+                                        if (((County) items.get(k)).id == monthPatterns.patternRecords.get(i).poi_cbg_censusBlock.county.id) {
+                                            sourceIndex = k;
+                                            break;
+                                        }
+                                    }
+                                    for (int k = 0; k < items.size(); k++) {
+                                        if (((County) items.get(k)).id == monthPatterns.patternRecords.get(i).visitor_home_cbgs_place.get(j).getKey().county.id) {
+                                            destIndex = k;
+                                            break;
+                                        }
+                                    }
+                                    if (sourceIndex >= 0 && destIndex >= 0) {
+                                        matrix.get(sourceIndex).set(destIndex, matrix.get(sourceIndex).get(destIndex) + monthPatterns.patternRecords.get(i).visitor_home_cbgs_place.get(j).value);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+            } else if (granuality.equals("censustract")) {
+                for (int i = 0; i < monthPatterns.patternRecords.size(); i++) {
+                    if (monthPatterns.patternRecords.get(i).poi_cbg_censusBlock.country.name.equals(castedScope.name)) {
+                        if (monthPatterns.patternRecords.get(i).visitor_home_cbgs_place != null) {
+                            for (int j = 0; j < monthPatterns.patternRecords.get(i).visitor_home_cbgs_place.size(); j++) {
+                                if (monthPatterns.patternRecords.get(i).visitor_home_cbgs_place.get(j).getKey().country.name.equals(castedScope.name)) {
+                                    int sourceIndex = -1;
+                                    int destIndex = -1;
+                                    for (int k = 0; k < items.size(); k++) {
+                                        if (((CensusTract) items.get(k)).id == monthPatterns.patternRecords.get(i).poi_cbg_censusBlock.censusTract.id) {
+                                            sourceIndex = k;
+                                            break;
+                                        }
+                                    }
+                                    for (int k = 0; k < items.size(); k++) {
+                                        if (((CensusTract) items.get(k)).id == monthPatterns.patternRecords.get(i).visitor_home_cbgs_place.get(j).getKey().censusTract.id) {
+                                            destIndex = k;
+                                            break;
+                                        }
+                                    }
+                                    if (sourceIndex >= 0 && destIndex >= 0) {
+                                        matrix.get(sourceIndex).set(destIndex, matrix.get(sourceIndex).get(destIndex) + monthPatterns.patternRecords.get(i).visitor_home_cbgs_place.get(j).value);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+            } else if (granuality.equals("censusblockgroup")) {
+                for (int i = 0; i < monthPatterns.patternRecords.size(); i++) {
+                    if (monthPatterns.patternRecords.get(i).poi_cbg_censusBlock.country.name.equals(castedScope.name)) {
+                        if (monthPatterns.patternRecords.get(i).visitor_home_cbgs_place != null) {
+                            for (int j = 0; j < monthPatterns.patternRecords.get(i).visitor_home_cbgs_place.size(); j++) {
+                                if (monthPatterns.patternRecords.get(i).visitor_home_cbgs_place.get(j).getKey().country.name.equals(castedScope.name)) {
+                                    int sourceIndex = -1;
+                                    int destIndex = -1;
+                                    for (int k = 0; k < items.size(); k++) {
+                                        if (((CensusBlockGroup) items.get(k)).id == monthPatterns.patternRecords.get(i).poi_cbg_censusBlock.id) {
+                                            sourceIndex = k;
+                                            break;
+                                        }
+                                    }
+                                    for (int k = 0; k < items.size(); k++) {
+                                        if (((CensusBlockGroup) items.get(k)).id == monthPatterns.patternRecords.get(i).visitor_home_cbgs_place.get(j).getKey().id) {
+                                            destIndex = k;
+                                            break;
+                                        }
+                                    }
+                                    if (sourceIndex >= 0 && destIndex >= 0) {
+                                        matrix.get(sourceIndex).set(destIndex, matrix.get(sourceIndex).get(destIndex) + monthPatterns.patternRecords.get(i).visitor_home_cbgs_place.get(j).value);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
+        } else if (scope instanceof State) {
+            State castedScope = ((State) scope);
+            if (granuality.equals("county")) {
+                for (int i = 0; i < monthPatterns.patternRecords.size(); i++) {
+                    if (monthPatterns.patternRecords.get(i).poi_cbg_censusBlock.state.id == castedScope.id) {
+//                        if(monthPatterns.patternRecords.get(i)==null){
+//                            System.out.println("!!!!!!!!!!!!");
+//                        }
+//                        if(monthPatterns.patternRecords.get(i).visitor_home_cbgs_place==null){
+//                            System.out.println("@@@@@@@@@@@@@@@");
+//                        }
+                        if (monthPatterns.patternRecords.get(i).visitor_home_cbgs_place != null) {
+                            for (int j = 0; j < monthPatterns.patternRecords.get(i).visitor_home_cbgs_place.size(); j++) {
+                                if (monthPatterns.patternRecords.get(i).visitor_home_cbgs_place.get(j).getKey().state.id == castedScope.id) {
+                                    int sourceIndex = -1;
+                                    int destIndex = -1;
+                                    for (int k = 0; k < items.size(); k++) {
+                                        if (((County) items.get(k)).id == monthPatterns.patternRecords.get(i).poi_cbg_censusBlock.county.id) {
+                                            sourceIndex = k;
+                                            break;
+                                        }
+                                    }
+                                    for (int k = 0; k < items.size(); k++) {
+                                        if (((County) items.get(k)).id == monthPatterns.patternRecords.get(i).visitor_home_cbgs_place.get(j).getKey().county.id) {
+                                            destIndex = k;
+                                            break;
+                                        }
+                                    }
+                                    if (sourceIndex >= 0 && destIndex >= 0) {
+                                        matrix.get(sourceIndex).set(destIndex, matrix.get(sourceIndex).get(destIndex) + monthPatterns.patternRecords.get(i).visitor_home_cbgs_place.get(j).value);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+            } else if (granuality.equals("censustract")) {
+                for (int i = 0; i < monthPatterns.patternRecords.size(); i++) {
+                    if (monthPatterns.patternRecords.get(i).poi_cbg_censusBlock.state.id == castedScope.id) {
+                        if (monthPatterns.patternRecords.get(i).visitor_home_cbgs_place != null) {
+                            for (int j = 0; j < monthPatterns.patternRecords.get(i).visitor_home_cbgs_place.size(); j++) {
+                                if (monthPatterns.patternRecords.get(i).visitor_home_cbgs_place.get(j).getKey().state.id == castedScope.id) {
+                                    int sourceIndex = -1;
+                                    int destIndex = -1;
+                                    for (int k = 0; k < items.size(); k++) {
+                                        if (((CensusTract) items.get(k)).id == monthPatterns.patternRecords.get(i).poi_cbg_censusBlock.censusTract.id) {
+                                            sourceIndex = k;
+                                            break;
+                                        }
+                                    }
+                                    for (int k = 0; k < items.size(); k++) {
+                                        if (((CensusTract) items.get(k)).id == monthPatterns.patternRecords.get(i).visitor_home_cbgs_place.get(j).getKey().censusTract.id) {
+                                            destIndex = k;
+                                            break;
+                                        }
+                                    }
+                                    if (sourceIndex >= 0 && destIndex >= 0) {
+                                        matrix.get(sourceIndex).set(destIndex, matrix.get(sourceIndex).get(destIndex) + monthPatterns.patternRecords.get(i).visitor_home_cbgs_place.get(j).value);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+            } else if (granuality.equals("censusblockgroup")) {
+                for (int i = 0; i < monthPatterns.patternRecords.size(); i++) {
+                    if (monthPatterns.patternRecords.get(i).poi_cbg_censusBlock.state.id == castedScope.id) {
+                        if (monthPatterns.patternRecords.get(i).visitor_home_cbgs_place != null) {
+                            for (int j = 0; j < monthPatterns.patternRecords.get(i).visitor_home_cbgs_place.size(); j++) {
+                                if (monthPatterns.patternRecords.get(i).visitor_home_cbgs_place.get(j).getKey().state.id == castedScope.id) {
+                                    int sourceIndex = -1;
+                                    int destIndex = -1;
+                                    for (int k = 0; k < items.size(); k++) {
+                                        if (((CensusBlockGroup) items.get(k)).id == monthPatterns.patternRecords.get(i).poi_cbg_censusBlock.id) {
+                                            sourceIndex = k;
+                                            break;
+                                        }
+                                    }
+                                    for (int k = 0; k < items.size(); k++) {
+                                        if (((CensusBlockGroup) items.get(k)).id == monthPatterns.patternRecords.get(i).visitor_home_cbgs_place.get(j).getKey().id) {
+                                            destIndex = k;
+                                            break;
+                                        }
+                                    }
+                                    if (sourceIndex >= 0 && destIndex >= 0) {
+                                        matrix.get(sourceIndex).set(destIndex, matrix.get(sourceIndex).get(destIndex) + monthPatterns.patternRecords.get(i).visitor_home_cbgs_place.get(j).value);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
+        } else if (scope instanceof County) {
+            County castedScope = ((County) scope);
+            if (granuality.equals("censustract")) {
+                for (int i = 0; i < monthPatterns.patternRecords.size(); i++) {
+                    if (monthPatterns.patternRecords.get(i).poi_cbg_censusBlock.county.id == castedScope.id) {
+                        if (monthPatterns.patternRecords.get(i).visitor_home_cbgs_place != null) {
+                            for (int j = 0; j < monthPatterns.patternRecords.get(i).visitor_home_cbgs_place.size(); j++) {
+                                if (monthPatterns.patternRecords.get(i).visitor_home_cbgs_place.get(j).getKey().county.id == castedScope.id) {
+                                    int sourceIndex = -1;
+                                    int destIndex = -1;
+                                    for (int k = 0; k < items.size(); k++) {
+                                        if (((CensusTract) items.get(k)).id == monthPatterns.patternRecords.get(i).poi_cbg_censusBlock.censusTract.id) {
+                                            sourceIndex = k;
+                                            break;
+                                        }
+                                    }
+                                    for (int k = 0; k < items.size(); k++) {
+                                        if (((CensusTract) items.get(k)).id == monthPatterns.patternRecords.get(i).visitor_home_cbgs_place.get(j).getKey().censusTract.id) {
+                                            destIndex = k;
+                                            break;
+                                        }
+                                    }
+                                    if (sourceIndex >= 0 && destIndex >= 0) {
+                                        matrix.get(sourceIndex).set(destIndex, matrix.get(sourceIndex).get(destIndex) + monthPatterns.patternRecords.get(i).visitor_home_cbgs_place.get(j).value);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+            } else if (granuality.equals("censusblock")) {
+                for (int i = 0; i < monthPatterns.patternRecords.size(); i++) {
+                    if (monthPatterns.patternRecords.get(i).poi_cbg_censusBlock.county.id == castedScope.id) {
+                        if (monthPatterns.patternRecords.get(i).visitor_home_cbgs_place != null) {
+                            for (int j = 0; j < monthPatterns.patternRecords.get(i).visitor_home_cbgs_place.size(); j++) {
+                                if (monthPatterns.patternRecords.get(i).visitor_home_cbgs_place.get(j).getKey().county.id == castedScope.id) {
+                                    int sourceIndex = -1;
+                                    int destIndex = -1;
+                                    for (int k = 0; k < items.size(); k++) {
+                                        if (((CensusBlockGroup) items.get(k)).id == monthPatterns.patternRecords.get(i).poi_cbg_censusBlock.id) {
+                                            sourceIndex = k;
+                                            break;
+                                        }
+                                    }
+                                    for (int k = 0; k < items.size(); k++) {
+                                        if (((CensusBlockGroup) items.get(k)).id == monthPatterns.patternRecords.get(i).visitor_home_cbgs_place.get(j).getKey().id) {
+                                            destIndex = k;
+                                            break;
+                                        }
+                                    }
+                                    if (sourceIndex >= 0 && destIndex >= 0) {
+                                        matrix.get(sourceIndex).set(destIndex, matrix.get(sourceIndex).get(destIndex) + monthPatterns.patternRecords.get(i).visitor_home_cbgs_place.get(j).value);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+
+        return matrix;
     }
 
     public void initAllPatternsAllPlaces() {

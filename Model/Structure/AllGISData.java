@@ -37,66 +37,66 @@ import lombok.Setter;
  *
  * @author Amir Mohammad Esmaieeli Sikaroudi
  */
-@Getter @Setter
+@Getter
+@Setter
 public class AllGISData extends Dataset implements Serializable {
 
     static final long serialVersionUID = softwareVersion;
     public ArrayList<Country> countries;
 
-    
     @Override
-    public void setDatasetTemplate(){
-        datasetTemplate=new DatasetTemplate();
-        datasetTemplate.name="AllGISData";
-        
-        DatasetTemplate Country=new DatasetTemplate();
-        Country.name="Country";
-        
-        DatasetTemplate State=new DatasetTemplate();
-        State.name="State";
-        
-        DatasetTemplate County=new DatasetTemplate();
-        County.name="County";
-        
-        DatasetTemplate CensusTract=new DatasetTemplate();
-        CensusTract.name="CensusTract";
-        
-        DatasetTemplate CensusBlockGroup=new DatasetTemplate();
-        CensusBlockGroup.name="CensusBlockGroup";
-        
-        for(int i=0;i<CensusBlockGroup.class.getFields().length;i++){
-            RecordTemplate temp=new RecordTemplate();
-            temp.name=CensusBlockGroup.class.getFields()[i].getName()+"("+CensusBlockGroup.class.getFields()[i].getGenericType().getTypeName()+")";
+    public void setDatasetTemplate() {
+        datasetTemplate = new DatasetTemplate();
+        datasetTemplate.name = "AllGISData";
+
+        DatasetTemplate Country = new DatasetTemplate();
+        Country.name = "Country";
+
+        DatasetTemplate State = new DatasetTemplate();
+        State.name = "State";
+
+        DatasetTemplate County = new DatasetTemplate();
+        County.name = "County";
+
+        DatasetTemplate CensusTract = new DatasetTemplate();
+        CensusTract.name = "CensusTract";
+
+        DatasetTemplate CensusBlockGroup = new DatasetTemplate();
+        CensusBlockGroup.name = "CensusBlockGroup";
+
+        for (int i = 0; i < CensusBlockGroup.class.getFields().length; i++) {
+            RecordTemplate temp = new RecordTemplate();
+            temp.name = CensusBlockGroup.class.getFields()[i].getName() + "(" + CensusBlockGroup.class.getFields()[i].getGenericType().getTypeName() + ")";
             CensusBlockGroup.recordTemplates.add(temp);
         }
-        
+
         CensusTract.innerDatasetTemplates.add(CensusBlockGroup);
         County.innerDatasetTemplates.add(CensusTract);
         State.innerDatasetTemplates.add(County);
         Country.innerDatasetTemplates.add(State);
         datasetTemplate.innerDatasetTemplates.add(Country);
     }
-    
+
     public CensusBlockGroup findCensusBlockGroup(long id) {
-        if(id==0){
+        if (id == 0) {
             return null;
         }
-        byte stateID=(byte)getMidDigits(id,11,12);
-        int countyID=(int)getMidDigits(id,8,10);
-        int censusTractID=(int)getMidDigits(id,2,7);
+        byte stateID = (byte) getMidDigits(id, 11, 12);
+        int countyID = (int) getMidDigits(id, 8, 10);
+        int censusTractID = (int) getMidDigits(id, 2, 7);
 //        byte censusBlockGroupID=(byte)getMidDigits(id,1,1);
         for (int i = 0; i < countries.size(); i++) {
-            State state=countries.get(i).findState(stateID);
-            County county=state.findCounty(countyID);
-            CensusTract censusTract=county.findCensusTract(censusTractID);
-            CensusBlockGroup censusBlockGroup=censusTract.findCensusBlock(id);
+            State state = countries.get(i).findState(stateID);
+            County county = state.findCounty(countyID);
+            CensusTract censusTract = county.findCensusTract(censusTractID);
+            CensusBlockGroup censusBlockGroup = censusTract.findCensusBlock(id);
             return censusBlockGroup;
         }
         return null;
     }
 
     public long getMidDigits(long number, int start, int end) {
-        long output=(long)(Math.floor(number/Math.pow(10,(start-1)))-Math.floor(number/Math.pow(10,end))*Math.pow(10,(end-start+1)));
+        long output = (long) (Math.floor(number / Math.pow(10, (start - 1))) - Math.floor(number / Math.pow(10, end)) * Math.pow(10, (end - start + 1)));
         return output;
     }
 
@@ -107,9 +107,9 @@ public class AllGISData extends Dataset implements Serializable {
             if (countries == null) {
                 countries = new ArrayList();
             }
-            Country us=findAndInsertCountry("USA");
+            Country us = findAndInsertCountry("USA");
             us.states = new ArrayList();
-            
+
             String line;
             int counter = 0;
             int largerCounter = 0;
@@ -125,6 +125,7 @@ public class AllGISData extends Dataset implements Serializable {
                     } else {
                         state.name = "NULL";
                     }
+                    state.country = us;
                 }
                 counter = counter + 1;
                 if (counter > counterInterval) {
@@ -158,6 +159,8 @@ public class AllGISData extends Dataset implements Serializable {
                     } else {
                         county.name = "NULL";
                     }
+                    county.country = countries.get(countries.size() - 1);
+                    county.state = state;
                 }
                 counter = counter + 1;
                 if (counter > counterInterval) {
@@ -190,6 +193,9 @@ public class AllGISData extends Dataset implements Serializable {
 
                     int censusTractInt = properties.getInt("TRACTCE");
                     CensusTract censusTract = county.findAndInsertCensusTract(censusTractInt);
+                    censusTract.country = countries.get(countries.size() - 1);
+                    censusTract.state = state;
+                    censusTract.county = county;
                     long censusBlockLong = Long.parseLong(properties.getString("GEOID"));
                     CensusBlockGroup censusBlock = censusTract.findAndInsertCensusBlock(censusBlockLong);
                     censusBlock.country = countries.get(countries.size() - 1);
@@ -212,7 +218,7 @@ public class AllGISData extends Dataset implements Serializable {
         } catch (IOException ex) {
             Logger.getLogger(AllGISData.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         System.out.println("READING 500 CITIES");
         File citiesFile = new File(geographyDirectory + "/500_Cities__Census_Tract-level_Data__GIS_Friendly_Format___2018_release.csv");
         try {
@@ -220,33 +226,33 @@ public class AllGISData extends Dataset implements Serializable {
             cSVReader.setContainsHeader(true);
             CsvContainer data = cSVReader.read(citiesFile, StandardCharsets.UTF_8);
             int counter = 0;
-                int largerCounter = 0;
-                int counterInterval = 1000;
-                for (int i = 0; i < data.getRowCount(); i++) {
-                    CsvRow row = data.getRow(i);
-                    String cityName = row.getField("PlaceName");
-                    String censusTractString = row.getField("TractFIPS");
+            int largerCounter = 0;
+            int counterInterval = 1000;
+            for (int i = 0; i < data.getRowCount(); i++) {
+                CsvRow row = data.getRow(i);
+                String cityName = row.getField("PlaceName");
+                String censusTractString = row.getField("TractFIPS");
 //                    System.out.println(i);
 //                    if(i==11){
 //                        System.out.println(i);
 //                    }
-                    int censusTractID=Integer.parseInt(censusTractString.substring(censusTractString.length()-6));
-                    int countyID=Integer.parseInt(censusTractString.substring(censusTractString.length()-9,censusTractString.length()-6));
-                    byte stateID=Byte.parseByte(censusTractString.substring(0,censusTractString.length()-9));
-                    State state=countries.get(countries.size() - 1).findState(stateID);
-                    County county=state.findCounty(countyID);
-                    City city=county.findAndInsertCity(cityName);
-                    CensusTract censusTract=county.findCensusTract(censusTractID);
-                    city.findAndInsertCensusTract(censusTract);
+                int censusTractID = Integer.parseInt(censusTractString.substring(censusTractString.length() - 6));
+                int countyID = Integer.parseInt(censusTractString.substring(censusTractString.length() - 9, censusTractString.length() - 6));
+                byte stateID = Byte.parseByte(censusTractString.substring(0, censusTractString.length() - 9));
+                State state = countries.get(countries.size() - 1).findState(stateID);
+                County county = state.findCounty(countyID);
+                City city = county.findAndInsertCity(cityName);
+                CensusTract censusTract = county.findCensusTract(censusTractID);
+                city.findAndInsertCensusTract(censusTract);
 //                    System.out.println(i);
-                    
-                    counter = counter + 1;
-                    if (counter > counterInterval) {
-                        largerCounter = largerCounter + 1;
-                        counter = 0;
-                        System.out.println("Num rows read: " + largerCounter * counterInterval);
-                    }
+
+                counter = counter + 1;
+                if (counter > counterInterval) {
+                    largerCounter = largerCounter + 1;
+                    counter = 0;
+                    System.out.println("Num rows read: " + largerCounter * counterInterval);
                 }
+            }
         } catch (IOException ex) {
             Logger.getLogger(Patterns.class.getName()).log(Level.SEVERE, (String) null, ex);
         }

@@ -21,6 +21,9 @@ public class County extends Marker implements Serializable {
     public ArrayList<City> cities;
     public ArrayList<ZipCode> zipcodes;
     public ArrayList<CensusTract> censusTracts;
+    
+    public Country country;
+    public State state;
 
     public void getLatLonSizeFromChildren() {
         float minLat = Float.MAX_VALUE;
