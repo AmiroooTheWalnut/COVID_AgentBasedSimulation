@@ -9,7 +9,7 @@ import de.fhpotsdam.unfolding.UnfoldingMap;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class MapSourse {
     public UnfoldingMap map;

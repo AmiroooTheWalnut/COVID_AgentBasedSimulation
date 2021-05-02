@@ -17,7 +17,7 @@ import java.util.concurrent.Callable;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class GISLocationDialog extends javax.swing.JDialog {
 

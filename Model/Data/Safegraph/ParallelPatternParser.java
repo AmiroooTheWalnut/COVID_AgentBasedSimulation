@@ -20,7 +20,7 @@ import org.json.JSONObject;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class ParallelPatternParser extends ParallelProcessor {
     public ArrayList<PatternsRecordProcessed> records;

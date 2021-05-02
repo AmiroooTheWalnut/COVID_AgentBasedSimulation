@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class PreviewDialog extends javax.swing.JDialog {
 
@@ -359,7 +359,7 @@ public class PreviewDialog extends javax.swing.JDialog {
                 @Override
                 public Object getElementAt(int index) {
                     if (jList1.getSelectedIndex() > -1) {
-                        return myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(index).name;
+                        return myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(index).name + " " + myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(index).id;
                     } else {
                         return null;
                     }
@@ -399,7 +399,7 @@ public class PreviewDialog extends javax.swing.JDialog {
 
                 public Object getElementAt(int index) {
                     if (jList1.getSelectedIndex() > -1 && jList2.getSelectedIndex() > -1) {
-                        return myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(index).name;
+                        return myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(index).name + " " + myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(index).id;
                     } else {
                         return null;
                     }

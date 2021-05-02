@@ -15,7 +15,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -40,7 +39,7 @@ public class AgentBasedModel {
     public String startTimeString;
     public String endTimeString;
 
-    public String studyScope;
+    public String studyScope = "FullData";
     public transient Object studyScopeGeography;
 
     private transient MainModel myMainModel;
@@ -174,18 +173,31 @@ public class AgentBasedModel {
             in.close();
 
             AgentBasedModel result = gson.fromJson(sb.toString(), AgentBasedModel.class);
-            agentTemplates = result.agentTemplates;
-            startTimeString = result.startTimeString;
-            endTimeString = result.endTimeString;
-            studyScope = result.studyScope;
-            calculateStudyScopeGeography();
-            if (startTimeString.length() > 0) {
-                ZonedDateTime zonedDateTime = ZonedDateTime.parse(startTimeString);
-                startTime = zonedDateTime;
+            if (result.agentTemplates != null) {
+                agentTemplates = result.agentTemplates;
             }
-            if (endTimeString.length() > 0) {
-                ZonedDateTime zonedDateTime = ZonedDateTime.parse(endTimeString);
-                endTime = zonedDateTime;
+            if (result.startTimeString != null) {
+                startTimeString = result.startTimeString;
+            }
+            if (result.endTimeString != null) {
+                endTimeString = result.endTimeString;
+            }
+            if (result.studyScope != null) {
+                studyScope = result.studyScope;
+            }
+
+            calculateStudyScopeGeography();
+            if (startTimeString != null) {
+                if (startTimeString.length() > 0) {
+                    ZonedDateTime zonedDateTime = ZonedDateTime.parse(startTimeString);
+                    startTime = zonedDateTime;
+                }
+            }
+            if (endTimeString != null) {
+                if (endTimeString.length() > 0) {
+                    ZonedDateTime zonedDateTime = ZonedDateTime.parse(endTimeString);
+                    endTime = zonedDateTime;
+                }
             }
             isPatternBasedTime = result.isPatternBasedTime;
         } catch (FileNotFoundException ex) {
@@ -198,74 +210,80 @@ public class AgentBasedModel {
     public void calculateStudyScopeGeography() {
         if (myMainModel.allGISData != null) {
             if (myMainModel.allGISData.countries != null) {
-                String sections[] = studyScope.split("_");
-                int countryIndex = -1;
-                int stateIndex = -1;
-                int countyIndex = -1;
-                if (sections.length == 1) {
-                    for (int i = 0; i < myMainModel.allGISData.countries.size(); i++) {
-                        if (sections[0].equals(myMainModel.allGISData.countries.get(i).name)) {
-                            studyScopeGeography = myMainModel.allGISData.countries.get(i);
-                            countryIndex = i;
+                if (studyScope != null) {
+                    if (studyScope.equals("FullData")) {
+                        studyScopeGeography=myMainModel.allGISData.countries.get(0);
+                    } else {
+                        String sections[] = studyScope.split("_");
+                        int countryIndex = -1;
+                        int stateIndex = -1;
+                        int countyIndex = -1;
+                        if (sections.length == 1) {
+                            for (int i = 0; i < myMainModel.allGISData.countries.size(); i++) {
+                                if (sections[0].equals(myMainModel.allGISData.countries.get(i).name)) {
+                                    studyScopeGeography = myMainModel.allGISData.countries.get(i);
+                                    countryIndex = i;
+                                }
+                            }
                         }
-                    }
-                }
-                if (sections.length == 2) {
-                    for (int i = 0; i < myMainModel.allGISData.countries.size(); i++) {
-                        if (sections[0].equals(myMainModel.allGISData.countries.get(i).name)) {
-                            studyScopeGeography = myMainModel.allGISData.countries.get(i);
-                            countryIndex = i;
+                        if (sections.length == 2) {
+                            for (int i = 0; i < myMainModel.allGISData.countries.size(); i++) {
+                                if (sections[0].equals(myMainModel.allGISData.countries.get(i).name)) {
+                                    studyScopeGeography = myMainModel.allGISData.countries.get(i);
+                                    countryIndex = i;
+                                }
+                            }
+                            for (int i = 0; i < myMainModel.allGISData.countries.get(countryIndex).states.size(); i++) {
+                                if (sections[1].equals(myMainModel.allGISData.countries.get(countryIndex).states.get(i).name)) {
+                                    studyScopeGeography = myMainModel.allGISData.countries.get(countryIndex).states.get(i);
+                                    stateIndex = i;
+                                }
+                            }
                         }
-                    }
-                    for (int i = 0; i < myMainModel.allGISData.countries.get(countryIndex).states.size(); i++) {
-                        if (sections[1].equals(myMainModel.allGISData.countries.get(countryIndex).states.get(i).name)) {
-                            studyScopeGeography = myMainModel.allGISData.countries.get(countryIndex).states.get(i);
-                            stateIndex = i;
+                        if (sections.length == 3) {
+                            for (int i = 0; i < myMainModel.allGISData.countries.size(); i++) {
+                                if (sections[0].equals(myMainModel.allGISData.countries.get(i).name)) {
+                                    studyScopeGeography = myMainModel.allGISData.countries.get(i);
+                                    countryIndex = i;
+                                }
+                            }
+                            for (int i = 0; i < myMainModel.allGISData.countries.get(countryIndex).states.size(); i++) {
+                                if (sections[1].equals(myMainModel.allGISData.countries.get(countryIndex).states.get(i).name)) {
+                                    studyScopeGeography = myMainModel.allGISData.countries.get(countryIndex).states.get(i);
+                                    stateIndex = i;
+                                }
+                            }
+                            for (int i = 0; i < myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.size(); i++) {
+                                if (sections[2].equals(myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(i).name)) {
+                                    studyScopeGeography = myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(i);
+                                    countyIndex = i;
+                                }
+                            }
                         }
-                    }
-                }
-                if (sections.length == 3) {
-                    for (int i = 0; i < myMainModel.allGISData.countries.size(); i++) {
-                        if (sections[0].equals(myMainModel.allGISData.countries.get(i).name)) {
-                            studyScopeGeography = myMainModel.allGISData.countries.get(i);
-                            countryIndex = i;
-                        }
-                    }
-                    for (int i = 0; i < myMainModel.allGISData.countries.get(countryIndex).states.size(); i++) {
-                        if (sections[1].equals(myMainModel.allGISData.countries.get(countryIndex).states.get(i).name)) {
-                            studyScopeGeography = myMainModel.allGISData.countries.get(countryIndex).states.get(i);
-                            stateIndex = i;
-                        }
-                    }
-                    for (int i = 0; i < myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.size(); i++) {
-                        if (sections[2].equals(myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(i).name)) {
-                            studyScopeGeography = myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(i);
-                            countyIndex = i;
-                        }
-                    }
-                }
-                if (sections.length == 4) {
-                    for (int i = 0; i < myMainModel.allGISData.countries.size(); i++) {
-                        if (sections[0].equals(myMainModel.allGISData.countries.get(i).name)) {
-                            studyScopeGeography = myMainModel.allGISData.countries.get(i);
-                            countryIndex = i;
-                        }
-                    }
-                    for (int i = 0; i < myMainModel.allGISData.countries.get(countryIndex).states.size(); i++) {
-                        if (sections[1].equals(myMainModel.allGISData.countries.get(countryIndex).states.get(i).name)) {
-                            studyScopeGeography = myMainModel.allGISData.countries.get(countryIndex).states.get(i);
-                            stateIndex = i;
-                        }
-                    }
-                    for (int i = 0; i < myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.size(); i++) {
-                        if (sections[2].equals(myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(i).name)) {
-                            studyScopeGeography = myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(i);
-                            countyIndex = i;
-                        }
-                    }
-                    for (int i = 0; i < myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(countyIndex).cities.size(); i++) {
-                        if (sections[3].equals(myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(countyIndex).cities.get(i).name)) {
-                            studyScopeGeography = myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(countyIndex).cities.get(i);
+                        if (sections.length == 4) {
+                            for (int i = 0; i < myMainModel.allGISData.countries.size(); i++) {
+                                if (sections[0].equals(myMainModel.allGISData.countries.get(i).name)) {
+                                    studyScopeGeography = myMainModel.allGISData.countries.get(i);
+                                    countryIndex = i;
+                                }
+                            }
+                            for (int i = 0; i < myMainModel.allGISData.countries.get(countryIndex).states.size(); i++) {
+                                if (sections[1].equals(myMainModel.allGISData.countries.get(countryIndex).states.get(i).name)) {
+                                    studyScopeGeography = myMainModel.allGISData.countries.get(countryIndex).states.get(i);
+                                    stateIndex = i;
+                                }
+                            }
+                            for (int i = 0; i < myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.size(); i++) {
+                                if (sections[2].equals(myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(i).name)) {
+                                    studyScopeGeography = myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(i);
+                                    countyIndex = i;
+                                }
+                            }
+                            for (int i = 0; i < myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(countyIndex).cities.size(); i++) {
+                                if (sections[3].equals(myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(countyIndex).cities.get(i).name)) {
+                                    studyScopeGeography = myMainModel.allGISData.countries.get(countryIndex).states.get(stateIndex).counties.get(countyIndex).cities.get(i);
+                                }
+                            }
                         }
                     }
                 }

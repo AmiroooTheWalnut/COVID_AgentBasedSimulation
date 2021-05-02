@@ -24,7 +24,7 @@ import javax.swing.tree.TreeSelectionModel;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class AgentTemplateDialog extends javax.swing.JDialog {
 

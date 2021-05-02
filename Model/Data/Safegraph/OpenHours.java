@@ -12,7 +12,7 @@ import lombok.Setter;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 @Getter @Setter
 public class OpenHours implements Serializable {

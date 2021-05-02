@@ -9,7 +9,7 @@ import groovy.lang.Script;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class JavaScript {
     public transient Script parsedScript;

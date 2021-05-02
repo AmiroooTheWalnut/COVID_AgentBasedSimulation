@@ -6,11 +6,10 @@
 package COVID_AgentBasedSimulation.Model;
 
 import java.util.ArrayList;
-import java.time.LocalDateTime;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class DatasetTemplate {
     public String name;

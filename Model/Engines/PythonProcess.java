@@ -7,7 +7,7 @@ package COVID_AgentBasedSimulation.Model.Engines;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class PythonProcess {
     

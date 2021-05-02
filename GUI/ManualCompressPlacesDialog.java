@@ -11,7 +11,7 @@ import COVID_AgentBasedSimulation.Model.Data.Safegraph.SafegraphPlaces;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class ManualCompressPlacesDialog extends javax.swing.JDialog {
 

@@ -7,7 +7,7 @@ package COVID_AgentBasedSimulation.GUI;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class ProjectDefaults {
     public String defaultProjectFileLocation;

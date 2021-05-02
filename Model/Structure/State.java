@@ -11,7 +11,7 @@ import lombok.Setter;
  * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 @Getter @Setter
-public class State extends Marker implements Serializable{
+public class State extends Marker implements Serializable, Comparable<State>{
     static final long serialVersionUID = softwareVersion;
     public String name;
     public byte id;
@@ -152,6 +152,11 @@ public class State extends Marker implements Serializable{
         temp.id = input;
         counties.add(temp);
         return counties.get(counties.size() - 1);
+    }
+
+    @Override
+    public int compareTo(State o) {
+        return name.compareTo(o.name);
     }
 
 }

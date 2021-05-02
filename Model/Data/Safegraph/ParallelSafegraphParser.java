@@ -9,11 +9,10 @@ import de.siegmar.fastcsv.reader.CsvContainer;
 import de.siegmar.fastcsv.reader.CsvRow;
 import esmaieeli.utilities.taskThreading.ParallelProcessor;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class ParallelSafegraphParser extends ParallelProcessor {
 

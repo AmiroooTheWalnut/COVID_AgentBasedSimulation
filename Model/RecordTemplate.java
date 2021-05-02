@@ -7,7 +7,7 @@ package COVID_AgentBasedSimulation.Model;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class RecordTemplate {
     public String name;

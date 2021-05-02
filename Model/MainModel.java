@@ -6,16 +6,14 @@ import COVID_AgentBasedSimulation.Model.AgentBasedModel.AgentTemplate;
 import COVID_AgentBasedSimulation.Model.AgentBasedModel.BehaviorScript;
 import COVID_AgentBasedSimulation.Model.AgentBasedModel.JavaScript;
 import COVID_AgentBasedSimulation.Model.AgentBasedModel.PythonScript;
+import COVID_AgentBasedSimulation.Model.Data.CovidCsseJhu.CovidCsseJhu;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.Safegraph;
 import COVID_AgentBasedSimulation.Model.Structure.AllGISData;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.util.DefaultInstantiatorStrategy;
-import groovy.lang.Binding;
-import groovy.lang.GroovyShell;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -26,7 +24,6 @@ import javax.swing.SwingUtilities;
 import lombok.Getter;
 import lombok.Setter;
 import org.objenesis.strategy.StdInstantiatorStrategy;
-import py4j.GatewayServer;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -35,7 +32,7 @@ import py4j.GatewayServer;
  */
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 @Getter
 @Setter
@@ -46,6 +43,7 @@ public class MainModel extends Dataset {
 
     public Safegraph safegraph;
     public AllGISData allGISData;
+    public CovidCsseJhu covidCsseJhu;
     
 //    public ArrayList<Person> people;
     public AgentBasedModel ABM;

@@ -16,7 +16,7 @@ import javax.swing.event.DocumentListener;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class AgentTemplatePanel extends javax.swing.JPanel {
 

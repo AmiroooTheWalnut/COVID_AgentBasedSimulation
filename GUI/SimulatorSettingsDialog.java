@@ -16,7 +16,7 @@ import javax.swing.SwingUtilities;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class SimulatorSettingsDialog extends javax.swing.JDialog {
 

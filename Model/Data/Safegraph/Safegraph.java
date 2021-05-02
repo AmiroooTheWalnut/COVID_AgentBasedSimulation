@@ -11,7 +11,6 @@ import COVID_AgentBasedSimulation.Model.Structure.City;
 import COVID_AgentBasedSimulation.Model.Structure.Country;
 import COVID_AgentBasedSimulation.Model.Structure.County;
 import COVID_AgentBasedSimulation.Model.Structure.State;
-import de.siegmar.fastcsv.writer.CsvWriter;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
@@ -29,6 +28,7 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.objenesis.strategy.StdInstantiatorStrategy;
@@ -732,6 +732,8 @@ public class Safegraph extends Dataset implements Serializable {
 
             }
         }
+        
+        Collections.sort(items);
 
         for (int i = 0; i < items.size(); i++) {
             matrix.add(new ArrayList());
@@ -750,12 +752,18 @@ public class Safegraph extends Dataset implements Serializable {
                 counter = counter + 1;
             }
         }
+        
+        for (int i = 0; i < matrix.size(); i++) {
+            for (int j = 0; j < matrix.get(0).size(); j++) {
+                matrix.get(i).set(j, (matrix.get(i).get(j) / counter));
+            }
+        }
 
         try {
             FileWriter myWriter = new FileWriter("travelMatrix_directed.csv");
             for (int i = 0; i < matrix.size(); i++) {
                 for (int j = 0; j < matrix.get(i).size(); j++) {
-                    myWriter.write(String.valueOf(matrix.get(i).get(j) / counter));
+                    myWriter.write(String.valueOf(matrix.get(i).get(j)));
                     if (j != matrix.get(i).size() - 1) {
                         myWriter.write(",");
                     }

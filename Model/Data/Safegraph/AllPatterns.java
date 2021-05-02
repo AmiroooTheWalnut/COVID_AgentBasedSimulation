@@ -7,7 +7,6 @@ package COVID_AgentBasedSimulation.Model.Data.Safegraph;
 
 import static COVID_AgentBasedSimulation.Model.MainModel.softwareVersion;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import lombok.Getter;
@@ -15,7 +14,7 @@ import lombok.Setter;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 @Getter @Setter
 public class AllPatterns implements Serializable {

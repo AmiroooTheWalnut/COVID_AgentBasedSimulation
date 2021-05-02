@@ -12,7 +12,7 @@ import lombok.Setter;
  * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 @Getter @Setter
-public class CensusBlockGroup extends Marker implements Serializable {
+public class CensusBlockGroup extends Marker implements Serializable, Comparable<CensusBlockGroup> {
     static final long serialVersionUID = softwareVersion;
     public long id;
     
@@ -69,6 +69,17 @@ public class CensusBlockGroup extends Marker implements Serializable {
         temp.placeKey = input;
         places.add(temp);
         return places.get(places.size()-1);
+    }
+
+    @Override
+    public int compareTo(CensusBlockGroup o) {
+        if (this.id == o.id) {
+            return 0;
+        } else if (this.id > o.id) {
+            return 1;
+        } else {
+            return -1;
+        }
     }
     
     

@@ -6,12 +6,10 @@
 package COVID_AgentBasedSimulation.GUI;
 
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.AllPatterns;
-import COVID_AgentBasedSimulation.Model.Data.Safegraph.Patterns;
-import COVID_AgentBasedSimulation.Model.Data.Safegraph.Safegraph;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class ManualLoadPatternsPlaces extends javax.swing.JDialog {
 

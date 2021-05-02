@@ -7,13 +7,11 @@ package COVID_AgentBasedSimulation.Model.Data.Safegraph;
 
 import COVID_AgentBasedSimulation.Model.Structure.AllGISData;
 import COVID_AgentBasedSimulation.Model.Structure.CensusBlockGroup;
-import de.siegmar.fastcsv.reader.CsvContainer;
 import esmaieeli.utilities.taskThreading.ParallelProcessor;
-import java.util.ArrayList;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class ParallelPatternPlaceConnection extends ParallelProcessor {
 

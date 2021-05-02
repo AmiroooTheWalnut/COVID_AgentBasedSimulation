@@ -12,7 +12,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class County extends Marker implements Serializable {
+public class County extends Marker implements Serializable, Comparable<County>{
 
     static final long serialVersionUID = softwareVersion;
     public String name;
@@ -210,6 +210,11 @@ public class County extends Marker implements Serializable {
         temp.id = input;
         censusTracts.add(temp);
         return censusTracts.get(censusTracts.size() - 1);
+    }
+
+    @Override
+    public int compareTo(County o) {
+        return name.compareTo(o.name);
     }
 
 }

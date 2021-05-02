@@ -11,7 +11,7 @@ import lombok.Setter;
  * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 @Getter @Setter
-public class City extends Marker implements Serializable {
+public class City extends Marker implements Serializable, Comparable<City> {
     static final long serialVersionUID = softwareVersion;
     public String name;
     public ArrayList<CensusTract> censusTracts;
@@ -85,6 +85,11 @@ public class City extends Marker implements Serializable {
         }
         censusTracts.add(input);
         return censusTracts.get(censusTracts.size()-1);
+    }
+
+    @Override
+    public int compareTo(City o) {
+        return name.compareTo(o.name);
     }
     
 }

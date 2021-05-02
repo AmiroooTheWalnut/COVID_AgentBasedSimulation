@@ -7,20 +7,17 @@ package COVID_AgentBasedSimulation.Model;
 
 import COVID_AgentBasedSimulation.Model.AgentBasedModel.AgentTemplate;
 import groovy.lang.Binding;
-import groovy.lang.GroovyCodeSource;
 import groovy.lang.GroovyShell;
 import groovy.lang.Script;
-import groovy.transform.CompileStatic;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class JavaEvaluationEngine {
 

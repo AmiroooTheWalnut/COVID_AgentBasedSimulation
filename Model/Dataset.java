@@ -10,7 +10,7 @@ import java.time.ZonedDateTime;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class Dataset {
     public ZonedDateTime startingDate;

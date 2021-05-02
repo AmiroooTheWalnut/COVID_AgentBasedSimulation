@@ -17,7 +17,7 @@ import org.fife.ui.rtextarea.RTextScrollPane;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class AgentBehaviorDialog extends javax.swing.JDialog {
 

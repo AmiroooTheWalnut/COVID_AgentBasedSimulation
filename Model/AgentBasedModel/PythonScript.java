@@ -5,16 +5,9 @@
  */
 package COVID_AgentBasedSimulation.Model.AgentBasedModel;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class PythonScript {
     public String script;

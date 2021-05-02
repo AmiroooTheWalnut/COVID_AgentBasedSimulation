@@ -9,7 +9,7 @@ import COVID_AgentBasedSimulation.Model.MainModel;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class PythonEngine {
     

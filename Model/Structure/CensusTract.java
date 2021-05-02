@@ -16,7 +16,7 @@ import lombok.Setter;
  * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 @Getter @Setter
-public class CensusTract extends Marker implements Serializable {
+public class CensusTract extends Marker implements Serializable, Comparable<CensusTract> {
     static final long serialVersionUID = softwareVersion;
     public int id;
     public transient boolean isLatLonCalculated=false;
@@ -102,6 +102,17 @@ public class CensusTract extends Marker implements Serializable {
         temp.id = input;
         censusBlocks.add(temp);
         return censusBlocks.get(censusBlocks.size()-1);
+    }
+
+    @Override
+    public int compareTo(CensusTract o) {
+        if (this.id == o.id) {
+            return 0;
+        } else if (this.id > o.id) {
+            return 1;
+        } else {
+            return -1;
+        }
     }
     
     
