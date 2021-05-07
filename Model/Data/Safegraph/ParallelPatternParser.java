@@ -146,11 +146,17 @@ public class ParallelPatternParser extends ParallelProcessor {
                         try {
                             JSONObject object = new JSONObject(field);
                             JSONArray names = object.names();
+                            ArrayList<DwellTime> dwellData=new ArrayList();
                             for (int k = 0; k < names.length(); k++) {
                                 DwellTime temp = new DwellTime();
                                 temp.number = object.getInt(names.getString(k));
                                 temp.dwellDuration = DwellTime.getDwellDuration(names.getString(k));
+                                dwellData.add(temp);
                             }
+                            patternsRecordProcessed.bucketed_dwell_times=dwellData;
+                            
+//                            System.out.println("!!!");
+                            
                         } catch (Exception ex) {
 //                            System.out.println(ex.getMessage());
                         }

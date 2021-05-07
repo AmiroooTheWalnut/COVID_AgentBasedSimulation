@@ -504,13 +504,13 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton8ActionPerformed
 
     private void jButton18ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton18ActionPerformed
-        ManualLoadPatternsPlaces manualLoadPatternsPlaces = new ManualLoadPatternsPlaces(myParent, false, "FullData", this);
+        ManualLoadPatternsPlacesDialog manualLoadPatternsPlaces = new ManualLoadPatternsPlacesDialog(myParent, false, "FullData", this);
         manualLoadPatternsPlaces.setVisible(true);
         manualLoadPatternsPlaces.refreshList();
     }//GEN-LAST:event_jButton18ActionPerformed
 
     private void jButton19ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton19ActionPerformed
-        ManualLoadPatternsPlaces manualLoadPatternsPlaces = new ManualLoadPatternsPlaces(myParent, false, mainModel.ABM.studyScope, this);
+        ManualLoadPatternsPlacesDialog manualLoadPatternsPlaces = new ManualLoadPatternsPlacesDialog(myParent, false, mainModel.ABM.studyScope, this);
         manualLoadPatternsPlaces.setVisible(true);
         manualLoadPatternsPlaces.refreshList();
     }//GEN-LAST:event_jButton19ActionPerformed
@@ -540,6 +540,35 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
                     SafegraphPlaces safegraphPlaces = Safegraph.getSubPlace(mainModel.ABM.studyScopeGeography, mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(jList2.getSelectedIndex()));
                     Safegraph.saveSafegraphPlacesKryo(directoryPath + "/processedData", safegraphPlaces);
                 }
+            }
+        } else {
+            String directoryPath = "./datasets/Safegraph/" + mainModel.ABM.studyScope;
+            File directory = new File(directoryPath);
+            if (!directory.exists()) {
+                directory.mkdir();
+            }
+            String[] patternsList = AllPatterns.detectAllPatterns("./datasets/Safegraph/FullData");
+            for (int i = 0; i < patternsList.length; i++) {
+                myParent.mainModel.safegraph.clearPatternsPlaces();
+                mainModel.safegraph.loadPatternsPlacesSet(patternsList[i].split("_")[1]+"_"+patternsList[i].split("_")[2], myParent.mainModel.allGISData, "FullData", true, myParent.numProcessors);
+
+                if (mainModel.safegraph.allPatterns.monthlyPatternsList != null && mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList != null) {
+                    if (mainModel.safegraph.allPatterns.monthlyPatternsList.size() > 0 && mainModel.safegraph.allPatterns.monthlyPatternsList.size() > 0) {
+                        directoryPath = "./datasets/Safegraph/" + mainModel.ABM.studyScope + "/" + patternsList[i];
+                        directory = new File(directoryPath);
+                        if (!directory.exists()) {
+                            directory.mkdir();
+                        }
+
+                        Patterns patterns = Safegraph.getSubPattern(mainModel.ABM.studyScopeGeography, mainModel.safegraph.allPatterns.monthlyPatternsList.get(0));
+                        Safegraph.savePatternsKryo(directoryPath + "/processedData", patterns);
+
+                        SafegraphPlaces safegraphPlaces = Safegraph.getSubPlace(mainModel.ABM.studyScopeGeography, mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(0));
+                        Safegraph.saveSafegraphPlacesKryo(directoryPath + "/processedData", safegraphPlaces);
+                    }
+                }
+
+                myParent.mainModel.safegraph.clearPatternsPlaces();
             }
         }
     }//GEN-LAST:event_jButton17ActionPerformed
@@ -575,25 +604,25 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
                 }
                 if (isMonthUnique == true) {
                     months.get(yearIndex).add(splitted[2]);
-                }else{
-                    
+                } else {
+
                 }
             }
         }
 
         String yearsArray[] = new String[years.size()];
         for (int i = 0; i < years.size(); i++) {
-            yearsArray[i]=years.get(i);
+            yearsArray[i] = years.get(i);
         }
-        
+
         String monthsArray[][] = new String[years.size()][];
         for (int i = 0; i < months.size(); i++) {
-            monthsArray[i]=new String[months.get(i).size()];
+            monthsArray[i] = new String[months.get(i).size()];
             for (int j = 0; j < months.get(i).size(); j++) {
-                monthsArray[i][j]=months.get(i).get(j);
+                monthsArray[i][j] = months.get(i).get(j);
             }
         }
-        
+
         myParent.mainModel.safegraph.writeTravelMatrix(myParent.mainModel.ABM.studyScopeGeography, jList3.getSelectedValue(), yearsArray, monthsArray, myParent.mainModel.allGISData, true, myParent.numProcessors);
     }//GEN-LAST:event_jButton5ActionPerformed
 

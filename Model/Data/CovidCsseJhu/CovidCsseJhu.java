@@ -71,33 +71,33 @@ public class CovidCsseJhu extends Dataset implements Serializable {
             for (int i = 0; i < data.getRowCount(); i++) {
                 CsvRow row = data.getRow(i);
                 String rowLatValidation = row.getField("Lat");
-                if(!rowLatValidation.equals(0)){
+                if (!rowLatValidation.equals(0)) {
                     String fipsCode = row.getField("FIPS");
-                    fipsCode=String.valueOf((int)Double.parseDouble(fipsCode));
-                    String countyCode=fipsCode.substring(fipsCode.length()-3, fipsCode.length());
-                    String stateCode=fipsCode.substring(0, fipsCode.length()-3);
-                    
-                    State state=gisData.countries.get(0).findState(Byte.valueOf(stateCode));
-                    County county=state.findCounty(Integer.parseInt(countyCode));
-                    
-                    for(int j=11;j<row.getFieldCount();j++){
-                        String splitted[]=data.getHeader().get(j).split("/");
-                        String month=splitted[0];
-                        if(month.length()==1){
-                            month="0"+month;
+                    fipsCode = String.valueOf((int) Double.parseDouble(fipsCode));
+                    String countyCode = fipsCode.substring(fipsCode.length() - 3, fipsCode.length());
+                    String stateCode = fipsCode.substring(0, fipsCode.length() - 3);
+
+                    State state = gisData.countries.get(0).findState(Byte.valueOf(stateCode));
+                    County county = state.findCounty(Integer.parseInt(countyCode));
+
+                    for (int j = 11; j < row.getFieldCount(); j++) {
+                        String splitted[] = data.getHeader().get(j).split("/");
+                        String month = splitted[0];
+                        if (month.length() == 1) {
+                            month = "0" + month;
                         }
-                        String day=splitted[1];
-                        if(day.length()==1){
-                            day="0"+day;
+                        String day = splitted[1];
+                        if (day.length() == 1) {
+                            day = "0" + day;
                         }
-                        String year=splitted[2];
-                        String isoTime="20"+year+"-"+month+"-"+day+"T00:00Z[UTC]";
-                        ZonedDateTime date=ZonedDateTime.parse(isoTime);
+                        String year = splitted[2];
+                        String isoTime = "20" + year + "-" + month + "-" + day + "T00:00Z[UTC]";
+                        ZonedDateTime date = ZonedDateTime.parse(isoTime);
                         int confirmedCased = Integer.parseInt(row.getField(j));
-                        DailyConfirmedCases dailyConfirmedCases=new DailyConfirmedCases(date,confirmedCased,county);
+                        DailyConfirmedCases dailyConfirmedCases = new DailyConfirmedCases(date, confirmedCased, county);
                         dailyConfirmedCasesList.add(dailyConfirmedCases);
                     }
-                    
+
 //                    System.out.println("!!!");
                 }
             }
@@ -183,12 +183,24 @@ public class CovidCsseJhu extends Dataset implements Serializable {
         }
         return null;
     }
-    
-    public ArrayList getCountyCases(County input){
-        ArrayList output=new ArrayList();
-        for(int i=0;i<dailyConfirmedCasesList.size();i++){
-            if(dailyConfirmedCasesList.get(i).county.id==input.id){
+
+    public ArrayList getCountyCases(County input) {
+        ArrayList output = new ArrayList();
+        for (int i = 0; i < dailyConfirmedCasesList.size(); i++) {
+            if (dailyConfirmedCasesList.get(i).county.id == input.id) {
                 output.add(dailyConfirmedCasesList.get(i));
+            }
+        }
+        return output;
+    }
+
+    public DailyConfirmedCases getCountyDailyCases(County input, ZonedDateTime day) {
+        DailyConfirmedCases output=null;
+        for (int i = 0; i < dailyConfirmedCasesList.size(); i++) {
+            if (dailyConfirmedCasesList.get(i).date.equals(day)) {
+                if (dailyConfirmedCasesList.get(i).county.id == input.id) {
+                    output=dailyConfirmedCasesList.get(i);
+                }
             }
         }
         return output;

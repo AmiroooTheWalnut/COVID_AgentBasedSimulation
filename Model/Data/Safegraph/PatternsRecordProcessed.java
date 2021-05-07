@@ -17,6 +17,8 @@ import lombok.Setter;
 public class PatternsRecordProcessed implements Serializable, Comparable<PatternsRecordProcessed>{
     static final long serialVersionUID = softwareVersion;
     
+    public transient boolean needToBeRemoved=false;
+    
     public transient SafegraphPlace place;
     public String placeKey;
     public long poi_cbg;
@@ -46,5 +48,6 @@ public class PatternsRecordProcessed implements Serializable, Comparable<Pattern
     @Override
     public int compareTo(PatternsRecordProcessed o) {
         return placeKey.compareTo(o.placeKey);
+        
     }
 }

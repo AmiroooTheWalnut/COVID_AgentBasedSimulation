@@ -70,8 +70,36 @@ public class ParallelPatternPlaceConnection extends ParallelProcessor {
                                     break;
                                 }
                             }
+
+                            boolean isLowerBoundPassed = false;
+                            boolean isUpperBoundPassed = false;
+                            if (plusSign > -1) {
+                                if (patterns.patternRecords.get(i).placeKey.compareTo(places.placesRecords.get(plusSign).placeKey) < 0) {
+                                    isUpperBoundPassed = true;
+                                }
+                            } else {
+                                isUpperBoundPassed = true;
+                            }
+                            if (minusSign > -1) {
+                                if (patterns.patternRecords.get(i).placeKey.compareTo(places.placesRecords.get(minusSign).placeKey) > 0) {
+                                    isLowerBoundPassed = true;
+                                }
+                            } else {
+                                isLowerBoundPassed = true;
+                            }
+                            if (isUpperBoundPassed == true && isLowerBoundPassed == true) {
+                                break;
+                            }
+
                         }
                     }
+                    if (patterns.patternRecords.get(i).place == null) {
+                        System.out.println("CENSUS BLOCK GROUP FOR PATTERN NOT FOUND!");
+                        patterns.patternRecords.get(i).needToBeRemoved=true;
+                        System.out.println("THE PATTERN " + i + " IS REMOVED!");
+                        continue;
+                    }
+
                     CensusBlockGroup tempCensusTract = allGISData.findCensusBlockGroup(patterns.patternRecords.get(i).poi_cbg);
                     patterns.patternRecords.get(i).poi_cbg_censusBlock = tempCensusTract;
                     if (patterns.patternRecords.get(i).visitor_daytime_cbgs != null) {

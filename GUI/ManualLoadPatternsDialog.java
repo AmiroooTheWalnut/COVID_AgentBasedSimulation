@@ -131,6 +131,7 @@ public class ManualLoadPatternsDialog extends javax.swing.JDialog {
             }
             if (isUnique == true) {
                 myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.add(patterns);
+                //byte a=0;
                 myParent.refreshPatternsList();
             }
         }

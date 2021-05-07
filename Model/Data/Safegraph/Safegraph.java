@@ -190,6 +190,8 @@ public class Safegraph extends Dataset implements Serializable {
         kryo.register(java.time.ZonedDateTime.class);
         kryo.register(COVID_AgentBasedSimulation.Model.DatasetTemplate.class);
         kryo.register(COVID_AgentBasedSimulation.Model.RecordTemplate.class);
+        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.DwellTime.class);
+        kryo.register(short[].class);
         Output output;
         try {
             output = new Output(new FileOutputStream(passed_file_path + ".bin"));
@@ -216,6 +218,8 @@ public class Safegraph extends Dataset implements Serializable {
         kryo.register(java.time.ZonedDateTime.class);
         kryo.register(COVID_AgentBasedSimulation.Model.DatasetTemplate.class);
         kryo.register(COVID_AgentBasedSimulation.Model.RecordTemplate.class);
+        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.DwellTime.class);
+        kryo.register(short[].class);
         Output output;
         try {
             output = new Output(new FileOutputStream(passed_file_path + ".bin"));
@@ -261,6 +265,8 @@ public class Safegraph extends Dataset implements Serializable {
         kryo.register(java.time.ZonedDateTime.class);
         kryo.register(COVID_AgentBasedSimulation.Model.DatasetTemplate.class);
         kryo.register(COVID_AgentBasedSimulation.Model.RecordTemplate.class);
+        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.DwellTime.class);
+        kryo.register(short[].class);
         Input input;
         try {
             File temp = new File(passed_file_path);
@@ -293,6 +299,8 @@ public class Safegraph extends Dataset implements Serializable {
         kryo.register(java.time.ZonedDateTime.class);
         kryo.register(COVID_AgentBasedSimulation.Model.DatasetTemplate.class);
         kryo.register(COVID_AgentBasedSimulation.Model.RecordTemplate.class);
+        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.DwellTime.class);
+        kryo.register(short[].class);
         Input input;
         try {
             File temp = new File(passed_file_path);
@@ -352,6 +360,7 @@ public class Safegraph extends Dataset implements Serializable {
         } else {
             allSafegraphPlaces = new AllSafegraphPlaces();
         }
+        System.gc();
     }
 
     public void loadPatternsPlacesSet(String date, AllGISData allGISData, String project, boolean isParallel, int numCPU) {
@@ -359,8 +368,14 @@ public class Safegraph extends Dataset implements Serializable {
         SafegraphPlaces safegraphPlaces = loadSafegraphPlacesKryo("./datasets/Safegraph/" + project + "/core_poi_" + date + "/processedData.bin");
 
         System.out.println("Data loaded");
+        if (patterns == null || safegraphPlaces == null) {
+            System.out.println("Pattern or Core place is missing. Skipping the data " + date);
+            return;
+        }
         System.out.println("Connecting patterns and places ...");
+        System.out.println("Patterns size before connection: " + patterns.patternRecords.size());
         connectPatternsAndPlaces(patterns, safegraphPlaces, allGISData, isParallel, numCPU);
+        System.out.println("Patterns size before connection: " + patterns.patternRecords.size());
         System.out.println("Connection done");
         if (patterns != null) {
             if (allPatterns != null) {
@@ -434,6 +449,11 @@ public class Safegraph extends Dataset implements Serializable {
             int counterInterval = 1000;
             int lastValidIndex = 0;
             for (int i = 0; i < patterns.patternRecords.size(); i++) {
+
+//                if(i==253)
+//                {
+//                    System.out.println("PROBLEM!!!!");
+//                }
                 if (places != null) {
                     for (int j = 0; j < places.placesRecords.size(); j++) {
                         int plusSign = -1;
@@ -477,8 +497,34 @@ public class Safegraph extends Dataset implements Serializable {
                                 break;
                             }
                         }
+                        boolean isLowerBoundPassed = false;
+                        boolean isUpperBoundPassed = false;
+                        if (plusSign > -1) {
+                            if (patterns.patternRecords.get(i).placeKey.compareTo(places.placesRecords.get(plusSign).placeKey) < 0) {
+                                isUpperBoundPassed = true;
+                            }
+                        } else {
+                            isUpperBoundPassed = true;
+                        }
+                        if (minusSign > -1) {
+                            if (patterns.patternRecords.get(i).placeKey.compareTo(places.placesRecords.get(minusSign).placeKey) > 0) {
+                                isLowerBoundPassed = true;
+                            }
+                        } else {
+                            isLowerBoundPassed = true;
+                        }
+                        if (isUpperBoundPassed == true && isLowerBoundPassed == true) {
+                            break;
+                        }
                     }
                 }
+                if (patterns.patternRecords.get(i).place == null) {
+                    System.out.println("CENSUS BLOCK GROUP FOR PATTERN NOT FOUND!");
+                    patterns.patternRecords.get(i).needToBeRemoved = true;
+                    System.out.println("THE PATTERN " + i + " IS REMOVED!");
+                    continue;
+                }
+
                 CensusBlockGroup tempCensusTract = allGISData.findCensusBlockGroup(patterns.patternRecords.get(i).poi_cbg);
                 patterns.patternRecords.get(i).poi_cbg_censusBlock = tempCensusTract;
                 if (patterns.patternRecords.get(i).visitor_daytime_cbgs != null) {
@@ -501,6 +547,11 @@ public class Safegraph extends Dataset implements Serializable {
                 }
             }
         }
+        for (int i = patterns.patternRecords.size() - 1; i > -1; i--) {
+            if (patterns.patternRecords.get(i).needToBeRemoved == true) {
+                patterns.patternRecords.remove(i);
+            }
+        }
     }
 
     public static Patterns getSubPattern(Object restriction, Patterns patterns) {
@@ -520,9 +571,14 @@ public class Safegraph extends Dataset implements Serializable {
             output.name = patterns.name;
             output.patternRecords = new ArrayList();
             for (int i = 0; i < patterns.patternRecords.size(); i++) {
-                if (patterns.patternRecords.get(i).place.censusBlock.state.name.equals(state.name)) {
-                    output.patternRecords.add(patterns.patternRecords.get(i));
+                if (patterns.patternRecords.get(i).place != null) {
+                    if (patterns.patternRecords.get(i).place.censusBlock.state.name.equals(state.name)) {
+                        output.patternRecords.add(patterns.patternRecords.get(i));
+                    }
+                } else {
+                    System.out.println("!!!");
                 }
+
             }
         }
         if (restriction instanceof County) {
@@ -611,9 +667,12 @@ public class Safegraph extends Dataset implements Serializable {
             output.name = safegraphPlaces.name;
             output.placesRecords = new ArrayList();
             for (int i = 0; i < safegraphPlaces.placesRecords.size(); i++) {
-                if (safegraphPlaces.placesRecords.get(i).censusBlock.country.name.equals(country.name)) {
-                    output.placesRecords.add(safegraphPlaces.placesRecords.get(i));
+                if (safegraphPlaces.placesRecords.get(i).censusBlock != null) {
+                    if (safegraphPlaces.placesRecords.get(i).censusBlock.country.name.equals(country.name)) {
+                        output.placesRecords.add(safegraphPlaces.placesRecords.get(i));
+                    }
                 }
+
             }
         }
         if (restriction instanceof State) {
@@ -621,9 +680,14 @@ public class Safegraph extends Dataset implements Serializable {
             output.name = safegraphPlaces.name;
             output.placesRecords = new ArrayList();
             for (int i = 0; i < safegraphPlaces.placesRecords.size(); i++) {
-                if (safegraphPlaces.placesRecords.get(i).censusBlock.state.name.equals(state.name)) {
-                    output.placesRecords.add(safegraphPlaces.placesRecords.get(i));
+                if (safegraphPlaces.placesRecords.get(i).censusBlock == null) {
+                    //System.out.println("!!!");
+                } else {
+                    if (safegraphPlaces.placesRecords.get(i).censusBlock.state.name.equals(state.name)) {
+                        output.placesRecords.add(safegraphPlaces.placesRecords.get(i));
+                    }
                 }
+
             }
         }
         if (restriction instanceof County) {
@@ -631,8 +695,10 @@ public class Safegraph extends Dataset implements Serializable {
             output.name = safegraphPlaces.name;
             output.placesRecords = new ArrayList();
             for (int i = 0; i < safegraphPlaces.placesRecords.size(); i++) {
-                if (safegraphPlaces.placesRecords.get(i).censusBlock.county.name.equals(county.name)) {
-                    output.placesRecords.add(safegraphPlaces.placesRecords.get(i));
+                if (safegraphPlaces.placesRecords.get(i).censusBlock != null) {
+                    if (safegraphPlaces.placesRecords.get(i).censusBlock.county.name.equals(county.name)) {
+                        output.placesRecords.add(safegraphPlaces.placesRecords.get(i));
+                    }
                 }
             }
         }
@@ -732,7 +798,7 @@ public class Safegraph extends Dataset implements Serializable {
 
             }
         }
-        
+
         Collections.sort(items);
 
         for (int i = 0; i < items.size(); i++) {
@@ -748,11 +814,10 @@ public class Safegraph extends Dataset implements Serializable {
                 loadPatternsPlacesSet(years[i] + "_" + months[i][j], allGISData, "FullData", isParallel, numCPU);
                 processOneMonth(allPatterns.monthlyPatternsList.get(0), items, matrix, scope, granuality);
                 clearPatternsPlaces();
-                System.gc();
                 counter = counter + 1;
             }
         }
-        
+
         for (int i = 0; i < matrix.size(); i++) {
             for (int j = 0; j < matrix.get(0).size(); j++) {
                 matrix.get(i).set(j, (matrix.get(i).get(j) / counter));
@@ -805,15 +870,15 @@ public class Safegraph extends Dataset implements Serializable {
             FileWriter myWriter = new FileWriter("indices_information.csv");
             for (int i = 0; i < items.size(); i++) {
                 if (granuality.equals("state")) {
-                    myWriter.write(((State)(items.get(i))).name);
-                }else if (granuality.equals("county")) {
-                    myWriter.write(((County)(items.get(i))).name);
-                }else if (granuality.equals("censustract")) {
-                    myWriter.write(String.valueOf(((CensusTract)(items.get(i))).id));
-                }else if (granuality.equals("censusblockgroup")) {
-                    myWriter.write(String.valueOf(((CensusBlockGroup)(items.get(i))).id));
+                    myWriter.write(((State) (items.get(i))).name);
+                } else if (granuality.equals("county")) {
+                    myWriter.write(((County) (items.get(i))).name);
+                } else if (granuality.equals("censustract")) {
+                    myWriter.write(String.valueOf(((CensusTract) (items.get(i))).id));
+                } else if (granuality.equals("censusblockgroup")) {
+                    myWriter.write(String.valueOf(((CensusBlockGroup) (items.get(i))).id));
                 }
-                
+
                 if (i != matrix.size() - 1) {
                     myWriter.write(",");
                 }

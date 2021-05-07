@@ -79,6 +79,8 @@ public class Patterns implements Serializable {
                     patternRecords = recordsLocal;
                     Safegraph.savePatternsKryo(directoryName + "/ProcessedData_" + cSVfileList[i].getName(), this);
                     patternRecords.clear();
+                    patternRecords = new ArrayList();
+                    System.gc();
                 } catch (IOException ex) {
                     Logger.getLogger(Patterns.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -98,6 +100,7 @@ public class Patterns implements Serializable {
         for (int i = 0; i < binFileListRecheck.length; i++) {
             binFileListRecheck[i].delete();
         }
+        System.gc();
     }
 
     public ArrayList<PatternsRecordProcessed> readData(String fileName, boolean isParallel, int numCPU) {
@@ -241,11 +244,17 @@ public class Patterns implements Serializable {
                         try {
                             JSONObject object = new JSONObject(field);
                             JSONArray names = object.names();
+                            ArrayList<DwellTime> dwellData=new ArrayList();
                             for (int k = 0; k < names.length(); k++) {
                                 DwellTime temp = new DwellTime();
                                 temp.number = object.getInt(names.getString(k));
                                 temp.dwellDuration = DwellTime.getDwellDuration(names.getString(k));
+                                dwellData.add(temp);
                             }
+                            patternsRecordProcessed.bucketed_dwell_times=dwellData;
+                            
+//                            System.out.println("!!!");
+                            
                         } catch (Exception ex) {
 //                            System.out.println(ex.getMessage());
                         }
