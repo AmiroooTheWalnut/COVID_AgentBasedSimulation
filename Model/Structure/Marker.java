@@ -22,5 +22,6 @@ public class Marker implements Serializable {
     public float lat;
     public float lon;
     public float size;
+    public int population;
     public HashMap<Layer,Double> layers;
 }

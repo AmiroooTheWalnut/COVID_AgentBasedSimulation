@@ -78,6 +78,8 @@ public class MainModel extends Dataset {
         initSafegraph();
         allGISData = new AllGISData();
         allGISData.setDatasetTemplate();
+        covidCsseJhu=new CovidCsseJhu();
+        covidCsseJhu.setDatasetTemplate();
     }
 
     @Override
@@ -163,6 +165,7 @@ public class MainModel extends Dataset {
 
     public void resetTimerTask() {
         runTask = new TimerTask() {
+            @Override
             public void run() {
                 int month = ABM.startTime.getMonthValue();
                 if (currentMonth != month) {
@@ -317,6 +320,41 @@ public class MainModel extends Dataset {
             input.close();
 
             return allGISData;
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(AllGISData.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+    
+    public static CovidCsseJhu loadCasesDataKryo(String passed_file_path) {
+        Kryo kryo = new Kryo();
+        kryo.register(COVID_AgentBasedSimulation.Model.Data.CovidCsseJhu.CovidCsseJhu.class);
+        kryo.register(java.util.ArrayList.class);
+        kryo.register(java.time.LocalDateTime.class);
+        kryo.register(int.class);
+        kryo.register(int[].class);
+        kryo.register(java.lang.String[].class);
+        kryo.register(java.lang.String.class);
+        kryo.setReferences(true);
+        kryo.register(COVID_AgentBasedSimulation.Model.Data.CovidCsseJhu.DailyConfirmedCases.class);
+        kryo.register(COVID_AgentBasedSimulation.Model.Structure.Country.class);
+        kryo.register(COVID_AgentBasedSimulation.Model.Structure.State.class);
+        kryo.register(COVID_AgentBasedSimulation.Model.Structure.County.class);
+        kryo.register(COVID_AgentBasedSimulation.Model.Structure.CensusTract.class);
+        kryo.register(COVID_AgentBasedSimulation.Model.Structure.CensusBlockGroup.class);
+        kryo.register(COVID_AgentBasedSimulation.Model.Structure.City.class);
+        kryo.register(java.time.ZonedDateTime.class);
+        kryo.setInstantiatorStrategy(new DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
+//        kryo.setInstantiatorStrategy(new Kryo.DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
+        kryo.register(COVID_AgentBasedSimulation.Model.DatasetTemplate.class);
+        kryo.register(COVID_AgentBasedSimulation.Model.RecordTemplate.class);
+        Input input;
+        try {
+            input = new Input(new FileInputStream(passed_file_path));
+            CovidCsseJhu covidCsseJhu = kryo.readObject(input, CovidCsseJhu.class);
+            input.close();
+
+            return covidCsseJhu;
         } catch (FileNotFoundException ex) {
             Logger.getLogger(AllGISData.class.getName()).log(Level.SEVERE, null, ex);
         }

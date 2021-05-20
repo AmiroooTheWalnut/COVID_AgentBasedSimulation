@@ -219,6 +219,7 @@ public class Safegraph extends Dataset implements Serializable {
         kryo.register(COVID_AgentBasedSimulation.Model.DatasetTemplate.class);
         kryo.register(COVID_AgentBasedSimulation.Model.RecordTemplate.class);
         kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.DwellTime.class);
+        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.OpenHours.class);
         kryo.register(short[].class);
         Output output;
         try {
@@ -300,6 +301,7 @@ public class Safegraph extends Dataset implements Serializable {
         kryo.register(COVID_AgentBasedSimulation.Model.DatasetTemplate.class);
         kryo.register(COVID_AgentBasedSimulation.Model.RecordTemplate.class);
         kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.DwellTime.class);
+        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.OpenHours.class);
         kryo.register(short[].class);
         Input input;
         try {
@@ -365,7 +367,7 @@ public class Safegraph extends Dataset implements Serializable {
 
     public void loadPatternsPlacesSet(String date, AllGISData allGISData, String project, boolean isParallel, int numCPU) {
         Patterns patterns = loadPatternsKryo("./datasets/Safegraph/" + project + "/patterns_" + date + "/processedData.bin");
-        SafegraphPlaces safegraphPlaces = loadSafegraphPlacesKryo("./datasets/Safegraph/" + project + "/core_poi_" + date + "/processedData.bin");
+        SafegraphPlaces safegraphPlaces = loadSafegraphPlacesKryo("./datasets/Safegraph/" + project + "/core_poi_" + date + "/processedData_withArea.bin");
 
         System.out.println("Data loaded");
         if (patterns == null || safegraphPlaces == null) {

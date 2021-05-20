@@ -8,6 +8,7 @@ package COVID_AgentBasedSimulation.GUI;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.AllSafegraphPlaces;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.SafegraphPlaces;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.Safegraph;
+import java.util.ArrayList;
 
 /**
  *
@@ -26,7 +27,7 @@ public class ManualLoadPlacesDialog extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         myMainFrameParent = (MainFrame) parent;
-        myParent=passed_SafeGraphPreprocessDialog;
+        myParent = passed_SafeGraphPreprocessDialog;
     }
 
     public void refreshList() {
@@ -107,12 +108,17 @@ public class ManualLoadPlacesDialog extends javax.swing.JDialog {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         if (jList1.getSelectedIndex() > -1) {
+            myParent.mainModel.safegraph.clearPatternsPlaces();
             SafegraphPlaces safegraphPlaces = Safegraph.loadSafegraphPlacesKryo("./datasets/Safegraph/FullData/" + jList1.getSelectedValue() + "/processedData.bin");
             boolean isUnique = true;
-            for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.size(); i++) {
-                if (myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).name.equals(safegraphPlaces.name)) {
-                    isUnique = false;
+            if (myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList != null) {
+                for (int i = 0; i < myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.size(); i++) {
+                    if (myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).name.equals(safegraphPlaces.name)) {
+                        isUnique = false;
+                    }
                 }
+            }else{
+                myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList=new ArrayList();
             }
             if (isUnique == true) {
                 myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.add(safegraphPlaces);

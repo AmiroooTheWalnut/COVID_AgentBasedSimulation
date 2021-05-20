@@ -11,4 +11,5 @@ package COVID_AgentBasedSimulation.GUI;
  */
 public class ProjectDefaults {
     public String defaultProjectFileLocation;
+    //public String currentDefaultProjectFileLocation;
 }

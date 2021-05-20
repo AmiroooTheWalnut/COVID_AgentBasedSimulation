@@ -62,6 +62,8 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
 //        DefaultMutableTreeNode javaNode = new DefaultMutableTreeNode("Java");
         DefaultMutableTreeNode safegraphNode = new DefaultMutableTreeNode("Safegraph");
         DefaultMutableTreeNode gISDataNode = new DefaultMutableTreeNode("GISData");
+        
+        DefaultMutableTreeNode covidCssJhuNode = new DefaultMutableTreeNode("CasesByCountyCsseJhu");
 
         rootDatasets.add(new DefaultMutableTreeNode("Object"));
         rootDatasets.add(new DefaultMutableTreeNode("Integer"));
@@ -73,10 +75,12 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
 //        model.reload(root);
         setDatasetTree(mainModel.safegraph.datasetTemplate, safegraphNode);
         setDatasetTree(mainModel.allGISData.datasetTemplate, gISDataNode);
+        setDatasetTree(mainModel.covidCsseJhu.datasetTemplate, covidCssJhuNode);
 
         rootDatasets.add(safegraphNode);
 //        model.reload(root);
         rootDatasets.add(gISDataNode);
+        rootDatasets.add(covidCssJhuNode);
         modelDatasets.reload(rootDatasets);
 
         expandAllNodes(jTree3);

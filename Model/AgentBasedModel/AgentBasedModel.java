@@ -55,7 +55,7 @@ public class AgentBasedModel {
 
     public AgentBasedModel(MainModel mainModel) {
         myMainModel = mainModel;
-        //currentTime.getMinute()
+//        currentTime.
     }
 
     public void evaluateAllAgents() {

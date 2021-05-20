@@ -107,6 +107,7 @@ public class ManualLoadPatternsDialog extends javax.swing.JDialog {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         if (jList1.getSelectedIndex() > -1) {
+            myParent.mainModel.safegraph.clearPatternsPlaces();
             Patterns patterns = Safegraph.loadPatternsKryo("./datasets/Safegraph/FullData/" + jList1.getSelectedValue() + "/processedData.bin");
             System.out.println("PATTERNS SIZE: "+patterns.patternRecords.size());
             double avg_num_visitors=0;

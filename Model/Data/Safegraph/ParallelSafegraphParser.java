@@ -80,6 +80,9 @@ public class ParallelSafegraphParser extends ParallelProcessor {
                     if (field.length() > 0) {
                         safegraphPlaceProcessed.naics_code = Integer.parseInt(field);
                     }
+                    
+//                    float result = SafegraphPlaces.getBuildingAreaOnline(safegraphPlaceProcessed.lat, safegraphPlaceProcessed.lon, false);
+//                    safegraphPlaceProcessed.landArea = result;
 
                     localRecords.add(safegraphPlaceProcessed);
                     counter = counter + 1;
@@ -89,6 +92,28 @@ public class ParallelSafegraphParser extends ParallelProcessor {
                         System.out.println("Thread number: " + myThreadIndex + " num rows read: " + largerCounter * counterInterval);
                     }
                 }
+                
+//                double avg=0;
+//                double std=0;
+//                for(int i=0;i<localRecords.size();i++){
+//                    if(localRecords.get(i).landArea!=-1 && localRecords.get(i).landArea!=0){
+//                        avg=avg+localRecords.get(i).landArea;
+//                    }
+//                }
+//                avg=avg/(double)localRecords.size();
+//                for(int i=0;i<localRecords.size();i++){
+//                    if(localRecords.get(i).landArea!=-1 && localRecords.get(i).landArea!=0){
+//                        std=std+Math.pow(localRecords.get(i).landArea-avg,2);
+//                    }
+//                }
+//                std=std/(localRecords.size()-1);
+//                std=Math.sqrt(std);
+//                for(int i=0;i<localRecords.size();i++){
+//                    if(localRecords.get(i).landArea==-1 || localRecords.get(i).landArea==0){
+//                        localRecords.get(i).landArea=(float)(avg+Math.random()*std);
+//                    }
+//                }
+                
                 records.addAll(localRecords);
             }
         });

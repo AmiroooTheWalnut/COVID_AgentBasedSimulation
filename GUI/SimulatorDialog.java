@@ -85,6 +85,7 @@ public class SimulatorDialog extends javax.swing.JDialog {
         jRadioButton4 = new javax.swing.JRadioButton();
         jRadioButton5 = new javax.swing.JRadioButton();
         jRadioButton7 = new javax.swing.JRadioButton();
+        jRadioButton8 = new javax.swing.JRadioButton();
         jRadioButton6 = new javax.swing.JRadioButton();
         jPanel8 = new javax.swing.JPanel();
         jToggleButton2 = new javax.swing.JToggleButton();
@@ -217,6 +218,15 @@ public class SimulatorDialog extends javax.swing.JDialog {
         });
         jPanel6.add(jRadioButton7);
 
+        buttonGroup1.add(jRadioButton8);
+        jRadioButton8.setText("1 tick per 0.05 seconds");
+        jRadioButton8.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton8ActionPerformed(evt);
+            }
+        });
+        jPanel6.add(jRadioButton8);
+
         buttonGroup1.add(jRadioButton6);
         jRadioButton6.setText("Fastforward");
         jRadioButton6.addActionListener(new java.awt.event.ActionListener() {
@@ -235,17 +245,17 @@ public class SimulatorDialog extends javax.swing.JDialog {
                 .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel7Layout.createSequentialGroup()
                         .addComponent(jToggleButton1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jCheckBox1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jButton1))
                     .addGroup(jPanel7Layout.createSequentialGroup()
                         .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton2)
                             .addGroup(jPanel7Layout.createSequentialGroup()
                                 .addComponent(jLabel1)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel2)))
+                                .addComponent(jLabel2))
+                            .addComponent(jButton2))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -992,6 +1002,15 @@ public class SimulatorDialog extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_jRadioButton7ActionPerformed
 
+    private void jRadioButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton8ActionPerformed
+        if (myParent.mainModel.isRunning == true) {
+            myParent.mainModel.newSimulationDelayTime = 50;
+            isRateChanged = true;
+        } else {
+            myParent.mainModel.simulationDelayTime = 50;
+        }
+    }//GEN-LAST:event_jRadioButton8ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
@@ -1032,6 +1051,7 @@ public class SimulatorDialog extends javax.swing.JDialog {
     private javax.swing.JRadioButton jRadioButton5;
     private javax.swing.JRadioButton jRadioButton6;
     private javax.swing.JRadioButton jRadioButton7;
+    private javax.swing.JRadioButton jRadioButton8;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane10;
     private javax.swing.JScrollPane jScrollPane2;

@@ -257,6 +257,61 @@ public class AllGISData extends Dataset implements Serializable {
             Logger.getLogger(Patterns.class.getName()).log(Level.SEVERE, (String) null, ex);
         }
 
+        System.out.println("READING census block population");
+        File cBGPopulationFile = new File(geographyDirectory + "/USCensusBlockPopulation.csv");
+        try {
+            CsvReader cSVReader = new CsvReader();
+            cSVReader.setContainsHeader(true);
+            CsvContainer data = cSVReader.read(cBGPopulationFile, StandardCharsets.UTF_8);
+            int counter = 0;
+            int largerCounter = 0;
+            int counterInterval = 1000;
+            for (int i = 0; i < data.getRowCount(); i++) {
+                CsvRow row = data.getRow(i);
+                String populationNumber = row.getField("Population");
+                String cBGString = row.getField("census_block_group");
+
+                int censusBlockGroupID = Integer.parseInt(cBGString.substring(cBGString.length() - 1));
+                //int censusTractID = Integer.parseInt(censusTractString.substring(censusTractString.length() - 6));
+                int censusTractID = Integer.parseInt(cBGString.substring(cBGString.length() - 7, cBGString.length() - 1));
+                int countyID = Integer.parseInt(cBGString.substring(cBGString.length() - 10, cBGString.length() - 7));
+                byte stateID = Byte.parseByte(cBGString.substring(0, cBGString.length() - 10));
+                State state = countries.get(countries.size() - 1).findState(stateID);
+//                if(state==null){
+//                    System.out.println("!!!");
+//                }
+                County county = state.findCounty(countyID);
+//                if(county==null){
+//                    System.out.println("!!!");
+//                }
+//                City city = county.findAndInsertCity(cityName);
+                CensusTract censusTract = county.findCensusTract(censusTractID);
+//                if(censusTract==null){
+//                    System.out.println("!!!");
+//                }
+                CensusBlockGroup censusBlockGroup = censusTract.findCensusBlock(Long.parseLong(cBGString));
+//                if(censusBlockGroup==null){
+//                    System.out.println("!!!");
+//                }
+                censusBlockGroup.population = Integer.parseInt(populationNumber);
+                censusTract.population = censusTract.population + censusBlockGroup.population;
+                county.population = county.population + censusBlockGroup.population;
+                state.population = state.population + censusBlockGroup.population;
+                countries.get(countries.size() - 1).population = countries.get(countries.size() - 1).population + censusBlockGroup.population;
+
+//                city.findAndInsertCensusTract(censusTract);
+//                    System.out.println(i);
+                counter = counter + 1;
+                if (counter > counterInterval) {
+                    largerCounter = largerCounter + 1;
+                    counter = 0;
+                    System.out.println("Num rows read: " + largerCounter * counterInterval);
+                }
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(Patterns.class.getName()).log(Level.SEVERE, (String) null, ex);
+        }
+
         for (int i = 0; i < countries.size(); i++) {
             countries.get(i).getLatLonSizeFromChildren();
         }

@@ -48,16 +48,39 @@ public class MainFrame extends javax.swing.JFrame {
         mainModel.numCPUs = numProcessors;
         mainModel.initData();
         mainModel.initAgentBasedModel();
-        File geoDataFile = new File("./datasets/ProcessedGeoData.bin");
-        if (geoDataFile.exists()) {
-            AllGISData geoData = MainModel.loadAllGISDataKryo("./datasets/ProcessedGeoData.bin");
-            mainModel.allGISData = geoData;
-            jLabel1.setText("Geographical data loaded");
-        } else {
-            jLabel1.setText("<html>No processed geographical data detected.<br/>You can preprocess the data.</html>");
+
+        try {
+            File geoDataFile = new File("./datasets/ProcessedGeoData.bin");
+            if (geoDataFile.exists()) {
+                AllGISData geoData = MainModel.loadAllGISDataKryo("./datasets/ProcessedGeoData.bin");
+                mainModel.allGISData = geoData;
+                jLabel1.setText("Geographical data loaded");
+            } else {
+                jLabel1.setText("<html>No processed geographical data detected.<br/>You can preprocess the data.</html>");
+            }
+        } catch (Exception ex) {
+            System.out.println("Error in reading GIS data!");
+            jLabel1.setText("Error in reading");
         }
 
-        checkDefaults();
+        try {
+            File casesDataFile = new File("./datasets/ProcessedCasesData.bin");
+            if (casesDataFile.exists()) {
+                CovidCsseJhu casesData = MainModel.loadCasesDataKryo("./datasets/ProcessedCasesData.bin");
+                mainModel.covidCsseJhu = casesData;
+                jLabel5.setText("Cases data loaded");
+            } else {
+                jLabel5.setText("<html>No processed cases data detected.<br/>You can preprocess the data.</html>");
+            }
+        } catch (Exception ex) {
+            System.out.println("Error in reading cases data!");
+            jLabel5.setText("Error in reading");
+        }
+        try {
+            checkDefaults();
+        } catch (Exception ex) {
+            System.out.println("Error in reading defaults!");
+        }
     }
 
     public void checkDefaults() {
@@ -81,10 +104,13 @@ public class MainFrame extends javax.swing.JFrame {
                 projectDefaults = result;
                 if (projectDefaults != null) {
                     if (projectDefaults.defaultProjectFileLocation != null) {
+                        //projectDefaults.currentDefaultProjectFileLocation=projectDefaults.defaultProjectFileLocation;
                         String[] temp = projectDefaults.defaultProjectFileLocation.split("\\\\");
                         jLabel4.setText(temp[temp.length - 1]);
                         if (projectDefaults.defaultProjectFileLocation.length() > 0) {
                             mainModel.ABM.loadModel(projectDefaults.defaultProjectFileLocation);
+                            mainModel.ABM.filePath = projectDefaults.defaultProjectFileLocation;
+                            jLabel7.setText(temp[temp.length - 1]);
                         }
                     }
                 }
@@ -110,12 +136,14 @@ public class MainFrame extends javax.swing.JFrame {
         jButton11 = new javax.swing.JButton();
         jButton12 = new javax.swing.JButton();
         jPanel6 = new javax.swing.JPanel();
-        jButton13 = new javax.swing.JButton();
-        jButton14 = new javax.swing.JButton();
-        jButton15 = new javax.swing.JButton();
-        jButton16 = new javax.swing.JButton();
+        loadProjectButton = new javax.swing.JButton();
+        setDefaultProjectButton = new javax.swing.JButton();
+        saveProjectButton = new javax.swing.JButton();
+        removeDefaultProjectButton = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
         jPanel14 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jSpinner1 = new javax.swing.JSpinner();
@@ -153,35 +181,37 @@ public class MainFrame extends javax.swing.JFrame {
 
         jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Project"));
 
-        jButton13.setText("Load project");
-        jButton13.addActionListener(new java.awt.event.ActionListener() {
+        loadProjectButton.setText("Load project");
+        loadProjectButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton13ActionPerformed(evt);
+                loadProjectButtonActionPerformed(evt);
             }
         });
 
-        jButton14.setText("Set default project on startup");
-        jButton14.addActionListener(new java.awt.event.ActionListener() {
+        setDefaultProjectButton.setText("Set default project on startup");
+        setDefaultProjectButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton14ActionPerformed(evt);
+                setDefaultProjectButtonActionPerformed(evt);
             }
         });
 
-        jButton15.setText("Save project");
-        jButton15.addActionListener(new java.awt.event.ActionListener() {
+        saveProjectButton.setText("Save project");
+        saveProjectButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton15ActionPerformed(evt);
+                saveProjectButtonActionPerformed(evt);
             }
         });
 
-        jButton16.setText("Remove default project");
-        jButton16.addActionListener(new java.awt.event.ActionListener() {
+        removeDefaultProjectButton.setText("Remove default project");
+        removeDefaultProjectButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton16ActionPerformed(evt);
+                removeDefaultProjectButtonActionPerformed(evt);
             }
         });
 
         jLabel3.setText("Default project:");
+
+        jLabel6.setText("Current project:");
 
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
@@ -193,29 +223,35 @@ public class MainFrame extends javax.swing.JFrame {
                     .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel6Layout.createSequentialGroup()
                         .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton13)
-                            .addComponent(jButton14)
-                            .addComponent(jButton15)
-                            .addComponent(jButton16)
-                            .addComponent(jLabel3))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                            .addComponent(loadProjectButton)
+                            .addComponent(setDefaultProjectButton)
+                            .addComponent(saveProjectButton)
+                            .addComponent(removeDefaultProjectButton)
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel6))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jButton13)
+                .addComponent(loadProjectButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton15)
+                .addComponent(saveProjectButton)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel6)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
-                .addComponent(jButton14)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(setDefaultProjectButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton16)
+                .addComponent(removeDefaultProjectButton)
                 .addContainerGap())
         );
 
@@ -234,8 +270,8 @@ public class MainFrame extends javax.swing.JFrame {
         jPanel12Layout.setVerticalGroup(
             jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel12Layout.createSequentialGroup()
-                .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
                 .addComponent(jButton12)
                 .addGap(18, 18, 18)
                 .addComponent(jButton11)
@@ -385,7 +421,7 @@ public class MainFrame extends javax.swing.JFrame {
             jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel13Layout.createSequentialGroup()
                 .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 203, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 272, Short.MAX_VALUE)
                 .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jButton10)
@@ -422,7 +458,7 @@ public class MainFrame extends javax.swing.JFrame {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addComponent(jLabel5)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 288, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 357, Short.MAX_VALUE)
                 .addComponent(jButton2)
                 .addContainerGap())
         );
@@ -485,7 +521,7 @@ public class MainFrame extends javax.swing.JFrame {
         simulatorSettingsDialog.setVisible(true);
     }//GEN-LAST:event_jButton12ActionPerformed
 
-    private void jButton15ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton15ActionPerformed
+    private void saveProjectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveProjectButtonActionPerformed
         JFileChooser fcSave = new JFileChooser(".");
         fcSave.setAcceptAllFileFilterUsed(false);
         int returnVal = fcSave.showSaveDialog(this);
@@ -493,10 +529,12 @@ public class MainFrame extends javax.swing.JFrame {
             String saveFilePath = fcSave.getSelectedFile().getAbsolutePath();
             mainModel.ABM.saveModel(saveFilePath);
             mainModel.ABM.filePath = saveFilePath;
+            String[] temp = saveFilePath.split("\\\\");
+            jLabel7.setText(temp[temp.length - 1]);
         }
-    }//GEN-LAST:event_jButton15ActionPerformed
+    }//GEN-LAST:event_saveProjectButtonActionPerformed
 
-    private void jButton13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton13ActionPerformed
+    private void loadProjectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadProjectButtonActionPerformed
         JFileChooser fcLoad = new javax.swing.JFileChooser(".");
         fcLoad.setAcceptAllFileFilterUsed(false);
         int returnVal = fcLoad.showOpenDialog(this);
@@ -504,10 +542,12 @@ public class MainFrame extends javax.swing.JFrame {
             String loadFilePath = fcLoad.getSelectedFile().getAbsolutePath();
             mainModel.ABM.loadModel(loadFilePath);
             mainModel.ABM.filePath = loadFilePath;
+            String[] temp = loadFilePath.split("\\\\");
+            jLabel7.setText(temp[temp.length - 1]);
         }
-    }//GEN-LAST:event_jButton13ActionPerformed
+    }//GEN-LAST:event_loadProjectButtonActionPerformed
 
-    private void jButton14ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton14ActionPerformed
+    private void setDefaultProjectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setDefaultProjectButtonActionPerformed
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         projectDefaults.defaultProjectFileLocation = mainModel.ABM.filePath;
         String result = gson.toJson(projectDefaults);
@@ -519,12 +559,14 @@ public class MainFrame extends javax.swing.JFrame {
 
             writer.close();
             out.close();
+            String[] temp = projectDefaults.defaultProjectFileLocation.split("\\\\");
+            jLabel4.setText(temp[temp.length - 1]);
         } catch (IOException ex) {
             Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }//GEN-LAST:event_jButton14ActionPerformed
+    }//GEN-LAST:event_setDefaultProjectButtonActionPerformed
 
-    private void jButton16ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton16ActionPerformed
+    private void removeDefaultProjectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeDefaultProjectButtonActionPerformed
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         projectDefaults.defaultProjectFileLocation = "";
         String result = gson.toJson(projectDefaults);
@@ -536,10 +578,11 @@ public class MainFrame extends javax.swing.JFrame {
 
             writer.close();
             out.close();
+            jLabel4.setText("NO PROJECT");
         } catch (IOException ex) {
             Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }//GEN-LAST:event_jButton16ActionPerformed
+    }//GEN-LAST:event_removeDefaultProjectButtonActionPerformed
 
     private void jButton20ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton20ActionPerformed
         SafeGraphPreprocessDialog safeGraphPreprocessDialog = new SafeGraphPreprocessDialog(this, false);
@@ -549,7 +592,7 @@ public class MainFrame extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         GISLocationDialog gISLocationDialog = new GISLocationDialog(this, false);
         gISLocationDialog.setVisible(true);
-        
+
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -599,10 +642,6 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JButton jButton10;
     private javax.swing.JButton jButton11;
     private javax.swing.JButton jButton12;
-    private javax.swing.JButton jButton13;
-    private javax.swing.JButton jButton14;
-    private javax.swing.JButton jButton15;
-    private javax.swing.JButton jButton16;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton20;
     private javax.swing.JButton jButton5;
@@ -611,6 +650,8 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
@@ -621,5 +662,9 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JSpinner jSpinner1;
+    private javax.swing.JButton loadProjectButton;
+    private javax.swing.JButton removeDefaultProjectButton;
+    private javax.swing.JButton saveProjectButton;
+    private javax.swing.JButton setDefaultProjectButton;
     // End of variables declaration//GEN-END:variables
 }

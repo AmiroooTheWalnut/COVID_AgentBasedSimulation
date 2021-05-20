@@ -7,8 +7,10 @@ package COVID_AgentBasedSimulation.Model.Data.CovidCsseJhu;
 
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.Patterns;
 import COVID_AgentBasedSimulation.Model.Dataset;
+import COVID_AgentBasedSimulation.Model.DatasetTemplate;
 import java.util.ArrayList;
 import static COVID_AgentBasedSimulation.Model.MainModel.softwareVersion;
+import COVID_AgentBasedSimulation.Model.RecordTemplate;
 import COVID_AgentBasedSimulation.Model.Structure.AllGISData;
 import COVID_AgentBasedSimulation.Model.Structure.County;
 import COVID_AgentBasedSimulation.Model.Structure.State;
@@ -58,6 +60,19 @@ public class CovidCsseJhu extends Dataset implements Serializable {
 
     @Override
     public void setDatasetTemplate() {
+        datasetTemplate = new DatasetTemplate();
+        datasetTemplate.name = "CovidCsseJhu";
+
+        DatasetTemplate dailyConfirmedCasesList = new DatasetTemplate();
+        dailyConfirmedCasesList.name = "monthlyPatternsList";
+
+        for (int i = 0; i < DailyConfirmedCases.class.getFields().length; i++) {
+            RecordTemplate temp = new RecordTemplate();
+            temp.name = DailyConfirmedCases.class.getFields()[i].getName() + "(" + DailyConfirmedCases.class.getFields()[i].getGenericType().getTypeName() + ")";
+            dailyConfirmedCasesList.recordTemplates.add(temp);
+        }
+
+        datasetTemplate.innerDatasetTemplates.add(dailyConfirmedCasesList);
 
     }
 
@@ -73,34 +88,53 @@ public class CovidCsseJhu extends Dataset implements Serializable {
                 String rowLatValidation = row.getField("Lat");
                 if (!rowLatValidation.equals(0)) {
                     String fipsCode = row.getField("FIPS");
-                    fipsCode = String.valueOf((int) Double.parseDouble(fipsCode));
-                    String countyCode = fipsCode.substring(fipsCode.length() - 3, fipsCode.length());
-                    String stateCode = fipsCode.substring(0, fipsCode.length() - 3);
+                    if (fipsCode.length() > 0) {
+                        fipsCode = String.valueOf((int) Double.parseDouble(fipsCode));
+                        if (!(fipsCode.length() - 3 < 0)) {
+                            String countyCode = fipsCode.substring(fipsCode.length() - 3, fipsCode.length());
+                            String stateCode = fipsCode.substring(0, fipsCode.length() - 3);
 
-                    State state = gisData.countries.get(0).findState(Byte.valueOf(stateCode));
-                    County county = state.findCounty(Integer.parseInt(countyCode));
+                            State state = gisData.countries.get(0).findState(Byte.valueOf(stateCode));
+                            if (state != null) {
+                                County county = state.findCounty(Integer.parseInt(countyCode));
 
-                    for (int j = 11; j < row.getFieldCount(); j++) {
-                        String splitted[] = data.getHeader().get(j).split("/");
-                        String month = splitted[0];
-                        if (month.length() == 1) {
-                            month = "0" + month;
+                                for (int j = 11; j < row.getFieldCount(); j++) {
+                                    String splitted[] = data.getHeader().get(j).split("/");
+                                    String month = splitted[0];
+                                    if (month.length() == 1) {
+                                        month = "0" + month;
+                                    }
+                                    String day = splitted[1];
+                                    if (day.length() == 1) {
+                                        day = "0" + day;
+                                    }
+                                    String year = splitted[2];
+                                    String isoTime = "20" + year + "-" + month + "-" + day + "T00:00Z[UTC]";
+                                    ZonedDateTime date = ZonedDateTime.parse(isoTime);
+                                    int confirmedCased = Integer.parseInt(row.getField(j));
+                                    DailyConfirmedCases dailyConfirmedCases = new DailyConfirmedCases(date, confirmedCased, county);
+                                    dailyConfirmedCasesList.add(dailyConfirmedCases);
+                                }
+                            }
                         }
-                        String day = splitted[1];
-                        if (day.length() == 1) {
-                            day = "0" + day;
-                        }
-                        String year = splitted[2];
-                        String isoTime = "20" + year + "-" + month + "-" + day + "T00:00Z[UTC]";
-                        ZonedDateTime date = ZonedDateTime.parse(isoTime);
-                        int confirmedCased = Integer.parseInt(row.getField(j));
-                        DailyConfirmedCases dailyConfirmedCases = new DailyConfirmedCases(date, confirmedCased, county);
-                        dailyConfirmedCasesList.add(dailyConfirmedCases);
                     }
 
 //                    System.out.println("!!!");
                 }
             }
+
+            for (int i = 0; i < dailyConfirmedCasesList.size(); i++) {
+                int sumInfected=0;
+                for(int j=0;j<14;j++){
+                    if(i-j>-1){
+                        sumInfected=sumInfected+dailyConfirmedCasesList.get(i-j).numDailyCases;
+                    }
+                }
+                dailyConfirmedCasesList.get(i).numActiveCases=sumInfected;
+            }
+
+            CovidCsseJhu.saveDailyConfirmedCasesListKryo("./datasets/ProcessedCasesData", this);
+
         } catch (IOException ex) {
             Logger.getLogger(Patterns.class.getName()).log(Level.SEVERE, (String) null, ex);
         }
@@ -136,6 +170,14 @@ public class CovidCsseJhu extends Dataset implements Serializable {
         kryo.register(java.lang.String[].class);
         kryo.register(java.lang.String.class);
         kryo.setReferences(true);
+        kryo.register(COVID_AgentBasedSimulation.Model.Data.CovidCsseJhu.DailyConfirmedCases.class);
+        kryo.register(COVID_AgentBasedSimulation.Model.Structure.Country.class);
+        kryo.register(COVID_AgentBasedSimulation.Model.Structure.State.class);
+        kryo.register(COVID_AgentBasedSimulation.Model.Structure.County.class);
+        kryo.register(COVID_AgentBasedSimulation.Model.Structure.CensusTract.class);
+        kryo.register(COVID_AgentBasedSimulation.Model.Structure.CensusBlockGroup.class);
+        kryo.register(COVID_AgentBasedSimulation.Model.Structure.City.class);
+        kryo.register(java.time.ZonedDateTime.class);
         kryo.setInstantiatorStrategy(new DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
 //        kryo.setInstantiatorStrategy(new Kryo.DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
         kryo.register(COVID_AgentBasedSimulation.Model.DatasetTemplate.class);
@@ -195,11 +237,11 @@ public class CovidCsseJhu extends Dataset implements Serializable {
     }
 
     public DailyConfirmedCases getCountyDailyCases(County input, ZonedDateTime day) {
-        DailyConfirmedCases output=null;
+        DailyConfirmedCases output = null;
         for (int i = 0; i < dailyConfirmedCasesList.size(); i++) {
             if (dailyConfirmedCasesList.get(i).date.equals(day)) {
                 if (dailyConfirmedCasesList.get(i).county.id == input.id) {
-                    output=dailyConfirmedCasesList.get(i);
+                    output = dailyConfirmedCasesList.get(i);
                 }
             }
         }
