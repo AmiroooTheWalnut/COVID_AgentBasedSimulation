@@ -42,6 +42,6 @@ public class AgentTemplate {
     public BehaviorScript destructor;
     public BehaviorScript behavior;
     
-    
+    public boolean canRunBehaviorParallel=false;
     
 }

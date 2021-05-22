@@ -44,6 +44,7 @@ public class ProcessingMapRenderer extends PApplet {
 
     //FOR AGENT_TEMPLATE STUFF
     ArrayList<Location> drawingAgentTemplateLocations;
+    ArrayList<Vector3f> colors;
     //FOR AGENT_TEMPLATE STUFF
 
     //FOR INDIVIDUAL AGENT
@@ -70,7 +71,7 @@ public class ProcessingMapRenderer extends PApplet {
     @Override
     public void settings() {
         size(parentPanel.getWidth(), parentPanel.getHeight(), "processing.opengl.PGraphics3D");
-        
+
     }
 
     @Override
@@ -80,32 +81,26 @@ public class ProcessingMapRenderer extends PApplet {
 //        surface.setResizable(true);
         //get the SmoothCanvas that holds the PSurface
 //        SmoothCanvas smoothCanvas = (SmoothCanvas) surface.getNative();
-        
+
         GLWindow glWindow = (GLWindow) surface.getNative();
         glWindow.setPosition(0, 0);
-        
-        NewtCanvasAWT newtCanvasAWT = new NewtCanvasAWT(glWindow); 
+
+        NewtCanvasAWT newtCanvasAWT = new NewtCanvasAWT(glWindow);
 //        newtCanvasAWT.setLocation(0, 0);
 //        newtCanvasAWT.setBounds(0, 0, 200, 200);
         parentPanel.add(newtCanvasAWT);
-        
+
         parentPanel.invalidate();
         parentPanel.revalidate();
 
-
         //SmoothCanvas can be used as a Component
 //        parentPanel.add(smoothCanvas);
-        
 //        glWindow.destroy();
-
 //        Frame myFrame = ((PSurfaceAWT.SmoothCanvas) ((PSurfaceAWT) surface).getNative()).getFrame();
 //        JFrame a = (JFrame) myFrame;
 //        a.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
 //        removeExitEvent(getSurface());
-
 //        a.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
-
         mapSources = new MapSources(this);
 
 //        for (int i = 0; i < mapSources.maps.size(); i++) {
@@ -126,7 +121,7 @@ public class ProcessingMapRenderer extends PApplet {
     public void draw() {
         background(100);
         map.draw();
-        
+
         if (isShowGISMarkers == true) {
             drawGISMarkers();
         }
@@ -134,8 +129,7 @@ public class ProcessingMapRenderer extends PApplet {
             drawIndividualMarker();
             drawAgentTemplatesMarker();
         }
-        
-        
+
 //        if (isPan == true) {
 //            isPan = false;
 //            isReadyPan = true;
@@ -166,13 +160,23 @@ public class ProcessingMapRenderer extends PApplet {
 
     public void setDrawingAgentTemplatesMarkers(ArrayList<Float> lats, ArrayList<Float> lons) {
         drawingAgentTemplateLocations = new ArrayList();
+        colors = new ArrayList();
         for (int i = 0; i < lats.size(); i++) {
             drawingAgentTemplateLocations.add(new Location(lons.get(i), lats.get(i)));
         }
     }
-    
-    public void setDrawingAgetnMarker(float lat, float lon){
-        drawingIndividualAgent=new Location(lat,lon);
+
+    public void setDrawingAgentTemplatesMarkers(ArrayList<Float> lats, ArrayList<Float> lons, ArrayList<Vector3f> passed_colors) {
+        drawingAgentTemplateLocations = new ArrayList();
+        colors = new ArrayList();
+        for (int i = 0; i < lats.size(); i++) {
+            drawingAgentTemplateLocations.add(new Location(lons.get(i), lats.get(i)));
+            colors.add(new Vector3f(passed_colors.get(i).x, passed_colors.get(i).y, passed_colors.get(i).z));
+        }
+    }
+
+    public void setDrawingAgetnMarker(float lat, float lon) {
+        drawingIndividualAgent = new Location(lat, lon);
     }
 
     public void drawGISMarkers() {
@@ -205,7 +209,15 @@ public class ProcessingMapRenderer extends PApplet {
             for (int i = 0; i < drawingAgentTemplateLocations.size(); i++) {
                 SimplePointMarker locSM = new SimplePointMarker(drawingAgentTemplateLocations.get(i));
                 ScreenPosition scLocPos = locSM.getScreenPosition(map);
-                fill(0.0F, 200.0F, 0.0F, 100.0F);
+                if(colors!=null){
+                    if(colors.size()>0){
+                        fill(colors.get(i).x,colors.get(i).y,colors.get(i).z,80f);
+                    }else{
+                        fill(0.0F, 200.0F, 0.0F, 100.0F);
+                    }
+                }else{
+                    fill(0.0F, 200.0F, 0.0F, 100.0F);
+                }
                 ellipse(scLocPos.x, scLocPos.y, 30, 30);
             }
         }
@@ -247,5 +259,16 @@ public class ProcessingMapRenderer extends PApplet {
         });
 
         thread.start();
+    }
+
+    public static class Vector3f {
+        float x;
+        float y;
+        float z;
+        public Vector3f(float passed_x, float passed_y, float passed_z){
+            x=passed_x;
+            y=passed_y;
+            z=passed_z;
+        }
     }
 }

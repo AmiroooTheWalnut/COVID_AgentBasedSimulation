@@ -138,7 +138,7 @@ public class MainModel extends Dataset {
         ABM.agentTemplates.add(rootAgentTemplate);
     }
 
-    public void initModel(boolean isParallel, int numCPUs) {
+    public void initModel(boolean isParallelLoadingData, boolean isParallelBehaviorEvaluation, int numCPUs) {
         javaEvaluationEngine.parseAllScripts(ABM.agentTemplates);
         int month = ABM.startTime.getMonthValue();
         currentMonth = month;
@@ -149,23 +149,23 @@ public class MainModel extends Dataset {
         String dateName = ABM.startTime.getYear() + "_" + monthString;
         safegraph.clearPatternsPlaces();
         System.gc();
-        safegraph.loadPatternsPlacesSet(dateName, allGISData, ABM.studyScope, isParallel, numCPUs);
+        safegraph.loadPatternsPlacesSet(dateName, allGISData, ABM.studyScope, isParallelLoadingData, numCPUs);
         ABM.rootAgent = new Agent(ABM.agentTemplates.get(0));
         ABM.agents = new CopyOnWriteArrayList();
         ABM.currentTime = ABM.startTime;
-        resetTimerTask();
+        resetTimerTask(isParallelBehaviorEvaluation, numCPUs);
         pythonEvaluationEngine.saveAllPythonScripts(ABM.agentTemplates);
         if (ABM.rootAgent.myTemplate.constructor.isJavaScriptActive == true) {
             
             //javaEvaluationEngine.runScript(ABM.rootAgent.myTemplate.constructor.javaScript.script);
             
-            javaEvaluationEngine.runParsedScript(ABM.rootAgent.myTemplate.constructor.javaScript.parsedScript);
+            javaEvaluationEngine.runParsedScript(ABM.rootAgent, ABM.rootAgent.myTemplate.constructor.javaScript.parsedScript);
         } else {
             pythonEvaluationEngine.runScript(ABM.rootAgent.myTemplate.constructor.pythonScript);
         }
     }
 
-    public void resetTimerTask() {
+    public void resetTimerTask(boolean isParallel, int numCPUs) {
         runTask = new TimerTask() {
             @Override
             public void run() {
@@ -181,13 +181,13 @@ public class MainModel extends Dataset {
                     safegraph.requestDataset(allGISData, ABM.studyScope, yearStr, monthString, true, numCPUs);
                     currentMonth = month;
                 }
-                ABM.evaluateAllAgents();
+                ABM.evaluateAllAgents(isParallel, numCPUs);
                 ABM.currentTime = ABM.currentTime.plusMinutes(1);
             }
         };
     }
 
-    public void fastForward() {
+    public void fastForward(boolean isParallel, int numCPUs) {
         thread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -204,7 +204,7 @@ public class MainModel extends Dataset {
                         safegraph.requestDataset(allGISData, ABM.studyScope, yearStr, monthString, true, numCPUs);
                         currentMonth = month;
                     }
-                    ABM.evaluateAllAgents();
+                    ABM.evaluateAllAgents(isParallel, numCPUs);
                     ABM.currentTime = ABM.currentTime.plusMinutes(1);
 //                    System.out.println(isPause);
                 }
@@ -221,13 +221,13 @@ public class MainModel extends Dataset {
 
     }
 
-    public void resume() {
+    public void resume(boolean isParallel, int numCPUs) {
         if (simulationDelayTime > -1) {
             simulationTimer = new Timer();
-            resetTimerTask();
+            resetTimerTask(isParallel, numCPUs);
             simulationTimer.schedule(runTask, 0, simulationDelayTime);
         } else {
-            fastForward();
+            fastForward(isParallel, numCPUs);
         }
         isRunning = true;
 

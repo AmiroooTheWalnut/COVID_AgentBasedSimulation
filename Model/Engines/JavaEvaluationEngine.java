@@ -5,6 +5,7 @@
  */
 package COVID_AgentBasedSimulation.Model.Engines;
 
+import COVID_AgentBasedSimulation.Model.AgentBasedModel.Agent;
 import COVID_AgentBasedSimulation.Model.AgentBasedModel.AgentTemplate;
 import COVID_AgentBasedSimulation.Model.MainModel;
 import groovy.lang.Binding;
@@ -60,7 +61,8 @@ public class JavaEvaluationEngine {
         mainShell.evaluate(script);
     }
     
-    public void runParsedScript(Script script){
+    public void runParsedScript(Agent agent, Script script){
+        script.getBinding().setVariable("currentAgent", agent);
         script.run();
     }
 

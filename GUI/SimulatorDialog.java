@@ -5,6 +5,7 @@
  */
 package COVID_AgentBasedSimulation.GUI;
 
+import COVID_AgentBasedSimulation.GUI.ProcessingMapRenderer.Vector3f;
 import COVID_AgentBasedSimulation.Model.Structure.Marker;
 import de.fhpotsdam.unfolding.geo.Location;
 import java.util.ArrayList;
@@ -149,7 +150,6 @@ public class SimulatorDialog extends javax.swing.JDialog {
             }
         });
 
-        jCheckBox1.setSelected(true);
         jCheckBox1.setText("IsParallel?");
 
         jButton1.setText("Reset");
@@ -618,7 +618,7 @@ public class SimulatorDialog extends javax.swing.JDialog {
         if (jToggleButton1.getText().equals("Run")) {
             myParent.mainModel.isPause = false;
             jToggleButton1.setText("Pause");
-            myParent.mainModel.resume();
+            myParent.mainModel.resume(jCheckBox1.isSelected(), myParent.numProcessors);
         } else if (jToggleButton1.getText().equals("Pause")) {
             myParent.mainModel.isPause = true;
             myParent.mainModel.pause();
@@ -633,7 +633,7 @@ public class SimulatorDialog extends javax.swing.JDialog {
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         myParent.mainModel.javaEvaluationEngine.connectToConsole(jTextArea1);
         myParent.mainModel.pythonEvaluationEngine.connectToConsole(jTextArea2);
-        myParent.mainModel.initModel(jCheckBox1.isSelected(), myParent.numProcessors);
+        myParent.mainModel.initModel(true, jCheckBox1.isSelected(), myParent.numProcessors);
         jLabel2.setText(myParent.mainModel.ABM.startTime.toString());
         Timer refreshSimulationDialogTimer = new Timer();
         refreshSimulationDialogTimer.schedule(new TimerTask() {
@@ -642,37 +642,75 @@ public class SimulatorDialog extends javax.swing.JDialog {
 //                System.out.println("UPDATE: "+myParent.mainModel.agentBasedModel.currentTime.toString());
                 jLabel2.setText(myParent.mainModel.ABM.currentTime.toString());
                 if (jList6.getSelectedIndex() > -1) {
-                    ArrayList lats = new ArrayList();
-                    ArrayList lons = new ArrayList();
-                    for (int i = 0; i < myParent.mainModel.ABM.agents.size(); i++) {
+                    if (jList6.getSelectedValue().equals("Person")) {
+                        ArrayList<Float> lats = new ArrayList();
+                        ArrayList<Float> lons = new ArrayList();
+                        ArrayList<Vector3f> colors = new ArrayList();
+                        for (int i = 0; i < myParent.mainModel.ABM.agents.size(); i++) {
 //                        if(myParent.mainModel.ABM.agents.get(i)==null){
 //                            System.out.println(myParent.mainModel.ABM.agents.get(i));
 //                        }
-                        if (myParent.mainModel.ABM.agents.get(i).myTemplate.agentTypeName.equals(jList6.getSelectedValue())) {
-                            Float lat = null;
-                            Float lon = null;
-                            for (int j = 0; j < myParent.mainModel.ABM.agents.get(i).myTemplate.agentProperties.size(); j++) {
-                                if (myParent.mainModel.ABM.agents.get(i).myTemplate.agentProperties.get(j).propertyName.equals("lat")) {
-                                    lat = (Float) myParent.mainModel.ABM.agents.get(i).myTemplate.agentProperties.get(j).value;
+                            if (myParent.mainModel.ABM.agents.get(i).myTemplate.agentTypeName.equals(jList6.getSelectedValue())) {
+                                Float lat = null;
+                                Float lon = null;
+                                int status = -1;
+                                for (int j = 0; j < myParent.mainModel.ABM.agents.get(i).myTemplate.agentProperties.size(); j++) {
+                                    if (myParent.mainModel.ABM.agents.get(i).myTemplate.agentProperties.get(j).propertyName.equals("lat")) {
+                                        lat = (Float) myParent.mainModel.ABM.agents.get(i).myTemplate.agentProperties.get(j).value;
+                                    }
+                                    if (myParent.mainModel.ABM.agents.get(i).myTemplate.agentProperties.get(j).propertyName.equals("lon")) {
+                                        lon = (Float) myParent.mainModel.ABM.agents.get(i).myTemplate.agentProperties.get(j).value;
+                                    }
+                                    if (myParent.mainModel.ABM.agents.get(i).myTemplate.agentProperties.get(j).propertyName.equals("status")) {
+                                        status = (Integer) myParent.mainModel.ABM.agents.get(i).myTemplate.agentProperties.get(j).value;
+                                    }
                                 }
-                                if (myParent.mainModel.ABM.agents.get(i).myTemplate.agentProperties.get(j).propertyName.equals("lon")) {
-                                    lon = (Float) myParent.mainModel.ABM.agents.get(i).myTemplate.agentProperties.get(j).value;
+                                if (lat != null && lon != null) {
+                                    lats.add(lat);
+                                    lons.add(lon);
                                 }
-                            }
-                            if(lat!=null && lon!=null){
-                                lats.add(lat);
-                                lons.add(lon);
+                                if (status == 0) {
+                                    colors.add(new Vector3f(0f, 200f, 10f));
+                                } else if (status == 1) {
+                                    colors.add(new Vector3f(200f, 10f, 10f));
+                                } else if (status == 2) {
+                                    colors.add(new Vector3f(10f, 10f, 200f));
+                                } else if (status == -1) {
+                                    System.out.println("Severe problem! A person's status is out of list!!!");
+                                }
                             }
                         }
+                        myParent.child.setDrawingAgentTemplatesMarkers(lats, lons, colors);
+                    } else {
+                        ArrayList<Float> lats = new ArrayList();
+                        ArrayList<Float> lons = new ArrayList();
+                        for (int i = 0; i < myParent.mainModel.ABM.agents.size(); i++) {
+                            if (myParent.mainModel.ABM.agents.get(i).myTemplate.agentTypeName.equals(jList6.getSelectedValue())) {
+                                Float lat = null;
+                                Float lon = null;
+                                for (int j = 0; j < myParent.mainModel.ABM.agents.get(i).myTemplate.agentProperties.size(); j++) {
+                                    if (myParent.mainModel.ABM.agents.get(i).myTemplate.agentProperties.get(j).propertyName.equals("lat")) {
+                                        lat = (Float) myParent.mainModel.ABM.agents.get(i).myTemplate.agentProperties.get(j).value;
+                                    }
+                                    if (myParent.mainModel.ABM.agents.get(i).myTemplate.agentProperties.get(j).propertyName.equals("lon")) {
+                                        lon = (Float) myParent.mainModel.ABM.agents.get(i).myTemplate.agentProperties.get(j).value;
+                                    }
+                                }
+                                if (lat != null && lon != null) {
+                                    lats.add(lat);
+                                    lons.add(lon);
+                                }
+                            }
+                        }
+                        myParent.child.setDrawingAgentTemplatesMarkers(lats, lons);
                     }
-                    myParent.child.setDrawingAgentTemplatesMarkers(lats, lons);
                 }
                 if (jList7.getSelectedIndex() > -1) {
-                    
+
                 }
                 if (isRateChanged == true) {
                     myParent.mainModel.pause();
-                    myParent.mainModel.resume();
+                    myParent.mainModel.resume(jCheckBox1.isSelected(), myParent.numProcessors);
                     isRateChanged = false;
                 }
             }

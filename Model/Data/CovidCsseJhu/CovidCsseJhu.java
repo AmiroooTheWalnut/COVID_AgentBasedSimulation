@@ -98,22 +98,24 @@ public class CovidCsseJhu extends Dataset implements Serializable {
                             if (state != null) {
                                 County county = state.findCounty(Integer.parseInt(countyCode));
 
-                                for (int j = 11; j < row.getFieldCount(); j++) {
-                                    String splitted[] = data.getHeader().get(j).split("/");
-                                    String month = splitted[0];
-                                    if (month.length() == 1) {
-                                        month = "0" + month;
+                                if (county != null) {
+                                    for (int j = 11; j < row.getFieldCount(); j++) {
+                                        String splitted[] = data.getHeader().get(j).split("/");
+                                        String month = splitted[0];
+                                        if (month.length() == 1) {
+                                            month = "0" + month;
+                                        }
+                                        String day = splitted[1];
+                                        if (day.length() == 1) {
+                                            day = "0" + day;
+                                        }
+                                        String year = splitted[2];
+                                        String isoTime = "20" + year + "-" + month + "-" + day + "T00:00Z[UTC]";
+                                        ZonedDateTime date = ZonedDateTime.parse(isoTime);
+                                        int confirmedCased = Integer.parseInt(row.getField(j));
+                                        DailyConfirmedCases dailyConfirmedCases = new DailyConfirmedCases(date, confirmedCased, county);
+                                        dailyConfirmedCasesList.add(dailyConfirmedCases);
                                     }
-                                    String day = splitted[1];
-                                    if (day.length() == 1) {
-                                        day = "0" + day;
-                                    }
-                                    String year = splitted[2];
-                                    String isoTime = "20" + year + "-" + month + "-" + day + "T00:00Z[UTC]";
-                                    ZonedDateTime date = ZonedDateTime.parse(isoTime);
-                                    int confirmedCased = Integer.parseInt(row.getField(j));
-                                    DailyConfirmedCases dailyConfirmedCases = new DailyConfirmedCases(date, confirmedCased, county);
-                                    dailyConfirmedCasesList.add(dailyConfirmedCases);
                                 }
                             }
                         }
@@ -124,13 +126,13 @@ public class CovidCsseJhu extends Dataset implements Serializable {
             }
 
             for (int i = 0; i < dailyConfirmedCasesList.size(); i++) {
-                int sumInfected=0;
-                for(int j=0;j<14;j++){
-                    if(i-j>-1){
-                        sumInfected=sumInfected+dailyConfirmedCasesList.get(i-j).numDailyCases;
+                int sumInfected = 0;
+                for (int j = 0; j < 14; j++) {
+                    if (i - j > -1) {
+                        sumInfected = sumInfected + dailyConfirmedCasesList.get(i - j).numDailyCases;
                     }
                 }
-                dailyConfirmedCasesList.get(i).numActiveCases=sumInfected;
+                dailyConfirmedCasesList.get(i).numActiveCases = sumInfected;
             }
 
             CovidCsseJhu.saveDailyConfirmedCasesListKryo("./datasets/ProcessedCasesData", this);

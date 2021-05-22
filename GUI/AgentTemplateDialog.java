@@ -130,6 +130,7 @@ public class AgentTemplateDialog extends javax.swing.JDialog {
 
     public void updatePropertiestTemplateList() {
         jTextField1.setText(workingAgentTemplate.agentTypeName);
+        jPanel1.removeAll();
         for (int i = 0; i < workingAgentTemplate.agentProperties.size(); i++) {
             AgentTemplatePanel temp = new AgentTemplatePanel(myMainModel, this, workingAgentTemplate.agentProperties.get(i), i);
             temp.jTextField1.setText(workingAgentTemplate.agentProperties.get(i).propertyName);
@@ -376,7 +377,30 @@ public class AgentTemplateDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
+        for (int i = 0; i < jPanel1.getComponentCount(); i++) {
+            if (jPanel1.getComponent(i) instanceof AgentTemplatePanel) {
+                workingAgentTemplate.agentProperties.get(((AgentTemplatePanel) jPanel1.getComponent(i)).myIndex).propertyName = ((AgentTemplatePanel) jPanel1.getComponent(i)).jTextField1.getText();
+                workingAgentTemplate.agentProperties.get(((AgentTemplatePanel) jPanel1.getComponent(i)).myIndex).propertyType = ((AgentTemplatePanel) jPanel1.getComponent(i)).jLabel2.getText();
+            }
+        }
+        for (int i = 0; i < jPanel1.getComponentCount(); i++) {
+            if (jPanel1.getComponent(i) instanceof AgentTemplatePanel) {
+                if (((AgentTemplatePanel) jPanel1.getComponent(i)).isSelected == true) {
+                    workingAgentTemplate.agentProperties.remove(((AgentTemplatePanel) jPanel1.getComponent(i)).myIndex);
+                }
+            }
+        }
+        updatePropertiestTemplateList();
+        jPanel1.repaint();
+        jPanel1.invalidate();
+        jPanel1.revalidate();
+        int counter = 0;
+        for (int i = 0; i < jPanel1.getComponentCount(); i++) {
+            if (jPanel1.getComponent(i) instanceof AgentTemplatePanel) {
+                ((AgentTemplatePanel) jPanel1.getComponent(i)).myIndex = counter;
+                counter = counter + 1;
+            }
+        }
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jTree1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTree1MouseReleased

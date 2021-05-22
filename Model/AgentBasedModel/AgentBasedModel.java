@@ -44,9 +44,8 @@ public class AgentBasedModel {
 
     private transient MainModel myMainModel;
 
-    public transient Agent currentEvaluatingAgent[] = new Agent[1];
-    public transient Agent oldCurrentEvaluatingAgent[] = new Agent[1];
-
+//    public transient Agent currentEvaluatingAgent[] = new Agent[1];
+//    public transient Agent oldCurrentEvaluatingAgent[] = new Agent[1];
     public transient ZonedDateTime startTime;
     public transient ZonedDateTime currentTime;
     public transient ZonedDateTime endTime;
@@ -58,27 +57,60 @@ public class AgentBasedModel {
 //        currentTime.
     }
 
-    public void evaluateAllAgents() {
+    public void evaluateAllAgents(boolean isParallel, int numCPU) {
+        Agent currentEvaluatingAgent[] = new Agent[1];
         try {
             currentEvaluatingAgent[0] = rootAgent;
             if (rootAgent.myTemplate.behavior.isJavaScriptActive == true) {
                 //myMainModel.javaEvaluationEngine.runScript(rootAgent.myTemplate.behavior.javaScript.script);
 
-                myMainModel.javaEvaluationEngine.runParsedScript(rootAgent.myTemplate.behavior.javaScript.parsedScript);
+                myMainModel.javaEvaluationEngine.runParsedScript(rootAgent, rootAgent.myTemplate.behavior.javaScript.parsedScript);
 
             } else {
                 myMainModel.pythonEvaluationEngine.runScript(rootAgent.myTemplate.behavior.pythonScript);
             }
-            for (int i = 0; i < agents.size(); i++) {
-                currentEvaluatingAgent[0] = agents.get(i);
-                if (agents.get(i).myTemplate.behavior.isJavaScriptActive == true) {
-                    //myMainModel.javaEvaluationEngine.runScript(agents.get(i).myTemplate.behavior.javaScript.script);
+            if (isParallel == false) {
+                for (int i = 0; i < agents.size(); i++) {
+                    currentEvaluatingAgent[0] = agents.get(i);
+                    if (agents.get(i).myTemplate.behavior.isJavaScriptActive == true) {
+                        //myMainModel.javaEvaluationEngine.runScript(agents.get(i).myTemplate.behavior.javaScript.script);
 
-                    myMainModel.javaEvaluationEngine.runParsedScript(agents.get(i).myTemplate.behavior.javaScript.parsedScript);
-                } else {
-                    myMainModel.pythonEvaluationEngine.runScript(agents.get(i).myTemplate.behavior.pythonScript);
+                        myMainModel.javaEvaluationEngine.runParsedScript(agents.get(i), agents.get(i).myTemplate.behavior.javaScript.parsedScript);
+                    } else {
+                        myMainModel.pythonEvaluationEngine.runScript(agents.get(i).myTemplate.behavior.pythonScript);
+                    }
                 }
+            } else {
+//                for (int i = 0; i < agents.size(); i++) {
+//                    
+//                }
+                int numProcessors = numCPU;
+                if (numProcessors > Runtime.getRuntime().availableProcessors()) {
+                    numProcessors = Runtime.getRuntime().availableProcessors();
+                }
+                ParallelAgentEvaluator parallelAgentEval[] = new ParallelAgentEvaluator[numProcessors];
+
+                for (int i = 0; i < numProcessors - 1; i++) {
+                    parallelAgentEval[i] = new ParallelAgentEvaluator(myMainModel, agents, (int) Math.floor(i * ((agents.size()) / numProcessors)), (int) Math.floor((i + 1) * ((agents.size()) / numProcessors)));
+                }
+                parallelAgentEval[numProcessors - 1] = new ParallelAgentEvaluator(myMainModel, agents, (int) Math.floor((numProcessors - 1) * ((agents.size()) / numProcessors)), agents.size());
+
+                for (int i = 0; i < numProcessors; i++) {
+                    parallelAgentEval[i].myThread.start();
+                }
+                for (int i = 0; i < numProcessors; i++) {
+                    try {
+                        parallelAgentEval[i].myThread.join();
+//                        System.out.println("thread " + i + "finished for records: " + parallelAgentEval[i].myStartIndex + " | " + parallelAgentEval[i].myEndIndex);
+                    } catch (InterruptedException ie) {
+                        System.out.println(ie.toString());
+                    }
+                }
+//                for (int i = 0; i < numProcessors; i++) {
+//                    recordsLocal.addAll(parallelPatternParsers[i].records);
+//                }
             }
+
         } catch (Exception ex) {
             System.out.println("ERROR ON AGENT TYPE:");
             System.out.println(currentEvaluatingAgent[0].myTemplate.agentTypeName);
@@ -88,11 +120,12 @@ public class AgentBasedModel {
         }
     }
 
-    public Agent getCurrentAgent() {
-        return currentEvaluatingAgent[0];
-    }
-
+//    public Agent getCurrentAgent() {
+//        return currentEvaluatingAgent[0];
+//    }
     public Agent makeAgent(String agentTemplate) {
+//        Agent currentEvaluatingAgent[] = new Agent[1];
+//        Agent oldCurrentEvaluatingAgent[] = new Agent[1];
         try {
             AgentTemplate template = null;
             for (int i = 0; i < agentTemplates.size(); i++) {
@@ -105,6 +138,7 @@ public class AgentBasedModel {
                 System.out.println("ERROR: MAKE AGENT: AGENT TEMPLATE NOT FOUND");
                 return null;
             } else {
+
                 AgentTemplate copiedTemplate = new AgentTemplate(template);
                 copiedTemplate.constructor = template.constructor;
                 copiedTemplate.behavior = template.behavior;
@@ -112,23 +146,23 @@ public class AgentBasedModel {
                 Agent output = new Agent(copiedTemplate);
                 output.myIndex = agents.size();
                 agents.add(output);
-                oldCurrentEvaluatingAgent[0] = currentEvaluatingAgent[0];
-                currentEvaluatingAgent = new Agent[1];
-                currentEvaluatingAgent[0] = output;
+//                oldCurrentEvaluatingAgent[0] = self;
+//                currentEvaluatingAgent = new Agent[1];
+//                currentEvaluatingAgent[0] = output;
                 if (output.myTemplate.constructor.isJavaScriptActive == true) {
                     //myMainModel.javaEvaluationEngine.runScript(output.myTemplate.constructor.javaScript.script);
 
-                    myMainModel.javaEvaluationEngine.runParsedScript(output.myTemplate.constructor.javaScript.parsedScript);
+                    myMainModel.javaEvaluationEngine.runParsedScript(output, output.myTemplate.constructor.javaScript.parsedScript);
                 } else {
                     myMainModel.pythonEvaluationEngine.runScript(output.myTemplate.constructor.pythonScript);
                 }
-                currentEvaluatingAgent[0] = oldCurrentEvaluatingAgent[0];
+//                currentEvaluatingAgent[0] = oldCurrentEvaluatingAgent[0];
                 return output;
             }
         } catch (Exception ex) {
 
         }
-        currentEvaluatingAgent[0] = oldCurrentEvaluatingAgent[0];
+//        currentEvaluatingAgent[0] = oldCurrentEvaluatingAgent[0];
         return null;
     }
 
@@ -136,7 +170,7 @@ public class AgentBasedModel {
         if (agent.myTemplate.destructor.isJavaScriptActive == true) {
             //myMainModel.javaEvaluationEngine.runScript(agent.myTemplate.destructor.javaScript.script);
 
-            myMainModel.javaEvaluationEngine.runParsedScript(agent.myTemplate.destructor.javaScript.parsedScript);
+            myMainModel.javaEvaluationEngine.runParsedScript(agent, agent.myTemplate.destructor.javaScript.parsedScript);
         } else {
             myMainModel.pythonEvaluationEngine.runScript(agent.myTemplate.destructor.pythonScript);
         }
@@ -213,7 +247,7 @@ public class AgentBasedModel {
             if (myMainModel.allGISData.countries != null) {
                 if (studyScope != null) {
                     if (studyScope.equals("FullData")) {
-                        studyScopeGeography=myMainModel.allGISData.countries.get(0);
+                        studyScopeGeography = myMainModel.allGISData.countries.get(0);
                     } else {
                         String sections[] = studyScope.split("_");
                         int countryIndex = -1;
