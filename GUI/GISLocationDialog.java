@@ -13,6 +13,8 @@ import esmaieeli.gisFastLocationOptimization.Simulation.FacilityLocation;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 /**
@@ -58,6 +60,9 @@ public class GISLocationDialog extends javax.swing.JDialog {
         jButton4 = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
         jButton6 = new javax.swing.JButton();
+        jButton7 = new javax.swing.JButton();
+        jButton8 = new javax.swing.JButton();
+        jButton9 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -106,6 +111,27 @@ public class GISLocationDialog extends javax.swing.JDialog {
             }
         });
 
+        jButton7.setText("Generate shops");
+        jButton7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton7ActionPerformed(evt);
+            }
+        });
+
+        jButton8.setText("Generate schools");
+        jButton8.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton8ActionPerformed(evt);
+            }
+        });
+
+        jButton9.setText("Show shops and schools");
+        jButton9.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton9ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -117,8 +143,11 @@ public class GISLocationDialog extends javax.swing.JDialog {
                     .addComponent(jButton2)
                     .addComponent(jButton4)
                     .addComponent(jButton3)
+                    .addComponent(jButton6)
+                    .addComponent(jButton7)
                     .addComponent(jButton5)
-                    .addComponent(jButton6))
+                    .addComponent(jButton8)
+                    .addComponent(jButton9))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
@@ -127,16 +156,22 @@ public class GISLocationDialog extends javax.swing.JDialog {
                 .addContainerGap()
                 .addComponent(jButton4)
                 .addGap(18, 18, 18)
+                .addComponent(jButton7)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton2)
                 .addGap(18, 18, 18)
+                .addComponent(jButton8)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton6)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton3)
                 .addGap(18, 18, 18)
                 .addComponent(jButton5)
-                .addContainerGap(514, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(jButton9)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -238,7 +273,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
                 if (shopFacilities != null) {
                     mainFParent.app.removeAllHeadquarters();
                     for (int i = 0; i < shopFacilities.length; i++) {
-                        mainFParent.app.headquarter(shopFacilities[i].renderingLocation, shopFacilities[i].capacity, "center");
+                        mainFParent.app.headquarter(shopFacilities[i].renderingLocation, 0.4f, "center");
                     }
                 }
                 return null;
@@ -301,7 +336,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
                 if (schoolFacilities != null) {
                     mainFParent.app.removeAllHeadquarters();
                     for (int i = 0; i < schoolFacilities.length; i++) {
-                        mainFParent.app.headquarter(schoolFacilities[i].renderingLocation, schoolFacilities[i].capacity, "center");
+                        mainFParent.app.headquarter(schoolFacilities[i].renderingLocation, 0.4f, "candidate");
                     }
                 }
                 return null;
@@ -310,51 +345,128 @@ public class GISLocationDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-        int shopLayer=mainFParent.findLayer("shops_v");
-        int schoolLayer=mainFParent.findLayer("schools_v");
-        HashMap<String, String> perms=new HashMap();
-        int counter=0;
-        for(int i=1;i<((LayerDefinition)mainFParent.allData.all_Layers.get(shopLayer)).categories.length;i++){
-            for(int j=1;j<((LayerDefinition)mainFParent.allData.all_Layers.get(schoolLayer)).categories.length;j++){
-                perms.put(i+"_"+j, String.valueOf(counter));
-                counter=counter+1;
+        int shopLayer = mainFParent.findLayer("shops_v");
+        int schoolLayer = mainFParent.findLayer("schools_v");
+        HashMap<String, String> perms = new HashMap();
+        HashMap<String, Integer> usedPerms = new HashMap();
+        HashMap<String, Integer> refinedPermsById = new HashMap();
+        HashMap<String, Integer> refinedPermsbyUse = new HashMap();
+        ArrayList<String> refinedPermsKeys = new ArrayList();
+        int counter = 0;
+        for (int i = 1; i < ((LayerDefinition) mainFParent.allData.all_Layers.get(shopLayer)).categories.length; i++) {
+            for (int j = 1; j < ((LayerDefinition) mainFParent.allData.all_Layers.get(schoolLayer)).categories.length; j++) {
+                perms.put(i + "_" + j, String.valueOf(counter));
+                usedPerms.put(i + "_" + j, 0);
+                counter = counter + 1;
             }
         }
-        
+        usedPerms.put("0", 0);
+
+        for (int i = 0; i < mainFParent.allData.all_Nodes.length; i++) {
+            short shopIndex = (short) (((short[]) mainFParent.allData.all_Nodes[i].layers.get(shopLayer))[0] - 1);
+            short schoolIndex = (short) (((short[]) mainFParent.allData.all_Nodes[i].layers.get(schoolLayer))[0] - 1);
+            int currentCounter = -1;
+            if (shopIndex == 0 || schoolIndex == 0) {//NOT ASSIGNED SCENARIOS
+                currentCounter = usedPerms.get("0");
+            } else {
+                currentCounter = usedPerms.get(shopIndex + "_" + schoolIndex);
+            }
+
+            usedPerms.put(shopIndex + "_" + schoolIndex, currentCounter + 1);
+        }
+
+        counter = 1;
+        int refinedCounter = 0;
+        for (Map.Entry<String, Integer> entry : usedPerms.entrySet()) {
+            String key = entry.getKey();
+            Integer value = entry.getValue();
+            if (value > 0) {
+                refinedPermsbyUse.put(key, value);
+                refinedPermsById.put(key, refinedCounter + 1);
+                refinedCounter = refinedCounter + 1;
+            }
+            counter = counter + 1;
+        }
+
         LayerDefinition tempLayer = new LayerDefinition("category", "voronoi_combination_v");
-        tempLayer.categories = new String[counter+1];
-        tempLayer.colors = new Color[counter+1];
-        tempLayer.values = new double[counter+1];
+        tempLayer.categories = new String[refinedCounter + 1];
+        tempLayer.colors = new Color[refinedCounter + 1];
+        tempLayer.values = new double[refinedCounter + 1];
 
         tempLayer.categories[0] = "NOT ASSIGNED";
         tempLayer.colors[0] = new Color(2, 2, 2);
-        tempLayer.values[0] = Double.valueOf(0);
-        for (int i = 1; i < counter+1; i++) {
-            tempLayer.categories[i] = "combination " + String.valueOf(i);
-            tempLayer.colors[i] = new Color(Color.HSBtoRGB((float) i / (float) counter + 1 - 1, 1, 1));
-            tempLayer.values[i] = Double.valueOf(i);
+        tempLayer.values[0] = Double.valueOf(1);
+//        for (int i = 1; i < counter + 1; i++) {
+//            tempLayer.categories[i] = "combination " + String.valueOf(i);
+//            tempLayer.colors[i] = new Color(Color.HSBtoRGB((float) i / (float) counter + 1 - 1, 1, 1));
+//            tempLayer.values[i] = Double.valueOf(i + 1);
+//        }
+
+        int combinationCounter = 1;
+        for (Map.Entry<String, Integer> entry : refinedPermsById.entrySet()) {
+            String key = entry.getKey();
+            Integer value = entry.getValue();
+            tempLayer.categories[combinationCounter] = "combination " + key;
+            tempLayer.colors[combinationCounter] = new Color(Color.HSBtoRGB((float) combinationCounter / (float) refinedCounter + 1 - 1, 1, 1));
+            tempLayer.values[combinationCounter] = Double.valueOf(value);
+            combinationCounter = combinationCounter + 1;
         }
-        
+
         for (int i = 0; i < mainFParent.allData.all_Nodes.length; i++) {
-            short shopIndex=(short)(((short[]) mainFParent.allData.all_Nodes[i].layers.get(shopLayer))[0]-1);
-            short schoolIndex=(short)(((short[]) mainFParent.allData.all_Nodes[i].layers.get(schoolLayer))[0]-1);
+            short shopIndex = (short) (((short[]) mainFParent.allData.all_Nodes[i].layers.get(shopLayer))[0] - 1);
+            short schoolIndex = (short) (((short[]) mainFParent.allData.all_Nodes[i].layers.get(schoolLayer))[0] - 1);
             String combinationIndex;
-            if(shopIndex==0 || schoolIndex==0){//NOT ASSIGNED SCENARIOS
-                combinationIndex="0";
-            }else{
-                combinationIndex=perms.get(shopIndex+"_"+schoolIndex);
+            if (shopIndex == 0 || schoolIndex == 0) {//NOT ASSIGNED SCENARIOS
+                combinationIndex = "0";
+            } else {
+                combinationIndex = String.valueOf(refinedPermsById.get(shopIndex + "_" + schoolIndex));
             }
             short[] val = new short[1];
 //            if(combinationIndex==null){
 //                System.out.println("combinationIndex: "+combinationIndex);
 //            }
-            val[0]=Short.valueOf(combinationIndex);
+            val[0] = (short) (Short.valueOf(combinationIndex) + 1);
+//            if (val[0] == 0) {
+//                System.out.println("!!!");
+//            }
+//            if (val[0] > 64) {
+//                System.out.println("!!!");
+//            }
             mainFParent.allData.all_Nodes[i].layers.add(val);
         }
-        
+
         mainFParent.allData.all_Layers.add(tempLayer);
         mainFParent.refreshLayersList();
     }//GEN-LAST:event_jButton5ActionPerformed
+
+    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
+        shopFacilities = initShopFacilities();
+    }//GEN-LAST:event_jButton7ActionPerformed
+
+    private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
+        schoolFacilities = initSchoolFacilities();
+    }//GEN-LAST:event_jButton8ActionPerformed
+
+    private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
+        (mainFParent.app).enqueue(new Callable() {
+            public Object call() throws Exception {
+                mainFParent.app.removeAllHeadquarters();
+                if (shopFacilities != null) {
+//                    mainFParent.app.removeAllHeadquarters();
+                    for (int i = 0; i < shopFacilities.length; i++) {
+                        mainFParent.app.headquarter(shopFacilities[i].renderingLocation, 0.4f, "center");
+                    }
+                }
+                if (schoolFacilities != null) {
+//                    mainFParent.app.removeAllHeadquarters();
+                    for (int i = 0; i < schoolFacilities.length; i++) {
+                        mainFParent.app.headquarter(schoolFacilities[i].renderingLocation, 0.4f, "candidate");
+                    }
+                }
+                return null;
+            }
+        });
+    }//GEN-LAST:event_jButton9ActionPerformed
 
     public boolean isShop(int naicsCode) {
         String naicsString = String.valueOf(naicsCode);
@@ -388,7 +500,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
                 }
             }
         }
-        shops=mergeFacilities(shops,0.006f);
+        shops = mergeFacilities(shops, 0.01f);
 
         int numFacilities = shops.size();
         FacilityLocation output[] = new FacilityLocation[numFacilities];
@@ -401,36 +513,37 @@ public class GISLocationDialog extends javax.swing.JDialog {
             output[i] = new FacilityLocation(mainFParent, shops.get(i), shops.get(i).myWays[0], 20d);
             output[i].color = colors[i];
             output[i].isDecoyable = true;
+            output[i].tollOff=0.5;//IMP
         }
+        System.out.println("shops generated: "+output.length);
         return output;
     }
 
     public ArrayList<LocationNode> mergeFacilities(ArrayList<LocationNode> input, float threshold) {
         ArrayList<LocationNode> checker = new ArrayList();
-        
+
 //        for (int i = 0; i < input.size(); i++) {
 //            checker.add(new LocationNode(input.get(i).id,input.get(i).lat,input.get(i).lon,input.get(i).myOrder));
 //        }
-        
         for (int i = 0; i < input.size(); i++) {
-            boolean tooClose=false;
+            boolean tooClose = false;
             for (int j = 0; j < input.size(); j++) {
                 if (i != j) {
-                    if (Math.sqrt(Math.pow(input.get(i).lat-input.get(j).lat, 2) + Math.pow(input.get(i).lon-input.get(j).lon, 2)) < threshold) {
-                        tooClose=true;
+                    if (Math.sqrt(Math.pow(input.get(i).lat - input.get(j).lat, 2) + Math.pow(input.get(i).lon - input.get(j).lon, 2)) < threshold) {
+                        tooClose = true;
                     } else {
 
                     }
                 }
             }
-            if(tooClose==false){
-                checker.add(new LocationNode(input.get(i).id,input.get(i).lat,input.get(i).lon,input.get(i).myOrder));
+            if (tooClose == false) {
+                checker.add(new LocationNode(input.get(i).id, input.get(i).lat, input.get(i).lon, input.get(i).myOrder));
             }
         }
         ArrayList<LocationNode> output = new ArrayList();
-        
+
         for (int i = 0; i < checker.size(); i++) {
-            output.add(getNearestNode((float)checker.get(i).lat,(float)checker.get(i).lon));
+            output.add(getNearestNode((float) checker.get(i).lat, (float) checker.get(i).lon));
         }
         return output;
     }
@@ -451,7 +564,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
                 }
             }
         }
-        schools=mergeFacilities(schools,0.007f);
+        schools = mergeFacilities(schools, 0.007f);
 
         int numFacilities = schools.size();
         FacilityLocation output[] = new FacilityLocation[numFacilities];
@@ -464,7 +577,9 @@ public class GISLocationDialog extends javax.swing.JDialog {
             output[i] = new FacilityLocation(mainFParent, schools.get(i), schools.get(i).myWays[0], 20d);
             output[i].color = colors[i];
             output[i].isDecoyable = true;
+            output[i].tollOff=0.5;//IMP
         }
+        System.out.println("schools generated: "+output.length);
         return output;
     }
 
@@ -495,11 +610,13 @@ public class GISLocationDialog extends javax.swing.JDialog {
 //                            System.out.println("max y: "+max_y);
 //                            System.out.println("min y: "+min_y);
                 if (collisionPositiony < mainFParent.allData.grid[i][j].max_y_val && collisionPositiony > mainFParent.allData.grid[i][j].min_y_val && collisionPositionx < mainFParent.allData.grid[i][j].max_x_val && collisionPositionx > mainFParent.allData.grid[i][j].min_x_val) {
-                    isValidCollition = true;
+                    if (mainFParent.allData.grid[i][j].myNodes.length > 0) {
+                        isValidCollition = true;
 //                                System.out.println("grid x: "+i);
 //                                System.out.println("grid y: "+j);
-                    outputGrid = mainFParent.allData.grid[i][j];
-                    break;
+                        outputGrid = mainFParent.allData.grid[i][j];
+                        break;
+                    }
                 }
             }
             if (isValidCollition == true) {
@@ -531,6 +648,9 @@ public class GISLocationDialog extends javax.swing.JDialog {
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
+    private javax.swing.JButton jButton7;
+    private javax.swing.JButton jButton8;
+    private javax.swing.JButton jButton9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     // End of variables declaration//GEN-END:variables

@@ -69,6 +69,7 @@ public class AgentBehaviorDialog extends javax.swing.JDialog {
         rootDatasets.add(new DefaultMutableTreeNode("Integer"));
         rootDatasets.add(new DefaultMutableTreeNode("Double"));
         rootDatasets.add(new DefaultMutableTreeNode("String"));
+        rootDatasets.add(new DefaultMutableTreeNode("Boolean"));
         rootDatasets.add(new DefaultMutableTreeNode("ArrayList"));
 
 //        root.add(javaNode);

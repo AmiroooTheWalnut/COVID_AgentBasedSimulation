@@ -211,14 +211,17 @@ public class ProcessingMapRenderer extends PApplet {
                 ScreenPosition scLocPos = locSM.getScreenPosition(map);
                 if(colors!=null){
                     if(colors.size()>0){
-                        fill(colors.get(i).x,colors.get(i).y,colors.get(i).z,80f);
+                        noStroke();
+                        fill(colors.get(i).x,colors.get(i).y,colors.get(i).z,255f);
+                        ellipse(scLocPos.x, scLocPos.y, 10, 10);
                     }else{
                         fill(0.0F, 200.0F, 0.0F, 100.0F);
+                        ellipse(scLocPos.x, scLocPos.y, 30, 30);
                     }
                 }else{
                     fill(0.0F, 200.0F, 0.0F, 100.0F);
+                    ellipse(scLocPos.x, scLocPos.y, 30, 30);
                 }
-                ellipse(scLocPos.x, scLocPos.y, 30, 30);
             }
         }
     }

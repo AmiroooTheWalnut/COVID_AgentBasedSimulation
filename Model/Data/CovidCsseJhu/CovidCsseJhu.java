@@ -90,8 +90,14 @@ public class CovidCsseJhu extends Dataset implements Serializable {
                     String fipsCode = row.getField("FIPS");
                     if (fipsCode.length() > 0) {
                         fipsCode = String.valueOf((int) Double.parseDouble(fipsCode));
+
+//                        if (fipsCode.equals("55111")) {
+//                            System.out.println("!!!");
+//                        }
+
                         if (!(fipsCode.length() - 3 < 0)) {
                             String countyCode = fipsCode.substring(fipsCode.length() - 3, fipsCode.length());
+
                             String stateCode = fipsCode.substring(0, fipsCode.length() - 3);
 
                             State state = gisData.countries.get(0).findState(Byte.valueOf(stateCode));
@@ -113,6 +119,9 @@ public class CovidCsseJhu extends Dataset implements Serializable {
                                         String isoTime = "20" + year + "-" + month + "-" + day + "T00:00Z[UTC]";
                                         ZonedDateTime date = ZonedDateTime.parse(isoTime);
                                         int confirmedCased = Integer.parseInt(row.getField(j));
+//                                        if(confirmedCased>0 && fipsCode.equals("55111")){
+//                                            System.out.println("!!!");
+//                                        }
                                         DailyConfirmedCases dailyConfirmedCases = new DailyConfirmedCases(date, confirmedCased, county);
                                         dailyConfirmedCasesList.add(dailyConfirmedCases);
                                     }

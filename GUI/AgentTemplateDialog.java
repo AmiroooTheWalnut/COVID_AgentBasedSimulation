@@ -12,6 +12,8 @@ import COVID_AgentBasedSimulation.Model.AgentBasedModel.JavaScript;
 import COVID_AgentBasedSimulation.Model.AgentBasedModel.PythonScript;
 import COVID_AgentBasedSimulation.Model.DatasetTemplate;
 import COVID_AgentBasedSimulation.Model.MainModel;
+import java.awt.Color;
+import java.util.ArrayList;
 import javax.swing.JTree;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -79,6 +81,7 @@ public class AgentTemplateDialog extends javax.swing.JDialog {
         root.add(new DefaultMutableTreeNode("Integer"));
         root.add(new DefaultMutableTreeNode("Double"));
         root.add(new DefaultMutableTreeNode("String"));
+        root.add(new DefaultMutableTreeNode("Boolean"));
         root.add(new DefaultMutableTreeNode("ArrayList"));
 
 //        root.add(javaNode);
@@ -139,6 +142,24 @@ public class AgentTemplateDialog extends javax.swing.JDialog {
             jPanel1.repaint();
             jPanel1.invalidate();
             jPanel1.revalidate();
+        }
+    }
+
+    public void updateStatusList() {
+        jPanel5.removeAll();
+        for (int i = 0; i < workingAgentTemplate.statusNames.size(); i++) {
+            StatusPanel temp = new StatusPanel(myMainModel, this, workingAgentTemplate, i);
+            temp.jTextField1.setText(workingAgentTemplate.statusNames.get(i));
+            temp.jFormattedTextField1.setText(String.valueOf(workingAgentTemplate.statusValues.get(i)));
+            Color color=new Color(Color.HSBtoRGB((float) i / (float) workingAgentTemplate.statusNames.size() - 1, 1, 1));
+            temp.jPanel1.setBackground(color);
+            if(i==0){
+                temp.jButton1.setEnabled(false);
+            }
+            jPanel5.add(temp);
+            jPanel5.repaint();
+            jPanel5.invalidate();
+            jPanel5.revalidate();
         }
     }
 
@@ -238,6 +259,10 @@ public class AgentTemplateDialog extends javax.swing.JDialog {
         jScrollPane2 = new javax.swing.JScrollPane();
         jTree1 = new javax.swing.JTree();
         jButton3 = new javax.swing.JButton();
+        jPanel4 = new javax.swing.JPanel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jPanel5 = new javax.swing.JPanel();
+        jButton4 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -319,7 +344,7 @@ public class AgentTemplateDialog extends javax.swing.JDialog {
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 457, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 471, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -330,6 +355,35 @@ public class AgentTemplateDialog extends javax.swing.JDialog {
             }
         });
 
+        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Status"));
+
+        jPanel5.setLayout(new javax.swing.BoxLayout(jPanel5, javax.swing.BoxLayout.X_AXIS));
+        jScrollPane3.setViewportView(jPanel5);
+
+        jButton4.setText("+");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane3))
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane3)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addComponent(jButton4)
+                .addGap(0, 75, Short.MAX_VALUE))
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -337,14 +391,19 @@ public class AgentTemplateDialog extends javax.swing.JDialog {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
+                        .addComponent(jButton3)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jButton3)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -357,10 +416,12 @@ public class AgentTemplateDialog extends javax.swing.JDialog {
                             .addComponent(jLabel1)
                             .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton3))
+                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton3)
                 .addContainerGap())
         );
 
@@ -404,7 +465,7 @@ public class AgentTemplateDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jTree1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTree1MouseReleased
-
+        
     }//GEN-LAST:event_jTree1MouseReleased
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
@@ -441,6 +502,14 @@ public class AgentTemplateDialog extends javax.swing.JDialog {
         }
 
         myParent.updateAgentTemplateList();
+        
+        for (int i = 0; i < jPanel5.getComponentCount(); i++) {
+            if (jPanel5.getComponent(i) instanceof StatusPanel) {
+                workingAgentTemplate.statusNames.set(((StatusPanel) jPanel5.getComponent(i)).myIndex, ((StatusPanel) jPanel5.getComponent(i)).jTextField1.getText());
+                workingAgentTemplate.statusValues.set(((StatusPanel) jPanel5.getComponent(i)).myIndex, Integer.valueOf(((StatusPanel) jPanel5.getComponent(i)).jFormattedTextField1.getText()));
+            }
+        }
+        
         this.dispose();
     }//GEN-LAST:event_jButton3ActionPerformed
 
@@ -456,17 +525,33 @@ public class AgentTemplateDialog extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_jTree1ValueChanged
 
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        for (int i = 0; i < jPanel5.getComponentCount(); i++) {
+            if (jPanel5.getComponent(i) instanceof StatusPanel) {
+                workingAgentTemplate.statusNames.set(((StatusPanel) jPanel5.getComponent(i)).myIndex, ((StatusPanel) jPanel5.getComponent(i)).jTextField1.getText());
+                workingAgentTemplate.statusValues.set(((StatusPanel) jPanel5.getComponent(i)).myIndex, Integer.valueOf(((StatusPanel) jPanel5.getComponent(i)).jFormattedTextField1.getText()));
+            }
+        }
+        workingAgentTemplate.statusNames.add("empty");
+        workingAgentTemplate.statusValues.add(0);
+        updateStatusList();
+    }//GEN-LAST:event_jButton4ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    public javax.swing.JPanel jPanel5;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTree jTree1;
     // End of variables declaration//GEN-END:variables

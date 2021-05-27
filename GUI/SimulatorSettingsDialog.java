@@ -568,6 +568,7 @@ public class SimulatorSettingsDialog extends javax.swing.JDialog {
             AgentTemplateDialog agentTemplateDialog = new AgentTemplateDialog(myMainModel, this, (JFrame) SwingUtilities.getWindowAncestor(this), true, jList1.getSelectedIndex());
             agentTemplateDialog.workingAgentTemplate = myMainModel.ABM.agentTemplates.get(jList1.getSelectedIndex());
             agentTemplateDialog.updatePropertiestTemplateList();
+            agentTemplateDialog.updateStatusList();
             agentTemplateDialog.setVisible(true);
         }
     }//GEN-LAST:event_jButton3ActionPerformed

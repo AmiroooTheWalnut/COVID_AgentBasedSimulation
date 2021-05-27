@@ -54,7 +54,8 @@ public class AgentBasedModel {
 
     public AgentBasedModel(MainModel mainModel) {
         myMainModel = mainModel;
-//        currentTime.
+//        currentTime.geth
+//        FileWriter fileWritter = new FileWriter("",true);
     }
 
     public void evaluateAllAgents(boolean isParallel, int numCPU) {
@@ -143,6 +144,8 @@ public class AgentBasedModel {
                 copiedTemplate.constructor = template.constructor;
                 copiedTemplate.behavior = template.behavior;
                 copiedTemplate.destructor = template.destructor;
+                copiedTemplate.statusNames = template.statusNames;
+                copiedTemplate.statusValues = template.statusValues;
                 Agent output = new Agent(copiedTemplate);
                 output.myIndex = agents.size();
                 agents.add(output);

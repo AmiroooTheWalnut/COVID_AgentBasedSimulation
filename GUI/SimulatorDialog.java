@@ -11,6 +11,7 @@ import de.fhpotsdam.unfolding.geo.Location;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.awt.Color;
 
 /**
  *
@@ -62,6 +63,37 @@ public class SimulatorDialog extends javax.swing.JDialog {
         });
     }
 
+    public void updateStatusList() {
+        jPanel10.removeAll();
+        if (jList6.getSelectedIndex() > -1) {
+            int agentTemplateIndex = -1;
+            for (int i = 0; i < myParent.mainModel.ABM.agentTemplates.size(); i++) {
+                if (myParent.mainModel.ABM.agentTemplates.get(i).agentTypeName.equals(jList6.getSelectedValue())) {
+                    agentTemplateIndex = i;
+                    break;
+                }
+            }
+            for (int i = 0; i < myParent.mainModel.ABM.agentTemplates.get(agentTemplateIndex).statusNames.size(); i++) {
+                StatusPanel temp = new StatusPanel(myParent.mainModel, null, myParent.mainModel.ABM.agentTemplates.get(agentTemplateIndex), i);
+                temp.jTextField1.setText(myParent.mainModel.ABM.agentTemplates.get(agentTemplateIndex).statusNames.get(i));
+                temp.jFormattedTextField1.setText(String.valueOf(myParent.mainModel.ABM.agentTemplates.get(agentTemplateIndex).statusValues.get(i)));
+                Color color = new Color(Color.HSBtoRGB((float) i / (float) myParent.mainModel.ABM.agentTemplates.get(agentTemplateIndex).statusNames.size() - 1, 1, 1));
+                temp.jPanel1.setBackground(color);
+                temp.jPanel1.setEnabled(false);
+                temp.jButton1.setEnabled(false);
+                temp.jTextField1.setEditable(false);
+                temp.jFormattedTextField1.setEnabled(false);
+                if (i == 0) {
+                    temp.jButton1.setEnabled(false);
+                }
+                jPanel10.add(temp);
+                jPanel10.repaint();
+                jPanel10.invalidate();
+                jPanel10.revalidate();
+            }
+        }
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -92,9 +124,12 @@ public class SimulatorDialog extends javax.swing.JDialog {
         jToggleButton2 = new javax.swing.JToggleButton();
         jToggleButton3 = new javax.swing.JToggleButton();
         jTabbedPane1 = new javax.swing.JTabbedPane();
-        jPanel10 = new javax.swing.JPanel();
+        jPanel19 = new javax.swing.JPanel();
         jScrollPane8 = new javax.swing.JScrollPane();
         jList6 = new javax.swing.JList<>();
+        jPanel18 = new javax.swing.JPanel();
+        jScrollPane11 = new javax.swing.JScrollPane();
+        jPanel10 = new javax.swing.JPanel();
         jPanel15 = new javax.swing.JPanel();
         jScrollPane9 = new javax.swing.JScrollPane();
         jList7 = new javax.swing.JList<>();
@@ -314,8 +349,6 @@ public class SimulatorDialog extends javax.swing.JDialog {
                 .addGap(0, 14, Short.MAX_VALUE))
         );
 
-        jPanel10.setBorder(javax.swing.BorderFactory.createTitledBorder("Agent templates"));
-
         jList6.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
                 jList6ValueChanged(evt);
@@ -323,18 +356,38 @@ public class SimulatorDialog extends javax.swing.JDialog {
         });
         jScrollPane8.setViewportView(jList6);
 
-        javax.swing.GroupLayout jPanel10Layout = new javax.swing.GroupLayout(jPanel10);
-        jPanel10.setLayout(jPanel10Layout);
-        jPanel10Layout.setHorizontalGroup(
-            jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 347, Short.MAX_VALUE)
+        jPanel18.setBorder(javax.swing.BorderFactory.createTitledBorder("Status"));
+
+        jPanel10.setLayout(new javax.swing.BoxLayout(jPanel10, javax.swing.BoxLayout.X_AXIS));
+        jScrollPane11.setViewportView(jPanel10);
+
+        javax.swing.GroupLayout jPanel18Layout = new javax.swing.GroupLayout(jPanel18);
+        jPanel18.setLayout(jPanel18Layout);
+        jPanel18Layout.setHorizontalGroup(
+            jPanel18Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane11)
         );
-        jPanel10Layout.setVerticalGroup(
-            jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 584, Short.MAX_VALUE)
+        jPanel18Layout.setVerticalGroup(
+            jPanel18Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane11, javax.swing.GroupLayout.DEFAULT_SIZE, 127, Short.MAX_VALUE)
         );
 
-        jTabbedPane1.addTab("Agent templates", jPanel10);
+        javax.swing.GroupLayout jPanel19Layout = new javax.swing.GroupLayout(jPanel19);
+        jPanel19.setLayout(jPanel19Layout);
+        jPanel19Layout.setHorizontalGroup(
+            jPanel19Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 359, Short.MAX_VALUE)
+            .addComponent(jPanel18, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        jPanel19Layout.setVerticalGroup(
+            jPanel19Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel19Layout.createSequentialGroup()
+                .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 451, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel18, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("Agent templates", jPanel19);
 
         jPanel15.setBorder(javax.swing.BorderFactory.createTitledBorder("Agents"));
 
@@ -587,7 +640,7 @@ public class SimulatorDialog extends javax.swing.JDialog {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jTabbedPane1)
                     .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -646,6 +699,8 @@ public class SimulatorDialog extends javax.swing.JDialog {
                         ArrayList<Float> lats = new ArrayList();
                         ArrayList<Float> lons = new ArrayList();
                         ArrayList<Vector3f> colors = new ArrayList();
+                        ArrayList<Integer> statusValues = new ArrayList();
+                        int maxStatusValue = 0;
                         for (int i = 0; i < myParent.mainModel.ABM.agents.size(); i++) {
 //                        if(myParent.mainModel.ABM.agents.get(i)==null){
 //                            System.out.println(myParent.mainModel.ABM.agents.get(i));
@@ -669,16 +724,45 @@ public class SimulatorDialog extends javax.swing.JDialog {
                                     lats.add(lat);
                                     lons.add(lon);
                                 }
-                                if (status == 0) {
-                                    colors.add(new Vector3f(0f, 200f, 10f));
-                                } else if (status == 1) {
-                                    colors.add(new Vector3f(200f, 10f, 10f));
-                                } else if (status == 2) {
-                                    colors.add(new Vector3f(10f, 10f, 200f));
-                                } else if (status == -1) {
-                                    System.out.println("Severe problem! A person's status is out of list!!!");
+                                if (maxStatusValue < status) {
+                                    maxStatusValue = status;
+                                }
+                                statusValues.add(status);
+//                                if (status == 0) {
+//                                    colors.add(new Vector3f(0f, 200f, 10f));
+//                                } else if (status == 1) {
+//                                    colors.add(new Vector3f(200f, 10f, 10f));
+//                                } else if (status == 2) {
+//                                    colors.add(new Vector3f(10f, 10f, 200f));
+//                                } else if (status == -1) {
+////                                    System.out.println("Severe problem! A person's status is out of list!!!");
+//                                }
+                            }
+                        }
+                        for (int i = 0; i < statusValues.size(); i++) {
+                            boolean isFound=false;
+                            for(int j=0;j<myParent.mainModel.ABM.agents.get(i).myTemplate.statusValues.size();j++){
+                                if(statusValues.get(i)==myParent.mainModel.ABM.agents.get(i).myTemplate.statusValues.get(j)){
+                                    Color color = new Color(Color.HSBtoRGB((float) (statusValues.get(i)+1) / (float) (myParent.mainModel.ABM.agents.get(i).myTemplate.statusValues.size()), 1, 1));
+                                    colors.add(new Vector3f((float) color.getRed(), (float) color.getGreen(), (float) color.getBlue()));
+                                    isFound=true;
+                                    break;
                                 }
                             }
+                            if(isFound==false){
+                                Color color = new Color(Color.HSBtoRGB(0, 1, 1));
+                                colors.add(new Vector3f((float) color.getRed(), (float) color.getGreen(), (float) color.getBlue()));
+                            }
+//                            if (statusValues.get(i) == -1) {
+////                                System.out.println("Severe problem! A person's status is out of list!!!");
+//                            } else {
+//                                Color color = new Color(Color.HSBtoRGB((float) statusValues.get(i) / (float) maxStatusValue - 1, 1, 1));
+//                                colors.add(new Vector3f((float) color.getRed(), (float) color.getGreen(), (float) color.getBlue()));
+//                            }
+
+//                            for (int j = 0; j < maxStatusValue; j++) {
+//                                colors[i] = new Color(Color.HSBtoRGB((float) status / (float) maxStatusValue - 1, 1, 1));
+//                            }
                         }
                         myParent.child.setDrawingAgentTemplatesMarkers(lats, lons, colors);
                     } else {
@@ -1024,7 +1108,7 @@ public class SimulatorDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jPanel14AncestorResized
 
     private void jList6ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList6ValueChanged
-
+        updateStatusList();
     }//GEN-LAST:event_jList6ValueChanged
 
     private void jList7ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList7ValueChanged
@@ -1074,6 +1158,8 @@ public class SimulatorDialog extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel16;
     private javax.swing.JPanel jPanel17;
+    private javax.swing.JPanel jPanel18;
+    private javax.swing.JPanel jPanel19;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -1092,6 +1178,7 @@ public class SimulatorDialog extends javax.swing.JDialog {
     private javax.swing.JRadioButton jRadioButton8;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane10;
+    private javax.swing.JScrollPane jScrollPane11;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;

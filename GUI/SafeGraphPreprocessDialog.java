@@ -12,7 +12,10 @@ import COVID_AgentBasedSimulation.Model.Data.Safegraph.Safegraph;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.SafegraphPlaces;
 import static COVID_AgentBasedSimulation.Model.Data.Safegraph.SafegraphPlaces.getBuildingAreaOnline;
 import COVID_AgentBasedSimulation.Model.MainModel;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -91,6 +94,7 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
         jPanel12 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         jList3 = new javax.swing.JList<>();
+        jButton11 = new javax.swing.JButton();
 
         jLabel2.setText("jLabel2");
 
@@ -486,6 +490,13 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
 
         jPanel1.add(jPanel6);
 
+        jButton11.setText("Report NAICS");
+        jButton11.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton11ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -499,6 +510,8 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
                 .addComponent(jButton17)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jCheckBox1)
+                .addGap(18, 18, 18)
+                .addComponent(jButton11)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
@@ -511,7 +524,8 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
                     .addComponent(jButton17)
                     .addComponent(jCheckBox1)
                     .addComponent(jButton18)
-                    .addComponent(jButton19))
+                    .addComponent(jButton19)
+                    .addComponent(jButton11))
                 .addContainerGap())
         );
 
@@ -606,7 +620,7 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
             String[] patternsList = AllPatterns.detectAllPatterns("./datasets/Safegraph/FullData");
             for (int i = 0; i < patternsList.length; i++) {
                 myParent.mainModel.safegraph.clearPatternsPlaces();
-                mainModel.safegraph.loadPatternsPlacesSet(patternsList[i].split("_")[1]+"_"+patternsList[i].split("_")[2], myParent.mainModel.allGISData, "FullData", true, myParent.numProcessors);
+                mainModel.safegraph.loadPatternsPlacesSet(patternsList[i].split("_")[1] + "_" + patternsList[i].split("_")[2], myParent.mainModel.allGISData, "FullData", true, myParent.numProcessors);
 
                 if (mainModel.safegraph.allPatterns.monthlyPatternsList != null && mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList != null) {
                     if (mainModel.safegraph.allPatterns.monthlyPatternsList.size() > 0 && mainModel.safegraph.allPatterns.monthlyPatternsList.size() > 0) {
@@ -683,11 +697,300 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
-        if(jList2.getSelectedIndex()!=-1){
-            SafegraphPlaces.connectToOSMBuildingArea(mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(jList2.getSelectedIndex()).placesRecords,(int)jSpinner1.getValue());
-            Safegraph.saveSafegraphPlacesKryo("./datasets/Safegraph/FullData/"+jList2.getSelectedValue()+"/processedData_withArea", mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(jList2.getSelectedIndex()));
+        if (jList2.getSelectedIndex() != -1) {
+            SafegraphPlaces.connectToOSMBuildingArea(mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(jList2.getSelectedIndex()).placesRecords, (int) jSpinner1.getValue());
+            Safegraph.saveSafegraphPlacesKryo("./datasets/Safegraph/FullData/" + jList2.getSelectedValue() + "/processedData_withArea", mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(jList2.getSelectedIndex()));
         }
     }//GEN-LAST:event_jButton10ActionPerformed
+
+    private void jButton11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton11ActionPerformed
+        if (jList1.getSelectedIndex() > -1) {
+            String businessNames[] = new String[]{"Agriculture", "Mining", "Utilities", "Construction", "Manufacturing", "WholesaleTrade", "RetailTrade", "TransportationWarehousing", "Information", "FinanceInsurance", "RealestateRentalLeasing", "ProfessionalScientificTechnicalServices", "ManagementCompaniesEnterprises", "AdministrativeSupportWasteManagementRemediationServices", "EducationalServices", "HealthCareSocialAssistance", "ArtsEntertainmentRecreation", "AccommodationFoodServices", "OtherServicesExceptPublicAdministration", "PublicAdministration","Extra: Food and groceries","Extra: Religious organizations","Extra: Schools"};
+            int businessTravelsCount[] = new int[businessNames.length];
+            for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.size(); i++) {
+//                System.out.println(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).place.naics_code);
+                if (isAgriculture(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).place.naics_code) == true) {
+                    businessTravelsCount[0] += myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).raw_visit_counts;
+//                    System.out.println("Agriculture: "+businessTravelsCount[0]);
+                } else if (isMining(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).place.naics_code) == true) {
+                    businessTravelsCount[1] += myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).raw_visit_counts;
+//                    System.out.println("Mining: "+businessTravelsCount[1]);
+                } else if (isUtilities(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).place.naics_code) == true) {
+                    businessTravelsCount[2] += myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).raw_visit_counts;
+//                    System.out.println("Utilities: "+businessTravelsCount[2]);
+                } else if (isConstruction(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).place.naics_code) == true) {
+                    businessTravelsCount[3] += myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).raw_visit_counts;
+//                    System.out.println("Construction: "+businessTravelsCount[3]);
+                } else if (isManufacturing(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).place.naics_code) == true) {
+                    businessTravelsCount[4] += myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).raw_visit_counts;
+//                    System.out.println("Manufacturing: "+businessTravelsCount[4]);
+                } else if (isWholesaleTrade(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).place.naics_code) == true) {
+                    businessTravelsCount[5] += myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).raw_visit_counts;
+//                    System.out.println("WholesaleTrade: "+businessTravelsCount[5]);
+                } else if (isRetailTrade(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).place.naics_code) == true) {
+                    businessTravelsCount[6] += myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).raw_visit_counts;
+//                    System.out.println("RetailTrade: "+businessTravelsCount[6]);
+                } else if (isTransportationWarehousing(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).place.naics_code) == true) {
+                    businessTravelsCount[7] += myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).raw_visit_counts;
+//                    System.out.println("TransportationWarehousing: "+businessTravelsCount[7]);
+                } else if (isInformation(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).place.naics_code) == true) {
+                    businessTravelsCount[8] += myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).raw_visit_counts;
+//                    System.out.println("Information: "+businessTravelsCount[8]);
+                } else if (isFinanceInsurance(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).place.naics_code) == true) {
+                    businessTravelsCount[9] += myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).raw_visit_counts;
+//                    System.out.println("FinanceInsurance: "+businessTravelsCount[9]);
+                } else if (isRealestateRentalLeasing(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).place.naics_code) == true) {
+                    businessTravelsCount[10] += myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).raw_visit_counts;
+//                    System.out.println("RealestateRentalLeasing: "+businessTravelsCount[10]);
+                } else if (isProfessionalScientificTechnicalServices(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).place.naics_code) == true) {
+                    businessTravelsCount[11] += myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).raw_visit_counts;
+//                    System.out.println("ProfessionalScientificTechnicalServices: "+businessTravelsCount[11]);
+                } else if (isManagementCompaniesEnterprises(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).place.naics_code) == true) {
+                    businessTravelsCount[12] += myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).raw_visit_counts;
+//                    System.out.println("ManagementCompaniesEnterprises: "+businessTravelsCount[12]);
+                } else if (isAdministrativeSupportWasteManagementRemediationServices(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).place.naics_code) == true) {
+                    businessTravelsCount[13] += myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).raw_visit_counts;
+//                    System.out.println("AdministrativeSupportWasteManagementRemediationServices: "+businessTravelsCount[13]);
+                } else if (isEducationalServices(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).place.naics_code) == true) {
+                    businessTravelsCount[14] += myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).raw_visit_counts;
+//                    System.out.println("EducationalServices: "+businessTravelsCount[14]);
+                } else if (isHealthCareSocialAssistance(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).place.naics_code) == true) {
+                    businessTravelsCount[15] += myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).raw_visit_counts;
+//                    System.out.println("HealthCareSocialAssistance: "+businessTravelsCount[15]);
+                } else if (isArtsEntertainmentRecreation(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).place.naics_code) == true) {
+                    businessTravelsCount[16] += myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).raw_visit_counts;
+//                    System.out.println("ArtsEntertainmentRecreation: "+businessTravelsCount[16]);
+                } else if (isAccommodationFoodServices(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).place.naics_code) == true) {
+                    businessTravelsCount[17] += myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).raw_visit_counts;
+//                    System.out.println("AccommodationFoodServices: "+businessTravelsCount[17]);
+                } else if (isOtherServicesExceptPublicAdministration(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).place.naics_code) == true) {
+                    businessTravelsCount[18] += myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).raw_visit_counts;
+//                    System.out.println("OtherServicesExceptPublicAdministration: "+businessTravelsCount[18]);
+                } else if (isPublicAdministration(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).place.naics_code) == true) {
+                    businessTravelsCount[19] += myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).raw_visit_counts;
+//                    System.out.println("PublicAdministration: "+businessTravelsCount[19]);
+                }
+                if (isFoodAndGrocery(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).place.naics_code) == true) {
+                    businessTravelsCount[20] += myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).raw_visit_counts;
+//                    System.out.println("PublicAdministration: "+businessTravelsCount[19]);
+                } else if (isReligiousOrganization(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).place.naics_code) == true) {
+                    businessTravelsCount[21] += myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).raw_visit_counts;
+//                    System.out.println("PublicAdministration: "+businessTravelsCount[19]);
+                } else if (isEducationalServices(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).place.naics_code) == true) {
+                    businessTravelsCount[22] += myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).raw_visit_counts;
+//                    System.out.println("PublicAdministration: "+businessTravelsCount[19]);
+                }
+                
+            }
+            try {
+                String header = new String();
+                for (int i = 0; i < businessNames.length; i++) {
+                    header += businessNames[i];
+                    if (i != businessNames.length - 1) {
+                        header += ",";
+                    }
+                }
+                header += "\n";
+                String data = new String();
+                for (int i = 0; i < businessTravelsCount.length; i++) {
+                    data += String.valueOf(businessTravelsCount[i]);
+                    if (i != businessTravelsCount.length - 1) {
+                        data += ",";
+                    }
+                }
+                data += "\n";
+                File f1 = new File("./"+jList1.getSelectedValue()+"_NAICSReport.csv");
+                if (!f1.exists()) {
+                    f1.createNewFile();
+                }
+
+                FileWriter fileWritter = new FileWriter(f1.getName(), false);
+                BufferedWriter bw = new BufferedWriter(fileWritter);
+                bw.write(header);
+                bw.write(data);
+                bw.close();
+                System.out.println("Done");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }//GEN-LAST:event_jButton11ActionPerformed
+
+    public boolean isReligiousOrganization(int naicsCode) {
+        String naicsString = String.valueOf(naicsCode);
+        if (naicsString.startsWith("8131")) {
+            return true;
+        }
+        return false;
+    }
+    
+    public boolean isFoodAndGrocery(int naicsCode) {
+        String naicsString = String.valueOf(naicsCode);
+        if ((naicsString.startsWith("44") || naicsString.startsWith("45")) && !naicsString.startsWith("4411") && !naicsString.startsWith("4412") && !naicsString.startsWith("4413")) {
+            return true;
+        }
+        return false;
+    }
+    
+    public boolean isAgriculture(int naicsCode) {
+        String naicsString = String.valueOf(naicsCode);
+        if (naicsString.startsWith("11")) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isMining(int naicsCode) {
+        String naicsString = String.valueOf(naicsCode);
+        if (naicsString.startsWith("21")) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isUtilities(int naicsCode) {
+        String naicsString = String.valueOf(naicsCode);
+        if (naicsString.startsWith("22")) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isConstruction(int naicsCode) {
+        String naicsString = String.valueOf(naicsCode);
+        if (naicsString.startsWith("23")) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isManufacturing(int naicsCode) {
+        String naicsString = String.valueOf(naicsCode);
+        if (naicsString.startsWith("31") || naicsString.startsWith("32") || naicsString.startsWith("33")) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isWholesaleTrade(int naicsCode) {
+        String naicsString = String.valueOf(naicsCode);
+        if (naicsString.startsWith("42")) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isRetailTrade(int naicsCode) {
+        String naicsString = String.valueOf(naicsCode);
+        if (naicsString.startsWith("44") || naicsString.startsWith("45")) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isTransportationWarehousing(int naicsCode) {
+        String naicsString = String.valueOf(naicsCode);
+        if (naicsString.startsWith("48") || naicsString.startsWith("49")) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isInformation(int naicsCode) {
+        String naicsString = String.valueOf(naicsCode);
+        if (naicsString.startsWith("51")) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isFinanceInsurance(int naicsCode) {
+        String naicsString = String.valueOf(naicsCode);
+        if (naicsString.startsWith("52")) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isRealestateRentalLeasing(int naicsCode) {
+        String naicsString = String.valueOf(naicsCode);
+        if (naicsString.startsWith("53")) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isProfessionalScientificTechnicalServices(int naicsCode) {
+        String naicsString = String.valueOf(naicsCode);
+        if (naicsString.startsWith("54")) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isManagementCompaniesEnterprises(int naicsCode) {
+        String naicsString = String.valueOf(naicsCode);
+        if (naicsString.startsWith("55")) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isAdministrativeSupportWasteManagementRemediationServices(int naicsCode) {
+        String naicsString = String.valueOf(naicsCode);
+        if (naicsString.startsWith("56")) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isEducationalServices(int naicsCode) {
+        String naicsString = String.valueOf(naicsCode);
+        if (naicsString.startsWith("61")) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isHealthCareSocialAssistance(int naicsCode) {
+        String naicsString = String.valueOf(naicsCode);
+        if (naicsString.startsWith("62")) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isArtsEntertainmentRecreation(int naicsCode) {
+        String naicsString = String.valueOf(naicsCode);
+        if (naicsString.startsWith("71")) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isAccommodationFoodServices(int naicsCode) {
+        String naicsString = String.valueOf(naicsCode);
+        if (naicsString.startsWith("72")) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isOtherServicesExceptPublicAdministration(int naicsCode) {
+        String naicsString = String.valueOf(naicsCode);
+        if (naicsString.startsWith("81")) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isPublicAdministration(int naicsCode) {
+        String naicsString = String.valueOf(naicsCode);
+        if (naicsString.startsWith("92")) {
+            return true;
+        }
+        return false;
+    }
 
     public void refreshPatternsList() {
         jList1.setModel(new javax.swing.AbstractListModel() {
@@ -735,6 +1038,7 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton10;
+    private javax.swing.JButton jButton11;
     private javax.swing.JButton jButton17;
     private javax.swing.JButton jButton18;
     private javax.swing.JButton jButton19;

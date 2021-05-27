@@ -18,7 +18,10 @@ import lombok.Setter;
 public class AgentTemplate {
     
     public AgentTemplate(){
-        
+        statusNames=new ArrayList();
+        statusNames.add("DEFAULT_UNKNOWN");
+        statusValues=new ArrayList();
+        statusValues.add(-1);
     }
     
     public AgentTemplate(AgentTemplate copied){
@@ -32,9 +35,17 @@ public class AgentTemplate {
         //this.constructor=copied.constructor;
         //this.destructor=copied.destructor;
         //this.behavior=copied.behavior;
+        
+        statusNames=new ArrayList();
+        statusNames.add("DEFAULT_UNKNOWN");
+        statusValues=new ArrayList();
+        statusValues.add(-1);
     }
     
     public String agentTypeName;
+    
+    public ArrayList<String> statusNames;
+    public ArrayList<Integer> statusValues;
     
     public ArrayList<AgentPropertyTemplate> agentProperties=new ArrayList();
     
