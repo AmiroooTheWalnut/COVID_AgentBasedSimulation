@@ -46,7 +46,7 @@ public class MainModel extends Dataset {
     public Safegraph safegraph;
     public AllGISData allGISData;
     public CovidCsseJhu covidCsseJhu;
-    
+
 //    public ArrayList<Person> people;
     public AgentBasedModel ABM;
 
@@ -66,8 +66,8 @@ public class MainModel extends Dataset {
 
     public boolean isPause = false;
     public boolean isRunning = false;
-    
-    public int newSimulationDelayTime=-2;
+
+    public int newSimulationDelayTime = -2;
 
     private Thread thread;
 
@@ -80,7 +80,7 @@ public class MainModel extends Dataset {
         initSafegraph();
         allGISData = new AllGISData();
         allGISData.setDatasetTemplate();
-        covidCsseJhu=new CovidCsseJhu();
+        covidCsseJhu = new CovidCsseJhu();
         covidCsseJhu.setDatasetTemplate();
     }
 
@@ -139,7 +139,7 @@ public class MainModel extends Dataset {
     }
 
     public void initModel(boolean isParallelLoadingData, boolean isParallelBehaviorEvaluation, int numCPUs) {
-        javaEvaluationEngine.parseAllScripts(ABM.agentTemplates);
+//        javaEvaluationEngine.parseAllScripts(ABM.agents, ABM.agentTemplates);
         int month = ABM.startTime.getMonthValue();
         currentMonth = month;
         String monthString = String.valueOf(month);
@@ -150,15 +150,32 @@ public class MainModel extends Dataset {
         safegraph.clearPatternsPlaces();
         System.gc();
         safegraph.loadPatternsPlacesSet(dateName, allGISData, ABM.studyScope, isParallelLoadingData, numCPUs);
-        ABM.rootAgent = new Agent(ABM.agentTemplates.get(0));
         ABM.agents = new CopyOnWriteArrayList();
+
         ABM.currentTime = ABM.startTime;
+
+        ABM.rootAgent = ABM.makeRootAgent();
+
+        if (ABM.rootAgent.myTemplate.constructor.isJavaScriptActive == true) {
+            //myMainModel.javaEvaluationEngine.runScript(output.myTemplate.constructor.javaScript.script);
+
+            javaEvaluationEngine.runParsedScript(ABM.rootAgent, ABM.rootAgent.myTemplate.constructor.javaScript.parsedScript);
+        } else {
+            pythonEvaluationEngine.runScript(ABM.rootAgent.myTemplate.constructor.pythonScript);
+        }
+//                currentEvaluatingAgent[0] = oldCurrentEvaluatingAgent[0];
+
+//        if (ABM.rootAgent.myTemplate.agentTypeName.equals("Person")) {
+//            System.out.println(ABM.rootAgent.myIndex);
+//            System.out.println("!!!!");
+//        }
+
+//        ABM.rootAgent = new Agent(ABM.agentTemplates.get(0));
         resetTimerTask(isParallelBehaviorEvaluation, numCPUs);
         pythonEvaluationEngine.saveAllPythonScripts(ABM.agentTemplates);
         if (ABM.rootAgent.myTemplate.constructor.isJavaScriptActive == true) {
-            
+
             //javaEvaluationEngine.runScript(ABM.rootAgent.myTemplate.constructor.javaScript.script);
-            
             javaEvaluationEngine.runParsedScript(ABM.rootAgent, ABM.rootAgent.myTemplate.constructor.javaScript.parsedScript);
         } else {
             pythonEvaluationEngine.runScript(ABM.rootAgent.myTemplate.constructor.pythonScript);
@@ -264,8 +281,8 @@ public class MainModel extends Dataset {
                 }
             }
         }
-        if(newSimulationDelayTime>-2){
-            simulationDelayTime=newSimulationDelayTime;
+        if (newSimulationDelayTime > -2) {
+            simulationDelayTime = newSimulationDelayTime;
         }
     }
 
@@ -327,7 +344,7 @@ public class MainModel extends Dataset {
         }
         return null;
     }
-    
+
     public static CovidCsseJhu loadCasesDataKryo(String passed_file_path) {
         Kryo kryo = new Kryo();
         kryo.register(COVID_AgentBasedSimulation.Model.Data.CovidCsseJhu.CovidCsseJhu.class);

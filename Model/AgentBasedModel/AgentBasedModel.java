@@ -9,6 +9,8 @@ import COVID_AgentBasedSimulation.GUI.MainFrame;
 import COVID_AgentBasedSimulation.Model.MainModel;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import groovy.lang.Binding;
+import groovy.lang.GroovyShell;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
@@ -141,9 +143,9 @@ public class AgentBasedModel {
             } else {
 
                 AgentTemplate copiedTemplate = new AgentTemplate(template);
-                copiedTemplate.constructor = template.constructor;
-                copiedTemplate.behavior = template.behavior;
-                copiedTemplate.destructor = template.destructor;
+//                copiedTemplate.constructor = template.constructor;
+//                copiedTemplate.behavior = template.behavior;
+//                copiedTemplate.destructor = template.destructor;
                 copiedTemplate.statusNames = template.statusNames;
                 copiedTemplate.statusValues = template.statusValues;
                 Agent output = new Agent(copiedTemplate);
@@ -152,6 +154,24 @@ public class AgentBasedModel {
 //                oldCurrentEvaluatingAgent[0] = self;
 //                currentEvaluatingAgent = new Agent[1];
 //                currentEvaluatingAgent[0] = output;
+                output.myTemplate.constructor.javaScript.myShell=new GroovyShell(new Binding());
+                output.myTemplate.behavior.javaScript.myShell=new GroovyShell(new Binding());
+                output.myTemplate.destructor.javaScript.myShell=new GroovyShell(new Binding());
+
+                output.myTemplate.constructor.javaScript.parsedScript=output.myTemplate.constructor.javaScript.myShell.parse(output.myTemplate.constructor.javaScript.script);
+                output.myTemplate.behavior.javaScript.parsedScript=output.myTemplate.behavior.javaScript.myShell.parse(output.myTemplate.behavior.javaScript.script);
+                output.myTemplate.destructor.javaScript.parsedScript=output.myTemplate.destructor.javaScript.myShell.parse(output.myTemplate.destructor.javaScript.script);
+                
+                output.myTemplate.constructor.javaScript.parsedScript.setBinding(new Binding());
+                output.myTemplate.constructor.javaScript.parsedScript.getBinding().setVariable("modelRoot", myMainModel);
+                output.myTemplate.constructor.javaScript.parsedScript.getBinding().setVariable("currentAgent", output);
+                output.myTemplate.behavior.javaScript.parsedScript.setBinding(new Binding());
+                output.myTemplate.behavior.javaScript.parsedScript.getBinding().setVariable("modelRoot", myMainModel);
+                output.myTemplate.behavior.javaScript.parsedScript.getBinding().setVariable("currentAgent", output);
+                output.myTemplate.destructor.javaScript.parsedScript.setBinding(new Binding());
+                output.myTemplate.destructor.javaScript.parsedScript.getBinding().setVariable("modelRoot", myMainModel);
+                output.myTemplate.destructor.javaScript.parsedScript.getBinding().setVariable("currentAgent", output);
+
                 if (output.myTemplate.constructor.isJavaScriptActive == true) {
                     //myMainModel.javaEvaluationEngine.runScript(output.myTemplate.constructor.javaScript.script);
 
@@ -160,10 +180,73 @@ public class AgentBasedModel {
                     myMainModel.pythonEvaluationEngine.runScript(output.myTemplate.constructor.pythonScript);
                 }
 //                currentEvaluatingAgent[0] = oldCurrentEvaluatingAgent[0];
+                
+//                if(output.myTemplate.agentTypeName.equals("Person")){
+//                    System.out.println(output.myIndex);
+//                    System.out.println("!!!!");
+//                }
                 return output;
             }
         } catch (Exception ex) {
+            System.out.println(ex.toString());
+            ex.printStackTrace();
+        }
+//        currentEvaluatingAgent[0] = oldCurrentEvaluatingAgent[0];
+        return null;
+    }
+    
+    public Agent makeRootAgent() {
+//        Agent currentEvaluatingAgent[] = new Agent[1];
+//        Agent oldCurrentEvaluatingAgent[] = new Agent[1];
+        try {
+            AgentTemplate template = null;
+            for (int i = 0; i < agentTemplates.size(); i++) {
+                if (agentTemplates.get(i).agentTypeName.equals("root")) {
+                    template = agentTemplates.get(i);
+                    break;
+                }
+            }
+            if (template == null) {
+                System.out.println("ERROR: MAKE AGENT: AGENT TEMPLATE NOT FOUND");
+                return null;
+            } else {
 
+                AgentTemplate copiedTemplate = new AgentTemplate(template);
+//                copiedTemplate.constructor = template.constructor;
+//                copiedTemplate.behavior = template.behavior;
+//                copiedTemplate.destructor = template.destructor;
+                copiedTemplate.statusNames = template.statusNames;
+                copiedTemplate.statusValues = template.statusValues;
+                Agent output = new Agent(copiedTemplate);
+                output.myIndex = agents.size();
+                agents.add(output);
+//                oldCurrentEvaluatingAgent[0] = self;
+//                currentEvaluatingAgent = new Agent[1];
+//                currentEvaluatingAgent[0] = output;
+                output.myTemplate.constructor.javaScript.myShell=new GroovyShell(new Binding());
+                output.myTemplate.behavior.javaScript.myShell=new GroovyShell(new Binding());
+                output.myTemplate.destructor.javaScript.myShell=new GroovyShell(new Binding());
+
+                output.myTemplate.constructor.javaScript.parsedScript=output.myTemplate.constructor.javaScript.myShell.parse(output.myTemplate.constructor.javaScript.script);
+                output.myTemplate.behavior.javaScript.parsedScript=output.myTemplate.behavior.javaScript.myShell.parse(output.myTemplate.behavior.javaScript.script);
+                output.myTemplate.destructor.javaScript.parsedScript=output.myTemplate.destructor.javaScript.myShell.parse(output.myTemplate.destructor.javaScript.script);
+                
+                output.myTemplate.constructor.javaScript.parsedScript.setBinding(new Binding());
+                output.myTemplate.constructor.javaScript.parsedScript.getBinding().setVariable("modelRoot", myMainModel);
+                output.myTemplate.constructor.javaScript.parsedScript.getBinding().setVariable("currentAgent", output);
+                output.myTemplate.behavior.javaScript.parsedScript.setBinding(new Binding());
+                output.myTemplate.behavior.javaScript.parsedScript.getBinding().setVariable("modelRoot", myMainModel);
+                output.myTemplate.behavior.javaScript.parsedScript.getBinding().setVariable("currentAgent", output);
+                output.myTemplate.destructor.javaScript.parsedScript.setBinding(new Binding());
+                output.myTemplate.destructor.javaScript.parsedScript.getBinding().setVariable("modelRoot", myMainModel);
+                output.myTemplate.destructor.javaScript.parsedScript.getBinding().setVariable("currentAgent", output);
+                
+                
+                return output;
+            }
+        } catch (Exception ex) {
+            System.out.println(ex.toString());
+            ex.printStackTrace();
         }
 //        currentEvaluatingAgent[0] = oldCurrentEvaluatingAgent[0];
         return null;

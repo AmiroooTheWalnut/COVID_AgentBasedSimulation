@@ -314,6 +314,15 @@ public class AllGISData extends Dataset implements Serializable {
 
         for (int i = 0; i < countries.size(); i++) {
             countries.get(i).getLatLonSizeFromChildren();
+            for (int j = 0; j < countries.get(i).states.size(); j++) {
+                for (int k = 0; k < countries.get(i).states.get(j).counties.size(); k++) {
+                    if (countries.get(i).states.get(j).counties.get(k).cities != null) {
+                        for (int m = 0; m < countries.get(i).states.get(j).counties.get(k).cities.size(); m++) {
+                            countries.get(i).states.get(j).counties.get(k).cities.get(m).calcPopulation();
+                        }
+                    }
+                }
+            }
         }
         AllGISData.saveAllGISDataKryo("./datasets/ProcessedGeoData", this);
     }

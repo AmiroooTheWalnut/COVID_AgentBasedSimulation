@@ -718,6 +718,7 @@ public class SimulatorDialog extends javax.swing.JDialog {
                                     }
                                     if (myParent.mainModel.ABM.agents.get(i).myTemplate.agentProperties.get(j).propertyName.equals("status")) {
                                         status = (Integer) myParent.mainModel.ABM.agents.get(i).myTemplate.agentProperties.get(j).value;
+//                                        System.out.println(status);
                                     }
                                 }
                                 if (lat != null && lon != null) {
@@ -728,42 +729,30 @@ public class SimulatorDialog extends javax.swing.JDialog {
                                     maxStatusValue = status;
                                 }
                                 statusValues.add(status);
-//                                if (status == 0) {
-//                                    colors.add(new Vector3f(0f, 200f, 10f));
-//                                } else if (status == 1) {
-//                                    colors.add(new Vector3f(200f, 10f, 10f));
-//                                } else if (status == 2) {
-//                                    colors.add(new Vector3f(10f, 10f, 200f));
-//                                } else if (status == -1) {
-////                                    System.out.println("Severe problem! A person's status is out of list!!!");
-//                                }
                             }
                         }
-                        for (int i = 0; i < statusValues.size(); i++) {
-                            boolean isFound=false;
-                            for(int j=0;j<myParent.mainModel.ABM.agents.get(i).myTemplate.statusValues.size();j++){
-                                if(statusValues.get(i)==myParent.mainModel.ABM.agents.get(i).myTemplate.statusValues.get(j)){
-                                    Color color = new Color(Color.HSBtoRGB((float) (statusValues.get(i)+1) / (float) (myParent.mainModel.ABM.agents.get(i).myTemplate.statusValues.size()), 1, 1));
-                                    colors.add(new Vector3f((float) color.getRed(), (float) color.getGreen(), (float) color.getBlue()));
-                                    isFound=true;
-                                    break;
+                        int counter = 0;
+                        for (int i = 0; i < myParent.mainModel.ABM.agents.size(); i++) {
+                            if (myParent.mainModel.ABM.agents.get(i).myTemplate.agentTypeName.equals(jList6.getSelectedValue())) {
+                                boolean isFound = false;
+                                for (int j = 0; j < myParent.mainModel.ABM.agents.get(i).myTemplate.statusValues.size(); j++) {
+                                    if (statusValues.get(counter) == myParent.mainModel.ABM.agents.get(i).myTemplate.statusValues.get(j)) {
+                                        if (myParent.mainModel.ABM.agents.get(i).myTemplate.agentTypeName.equals(jList6.getSelectedValue())) {
+                                            Color color = new Color(Color.HSBtoRGB((float) (statusValues.get(counter) + 1) / (float) (myParent.mainModel.ABM.agents.get(i).myTemplate.statusValues.size()), 1, 1));
+                                            colors.add(new Vector3f((float) color.getRed(), (float) color.getGreen(), (float) color.getBlue()));
+                                            isFound = true;
+                                            break;
+                                        }
+                                    }
                                 }
+                                if (isFound == false) {
+                                    Color color = new Color(Color.HSBtoRGB(0, 1, 1));
+                                    colors.add(new Vector3f((float) color.getRed(), (float) color.getGreen(), (float) color.getBlue()));
+                                }
+                                counter=counter+1;
                             }
-                            if(isFound==false){
-                                Color color = new Color(Color.HSBtoRGB(0, 1, 1));
-                                colors.add(new Vector3f((float) color.getRed(), (float) color.getGreen(), (float) color.getBlue()));
-                            }
-//                            if (statusValues.get(i) == -1) {
-////                                System.out.println("Severe problem! A person's status is out of list!!!");
-//                            } else {
-//                                Color color = new Color(Color.HSBtoRGB((float) statusValues.get(i) / (float) maxStatusValue - 1, 1, 1));
-//                                colors.add(new Vector3f((float) color.getRed(), (float) color.getGreen(), (float) color.getBlue()));
-//                            }
-
-//                            for (int j = 0; j < maxStatusValue; j++) {
-//                                colors[i] = new Color(Color.HSBtoRGB((float) status / (float) maxStatusValue - 1, 1, 1));
-//                            }
                         }
+
                         myParent.child.setDrawingAgentTemplatesMarkers(lats, lons, colors);
                     } else {
                         ArrayList<Float> lats = new ArrayList();
@@ -799,6 +788,20 @@ public class SimulatorDialog extends javax.swing.JDialog {
                 }
             }
         }, 0, 1000);
+        
+        jList7.setModel(new javax.swing.AbstractListModel() {
+            @Override
+            public int getSize() {
+                return myParent.mainModel.ABM.agents.size();
+            }
+
+            @Override
+            public Object getElementAt(int index) {
+                return myParent.mainModel.ABM.agents.get(index).myTemplate.agentTypeName + " " + myParent.mainModel.ABM.agents.get(index).myIndex;
+            }
+        });
+        
+        System.out.println("###");
 
     }//GEN-LAST:event_jButton2ActionPerformed
 

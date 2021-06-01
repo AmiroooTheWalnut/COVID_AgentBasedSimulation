@@ -86,6 +86,13 @@ public class City extends Marker implements Serializable, Comparable<City> {
         censusTracts.add(input);
         return censusTracts.get(censusTracts.size()-1);
     }
+    
+    public void calcPopulation(){
+        population=0;
+        for(int i=0;i<censusTracts.size();i++){
+            population=population+censusTracts.get(i).population;
+        }
+    }
 
     @Override
     public int compareTo(City o) {

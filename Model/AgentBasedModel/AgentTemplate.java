@@ -6,6 +6,8 @@
 package COVID_AgentBasedSimulation.Model.AgentBasedModel;
 
 import COVID_AgentBasedSimulation.Model.Structure.Marker;
+import groovy.lang.Binding;
+import groovy.lang.Script;
 import java.util.ArrayList;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,9 +34,17 @@ public class AgentTemplate {
             temp.set(i, tempP);
         }
         this.agentProperties=temp;
-        //this.constructor=copied.constructor;
-        //this.destructor=copied.destructor;
-        //this.behavior=copied.behavior;
+        
+        this.constructor=copied.constructor;
+        this.destructor=copied.destructor;
+        this.behavior=copied.behavior;
+        
+//        Binding tempBinding=new Binding();
+//        this.constructor.javaScript.parsedScript.setBinding(tempBinding);
+//        tempBinding=new Binding();
+//        this.destructor.javaScript.parsedScript.setBinding(tempBinding);
+//        tempBinding=new Binding();
+//        this.behavior.javaScript.parsedScript.setBinding(tempBinding);
         
         statusNames=new ArrayList();
         statusNames.add("DEFAULT_UNKNOWN");

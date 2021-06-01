@@ -14,7 +14,7 @@ import lombok.Setter;
  */
 @Getter @Setter
 public class Agent {
-    int myIndex;
+    public int myIndex;
     
     public AgentTemplate myTemplate;
     

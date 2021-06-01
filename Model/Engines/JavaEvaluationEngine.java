@@ -14,6 +14,7 @@ import groovy.lang.Script;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
@@ -23,30 +24,39 @@ import javax.swing.SwingUtilities;
  */
 public class JavaEvaluationEngine {
 
-    public Binding mainBinding;
-    public GroovyShell mainShell;
+    public Binding sharedBinding;
+    public GroovyShell sharedShell;
     public JTextAreaOutputStream myConsole;   
 
     public JavaEvaluationEngine(MainModel mainModel) {
-        mainBinding = new Binding();
-        mainBinding.setVariable("modelRoot", mainModel);
+        sharedBinding = new Binding();
+        sharedBinding.setVariable("modelRoot", mainModel);
         //mainBinding.setVariable("agentRoot", mainModel.ABM.currentEvaluatingAgent);
-        mainShell = new GroovyShell(mainBinding);
+        sharedShell = new GroovyShell(sharedBinding);
         //mainShell.setProperty(property, mainModel);
     }
     
-    public void parseAllScripts(ArrayList<AgentTemplate> agentTemplates){
-        for (int i = 0; i < agentTemplates.size(); i++) {
-            if(agentTemplates.get(i).constructor.isJavaScriptActive==true){
-                agentTemplates.get(i).constructor.javaScript.parsedScript=mainShell.parse(agentTemplates.get(i).constructor.javaScript.script);
-            }
-            if(agentTemplates.get(i).behavior.isJavaScriptActive==true){
-                agentTemplates.get(i).behavior.javaScript.parsedScript=mainShell.parse(agentTemplates.get(i).behavior.javaScript.script);
-            }
-            if(agentTemplates.get(i).destructor.isJavaScriptActive==true){
-                agentTemplates.get(i).destructor.javaScript.parsedScript=mainShell.parse(agentTemplates.get(i).destructor.javaScript.script);
+    public void parseAllScripts(CopyOnWriteArrayList<Agent> agents, ArrayList<AgentTemplate> agentTemplates){
+        
+        for (int i = 0; i < agents.size(); i++) {
+            if(agents.get(i).myTemplate.constructor.isJavaScriptActive==true){
+                agents.get(i).myTemplate.constructor.javaScript.myShell.parse(agents.get(i).myTemplate.constructor.javaScript.script);
+                agents.get(i).myTemplate.behavior.javaScript.myShell.parse(agents.get(i).myTemplate.behavior.javaScript.script);
+                agents.get(i).myTemplate.destructor.javaScript.myShell.parse(agents.get(i).myTemplate.destructor.javaScript.script);
             }
         }
+        
+//        for (int i = 0; i < agentTemplates.size(); i++) {
+//            if(agentTemplates.get(i).constructor.isJavaScriptActive==true){
+//                agentTemplates.get(i).constructor.javaScript.parsedScript=sharedShell.parse(agentTemplates.get(i).constructor.javaScript.script);
+//            }
+//            if(agentTemplates.get(i).behavior.isJavaScriptActive==true){
+//                agentTemplates.get(i).behavior.javaScript.parsedScript=sharedShell.parse(agentTemplates.get(i).behavior.javaScript.script);
+//            }
+//            if(agentTemplates.get(i).destructor.isJavaScriptActive==true){
+//                agentTemplates.get(i).destructor.javaScript.parsedScript=sharedShell.parse(agentTemplates.get(i).destructor.javaScript.script);
+//            }
+//        }
     }
 
     public void connectToConsole(JTextArea console) {
@@ -58,7 +68,7 @@ public class JavaEvaluationEngine {
     RUN RAW TEXT SCRIPT
     */
     public void runScript(String script) {
-        mainShell.evaluate(script);
+        sharedShell.evaluate(script);
     }
     
     public void runParsedScript(Agent agent, Script script){
