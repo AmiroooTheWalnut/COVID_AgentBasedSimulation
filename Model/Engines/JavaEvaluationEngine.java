@@ -36,27 +36,27 @@ public class JavaEvaluationEngine {
         //mainShell.setProperty(property, mainModel);
     }
     
-    public void parseAllScripts(CopyOnWriteArrayList<Agent> agents, ArrayList<AgentTemplate> agentTemplates){
+    public void parseAllScripts(ArrayList<AgentTemplate> agentTemplates){
         
-        for (int i = 0; i < agents.size(); i++) {
-            if(agents.get(i).myTemplate.constructor.isJavaScriptActive==true){
-                agents.get(i).myTemplate.constructor.javaScript.myShell.parse(agents.get(i).myTemplate.constructor.javaScript.script);
-                agents.get(i).myTemplate.behavior.javaScript.myShell.parse(agents.get(i).myTemplate.behavior.javaScript.script);
-                agents.get(i).myTemplate.destructor.javaScript.myShell.parse(agents.get(i).myTemplate.destructor.javaScript.script);
-            }
-        }
-        
-//        for (int i = 0; i < agentTemplates.size(); i++) {
-//            if(agentTemplates.get(i).constructor.isJavaScriptActive==true){
-//                agentTemplates.get(i).constructor.javaScript.parsedScript=sharedShell.parse(agentTemplates.get(i).constructor.javaScript.script);
-//            }
-//            if(agentTemplates.get(i).behavior.isJavaScriptActive==true){
-//                agentTemplates.get(i).behavior.javaScript.parsedScript=sharedShell.parse(agentTemplates.get(i).behavior.javaScript.script);
-//            }
-//            if(agentTemplates.get(i).destructor.isJavaScriptActive==true){
-//                agentTemplates.get(i).destructor.javaScript.parsedScript=sharedShell.parse(agentTemplates.get(i).destructor.javaScript.script);
+//        for (int i = 0; i < agents.size(); i++) {
+//            if(agents.get(i).myTemplate.constructor.isJavaScriptActive==true){
+//                agents.get(i).myTemplate.constructor.javaScript.myShell.parse(agents.get(i).myTemplate.constructor.javaScript.script);
+//                agents.get(i).myTemplate.behavior.javaScript.myShell.parse(agents.get(i).myTemplate.behavior.javaScript.script);
+//                agents.get(i).myTemplate.destructor.javaScript.myShell.parse(agents.get(i).myTemplate.destructor.javaScript.script);
 //            }
 //        }
+        
+        for (int i = 0; i < agentTemplates.size(); i++) {
+            if(agentTemplates.get(i).constructor.isJavaScriptActive==true){
+                agentTemplates.get(i).constructor.javaScript.parsedScript=sharedShell.parse(agentTemplates.get(i).constructor.javaScript.script);
+            }
+            if(agentTemplates.get(i).behavior.isJavaScriptActive==true){
+                agentTemplates.get(i).behavior.javaScript.parsedScript=sharedShell.parse(agentTemplates.get(i).behavior.javaScript.script);
+            }
+            if(agentTemplates.get(i).destructor.isJavaScriptActive==true){
+                agentTemplates.get(i).destructor.javaScript.parsedScript=sharedShell.parse(agentTemplates.get(i).destructor.javaScript.script);
+            }
+        }
     }
 
     public void connectToConsole(JTextArea console) {

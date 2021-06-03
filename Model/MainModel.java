@@ -139,7 +139,9 @@ public class MainModel extends Dataset {
     }
 
     public void initModel(boolean isParallelLoadingData, boolean isParallelBehaviorEvaluation, int numCPUs) {
-//        javaEvaluationEngine.parseAllScripts(ABM.agents, ABM.agentTemplates);
+        //\/\/\/ THIS IS FOR ERROR CHECKING ONLY!
+        javaEvaluationEngine.parseAllScripts(ABM.agentTemplates);
+        //^^^ THIS IS FOR ERROR CHECKING ONLY!
         int month = ABM.startTime.getMonthValue();
         currentMonth = month;
         String monthString = String.valueOf(month);
@@ -156,6 +158,7 @@ public class MainModel extends Dataset {
 
         ABM.rootAgent = ABM.makeRootAgent();
 
+        pythonEvaluationEngine.saveAllPythonScripts(ABM.agentTemplates);
         if (ABM.rootAgent.myTemplate.constructor.isJavaScriptActive == true) {
             //myMainModel.javaEvaluationEngine.runScript(output.myTemplate.constructor.javaScript.script);
 
@@ -172,14 +175,14 @@ public class MainModel extends Dataset {
 
 //        ABM.rootAgent = new Agent(ABM.agentTemplates.get(0));
         resetTimerTask(isParallelBehaviorEvaluation, numCPUs);
-        pythonEvaluationEngine.saveAllPythonScripts(ABM.agentTemplates);
-        if (ABM.rootAgent.myTemplate.constructor.isJavaScriptActive == true) {
-
-            //javaEvaluationEngine.runScript(ABM.rootAgent.myTemplate.constructor.javaScript.script);
-            javaEvaluationEngine.runParsedScript(ABM.rootAgent, ABM.rootAgent.myTemplate.constructor.javaScript.parsedScript);
-        } else {
-            pythonEvaluationEngine.runScript(ABM.rootAgent.myTemplate.constructor.pythonScript);
-        }
+        
+//        if (ABM.rootAgent.myTemplate.constructor.isJavaScriptActive == true) {
+//
+//            //javaEvaluationEngine.runScript(ABM.rootAgent.myTemplate.constructor.javaScript.script);
+//            javaEvaluationEngine.runParsedScript(ABM.rootAgent, ABM.rootAgent.myTemplate.constructor.javaScript.parsedScript);
+//        } else {
+//            pythonEvaluationEngine.runScript(ABM.rootAgent.myTemplate.constructor.pythonScript);
+//        }
     }
 
     public void resetTimerTask(boolean isParallel, int numCPUs) {
