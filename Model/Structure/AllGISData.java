@@ -32,6 +32,10 @@ import org.json.JSONObject;
 import org.objenesis.strategy.StdInstantiatorStrategy;
 import lombok.Getter;
 import lombok.Setter;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LinearRing;
+import org.locationtech.jts.geom.Polygon;
 
 /**
  *
@@ -325,6 +329,87 @@ public class AllGISData extends Dataset implements Serializable {
             }
         }
         AllGISData.saveAllGISDataKryo("./datasets/ProcessedGeoData", this);
+    }
+
+    public void readCensusBlockGrioupPolygon(String geographyDirectory) {
+        File censusBlockGroupFile = new File(geographyDirectory + "/US_CensusBlockGroup.json");
+        try (BufferedReader br = new BufferedReader(new FileReader(censusBlockGroupFile))) {
+            String line;
+            int deguggingCounter = 0;
+            int counter = 0;
+            int largerCounter = 0;
+            int counterInterval = 1000;
+            int debugCounter=0;
+            while ((line = br.readLine()) != null) {
+                if (line.contains("{ \"type\": \"Feature\", \"properties\":")) {
+                    JSONObject root = new JSONObject(line);
+                    JSONObject properties = root.getJSONObject("properties");
+                    byte stateId = Byte.parseByte(properties.getString("STATEFP"));
+                    State state = countries.get(countries.size() - 1).findAndInsertState(stateId);
+
+                    int countyId = Integer.parseInt(properties.getString("COUNTYFP"));
+                    County county = state.findAndInsertCounty(countyId);
+
+                    int censusTractInt = properties.getInt("TRACTCE");
+                    CensusTract censusTract = county.findAndInsertCensusTract(censusTractInt);
+//                    censusTract.country = countries.get(countries.size() - 1);
+//                    censusTract.state = state;
+//                    censusTract.county = county;
+                    long censusBlockLong = Long.parseLong(properties.getString("GEOID"));
+                    CensusBlockGroup censusBlock = censusTract.findAndInsertCensusBlock(censusBlockLong);
+                    
+                    if(censusBlock.shape==null){
+                        censusBlock.shape=new ArrayList();
+                    }
+//                    censusBlock.country = countries.get(countries.size() - 1);
+//                    censusBlock.state = state;
+//                    censusBlock.county = county;
+//                    censusBlock.censusTract = censusTract;
+                    JSONObject geometry = root.getJSONObject("geometry");
+                    JSONArray coordsT = geometry.getJSONArray("coordinates");
+                    String geomType = (String)(geometry.get("type"));
+                    JSONArray coords = coordsT.getJSONArray(0);
+                    ArrayList<Coordinate> coordsArrayList = new ArrayList();
+                    for (int i = 0; i < coords.length(); i++) {
+                        if(geomType.equals("Polygon")){
+                            coordsArrayList.add(new Coordinate(coords.getJSONArray(i).getDouble(0), coords.getJSONArray(i).getDouble(1)));
+                        }else if(geomType.equals("MultiPolygon")){
+                            
+                        }
+//                        System.out.println(coords.get(i));
+//                        System.out.println(debugCounter);
+                        
+                    }
+                    
+                    debugCounter=debugCounter+1;
+
+                    Coordinate coordsArray[] = new Coordinate[coordsArrayList.size()];
+                    for (int m = 0; m < coordsArrayList.size(); m++) {
+                        coordsArray[m] = coordsArrayList.get(m);
+                    }
+
+                    GeometryFactory geomFactory = new GeometryFactory();
+
+                    try {
+                        LinearRing linearRing = geomFactory.createLinearRing(coordsArray);
+                        Polygon poly = geomFactory.createPolygon(linearRing);
+
+                        censusBlock.shape.add(poly);
+                    } catch (Exception ex) {
+
+                    }
+                }
+                deguggingCounter = deguggingCounter + 1;
+                counter = counter + 1;
+                if (counter > counterInterval) {
+                    largerCounter = largerCounter + 1;
+                    counter = 0;
+                    System.out.println("Num rows read: " + largerCounter * counterInterval);
+                }
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(AllGISData.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public float[] getSizeMiddleLatLon(JSONArray input) {

@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import lombok.Getter;
 import lombok.Setter;
+import org.locationtech.jts.geom.Polygon;
 
 /**
  *
@@ -20,6 +21,8 @@ public class CensusBlockGroup extends Marker implements Serializable, Comparable
     public State state;
     public County county;
     public CensusTract censusTract;
+    
+    public transient ArrayList<Polygon> shape;
     
     public transient ArrayList<SafegraphPlace> places;
     

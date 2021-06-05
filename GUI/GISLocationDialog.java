@@ -5,17 +5,28 @@
  */
 package COVID_AgentBasedSimulation.GUI;
 
+import COVID_AgentBasedSimulation.Model.Data.Safegraph.ParallelPatternParser;
+import COVID_AgentBasedSimulation.Model.Data.Safegraph.PatternsRecordProcessed;
+import de.siegmar.fastcsv.reader.CsvContainer;
 import esmaieeli.gisFastLocationOptimization.GIS3D.Grid;
 import esmaieeli.gisFastLocationOptimization.GIS3D.LayerDefinition;
 import esmaieeli.gisFastLocationOptimization.GIS3D.LocationNode;
 import esmaieeli.gisFastLocationOptimization.GUI.MainFramePanel;
 import esmaieeli.gisFastLocationOptimization.Simulation.FacilityLocation;
+import esmaieeli.utilities.taskThreading.ParallelProcessor;
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 
 /**
  *
@@ -63,6 +74,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
         jButton7 = new javax.swing.JButton();
         jButton8 = new javax.swing.JButton();
         jButton9 = new javax.swing.JButton();
+        jButton10 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -132,6 +144,13 @@ public class GISLocationDialog extends javax.swing.JDialog {
             }
         });
 
+        jButton10.setText("Generate CBG layer");
+        jButton10.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton10ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -147,7 +166,8 @@ public class GISLocationDialog extends javax.swing.JDialog {
                     .addComponent(jButton7)
                     .addComponent(jButton5)
                     .addComponent(jButton8)
-                    .addComponent(jButton9))
+                    .addComponent(jButton9)
+                    .addComponent(jButton10))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
@@ -171,6 +191,8 @@ public class GISLocationDialog extends javax.swing.JDialog {
                 .addComponent(jButton5)
                 .addGap(18, 18, 18)
                 .addComponent(jButton9)
+                .addGap(18, 18, 18)
+                .addComponent(jButton10)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -468,6 +490,118 @@ public class GISLocationDialog extends javax.swing.JDialog {
         });
     }//GEN-LAST:event_jButton9ActionPerformed
 
+    private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
+        myParent.mainModel.allGISData.readCensusBlockGrioupPolygon("./datasets");
+
+        System.out.println("num nodes: " + mainFParent.allData.all_Nodes.length);
+
+        Long cBGForNodes[] = new Long[mainFParent.allData.all_Nodes.length];
+
+        int numProcessors = myParent.mainModel.numCPUs;
+        if (numProcessors > Runtime.getRuntime().availableProcessors()) {
+            numProcessors = Runtime.getRuntime().availableProcessors();
+        }
+        ParallelLocationNodeCBGIdConnector parallelLocationNodeCBGIdConnector[] = new ParallelLocationNodeCBGIdConnector[numProcessors];
+
+        for (int i = 0; i < numProcessors - 1; i++) {
+            parallelLocationNodeCBGIdConnector[i] = new ParallelLocationNodeCBGIdConnector(i, this, cBGForNodes, (int) Math.floor(i * ((mainFParent.allData.all_Nodes.length) / numProcessors)), (int) Math.floor((i + 1) * ((mainFParent.allData.all_Nodes.length) / numProcessors)));
+        }
+        parallelLocationNodeCBGIdConnector[numProcessors - 1] = new ParallelLocationNodeCBGIdConnector(numProcessors - 1, this, cBGForNodes, (int) Math.floor((numProcessors - 1) * ((mainFParent.allData.all_Nodes.length) / numProcessors)), mainFParent.allData.all_Nodes.length);
+
+        for (int i = 0; i < numProcessors; i++) {
+            parallelLocationNodeCBGIdConnector[i].myThread.start();
+        }
+        for (int i = 0; i < numProcessors; i++) {
+            try {
+                parallelLocationNodeCBGIdConnector[i].myThread.join();
+                System.out.println("thread " + i + "finished for location nodes: " + parallelLocationNodeCBGIdConnector[i].myStartIndex + " | " + parallelLocationNodeCBGIdConnector[i].myEndIndex);
+            } catch (InterruptedException ie) {
+                System.out.println(ie.toString());
+            }
+        }
+
+        /*
+        for (int u = 0; u < mainFParent.allData.all_Nodes.length; u++) {
+            isCBGFound = false;
+            for (int i = 0; i < myParent.mainModel.allGISData.countries.size(); i++) {
+                for (int j = 0; j < myParent.mainModel.allGISData.countries.get(i).states.size(); j++) {
+                    for (int k = 0; k < myParent.mainModel.allGISData.countries.get(i).states.get(j).counties.size(); k++) {
+                        for (int m = 0; m < myParent.mainModel.allGISData.countries.get(i).states.get(j).counties.get(k).censusTracts.size(); m++) {
+                            for (int v = 0; v < myParent.mainModel.allGISData.countries.get(i).states.get(j).counties.get(k).censusTracts.get(m).censusBlocks.size(); v++) {
+                                for (int y = 0; y < myParent.mainModel.allGISData.countries.get(i).states.get(j).counties.get(k).censusTracts.get(m).censusBlocks.get(v).shape.size(); y++) {
+                                    GeometryFactory geomFactory = new GeometryFactory();
+                                    Point point = geomFactory.createPoint(new Coordinate(mainFParent.allData.all_Nodes[u].lon, mainFParent.allData.all_Nodes[u].lat));
+                                    if (myParent.mainModel.allGISData.countries.get(i).states.get(j).counties.get(k).censusTracts.get(m).censusBlocks.get(v).shape.get(y).covers(point) == true) {
+                                        censusBlockGroupsEncounteredList.add(myParent.mainModel.allGISData.countries.get(i).states.get(j).counties.get(k).censusTracts.get(m).censusBlocks.get(v).id);
+                                        cBGForNodes[i] = myParent.mainModel.allGISData.countries.get(i).states.get(j).counties.get(k).censusTracts.get(m).censusBlocks.get(v).id;
+                                        isCBGFound = true;
+                                        break;
+                                    }
+                                }
+                                if (isCBGFound == true) {
+                                    break;
+                                }
+                            }
+                            if (isCBGFound == true) {
+                                break;
+                            }
+                        }
+                        if (isCBGFound == true) {
+                            break;
+                        }
+                    }
+                    if (isCBGFound == true) {
+                        break;
+                    }
+                }
+                if (isCBGFound == true) {
+                    break;
+                }
+            }
+            if (isCBGFound == false) {
+                System.out.println("SEVERE PROBLEM! LOCATION NODE HAS NOT CBG!");
+            }
+            System.out.println(counter);
+            counter = counter + 1;
+        }
+         */
+//        ArrayList<Long> censusBlockGroupsEncounteredList = new ArrayList();
+        List<Long> censusBlockGroupsEncounteredList = Arrays.asList(cBGForNodes);
+
+        LinkedHashSet<Long> censusBlockGroupsEncounteredUniqueSetHS = new LinkedHashSet(censusBlockGroupsEncounteredList);
+        ArrayList<Long> censusBlockGroupsEncounteredUniqueList = new ArrayList(censusBlockGroupsEncounteredUniqueSetHS);
+        int numCBGs = censusBlockGroupsEncounteredUniqueList.size();
+        int indices[] = new int[numCBGs];
+        for (int i = 0; i < numCBGs; i++) {
+            indices[i] = i + 1;
+        }
+
+        for (int u = 0; u < mainFParent.allData.all_Nodes.length; u++) {
+            for (int j = 0; j < censusBlockGroupsEncounteredUniqueList.size(); j++) {
+                if (cBGForNodes[u].equals(censusBlockGroupsEncounteredUniqueList.get(j)) == true) {
+                    short[] val = new short[1];
+                    val[0] = (short) (indices[j]);
+                    mainFParent.allData.all_Nodes[u].layers.add(val);
+                }
+            }
+        }
+
+        LayerDefinition tempLayer = new LayerDefinition("category", "censusBlockGroups");
+
+        tempLayer.categories = new String[numCBGs];
+        tempLayer.colors = new Color[numCBGs];
+        tempLayer.values = new double[numCBGs];
+
+        for (int i = 0; i < numCBGs; i++) {
+            tempLayer.categories[i] = "CBG " + String.valueOf(i+1);
+            tempLayer.colors[i] = new Color(Color.HSBtoRGB((float) i / (float) numCBGs - 1, 1, 1));
+            tempLayer.values[i] = Double.valueOf(censusBlockGroupsEncounteredUniqueList.get(i));
+        }
+
+        mainFParent.allData.all_Layers.add(tempLayer);
+        mainFParent.refreshLayersList();
+    }//GEN-LAST:event_jButton10ActionPerformed
+
     public boolean isShop(int naicsCode) {
         String naicsString = String.valueOf(naicsCode);
         if (naicsString.startsWith("44511") || naicsString.startsWith("44512") || naicsString.startsWith("44711")) {
@@ -513,9 +647,9 @@ public class GISLocationDialog extends javax.swing.JDialog {
             output[i] = new FacilityLocation(mainFParent, shops.get(i), shops.get(i).myWays[0], 20d);
             output[i].color = colors[i];
             output[i].isDecoyable = true;
-            output[i].tollOff=0.5;//IMP
+            output[i].tollOff = 0.5;//IMP
         }
-        System.out.println("shops generated: "+output.length);
+        System.out.println("shops generated: " + output.length);
         return output;
     }
 
@@ -577,9 +711,9 @@ public class GISLocationDialog extends javax.swing.JDialog {
             output[i] = new FacilityLocation(mainFParent, schools.get(i), schools.get(i).myWays[0], 20d);
             output[i].color = colors[i];
             output[i].isDecoyable = true;
-            output[i].tollOff=0.5;//IMP
+            output[i].tollOff = 0.5;//IMP
         }
-        System.out.println("schools generated: "+output.length);
+        System.out.println("schools generated: " + output.length);
         return output;
     }
 
@@ -641,8 +775,76 @@ public class GISLocationDialog extends javax.swing.JDialog {
         return nearestNode;
     }
 
+    public class ParallelLocationNodeCBGIdConnector extends ParallelProcessor {
+
+        public ArrayList<PatternsRecordProcessed> records;
+        GISLocationDialog myParent;
+        Long myData[];
+        int myThreadIndex;
+
+        public ParallelLocationNodeCBGIdConnector(int threadIndex, GISLocationDialog parent, Long cBGForNodes[], int startIndex, int endIndex) {
+            super(parent, cBGForNodes, startIndex, endIndex);
+            records = new ArrayList();
+            myThreadIndex = threadIndex;
+            myParent = parent;
+            myData = cBGForNodes;
+            myThread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+
+//                    int counter = 0;
+                    boolean isCBGFound = false;
+                    for (int u = startIndex; u < endIndex; u++) {
+                        isCBGFound = false;
+                        for (int i = 0; i < myParent.myParent.mainModel.allGISData.countries.size(); i++) {
+                            for (int j = 0; j < myParent.myParent.mainModel.allGISData.countries.get(i).states.size(); j++) {
+                                for (int k = 0; k < myParent.myParent.mainModel.allGISData.countries.get(i).states.get(j).counties.size(); k++) {
+                                    for (int m = 0; m < myParent.myParent.mainModel.allGISData.countries.get(i).states.get(j).counties.get(k).censusTracts.size(); m++) {
+                                        for (int v = 0; v < myParent.myParent.mainModel.allGISData.countries.get(i).states.get(j).counties.get(k).censusTracts.get(m).censusBlocks.size(); v++) {
+                                            for (int y = 0; y < myParent.myParent.mainModel.allGISData.countries.get(i).states.get(j).counties.get(k).censusTracts.get(m).censusBlocks.get(v).shape.size(); y++) {
+                                                GeometryFactory geomFactory = new GeometryFactory();
+                                                Point point = geomFactory.createPoint(new Coordinate(mainFParent.allData.all_Nodes[u].lon, mainFParent.allData.all_Nodes[u].lat));
+                                                if (myParent.myParent.mainModel.allGISData.countries.get(i).states.get(j).counties.get(k).censusTracts.get(m).censusBlocks.get(v).shape.get(y).covers(point) == true) {
+                                                    //censusBlockGroupsEncounteredList.add(myParent.myParent.mainModel.allGISData.countries.get(i).states.get(j).counties.get(k).censusTracts.get(m).censusBlocks.get(v).id);
+                                                    myData[u] = myParent.myParent.mainModel.allGISData.countries.get(i).states.get(j).counties.get(k).censusTracts.get(m).censusBlocks.get(v).id;
+                                                    isCBGFound = true;
+                                                    break;
+                                                }
+                                            }
+                                            if (isCBGFound == true) {
+                                                break;
+                                            }
+                                        }
+                                        if (isCBGFound == true) {
+                                            break;
+                                        }
+                                    }
+                                    if (isCBGFound == true) {
+                                        break;
+                                    }
+                                }
+                                if (isCBGFound == true) {
+                                    break;
+                                }
+                            }
+                            if (isCBGFound == true) {
+                                break;
+                            }
+                        }
+                        if (isCBGFound == false) {
+                            System.out.println("SEVERE PROBLEM! LOCATION NODE HAS NOT CBG!");
+                        }
+//                        System.out.println(counter);
+//                        counter = counter + 1;
+                    }
+                }
+            });
+        }
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton10;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
