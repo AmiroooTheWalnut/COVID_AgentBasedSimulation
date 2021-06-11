@@ -22,6 +22,15 @@ public class CensusBlockGroup extends Marker implements Serializable, Comparable
     public County county;
     public CensusTract censusTract;
     
+    public transient ArrayList<ArrayList<SafegraphPlace>> vDsPlacesShops;
+    public transient ArrayList<Double> proportionOfVDsShops;
+    
+    public transient ArrayList<ArrayList<SafegraphPlace>> vDsPlacesSchools;
+    public transient ArrayList<Double> proportionOfVDsSchools;
+    
+    public transient ArrayList<ArrayList<SafegraphPlace>> vDsPlacesTemples;
+    public transient ArrayList<Double> proportionOfVDsTemples;
+    
     public transient ArrayList<Polygon> shape;
     
     public transient ArrayList<SafegraphPlace> places;

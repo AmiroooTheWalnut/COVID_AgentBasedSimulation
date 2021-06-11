@@ -5,21 +5,21 @@
  */
 package COVID_AgentBasedSimulation.GUI;
 
-import COVID_AgentBasedSimulation.Model.Data.Safegraph.ParallelPatternParser;
+import COVID_AgentBasedSimulation.Model.Data.Safegraph.LocationNodeSafegraph;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.PatternsRecordProcessed;
-import de.siegmar.fastcsv.reader.CsvContainer;
+import COVID_AgentBasedSimulation.Model.Structure.CensusBlockGroup;
 import esmaieeli.gisFastLocationOptimization.GIS3D.Grid;
 import esmaieeli.gisFastLocationOptimization.GIS3D.LayerDefinition;
 import esmaieeli.gisFastLocationOptimization.GIS3D.LocationNode;
 import esmaieeli.gisFastLocationOptimization.GUI.MainFramePanel;
 import esmaieeli.gisFastLocationOptimization.Simulation.FacilityLocation;
+import esmaieeli.gisFastLocationOptimization.Simulation.Routing;
 import esmaieeli.utilities.taskThreading.ParallelProcessor;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +40,9 @@ public class GISLocationDialog extends javax.swing.JDialog {
 
     FacilityLocation[] shopFacilities;
     FacilityLocation[] schoolFacilities;
+
+    float shopMergeThreshold = 0.0129f;
+    float templeMergeThreshold = 0.012f;
 
     /**
      * Creates new form GISLocationDialog
@@ -75,11 +78,18 @@ public class GISLocationDialog extends javax.swing.JDialog {
         jButton8 = new javax.swing.JButton();
         jButton9 = new javax.swing.JButton();
         jButton10 = new javax.swing.JButton();
+        jButton11 = new javax.swing.JButton();
+        jButton12 = new javax.swing.JButton();
+        jButton13 = new javax.swing.JButton();
+        jButton14 = new javax.swing.JButton();
+        jButton15 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jPanel1.setLayout(new javax.swing.BoxLayout(jPanel1, javax.swing.BoxLayout.LINE_AXIS));
+
+        jPanel2.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
         jButton1.setText("Generate shops voronoi");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -151,6 +161,41 @@ public class GISLocationDialog extends javax.swing.JDialog {
             }
         });
 
+        jButton11.setText("Food & grocery 1,2,3 nearest home");
+        jButton11.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton11ActionPerformed(evt);
+            }
+        });
+
+        jButton12.setText("School 1,2,3 nearest");
+        jButton12.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton12ActionPerformed(evt);
+            }
+        });
+
+        jButton13.setText("Religious 1,2,3 nearest");
+        jButton13.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton13ActionPerformed(evt);
+            }
+        });
+
+        jButton14.setText("Food & grocery 1,2,3 nearest work");
+        jButton14.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton14ActionPerformed(evt);
+            }
+        });
+
+        jButton15.setText("Generate VDs CBGs");
+        jButton15.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton15ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -167,8 +212,13 @@ public class GISLocationDialog extends javax.swing.JDialog {
                     .addComponent(jButton5)
                     .addComponent(jButton8)
                     .addComponent(jButton9)
-                    .addComponent(jButton10))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jButton10)
+                    .addComponent(jButton11)
+                    .addComponent(jButton12)
+                    .addComponent(jButton13)
+                    .addComponent(jButton14)
+                    .addComponent(jButton15))
+                .addContainerGap(20, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -193,6 +243,16 @@ public class GISLocationDialog extends javax.swing.JDialog {
                 .addComponent(jButton9)
                 .addGap(18, 18, 18)
                 .addComponent(jButton10)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton15)
+                .addGap(18, 18, 18)
+                .addComponent(jButton11)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton12)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton13)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton14)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -202,8 +262,8 @@ public class GISLocationDialog extends javax.swing.JDialog {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 1158, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 1160, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -570,6 +630,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
 
         LinkedHashSet<Long> censusBlockGroupsEncounteredUniqueSetHS = new LinkedHashSet(censusBlockGroupsEncounteredList);
         ArrayList<Long> censusBlockGroupsEncounteredUniqueList = new ArrayList(censusBlockGroupsEncounteredUniqueSetHS);
+        Collections.sort(censusBlockGroupsEncounteredUniqueList);
         int numCBGs = censusBlockGroupsEncounteredUniqueList.size();
         int indices[] = new int[numCBGs];
         for (int i = 0; i < numCBGs; i++) {
@@ -578,11 +639,18 @@ public class GISLocationDialog extends javax.swing.JDialog {
 
         for (int u = 0; u < mainFParent.allData.all_Nodes.length; u++) {
             for (int j = 0; j < censusBlockGroupsEncounteredUniqueList.size(); j++) {
-                if (cBGForNodes[u].equals(censusBlockGroupsEncounteredUniqueList.get(j)) == true) {
+                if (cBGForNodes[u].equals(-1)) {
                     short[] val = new short[1];
-                    val[0] = (short) (indices[j]);
+                    val[0] = (short) (0);
                     mainFParent.allData.all_Nodes[u].layers.add(val);
+                } else {
+                    if (cBGForNodes[u].equals(censusBlockGroupsEncounteredUniqueList.get(j)) == true) {
+                        short[] val = new short[1];
+                        val[0] = (short) (indices[j]);
+                        mainFParent.allData.all_Nodes[u].layers.add(val);
+                    }
                 }
+
             }
         }
 
@@ -592,8 +660,11 @@ public class GISLocationDialog extends javax.swing.JDialog {
         tempLayer.colors = new Color[numCBGs];
         tempLayer.values = new double[numCBGs];
 
-        for (int i = 0; i < numCBGs; i++) {
-            tempLayer.categories[i] = "CBG " + String.valueOf(i+1);
+        tempLayer.categories[0] = "NOT ASSIGNED";
+        tempLayer.colors[0] = new Color(2, 2, 2);
+        tempLayer.values[0] = Double.valueOf(0);
+        for (int i = 1; i < numCBGs; i++) {
+            tempLayer.categories[i] = "CBG " + String.valueOf(i);
             tempLayer.colors[i] = new Color(Color.HSBtoRGB((float) i / (float) numCBGs - 1, 1, 1));
             tempLayer.values[i] = Double.valueOf(censusBlockGroupsEncounteredUniqueList.get(i));
         }
@@ -602,9 +673,767 @@ public class GISLocationDialog extends javax.swing.JDialog {
         mainFParent.refreshLayersList();
     }//GEN-LAST:event_jButton10ActionPerformed
 
+    private void jButton11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton11ActionPerformed
+        ArrayList<LocationNodeSafegraph> shopLocations = initShopLocations();
+        Integer indices[] = labelMergedFacilities(shopLocations, shopMergeThreshold);
+        List<Integer> indicesRawList = Arrays.asList(indices);
+        ArrayList<Integer> indicesList = new ArrayList(indicesRawList);
+        LinkedHashSet<Integer> indicesUniqueSetHS = new LinkedHashSet(indicesList);
+        ArrayList<Integer> indicesUniqueList = new ArrayList(indicesUniqueSetHS);
+        ArrayList<LocationNodeSafegraph> shopMergedLocations = mergeFacilitiesWithIndices(shopLocations, indicesList, indicesUniqueList);
+
+        int trafficLayerIndex = -1;
+        for (int i = 0; i < mainFParent.allData.all_Layers.size(); i++) {
+            if (((LayerDefinition) mainFParent.allData.all_Layers.get(i)).layerName.toLowerCase().contains("traffic")) {
+                trafficLayerIndex = i;
+            }
+        }
+
+        int numVisitsToNearestOrder[] = new int[shopMergedLocations.size()];
+
+        int numProcessors = myParent.mainModel.numCPUs;
+        if (numProcessors > Runtime.getRuntime().availableProcessors()) {
+            numProcessors = Runtime.getRuntime().availableProcessors();
+        }
+
+        mainFParent.allData.setParallelLayers(numProcessors, -1);
+
+        for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.size(); i++) {
+            for (int j = 0; j < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.size(); j++) {
+                if (isFoodAndGrocery(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.naics_code) == true) {
+                    LocationNode place = getNearestNode(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.lat, myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.lon);
+                    if (place != null) {
+
+                        boolean isUniqueLocationNode = true;
+                        int shopIndex = -1;
+                        for (int b = 0; b < shopLocations.size(); b++) {
+                            if (shopLocations.get(b).node.lat == place.lat && shopLocations.get(b).node.lon == place.lon) {
+                                isUniqueLocationNode = false;
+                                shopIndex = b;
+                                break;
+                            }
+                        }
+
+                        int shopGroupIndex = -1;
+                        for (int y = 0; y < indicesUniqueList.size(); y++) {
+                            if (indicesUniqueList.get(y).equals(indicesList.get(shopIndex))) {
+                                shopGroupIndex = y;
+                                break;
+                            }
+                        }
+
+//                        int shopGroupIndex = indicesList.get(shopIndex);
+                        LocationNodeSafegraph targetShopGroup = shopMergedLocations.get(shopGroupIndex);
+
+                        if (isUniqueLocationNode == false) {
+                            if (myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).visitor_home_cbgs != null) {
+                                for (int k = 0; k < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).visitor_home_cbgs.size(); k++) {
+                                    CensusBlockGroup cBG = myParent.mainModel.allGISData.findCensusBlockGroup(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).visitor_home_cbgs.get(k).key);
+                                    LocationNode home = getNearestNode(cBG.lon, cBG.lat);
+
+                                    if (home == null) {
+                                        float collisionPositionx = cBG.lat;
+                                        float collisionPositiony = cBG.lon;
+                                        double leastDistance = Double.POSITIVE_INFINITY;
+                                        LocationNode nearestNode = mainFParent.allData.all_Nodes[0];
+                                        for (int g = 0; g < mainFParent.allData.all_Nodes.length; g++) {
+                                            //System.out.println(outputGrid.myNodes[i]);//WARNING, NULL POINTER SPOTTED, A GRID HAS A NULL LOCATIONNODE
+                                            double dist = Math.sqrt(Math.pow(collisionPositionx - mainFParent.allData.all_Nodes[g].lat, 2) + Math.pow(collisionPositiony - mainFParent.allData.all_Nodes[g].lon, 2));
+                                            if (dist < leastDistance) {
+                                                nearestNode = mainFParent.allData.all_Nodes[g];
+                                                leastDistance = dist;
+                                            }
+                                        }
+                                        home = nearestNode;
+                                    }
+
+                                    Routing routing = new Routing(mainFParent.allData, trafficLayerIndex, 0);
+
+                                    routing.findPath(home, targetShopGroup.node);
+                                    double distanceToTarget = routing.pathDistance;
+
+                                    double distancesToOtherTargets[] = new double[shopMergedLocations.size()];
+
+                                    ParallelRouting parallelRouting[] = new ParallelRouting[numProcessors];
+
+                                    for (int f = 0; f < numProcessors - 1; f++) {
+                                        parallelRouting[f] = new ParallelRouting(f, this, distancesToOtherTargets, (int) Math.floor(f * ((shopMergedLocations.size()) / numProcessors)), (int) Math.floor((f + 1) * ((shopMergedLocations.size()) / numProcessors)), trafficLayerIndex, home, shopMergedLocations);
+                                    }
+                                    parallelRouting[numProcessors - 1] = new ParallelRouting(numProcessors - 1, this, distancesToOtherTargets, (int) Math.floor((numProcessors - 1) * ((shopMergedLocations.size()) / numProcessors)), shopMergedLocations.size(), trafficLayerIndex, home, shopMergedLocations);;
+
+                                    for (int f = 0; f < numProcessors; f++) {
+                                        parallelRouting[f].myThread.start();
+                                    }
+                                    for (int f = 0; f < numProcessors; f++) {
+                                        try {
+                                            parallelRouting[f].myThread.join();
+//                                            for (int d = 0; d < parallelRouting[f].myData.length; d++) {
+//                                                distancesToOtherTargets[d]=distancesToOtherTargets[d]+parallelRouting[f].myData[d];
+//                                            }
+//                                            System.out.println("thread " + f + "finished for location nodes: " + parallelRouting[f].myStartIndex + " | " + parallelRouting[f].myEndIndex);
+                                        } catch (InterruptedException ie) {
+                                            System.out.println(ie.toString());
+                                        }
+                                    }
+
+//                                    for (int h = 0; h < shopMergedLocations.size(); h++) {
+////                                    if (h != shopGroupIndex) {
+//                                        Routing routingToOthers = new Routing(mainFParent.allData, trafficLayerIndex, 0);
+//                                        routingToOthers.findPath(home, shopMergedLocations.get(h));
+//                                        distancesToOtherTargets[h] = routingToOthers.pathDistance;
+////                                    }
+//                                    }
+                                    Arrays.sort(distancesToOtherTargets);
+                                    int orderNumber = -1;
+                                    for (int m = 0; m < distancesToOtherTargets.length; m++) {
+                                        if (distancesToOtherTargets[m] == distanceToTarget && distanceToTarget != Double.POSITIVE_INFINITY) {
+                                            orderNumber = m;
+                                            break;
+                                        }
+                                    }
+                                    if (orderNumber != -1) {
+                                        numVisitsToNearestOrder[orderNumber] = numVisitsToNearestOrder[orderNumber] + myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).visitor_home_cbgs.get(k).value;
+                                    }
+                                }
+                                for (int r = 0; r < numVisitsToNearestOrder.length; r++) {
+                                    System.out.println(r + " " + numVisitsToNearestOrder[r]);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < numVisitsToNearestOrder.length; i++) {
+            System.out.println(i + " " + numVisitsToNearestOrder[i]);
+        }
+    }//GEN-LAST:event_jButton11ActionPerformed
+
+    private void jButton12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton12ActionPerformed
+        ArrayList<LocationNodeSafegraph> schoolLocations = initSchoolLocations();
+        Integer indices[] = labelMergedFacilities(schoolLocations, shopMergeThreshold);
+        List<Integer> indicesRawList = Arrays.asList(indices);
+        ArrayList<Integer> indicesList = new ArrayList(indicesRawList);
+        LinkedHashSet<Integer> indicesUniqueSetHS = new LinkedHashSet(indicesList);
+        ArrayList<Integer> indicesUniqueList = new ArrayList(indicesUniqueSetHS);
+        ArrayList<LocationNodeSafegraph> schoolMergedLocations = mergeFacilitiesWithIndices(schoolLocations, indicesList, indicesUniqueList);
+
+        int trafficLayerIndex = -1;
+        for (int i = 0; i < mainFParent.allData.all_Layers.size(); i++) {
+            if (((LayerDefinition) mainFParent.allData.all_Layers.get(i)).layerName.toLowerCase().contains("traffic")) {
+                trafficLayerIndex = i;
+            }
+        }
+
+        int numVisitsToNearestOrder[] = new int[schoolMergedLocations.size()];
+
+        int numProcessors = myParent.mainModel.numCPUs;
+        if (numProcessors > Runtime.getRuntime().availableProcessors()) {
+            numProcessors = Runtime.getRuntime().availableProcessors();
+        }
+
+        mainFParent.allData.setParallelLayers(numProcessors, -1);
+
+        for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.size(); i++) {
+            for (int j = 0; j < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.size(); j++) {
+                if (isSchool(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.naics_code) == true) {
+                    LocationNode place = getNearestNode(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.lat, myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.lon);
+                    if (place != null) {
+
+                        boolean isUniqueLocationNode = true;
+                        int shopIndex = -1;
+                        for (int b = 0; b < schoolLocations.size(); b++) {
+                            if (schoolLocations.get(b).node.lat == place.lat && schoolLocations.get(b).node.lon == place.lon) {
+                                isUniqueLocationNode = false;
+                                shopIndex = b;
+                                break;
+                            }
+                        }
+
+                        int schoolGroupIndex = -1;
+                        for (int y = 0; y < indicesUniqueList.size(); y++) {
+                            if (indicesUniqueList.get(y).equals(indicesList.get(shopIndex))) {
+                                schoolGroupIndex = y;
+                                break;
+                            }
+                        }
+
+//                        int shopGroupIndex = indicesList.get(shopIndex);
+                        LocationNodeSafegraph targetShopGroup = schoolMergedLocations.get(schoolGroupIndex);
+
+                        if (isUniqueLocationNode == false) {
+                            if (myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).visitor_home_cbgs != null) {
+                                for (int k = 0; k < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).visitor_home_cbgs.size(); k++) {
+                                    CensusBlockGroup cBG = myParent.mainModel.allGISData.findCensusBlockGroup(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).visitor_home_cbgs.get(k).key);
+                                    LocationNode home = getNearestNode(cBG.lon, cBG.lat);
+
+                                    if (home == null) {
+                                        float collisionPositionx = cBG.lat;
+                                        float collisionPositiony = cBG.lon;
+                                        double leastDistance = Double.POSITIVE_INFINITY;
+                                        LocationNode nearestNode = mainFParent.allData.all_Nodes[0];
+                                        for (int g = 0; g < mainFParent.allData.all_Nodes.length; g++) {
+                                            //System.out.println(outputGrid.myNodes[i]);//WARNING, NULL POINTER SPOTTED, A GRID HAS A NULL LOCATIONNODE
+                                            double dist = Math.sqrt(Math.pow(collisionPositionx - mainFParent.allData.all_Nodes[g].lat, 2) + Math.pow(collisionPositiony - mainFParent.allData.all_Nodes[g].lon, 2));
+                                            if (dist < leastDistance) {
+                                                nearestNode = mainFParent.allData.all_Nodes[g];
+                                                leastDistance = dist;
+                                            }
+                                        }
+                                        home = nearestNode;
+                                    }
+
+                                    Routing routing = new Routing(mainFParent.allData, trafficLayerIndex, 0);
+
+                                    routing.findPath(home, targetShopGroup.node);
+                                    double distanceToTarget = routing.pathDistance;
+
+                                    double distancesToOtherTargets[] = new double[schoolMergedLocations.size()];
+
+                                    ParallelRouting parallelRouting[] = new ParallelRouting[numProcessors];
+
+                                    for (int f = 0; f < numProcessors - 1; f++) {
+                                        parallelRouting[f] = new ParallelRouting(f, this, distancesToOtherTargets, (int) Math.floor(f * ((schoolMergedLocations.size()) / numProcessors)), (int) Math.floor((f + 1) * ((schoolMergedLocations.size()) / numProcessors)), trafficLayerIndex, home, schoolMergedLocations);
+                                    }
+                                    parallelRouting[numProcessors - 1] = new ParallelRouting(numProcessors - 1, this, distancesToOtherTargets, (int) Math.floor((numProcessors - 1) * ((schoolMergedLocations.size()) / numProcessors)), schoolMergedLocations.size(), trafficLayerIndex, home, schoolMergedLocations);;
+
+                                    for (int f = 0; f < numProcessors; f++) {
+                                        parallelRouting[f].myThread.start();
+                                    }
+                                    for (int f = 0; f < numProcessors; f++) {
+                                        try {
+                                            parallelRouting[f].myThread.join();
+//                                            for (int d = 0; d < parallelRouting[f].myData.length; d++) {
+//                                                distancesToOtherTargets[d]=distancesToOtherTargets[d]+parallelRouting[f].myData[d];
+//                                            }
+//                                            System.out.println("thread " + f + "finished for location nodes: " + parallelRouting[f].myStartIndex + " | " + parallelRouting[f].myEndIndex);
+                                        } catch (InterruptedException ie) {
+                                            System.out.println(ie.toString());
+                                        }
+                                    }
+
+//                                    for (int h = 0; h < shopMergedLocations.size(); h++) {
+////                                    if (h != shopGroupIndex) {
+//                                        Routing routingToOthers = new Routing(mainFParent.allData, trafficLayerIndex, 0);
+//                                        routingToOthers.findPath(home, shopMergedLocations.get(h));
+//                                        distancesToOtherTargets[h] = routingToOthers.pathDistance;
+////                                    }
+//                                    }
+                                    Arrays.sort(distancesToOtherTargets);
+                                    int orderNumber = -1;
+                                    for (int m = 0; m < distancesToOtherTargets.length; m++) {
+                                        if (distancesToOtherTargets[m] == distanceToTarget && distanceToTarget != Double.POSITIVE_INFINITY) {
+                                            orderNumber = m;
+                                            break;
+                                        }
+                                    }
+                                    if (orderNumber != -1) {
+                                        numVisitsToNearestOrder[orderNumber] = numVisitsToNearestOrder[orderNumber] + myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).visitor_home_cbgs.get(k).value;
+                                    }
+                                }
+                                for (int r = 0; r < numVisitsToNearestOrder.length; r++) {
+                                    System.out.println(r + " " + numVisitsToNearestOrder[r]);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < numVisitsToNearestOrder.length; i++) {
+            System.out.println(i + " " + numVisitsToNearestOrder[i]);
+        }
+    }//GEN-LAST:event_jButton12ActionPerformed
+
+    private void jButton13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton13ActionPerformed
+        ArrayList<LocationNodeSafegraph> templeLocations = initTempleLocations();
+        Integer indices[] = labelMergedFacilities(templeLocations, templeMergeThreshold);
+        List<Integer> indicesRawList = Arrays.asList(indices);
+        ArrayList<Integer> indicesList = new ArrayList(indicesRawList);
+        LinkedHashSet<Integer> indicesUniqueSetHS = new LinkedHashSet(indicesList);
+        ArrayList<Integer> indicesUniqueList = new ArrayList(indicesUniqueSetHS);
+        ArrayList<LocationNodeSafegraph> templeMergedLocations = mergeFacilitiesWithIndices(templeLocations, indicesList, indicesUniqueList);
+
+        int trafficLayerIndex = -1;
+        for (int i = 0; i < mainFParent.allData.all_Layers.size(); i++) {
+            if (((LayerDefinition) mainFParent.allData.all_Layers.get(i)).layerName.toLowerCase().contains("traffic")) {
+                trafficLayerIndex = i;
+            }
+        }
+
+        int numVisitsToNearestOrder[] = new int[templeMergedLocations.size()];
+
+        int numProcessors = myParent.mainModel.numCPUs;
+        if (numProcessors > Runtime.getRuntime().availableProcessors()) {
+            numProcessors = Runtime.getRuntime().availableProcessors();
+        }
+
+        mainFParent.allData.setParallelLayers(numProcessors, -1);
+
+        for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.size(); i++) {
+            for (int j = 0; j < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.size(); j++) {
+                if (isReligiousOrganization(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.naics_code) == true) {
+                    LocationNode place = getNearestNode(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.lat, myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.lon);
+                    if (place != null) {
+
+                        boolean isUniqueLocationNode = true;
+                        int templeIndex = -1;
+                        for (int b = 0; b < templeLocations.size(); b++) {
+                            if (templeLocations.get(b).node.lat == place.lat && templeLocations.get(b).node.lon == place.lon) {
+                                isUniqueLocationNode = false;
+                                templeIndex = b;
+                                break;
+                            }
+                        }
+
+                        int templeGroupIndex = -1;
+                        for (int y = 0; y < indicesUniqueList.size(); y++) {
+                            if (indicesUniqueList.get(y).equals(indicesList.get(templeIndex))) {
+                                templeGroupIndex = y;
+                                break;
+                            }
+                        }
+
+//                        int shopGroupIndex = indicesList.get(shopIndex);
+                        LocationNodeSafegraph targetShopGroup = templeMergedLocations.get(templeGroupIndex);
+
+                        if (isUniqueLocationNode == false) {
+                            if (myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).visitor_home_cbgs != null) {
+                                for (int k = 0; k < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).visitor_home_cbgs.size(); k++) {
+                                    CensusBlockGroup cBG = myParent.mainModel.allGISData.findCensusBlockGroup(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).visitor_home_cbgs.get(k).key);
+                                    LocationNode home = getNearestNode(cBG.lon, cBG.lat);
+
+                                    if (home == null) {
+                                        float collisionPositionx = cBG.lat;
+                                        float collisionPositiony = cBG.lon;
+                                        double leastDistance = Double.POSITIVE_INFINITY;
+                                        LocationNode nearestNode = mainFParent.allData.all_Nodes[0];
+                                        for (int g = 0; g < mainFParent.allData.all_Nodes.length; g++) {
+                                            //System.out.println(outputGrid.myNodes[i]);//WARNING, NULL POINTER SPOTTED, A GRID HAS A NULL LOCATIONNODE
+                                            double dist = Math.sqrt(Math.pow(collisionPositionx - mainFParent.allData.all_Nodes[g].lat, 2) + Math.pow(collisionPositiony - mainFParent.allData.all_Nodes[g].lon, 2));
+                                            if (dist < leastDistance) {
+                                                nearestNode = mainFParent.allData.all_Nodes[g];
+                                                leastDistance = dist;
+                                            }
+                                        }
+                                        home = nearestNode;
+                                    }
+
+                                    Routing routing = new Routing(mainFParent.allData, trafficLayerIndex, 0);
+
+                                    routing.findPath(home, targetShopGroup.node);
+                                    double distanceToTarget = routing.pathDistance;
+
+                                    double distancesToOtherTargets[] = new double[templeMergedLocations.size()];
+
+                                    ParallelRouting parallelRouting[] = new ParallelRouting[numProcessors];
+
+                                    for (int f = 0; f < numProcessors - 1; f++) {
+                                        parallelRouting[f] = new ParallelRouting(f, this, distancesToOtherTargets, (int) Math.floor(f * ((templeMergedLocations.size()) / numProcessors)), (int) Math.floor((f + 1) * ((templeMergedLocations.size()) / numProcessors)), trafficLayerIndex, home, templeMergedLocations);
+                                    }
+                                    parallelRouting[numProcessors - 1] = new ParallelRouting(numProcessors - 1, this, distancesToOtherTargets, (int) Math.floor((numProcessors - 1) * ((templeMergedLocations.size()) / numProcessors)), templeMergedLocations.size(), trafficLayerIndex, home, templeMergedLocations);;
+
+                                    for (int f = 0; f < numProcessors; f++) {
+                                        parallelRouting[f].myThread.start();
+                                    }
+                                    for (int f = 0; f < numProcessors; f++) {
+                                        try {
+                                            parallelRouting[f].myThread.join();
+//                                            for (int d = 0; d < parallelRouting[f].myData.length; d++) {
+//                                                distancesToOtherTargets[d]=distancesToOtherTargets[d]+parallelRouting[f].myData[d];
+//                                            }
+//                                            System.out.println("thread " + f + "finished for location nodes: " + parallelRouting[f].myStartIndex + " | " + parallelRouting[f].myEndIndex);
+                                        } catch (InterruptedException ie) {
+                                            System.out.println(ie.toString());
+                                        }
+                                    }
+
+//                                    for (int h = 0; h < shopMergedLocations.size(); h++) {
+////                                    if (h != shopGroupIndex) {
+//                                        Routing routingToOthers = new Routing(mainFParent.allData, trafficLayerIndex, 0);
+//                                        routingToOthers.findPath(home, shopMergedLocations.get(h));
+//                                        distancesToOtherTargets[h] = routingToOthers.pathDistance;
+////                                    }
+//                                    }
+                                    Arrays.sort(distancesToOtherTargets);
+                                    int orderNumber = -1;
+                                    for (int m = 0; m < distancesToOtherTargets.length; m++) {
+                                        if (distancesToOtherTargets[m] == distanceToTarget && distanceToTarget != Double.POSITIVE_INFINITY) {
+                                            orderNumber = m;
+                                            break;
+                                        }
+                                    }
+                                    if (orderNumber != -1) {
+                                        numVisitsToNearestOrder[orderNumber] = numVisitsToNearestOrder[orderNumber] + myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).visitor_home_cbgs.get(k).value;
+                                    }
+                                }
+                                for (int r = 0; r < numVisitsToNearestOrder.length; r++) {
+                                    System.out.println(r + " " + numVisitsToNearestOrder[r]);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < numVisitsToNearestOrder.length; i++) {
+            System.out.println(i + " " + numVisitsToNearestOrder[i]);
+        }
+    }//GEN-LAST:event_jButton13ActionPerformed
+
+    private void jButton14ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton14ActionPerformed
+        ArrayList<LocationNodeSafegraph> shopLocations = initShopLocations();
+        Integer indices[] = labelMergedFacilities(shopLocations, shopMergeThreshold);
+        List<Integer> indicesRawList = Arrays.asList(indices);
+        ArrayList<Integer> indicesList = new ArrayList(indicesRawList);
+        LinkedHashSet<Integer> indicesUniqueSetHS = new LinkedHashSet(indicesList);
+        ArrayList<Integer> indicesUniqueList = new ArrayList(indicesUniqueSetHS);
+        ArrayList<LocationNodeSafegraph> shopMergedLocations = mergeFacilitiesWithIndices(shopLocations, indicesList, indicesUniqueList);
+
+        int trafficLayerIndex = -1;
+        for (int i = 0; i < mainFParent.allData.all_Layers.size(); i++) {
+            if (((LayerDefinition) mainFParent.allData.all_Layers.get(i)).layerName.toLowerCase().contains("traffic")) {
+                trafficLayerIndex = i;
+            }
+        }
+
+        int numVisitsToNearestOrder[] = new int[shopMergedLocations.size()];
+
+        int numProcessors = myParent.mainModel.numCPUs;
+        if (numProcessors > Runtime.getRuntime().availableProcessors()) {
+            numProcessors = Runtime.getRuntime().availableProcessors();
+        }
+
+        mainFParent.allData.setParallelLayers(numProcessors, -1);
+
+        for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.size(); i++) {
+            for (int j = 0; j < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.size(); j++) {
+                if (isFoodAndGrocery(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.naics_code) == true) {
+                    LocationNode place = getNearestNode(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.lat, myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.lon);
+                    if (place != null) {
+
+                        boolean isUniqueLocationNode = true;
+                        int shopIndex = -1;
+                        for (int b = 0; b < shopLocations.size(); b++) {
+                            if (shopLocations.get(b).node.lat == place.lat && shopLocations.get(b).node.lon == place.lon) {
+                                isUniqueLocationNode = false;
+                                shopIndex = b;
+                                break;
+                            }
+                        }
+
+                        int shopGroupIndex = -1;
+                        for (int y = 0; y < indicesUniqueList.size(); y++) {
+                            if (indicesUniqueList.get(y).equals(indicesList.get(shopIndex))) {
+                                shopGroupIndex = y;
+                                break;
+                            }
+                        }
+
+//                        int shopGroupIndex = indicesList.get(shopIndex);
+                        LocationNodeSafegraph targetShopGroup = shopMergedLocations.get(shopGroupIndex);
+
+                        if (isUniqueLocationNode == false) {
+                            if (myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).visitor_daytime_cbgs != null) {
+                                for (int k = 0; k < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).visitor_daytime_cbgs.size(); k++) {
+                                    CensusBlockGroup cBG = myParent.mainModel.allGISData.findCensusBlockGroup(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).visitor_daytime_cbgs.get(k).key);
+                                    LocationNode work = getNearestNode(cBG.lon, cBG.lat);
+
+                                    if (work == null) {
+                                        float collisionPositionx = cBG.lat;
+                                        float collisionPositiony = cBG.lon;
+                                        double leastDistance = Double.POSITIVE_INFINITY;
+                                        LocationNode nearestNode = mainFParent.allData.all_Nodes[0];
+                                        for (int g = 0; g < mainFParent.allData.all_Nodes.length; g++) {
+                                            //System.out.println(outputGrid.myNodes[i]);//WARNING, NULL POINTER SPOTTED, A GRID HAS A NULL LOCATIONNODE
+                                            double dist = Math.sqrt(Math.pow(collisionPositionx - mainFParent.allData.all_Nodes[g].lat, 2) + Math.pow(collisionPositiony - mainFParent.allData.all_Nodes[g].lon, 2));
+                                            if (dist < leastDistance) {
+                                                nearestNode = mainFParent.allData.all_Nodes[g];
+                                                leastDistance = dist;
+                                            }
+                                        }
+                                        work = nearestNode;
+                                    }
+
+                                    Routing routing = new Routing(mainFParent.allData, trafficLayerIndex, 0);
+
+                                    routing.findPath(work, targetShopGroup.node);
+                                    double distanceToTarget = routing.pathDistance;
+
+                                    double distancesToOtherTargets[] = new double[shopMergedLocations.size()];
+
+                                    ParallelRouting parallelRouting[] = new ParallelRouting[numProcessors];
+
+                                    for (int f = 0; f < numProcessors - 1; f++) {
+                                        parallelRouting[f] = new ParallelRouting(f, this, distancesToOtherTargets, (int) Math.floor(f * ((shopMergedLocations.size()) / numProcessors)), (int) Math.floor((f + 1) * ((shopMergedLocations.size()) / numProcessors)), trafficLayerIndex, work, shopMergedLocations);
+                                    }
+                                    parallelRouting[numProcessors - 1] = new ParallelRouting(numProcessors - 1, this, distancesToOtherTargets, (int) Math.floor((numProcessors - 1) * ((shopMergedLocations.size()) / numProcessors)), shopMergedLocations.size(), trafficLayerIndex, work, shopMergedLocations);;
+
+                                    for (int f = 0; f < numProcessors; f++) {
+                                        parallelRouting[f].myThread.start();
+                                    }
+                                    for (int f = 0; f < numProcessors; f++) {
+                                        try {
+                                            parallelRouting[f].myThread.join();
+//                                            for (int d = 0; d < parallelRouting[f].myData.length; d++) {
+//                                                distancesToOtherTargets[d]=distancesToOtherTargets[d]+parallelRouting[f].myData[d];
+//                                            }
+//                                            System.out.println("thread " + f + "finished for location nodes: " + parallelRouting[f].myStartIndex + " | " + parallelRouting[f].myEndIndex);
+                                        } catch (InterruptedException ie) {
+                                            System.out.println(ie.toString());
+                                        }
+                                    }
+
+//                                    for (int h = 0; h < shopMergedLocations.size(); h++) {
+////                                    if (h != shopGroupIndex) {
+//                                        Routing routingToOthers = new Routing(mainFParent.allData, trafficLayerIndex, 0);
+//                                        routingToOthers.findPath(home, shopMergedLocations.get(h));
+//                                        distancesToOtherTargets[h] = routingToOthers.pathDistance;
+////                                    }
+//                                    }
+                                    Arrays.sort(distancesToOtherTargets);
+                                    int orderNumber = -1;
+                                    for (int m = 0; m < distancesToOtherTargets.length; m++) {
+                                        if (distancesToOtherTargets[m] == distanceToTarget && distanceToTarget != Double.POSITIVE_INFINITY) {
+                                            orderNumber = m;
+                                            break;
+                                        }
+                                    }
+                                    if (orderNumber != -1) {
+                                        numVisitsToNearestOrder[orderNumber] = numVisitsToNearestOrder[orderNumber] + myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).visitor_daytime_cbgs.get(k).value;
+                                    }
+                                }
+                                for (int r = 0; r < numVisitsToNearestOrder.length; r++) {
+                                    System.out.println(r + " " + numVisitsToNearestOrder[r]);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < numVisitsToNearestOrder.length; i++) {
+            System.out.println(i + " " + numVisitsToNearestOrder[i]);
+        }
+    }//GEN-LAST:event_jButton14ActionPerformed
+
+    private void jButton15ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton15ActionPerformed
+        int comLayer = mainFParent.findLayer("voronoi_combination_v");
+        int cBGLayer = mainFParent.findLayer("censusBlockGroups");
+
+        int shopLayer = mainFParent.findLayer("shops_v");
+        int schoolLayer = mainFParent.findLayer("schools_v");
+
+        ArrayList<LocationNodeSafegraph> shopLocations = initShopLocations();
+        Integer indices[] = labelMergedFacilities(shopLocations, shopMergeThreshold);
+        List<Integer> indicesRawList = Arrays.asList(indices);
+        ArrayList<Integer> indicesList = new ArrayList(indicesRawList);
+        LinkedHashSet<Integer> indicesUniqueSetHS = new LinkedHashSet(indicesList);
+        ArrayList<Integer> indicesUniqueList = new ArrayList(indicesUniqueSetHS);
+
+        ArrayList<LocationNodeSafegraph> shops = mergeFacilitiesWithIndices(shopLocations, indicesList, indicesUniqueList);
+
+        ArrayList<LocationNodeSafegraph> schoolLocations = initSchoolLocations();
+        indices = labelMergedFacilities(schoolLocations, shopMergeThreshold);
+        indicesRawList = Arrays.asList(indices);
+        indicesList = new ArrayList(indicesRawList);
+        indicesUniqueSetHS = new LinkedHashSet(indicesList);
+        indicesUniqueList = new ArrayList(indicesUniqueSetHS);
+
+        ArrayList<LocationNodeSafegraph> schools = mergeFacilitiesWithIndices(schoolLocations, indicesList, indicesUniqueList);
+
+        System.out.println("ALL CBGS SIZE: "+((LayerDefinition) mainFParent.allData.all_Layers.get(cBGLayer)).values.length);
+        for (int i = 0; i < ((LayerDefinition) mainFParent.allData.all_Layers.get(cBGLayer)).values.length; i++) {
+            System.out.println(i);
+            if ((long) (((LayerDefinition) mainFParent.allData.all_Layers.get(cBGLayer)).values[i]) > 0) {
+                CensusBlockGroup cBG = myParent.mainModel.allGISData.findCensusBlockGroup((long) (((LayerDefinition) mainFParent.allData.all_Layers.get(cBGLayer)).values[i]));
+                if (cBG != null) {
+                    for (int k = 0; k < mainFParent.allData.all_Nodes.length; k++) {
+                        short cBGIndex = (short) (((short[]) mainFParent.allData.all_Nodes[k].layers.get(cBGLayer))[0] - 1);
+
+                        if((long) (((LayerDefinition) mainFParent.allData.all_Layers.get(cBGLayer)).values[cBGIndex])<1){
+                            continue;
+                        }
+                        
+                        CensusBlockGroup nodeCBG = myParent.mainModel.allGISData.findCensusBlockGroup((long) (((LayerDefinition) mainFParent.allData.all_Layers.get(cBGLayer)).values[cBGIndex]));
+
+//                        if(nodeCBG==null){
+//                            System.out.println(i);
+//                        }
+                        
+                        if (nodeCBG.id == cBG.id) {
+                            short shopIndex = (short) (((short[]) mainFParent.allData.all_Nodes[k].layers.get(shopLayer))[0] - 1);
+                            short schoolIndex = (short) (((short[]) mainFParent.allData.all_Nodes[k].layers.get(schoolLayer))[0] - 1);
+
+                            if (shopIndex > 0) {
+                                LocationNodeSafegraph targetShopGroup = shops.get(shopIndex - 1);
+                                if (cBG.vDsPlacesShops == null) {
+                                    cBG.vDsPlacesShops = new ArrayList();
+                                    cBG.proportionOfVDsShops = new ArrayList();
+                                    cBG.vDsPlacesShops.add(targetShopGroup.places);
+                                    cBG.proportionOfVDsShops.add(1d);
+                                } else {
+                                    boolean isFound = false;
+                                    for (int m = 0; m < cBG.vDsPlacesShops.size(); m++) {
+                                        if (targetShopGroup.places.get(0) == cBG.vDsPlacesShops.get(m).get(0)) {
+                                            cBG.proportionOfVDsShops.set(m,cBG.proportionOfVDsShops.get(m)+1d);
+                                            isFound = true;
+                                            break;
+                                        }
+                                    }
+                                    if (isFound == false) {
+                                        cBG.vDsPlacesShops.add(targetShopGroup.places);
+                                        cBG.proportionOfVDsShops.add(1d);
+                                    }
+                                }
+                            }
+
+                            if (schoolIndex > 0) {
+                                LocationNodeSafegraph targetSchoolGroup = schools.get(schoolIndex - 1);
+                                if (cBG.vDsPlacesSchools == null) {
+                                    cBG.vDsPlacesSchools = new ArrayList();
+                                    cBG.proportionOfVDsSchools = new ArrayList();
+                                    cBG.vDsPlacesSchools.add(targetSchoolGroup.places);
+                                    cBG.proportionOfVDsSchools.add(1d);
+                                } else {
+                                    boolean isFound = false;
+                                    for (int m = 0; m < cBG.vDsPlacesSchools.size(); m++) {
+                                        if (targetSchoolGroup.places.get(0) == cBG.vDsPlacesSchools.get(m).get(0)) {
+                                            cBG.proportionOfVDsSchools.set(m,cBG.proportionOfVDsSchools.get(m)+1d);
+                                            isFound = true;
+                                            break;
+                                        }
+                                    }
+                                    if (isFound == false) {
+                                        cBG.vDsPlacesSchools.add(targetSchoolGroup.places);
+                                        cBG.proportionOfVDsSchools.add(1d);
+                                    }
+                                }
+                            }
+
+                        }
+
+                    }
+
+                }
+            }
+        }
+
+        HashMap<String, String> perms = new HashMap();
+        HashMap<String, Integer> usedPerms = new HashMap();
+        HashMap<String, Integer> refinedPermsById = new HashMap();
+        HashMap<String, Integer> refinedPermsbyUse = new HashMap();
+        ArrayList<String> refinedPermsKeys = new ArrayList();
+        int counter = 0;
+        for (int i = 1; i < ((LayerDefinition) mainFParent.allData.all_Layers.get(comLayer)).categories.length; i++) {
+            for (int j = 1; j < ((LayerDefinition) mainFParent.allData.all_Layers.get(cBGLayer)).categories.length; j++) {
+                perms.put(i + "_" + j, String.valueOf(counter));
+                usedPerms.put(i + "_" + j, 0);
+                counter = counter + 1;
+            }
+        }
+        usedPerms.put("0", 0);
+
+        for (int i = 0; i < mainFParent.allData.all_Nodes.length; i++) {
+            short shopIndex = (short) (((short[]) mainFParent.allData.all_Nodes[i].layers.get(comLayer))[0] - 1);
+            short schoolIndex = (short) (((short[]) mainFParent.allData.all_Nodes[i].layers.get(cBGLayer))[0] - 1);
+            int currentCounter = -1;
+            if (shopIndex == 0 || schoolIndex == 0) {//NOT ASSIGNED SCENARIOS
+                currentCounter = usedPerms.get("0");
+            } else {
+                currentCounter = usedPerms.get(shopIndex + "_" + schoolIndex);
+            }
+
+            usedPerms.put(shopIndex + "_" + schoolIndex, currentCounter + 1);
+        }
+
+        counter = 1;
+        int refinedCounter = 0;
+        for (Map.Entry<String, Integer> entry : usedPerms.entrySet()) {
+            String key = entry.getKey();
+            Integer value = entry.getValue();
+            if (value > 0) {
+                refinedPermsbyUse.put(key, value);
+                refinedPermsById.put(key, refinedCounter + 1);
+                refinedCounter = refinedCounter + 1;
+            }
+            counter = counter + 1;
+        }
+
+        LayerDefinition tempLayer = new LayerDefinition("category", "VDs_CBGs");
+        tempLayer.categories = new String[refinedCounter + 1];
+        tempLayer.colors = new Color[refinedCounter + 1];
+        tempLayer.values = new double[refinedCounter + 1];
+
+        tempLayer.categories[0] = "NOT ASSIGNED";
+        tempLayer.colors[0] = new Color(2, 2, 2);
+        tempLayer.values[0] = Double.valueOf(1);
+//        for (int i = 1; i < counter + 1; i++) {
+//            tempLayer.categories[i] = "combination " + String.valueOf(i);
+//            tempLayer.colors[i] = new Color(Color.HSBtoRGB((float) i / (float) counter + 1 - 1, 1, 1));
+//            tempLayer.values[i] = Double.valueOf(i + 1);
+//        }
+
+        int combinationCounter = 1;
+        for (Map.Entry<String, Integer> entry : refinedPermsById.entrySet()) {
+            String key = entry.getKey();
+            Integer value = entry.getValue();
+            tempLayer.categories[combinationCounter] = "combination " + key;
+            tempLayer.colors[combinationCounter] = new Color(Color.HSBtoRGB((float) combinationCounter / (float) refinedCounter + 1 - 1, 1, 1));
+            tempLayer.values[combinationCounter] = Double.valueOf(value);
+            combinationCounter = combinationCounter + 1;
+        }
+
+        for (int i = 0; i < mainFParent.allData.all_Nodes.length; i++) {
+            short shopIndex = (short) (((short[]) mainFParent.allData.all_Nodes[i].layers.get(comLayer))[0] - 1);
+            short schoolIndex = (short) (((short[]) mainFParent.allData.all_Nodes[i].layers.get(cBGLayer))[0] - 1);
+            String combinationIndex;
+            if (shopIndex == 0 || schoolIndex == 0) {//NOT ASSIGNED SCENARIOS
+                combinationIndex = "0";
+            } else {
+                combinationIndex = String.valueOf(refinedPermsById.get(shopIndex + "_" + schoolIndex));
+            }
+            short[] val = new short[1];
+//            if(combinationIndex==null){
+//                System.out.println("combinationIndex: "+combinationIndex);
+//            }
+            val[0] = (short) (Short.valueOf(combinationIndex) + 1);
+//            if (val[0] == 0) {
+//                System.out.println("!!!");
+//            }
+//            if (val[0] > 64) {
+//                System.out.println("!!!");
+//            }
+            mainFParent.allData.all_Nodes[i].layers.add(val);
+        }
+
+        mainFParent.allData.all_Layers.add(tempLayer);
+        mainFParent.refreshLayersList();
+    }//GEN-LAST:event_jButton15ActionPerformed
+
     public boolean isShop(int naicsCode) {
         String naicsString = String.valueOf(naicsCode);
         if (naicsString.startsWith("44511") || naicsString.startsWith("44512") || naicsString.startsWith("44711")) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isFoodAndGrocery(int naicsCode) {
+        String naicsString = String.valueOf(naicsCode);
+        if ((naicsString.startsWith("44") || naicsString.startsWith("45")) && !naicsString.startsWith("4411") && !naicsString.startsWith("4412") && !naicsString.startsWith("4413")) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isReligiousOrganization(int naicsCode) {
+        String naicsString = String.valueOf(naicsCode);
+        if (naicsString.startsWith("8131")) {
             return true;
         }
         return false;
@@ -618,23 +1447,85 @@ public class GISLocationDialog extends javax.swing.JDialog {
         return false;
     }
 
-    public FacilityLocation[] initShopFacilities() {
-        ArrayList<LocationNode> shops = new ArrayList();
+    public ArrayList<LocationNodeSafegraph> initShopLocations() {
+        ArrayList<LocationNodeSafegraph> shops = new ArrayList();
         for (int i = 0; i < myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.size(); i++) {
             for (int j = 0; j < myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.size(); j++) {
                 if (myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).censusBlock != null) {
-                    if (isShop(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).naics_code) == true) {
+                    if (isFoodAndGrocery(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).naics_code) == true) {
                         LocationNode node = getNearestNode(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lat, myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lon);
                         if (node != null) {
                             if (isUniqueLocationNode(shops, node)) {
-                                shops.add(node);
+                                LocationNodeSafegraph nodeSafegraph = new LocationNodeSafegraph();
+                                nodeSafegraph.node = node;
+                                nodeSafegraph.place = myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j);
+                                nodeSafegraph.placeKey = myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).placeKey;
+                                shops.add(nodeSafegraph);
                             }
                         }
                     }
                 }
             }
         }
-        shops = mergeFacilities(shops, 0.01f);
+        return shops;
+    }
+
+    public ArrayList<LocationNodeSafegraph> initSchoolLocations() {
+        ArrayList<LocationNodeSafegraph> schools = new ArrayList();
+        for (int i = 0; i < myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.size(); i++) {
+            for (int j = 0; j < myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.size(); j++) {
+                if (myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).censusBlock != null) {
+                    if (isSchool(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).naics_code) == true) {
+                        LocationNode node = getNearestNode(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lat, myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lon);
+                        if (node != null) {
+                            if (isUniqueLocationNode(schools, node)) {
+                                LocationNodeSafegraph locationNodeSafegraph = new LocationNodeSafegraph();
+                                locationNodeSafegraph.node = node;
+                                locationNodeSafegraph.place = myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j);
+                                locationNodeSafegraph.placeKey = myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).placeKey;
+                                schools.add(locationNodeSafegraph);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return schools;
+    }
+
+    public ArrayList<LocationNodeSafegraph> initTempleLocations() {
+        ArrayList<LocationNodeSafegraph> temples = new ArrayList();
+        for (int i = 0; i < myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.size(); i++) {
+            for (int j = 0; j < myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.size(); j++) {
+                if (myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).censusBlock != null) {
+                    if (isReligiousOrganization(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).naics_code) == true) {
+                        LocationNode node = getNearestNode(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lat, myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lon);
+                        if (node != null) {
+                            if (isUniqueLocationNode(temples, node)) {
+                                LocationNodeSafegraph locationNodeSafegraph = new LocationNodeSafegraph();
+                                locationNodeSafegraph.node = node;
+                                locationNodeSafegraph.place = myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j);
+                                locationNodeSafegraph.placeKey = myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).placeKey;
+                                temples.add(locationNodeSafegraph);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return temples;
+    }
+
+    public FacilityLocation[] initShopFacilities() {
+        ArrayList<LocationNodeSafegraph> shopLocations = initShopLocations();
+        Integer indices[] = labelMergedFacilities(shopLocations, shopMergeThreshold);
+        List<Integer> indicesRawList = Arrays.asList(indices);
+        ArrayList<Integer> indicesList = new ArrayList(indicesRawList);
+        LinkedHashSet<Integer> indicesUniqueSetHS = new LinkedHashSet(indicesList);
+        ArrayList<Integer> indicesUniqueList = new ArrayList(indicesUniqueSetHS);
+
+        System.out.println("Initial number of shops: " + shopLocations.size());
+        ArrayList<LocationNodeSafegraph> shops = mergeFacilitiesWithIndices(shopLocations, indicesList, indicesUniqueList);
 
         int numFacilities = shops.size();
         FacilityLocation output[] = new FacilityLocation[numFacilities];
@@ -644,7 +1535,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
 
         }
         for (int i = 0; i < numFacilities; i++) {
-            output[i] = new FacilityLocation(mainFParent, shops.get(i), shops.get(i).myWays[0], 20d);
+            output[i] = new FacilityLocation(mainFParent, shops.get(i).node, shops.get(i).node.myWays[0], 20d);
             output[i].color = colors[i];
             output[i].isDecoyable = true;
             output[i].tollOff = 0.5;//IMP
@@ -653,52 +1544,128 @@ public class GISLocationDialog extends javax.swing.JDialog {
         return output;
     }
 
-    public ArrayList<LocationNode> mergeFacilities(ArrayList<LocationNode> input, float threshold) {
-        ArrayList<LocationNode> checker = new ArrayList();
-
+//    public ArrayList<LocationNodeSafegraph> mergeFacilities(ArrayList<LocationNodeSafegraph> input, float threshold) {
+//        ArrayList<LocationNodeSafegraph> checker = new ArrayList();
+//
+////        for (int i = 0; i < input.size(); i++) {
+////            checker.add(new LocationNode(input.get(i).id,input.get(i).lat,input.get(i).lon,input.get(i).myOrder));
+////        }
 //        for (int i = 0; i < input.size(); i++) {
-//            checker.add(new LocationNode(input.get(i).id,input.get(i).lat,input.get(i).lon,input.get(i).myOrder));
+//            boolean tooClose = false;
+//            for (int j = 0; j < input.size(); j++) {
+//                if (i != j) {
+//                    if (Math.sqrt(Math.pow(input.get(i).lat - input.get(j).lat, 2) + Math.pow(input.get(i).lon - input.get(j).lon, 2)) < threshold) {
+//                        tooClose = true;
+//                    } else {
+//
+//                    }
+//                }
+//            }
+//            if (tooClose == false) {
+//                LocationNode node=new LocationNode(input.get(i).node.id, input.get(i).node.lat, input.get(i).node.lon, input.get(i).node.myOrder);
+//                LocationNodeSafegraph locationNodeSafegraph=new LocationNodeSafegraph();
+//                locationNodeSafegraph.node=node;
+//                locationNodeSafegraph.
+//                checker.add(new LocationNodeSafegraph(input.get(i).node.id, input.get(i).node.lat, input.get(i).node.lon, input.get(i).node.myOrder));
+//            }
 //        }
+//        ArrayList<LocationNodeSafegraph> output = new ArrayList();
+//
+//        for (int i = 0; i < checker.size(); i++) {
+//            checker.get(i).node = getNearestNode((float) checker.get(i).node.lat, (float) checker.get(i).node.lon);
+//            output.add(checker.get(i));
+//        }
+//        return output;
+//    }
+    public ArrayList<LocationNodeSafegraph> mergeFacilitiesWithIndices(ArrayList<LocationNodeSafegraph> input, ArrayList<Integer> allIndices, ArrayList<Integer> uniqueIndices) {
+        LocationNodeSafegraph[] centroids = new LocationNodeSafegraph[uniqueIndices.size()];
+        for (int i = 0; i < allIndices.size(); i++) {
+            int index = -1;
+            for (int j = 0; j < uniqueIndices.size(); j++) {
+                if (allIndices.get(i).equals(uniqueIndices.get(j))) {
+                    index = j;
+                    break;
+                }
+            }
+            if (centroids[index] == null) {
+                LocationNodeSafegraph locationNodeSafegraph = new LocationNodeSafegraph();
+                locationNodeSafegraph.node = input.get(i).node;
+                if (locationNodeSafegraph.placeKeys == null) {
+                    locationNodeSafegraph.places = new ArrayList();
+                    locationNodeSafegraph.places.add(input.get(i).place);
+                    locationNodeSafegraph.placeKeys = new ArrayList();
+                    locationNodeSafegraph.placeKeys.add(input.get(i).placeKey);
+                } else {
+                    locationNodeSafegraph.places.add(input.get(i).place);
+                    locationNodeSafegraph.placeKeys.add(input.get(i).placeKey);
+                }
+                centroids[index] = locationNodeSafegraph;
+            } else {
+                LocationNodeSafegraph locationNodeSafegraph = centroids[index];
+                locationNodeSafegraph.node = new LocationNode(0, (centroids[index].node.lat + input.get(i).node.lat) / 2f, (centroids[index].node.lon + input.get(i).node.lon) / 2f, 0);
+                if (locationNodeSafegraph.placeKeys == null) {
+                    locationNodeSafegraph.places = new ArrayList();
+                    locationNodeSafegraph.places.add(input.get(i).place);
+                    locationNodeSafegraph.placeKeys = new ArrayList();
+                    locationNodeSafegraph.placeKeys.add(input.get(i).placeKey);
+                } else {
+                    locationNodeSafegraph.places.add(input.get(i).place);
+                    locationNodeSafegraph.placeKeys.add(input.get(i).placeKey);
+                }
+                centroids[index] = locationNodeSafegraph;
+            }
+        }
+        ArrayList<LocationNodeSafegraph> output = new ArrayList();
+
+        for (int i = 0; i < centroids.length; i++) {
+            centroids[i].node = getNearestNode((float) centroids[i].node.lat, (float) centroids[i].node.lon);
+            output.add(centroids[i]);
+        }
+
+        return output;
+    }
+
+    public Integer[] labelMergedFacilities(ArrayList<LocationNodeSafegraph> input, float threshold) {
+        Integer output[] = new Integer[input.size()];
         for (int i = 0; i < input.size(); i++) {
-            boolean tooClose = false;
+            output[i] = i;
+        }
+        for (int i = 0; i < input.size(); i++) {
+//            boolean tooClose = false;
             for (int j = 0; j < input.size(); j++) {
                 if (i != j) {
-                    if (Math.sqrt(Math.pow(input.get(i).lat - input.get(j).lat, 2) + Math.pow(input.get(i).lon - input.get(j).lon, 2)) < threshold) {
-                        tooClose = true;
+                    if (Math.sqrt(Math.pow(input.get(i).node.lat - input.get(j).node.lat, 2) + Math.pow(input.get(i).node.lon - input.get(j).node.lon, 2)) < threshold) {
+//                        tooClose = true;
+                        output[j] = (int) (output[i]);
                     } else {
 
                     }
                 }
             }
-            if (tooClose == false) {
-                checker.add(new LocationNode(input.get(i).id, input.get(i).lat, input.get(i).lon, input.get(i).myOrder));
-            }
+//            if (tooClose == true) {
+//                
+////                checker.add(new LocationNode(input.get(i).id, input.get(i).lat, input.get(i).lon, input.get(i).myOrder));
+//            }
         }
-        ArrayList<LocationNode> output = new ArrayList();
 
-        for (int i = 0; i < checker.size(); i++) {
-            output.add(getNearestNode((float) checker.get(i).lat, (float) checker.get(i).lon));
-        }
+//        ArrayList<LocationNode> output = new ArrayList();
+//
+//        for (int i = 0; i < checker.size(); i++) {
+//            output.add(getNearestNode((float) checker.get(i).lat, (float) checker.get(i).lon));
+//        }
         return output;
     }
 
     public FacilityLocation[] initSchoolFacilities() {
-        ArrayList<LocationNode> schools = new ArrayList();
-        for (int i = 0; i < myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.size(); i++) {
-            for (int j = 0; j < myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.size(); j++) {
-                if (myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).censusBlock != null) {
-                    if (isSchool(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).naics_code) == true) {
-                        LocationNode node = getNearestNode(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lat, myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lon);
-                        if (node != null) {
-                            if (isUniqueLocationNode(schools, node)) {
-                                schools.add(node);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        schools = mergeFacilities(schools, 0.007f);
+        ArrayList<LocationNodeSafegraph> schoolLocations = initSchoolLocations();
+        Integer indices[] = labelMergedFacilities(schoolLocations, shopMergeThreshold);
+        List<Integer> indicesRawList = Arrays.asList(indices);
+        ArrayList<Integer> indicesList = new ArrayList(indicesRawList);
+        LinkedHashSet<Integer> indicesUniqueSetHS = new LinkedHashSet(indicesList);
+        ArrayList<Integer> indicesUniqueList = new ArrayList(indicesUniqueSetHS);
+
+        System.out.println("Initial number of shops: " + schoolLocations.size());
+        ArrayList<LocationNodeSafegraph> schools = mergeFacilitiesWithIndices(schoolLocations, indicesList, indicesUniqueList);
 
         int numFacilities = schools.size();
         FacilityLocation output[] = new FacilityLocation[numFacilities];
@@ -708,18 +1675,18 @@ public class GISLocationDialog extends javax.swing.JDialog {
 
         }
         for (int i = 0; i < numFacilities; i++) {
-            output[i] = new FacilityLocation(mainFParent, schools.get(i), schools.get(i).myWays[0], 20d);
+            output[i] = new FacilityLocation(mainFParent, schools.get(i).node, schools.get(i).node.myWays[0], 20d);
             output[i].color = colors[i];
             output[i].isDecoyable = true;
             output[i].tollOff = 0.5;//IMP
         }
-        System.out.println("schools generated: " + output.length);
+        System.out.println("shops generated: " + output.length);
         return output;
     }
 
-    public boolean isUniqueLocationNode(ArrayList<LocationNode> list, LocationNode input) {
+    public boolean isUniqueLocationNode(ArrayList<LocationNodeSafegraph> list, LocationNode input) {
         for (int i = 0; i < list.size(); i++) {
-            if (list.get(i).lat == input.lat && list.get(i).lon == input.lon) {
+            if (list.get(i).node.lat == input.lat && list.get(i).node.lon == input.lon) {
                 return false;
             }
         }
@@ -775,6 +1742,34 @@ public class GISLocationDialog extends javax.swing.JDialog {
         return nearestNode;
     }
 
+    public class ParallelRouting extends ParallelProcessor {
+
+        public ArrayList<PatternsRecordProcessed> records;
+        GISLocationDialog myParent;
+        double myData[];
+        int myThreadIndex;
+
+        public ParallelRouting(int threadIndex, GISLocationDialog parent, double[] data, int startIndex, int endIndex, int trafficLayerIndex, LocationNode home, ArrayList<LocationNodeSafegraph> shopMergedLocations) {
+            super(parent, data, startIndex, endIndex);
+            records = new ArrayList();
+            myThreadIndex = threadIndex;
+            myParent = parent;
+            myData = data;
+            myThread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    for (int h = startIndex; h < endIndex; h++) {
+//                                    if (h != shopGroupIndex) {
+                        Routing routingToOthers = new Routing(mainFParent.allData, trafficLayerIndex, threadIndex);
+                        routingToOthers.findPath(home, shopMergedLocations.get(h).node);
+                        myData[h] = routingToOthers.pathDistance;
+//                                    }
+                    }
+                }
+            });
+        }
+    }
+
     public class ParallelLocationNodeCBGIdConnector extends ParallelProcessor {
 
         public ArrayList<PatternsRecordProcessed> records;
@@ -805,10 +1800,17 @@ public class GISLocationDialog extends javax.swing.JDialog {
                                                 GeometryFactory geomFactory = new GeometryFactory();
                                                 Point point = geomFactory.createPoint(new Coordinate(mainFParent.allData.all_Nodes[u].lon, mainFParent.allData.all_Nodes[u].lat));
                                                 if (myParent.myParent.mainModel.allGISData.countries.get(i).states.get(j).counties.get(k).censusTracts.get(m).censusBlocks.get(v).shape.get(y).covers(point) == true) {
+                                                    if (myParent.myParent.mainModel.allGISData.isInScope(myParent.myParent.mainModel.ABM.studyScopeGeography, myParent.myParent.mainModel.allGISData.countries.get(i).states.get(j).counties.get(k).censusTracts.get(m).censusBlocks.get(v)) == true) {
+                                                        myData[u] = myParent.myParent.mainModel.allGISData.countries.get(i).states.get(j).counties.get(k).censusTracts.get(m).censusBlocks.get(v).id;
+                                                        isCBGFound = true;
+                                                        break;
+                                                    } else {
+                                                        myData[u] = Long.valueOf(-1);
+                                                        isCBGFound = true;
+                                                        break;
+                                                    }
                                                     //censusBlockGroupsEncounteredList.add(myParent.myParent.mainModel.allGISData.countries.get(i).states.get(j).counties.get(k).censusTracts.get(m).censusBlocks.get(v).id);
-                                                    myData[u] = myParent.myParent.mainModel.allGISData.countries.get(i).states.get(j).counties.get(k).censusTracts.get(m).censusBlocks.get(v).id;
-                                                    isCBGFound = true;
-                                                    break;
+
                                                 }
                                             }
                                             if (isCBGFound == true) {
@@ -845,6 +1847,11 @@ public class GISLocationDialog extends javax.swing.JDialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton10;
+    private javax.swing.JButton jButton11;
+    private javax.swing.JButton jButton12;
+    private javax.swing.JButton jButton13;
+    private javax.swing.JButton jButton14;
+    private javax.swing.JButton jButton15;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;

@@ -339,7 +339,7 @@ public class AllGISData extends Dataset implements Serializable {
             int counter = 0;
             int largerCounter = 0;
             int counterInterval = 1000;
-            int debugCounter=0;
+            int debugCounter = 0;
             while ((line = br.readLine()) != null) {
                 if (line.contains("{ \"type\": \"Feature\", \"properties\":")) {
                     JSONObject root = new JSONObject(line);
@@ -357,9 +357,9 @@ public class AllGISData extends Dataset implements Serializable {
 //                    censusTract.county = county;
                     long censusBlockLong = Long.parseLong(properties.getString("GEOID"));
                     CensusBlockGroup censusBlock = censusTract.findAndInsertCensusBlock(censusBlockLong);
-                    
-                    if(censusBlock.shape==null){
-                        censusBlock.shape=new ArrayList();
+
+                    if (censusBlock.shape == null) {
+                        censusBlock.shape = new ArrayList();
                     }
 //                    censusBlock.country = countries.get(countries.size() - 1);
 //                    censusBlock.state = state;
@@ -367,21 +367,21 @@ public class AllGISData extends Dataset implements Serializable {
 //                    censusBlock.censusTract = censusTract;
                     JSONObject geometry = root.getJSONObject("geometry");
                     JSONArray coordsT = geometry.getJSONArray("coordinates");
-                    String geomType = (String)(geometry.get("type"));
+                    String geomType = (String) (geometry.get("type"));
                     JSONArray coords = coordsT.getJSONArray(0);
                     ArrayList<Coordinate> coordsArrayList = new ArrayList();
                     for (int i = 0; i < coords.length(); i++) {
-                        if(geomType.equals("Polygon")){
+                        if (geomType.equals("Polygon")) {
                             coordsArrayList.add(new Coordinate(coords.getJSONArray(i).getDouble(0), coords.getJSONArray(i).getDouble(1)));
-                        }else if(geomType.equals("MultiPolygon")){
-                            
+                        } else if (geomType.equals("MultiPolygon")) {
+
                         }
 //                        System.out.println(coords.get(i));
 //                        System.out.println(debugCounter);
-                        
+
                     }
-                    
-                    debugCounter=debugCounter+1;
+
+                    debugCounter = debugCounter + 1;
 
                     Coordinate coordsArray[] = new Coordinate[coordsArrayList.size()];
                     for (int m = 0; m < coordsArrayList.size(); m++) {
@@ -521,6 +521,67 @@ public class AllGISData extends Dataset implements Serializable {
             output.close();
         } catch (FileNotFoundException ex) {
             Logger.getLogger(AllGISData.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public boolean isInScope(Object scope, CensusBlockGroup cBG) {
+        if (scope instanceof Country) {
+            Country scopeCountry = ((Country) scope);
+            for (int j = 0; j < scopeCountry.states.size(); j++) {
+                for (int k = 0; k < scopeCountry.states.get(j).counties.size(); k++) {
+                    for (int m = 0; m < scopeCountry.states.get(j).counties.get(k).censusTracts.size(); m++) {
+                        for (int v = 0; v < scopeCountry.states.get(j).counties.get(k).censusTracts.get(m).censusBlocks.size(); v++) {
+                            if (cBG.id == scopeCountry.states.get(j).counties.get(k).censusTracts.get(m).censusBlocks.get(v).id) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            return false;
+        } else if (scope instanceof State) {
+            State scopeState = ((State) scope);
+            for (int k = 0; k < scopeState.counties.size(); k++) {
+                for (int m = 0; m < scopeState.counties.get(k).censusTracts.size(); m++) {
+                    for (int v = 0; v < scopeState.counties.get(k).censusTracts.get(m).censusBlocks.size(); v++) {
+                        if (cBG.id == scopeState.counties.get(k).censusTracts.get(m).censusBlocks.get(v).id) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        } else if (scope instanceof County) {
+            County scopeCounty = ((County) scope);
+            for (int m = 0; m < scopeCounty.censusTracts.size(); m++) {
+                for (int v = 0; v < scopeCounty.censusTracts.get(m).censusBlocks.size(); v++) {
+                    if (cBG.id == scopeCounty.censusTracts.get(m).censusBlocks.get(v).id) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        } else if (scope instanceof CensusTract) {
+            CensusTract scopeCensusTract = ((CensusTract) scope);
+            for (int v = 0; v < scopeCensusTract.censusBlocks.size(); v++) {
+                if (cBG.id == scopeCensusTract.censusBlocks.get(v).id) {
+                    return true;
+                }
+            }
+            return false;
+        } else if (scope instanceof City) {
+            City scopeCity = ((City) scope);
+            for (int m = 0; m < scopeCity.censusTracts.size(); m++) {
+                for (int v = 0; v < scopeCity.censusTracts.get(m).censusBlocks.size(); v++) {
+                    if (cBG.id == scopeCity.censusTracts.get(m).censusBlocks.get(v).id) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        } else {
+            System.out.println("SCOPE UNKNOWN!");
+            return false;
         }
     }
 
