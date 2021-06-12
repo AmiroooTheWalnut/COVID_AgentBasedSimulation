@@ -2,7 +2,6 @@ package COVID_AgentBasedSimulation.Model;
 
 import COVID_AgentBasedSimulation.Model.Engines.PythonEvaluationEngine;
 import COVID_AgentBasedSimulation.Model.Engines.JavaEvaluationEngine;
-import COVID_AgentBasedSimulation.Model.AgentBasedModel.Agent;
 import COVID_AgentBasedSimulation.Model.AgentBasedModel.AgentBasedModel;
 import COVID_AgentBasedSimulation.Model.AgentBasedModel.AgentTemplate;
 import COVID_AgentBasedSimulation.Model.AgentBasedModel.BehaviorScript;
