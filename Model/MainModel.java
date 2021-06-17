@@ -9,6 +9,7 @@ import COVID_AgentBasedSimulation.Model.AgentBasedModel.JavaScript;
 import COVID_AgentBasedSimulation.Model.AgentBasedModel.PythonScript;
 import COVID_AgentBasedSimulation.Model.Data.CovidCsseJhu.CovidCsseJhu;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.Safegraph;
+import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Root;
 import COVID_AgentBasedSimulation.Model.Structure.AllGISData;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
@@ -137,6 +138,28 @@ public class MainModel extends Dataset {
         ABM.agentTemplates.add(rootAgentTemplate);
     }
 
+    public void initModelHardCoded(boolean isParallelLoadingData, boolean isParallelBehaviorEvaluation, int numCPUs) {
+        int month = ABM.startTime.getMonthValue();
+        currentMonth = month;
+        String monthString = String.valueOf(month);
+        if (monthString.length() < 2) {
+            monthString = "0" + monthString;
+        }
+        String dateName = ABM.startTime.getYear() + "_" + monthString;
+        safegraph.clearPatternsPlaces();
+        System.gc();
+        safegraph.loadPatternsPlacesSet(dateName, allGISData, ABM.studyScope, isParallelLoadingData, numCPUs);
+        ABM.agents = new CopyOnWriteArrayList();
+
+        ABM.currentTime = ABM.startTime;
+
+        ABM.rootAgent = ABM.makeRootAgentHardCoded();
+
+        ((Root) (ABM.rootAgent)).constructor(this);
+
+        resetTimerTask(isParallelBehaviorEvaluation, numCPUs, true);
+    }
+
     public void initModel(boolean isParallelLoadingData, boolean isParallelBehaviorEvaluation, int numCPUs) {
         //\/\/\/ THIS IS FOR ERROR CHECKING ONLY!
         javaEvaluationEngine.parseAllScripts(ABM.agentTemplates);
@@ -171,10 +194,9 @@ public class MainModel extends Dataset {
 //            System.out.println(ABM.rootAgent.myIndex);
 //            System.out.println("!!!!");
 //        }
-
 //        ABM.rootAgent = new Agent(ABM.agentTemplates.get(0));
-        resetTimerTask(isParallelBehaviorEvaluation, numCPUs);
-        
+        resetTimerTask(isParallelBehaviorEvaluation, numCPUs, false);
+
 //        if (ABM.rootAgent.myTemplate.constructor.isJavaScriptActive == true) {
 //
 //            //javaEvaluationEngine.runScript(ABM.rootAgent.myTemplate.constructor.javaScript.script);
@@ -184,7 +206,7 @@ public class MainModel extends Dataset {
 //        }
     }
 
-    public void resetTimerTask(boolean isParallel, int numCPUs) {
+    public void resetTimerTask(boolean isParallel, int numCPUs, boolean isHardCoded) {
         runTask = new TimerTask() {
             @Override
             public void run() {
@@ -200,13 +222,13 @@ public class MainModel extends Dataset {
                     safegraph.requestDataset(allGISData, ABM.studyScope, yearStr, monthString, true, numCPUs);
                     currentMonth = month;
                 }
-                ABM.evaluateAllAgents(isParallel, numCPUs);
+                ABM.evaluateAllAgents(isParallel, numCPUs, isHardCoded);
                 ABM.currentTime = ABM.currentTime.plusMinutes(1);
             }
         };
     }
 
-    public void fastForward(boolean isParallel, int numCPUs) {
+    public void fastForward(boolean isParallel, int numCPUs, boolean isHardCoded) {
         thread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -223,7 +245,7 @@ public class MainModel extends Dataset {
                         safegraph.requestDataset(allGISData, ABM.studyScope, yearStr, monthString, true, numCPUs);
                         currentMonth = month;
                     }
-                    ABM.evaluateAllAgents(isParallel, numCPUs);
+                    ABM.evaluateAllAgents(isParallel, numCPUs, isHardCoded);
                     ABM.currentTime = ABM.currentTime.plusMinutes(1);
 //                    System.out.println(isPause);
                 }
@@ -240,30 +262,27 @@ public class MainModel extends Dataset {
 
     }
 
-    public void resume(boolean isParallel, int numCPUs) {
-        if (simulationDelayTime > -1) {
-            simulationTimer = new Timer();
-            resetTimerTask(isParallel, numCPUs);
-            simulationTimer.schedule(runTask, 0, simulationDelayTime);
+    public void resume(boolean isParallel, int numCPUs, boolean isHardCoded) {
+        if (isHardCoded == true) {
+            if (simulationDelayTime > -1) {
+                simulationTimer = new Timer();
+                resetTimerTask(isParallel, numCPUs, isHardCoded);
+                simulationTimer.schedule(runTask, 0, simulationDelayTime);
+            } else {
+                fastForward(isParallel, numCPUs, isHardCoded);
+            }
+            isRunning = true;
         } else {
-            fastForward(isParallel, numCPUs);
+            if (simulationDelayTime > -1) {
+                simulationTimer = new Timer();
+                resetTimerTask(isParallel, numCPUs, isHardCoded);
+                simulationTimer.schedule(runTask, 0, simulationDelayTime);
+            } else {
+                fastForward(isParallel, numCPUs, isHardCoded);
+            }
+            isRunning = true;
         }
-        isRunning = true;
 
-//        if (people != null) {
-//            if (people.size() > 0) {
-//
-//                System.out.println(startTime.toString());
-//                Thread thread = new Thread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//
-//                    }
-//
-//                });
-//                thread.start();
-//            }
-//        }
     }
 
     public void pause() {

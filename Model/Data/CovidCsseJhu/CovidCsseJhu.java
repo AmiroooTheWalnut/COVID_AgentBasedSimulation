@@ -46,7 +46,7 @@ public class CovidCsseJhu extends Dataset implements Serializable {
 
     static final long serialVersionUID = softwareVersion;
 
-    ArrayList<DailyConfirmedCases> dailyConfirmedCasesList = new ArrayList();
+    public ArrayList<DailyConfirmedCases> dailyConfirmedCasesList = new ArrayList();
 
     @Override
     public void requestDataset(AllGISData allGISData, String project, String year, String month, boolean isParallel, int numCPU) {

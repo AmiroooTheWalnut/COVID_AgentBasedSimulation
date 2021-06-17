@@ -6,6 +6,9 @@
 package COVID_AgentBasedSimulation.Model.AgentBasedModel;
 
 import COVID_AgentBasedSimulation.GUI.MainFrame;
+import COVID_AgentBasedSimulation.Model.HardcodedSimulator.CBG;
+import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Person;
+import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Root;
 import COVID_AgentBasedSimulation.Model.MainModel;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -60,72 +63,177 @@ public class AgentBasedModel {
 //        FileWriter fileWritter = new FileWriter("",true);
     }
 
-    public void evaluateAllAgents(boolean isParallel, int numCPU) {
-        Agent currentEvaluatingAgent[] = new Agent[1];
-        try {
-            currentEvaluatingAgent[0] = rootAgent;
-            if (rootAgent.myTemplate.behavior.isJavaScriptActive == true) {
-                //myMainModel.javaEvaluationEngine.runScript(rootAgent.myTemplate.behavior.javaScript.script);
+    public void evaluateAllAgents(boolean isParallel, int numCPU, boolean isHardCoded) {
+        if (isHardCoded == false) {
+            Agent currentEvaluatingAgent[] = new Agent[1];
+            try {
+                currentEvaluatingAgent[0] = rootAgent;
+                if (rootAgent.myTemplate.behavior.isJavaScriptActive == true) {
+                    //myMainModel.javaEvaluationEngine.runScript(rootAgent.myTemplate.behavior.javaScript.script);
 
-                myMainModel.javaEvaluationEngine.runParsedScript(rootAgent, rootAgent.myTemplate.behavior.javaScript.parsedScript);
+                    myMainModel.javaEvaluationEngine.runParsedScript(rootAgent, rootAgent.myTemplate.behavior.javaScript.parsedScript);
 
-            } else {
-                myMainModel.pythonEvaluationEngine.runScript(rootAgent.myTemplate.behavior.pythonScript);
-            }
-            if (isParallel == false) {
-                for (int i = 0; i < agents.size(); i++) {
-                    currentEvaluatingAgent[0] = agents.get(i);
-                    if (agents.get(i).myTemplate.behavior.isJavaScriptActive == true) {
-                        //myMainModel.javaEvaluationEngine.runScript(agents.get(i).myTemplate.behavior.javaScript.script);
-
-                        myMainModel.javaEvaluationEngine.runParsedScript(agents.get(i), agents.get(i).myTemplate.behavior.javaScript.parsedScript);
-                    } else {
-                        myMainModel.pythonEvaluationEngine.runScript(agents.get(i).myTemplate.behavior.pythonScript);
-                    }
+                } else {
+                    myMainModel.pythonEvaluationEngine.runScript(rootAgent.myTemplate.behavior.pythonScript);
                 }
-            } else {
+                if (isParallel == false) {
+                    for (int i = 0; i < agents.size(); i++) {
+                        currentEvaluatingAgent[0] = agents.get(i);
+                        if (agents.get(i).myTemplate.behavior.isJavaScriptActive == true) {
+                            //myMainModel.javaEvaluationEngine.runScript(agents.get(i).myTemplate.behavior.javaScript.script);
+
+                            myMainModel.javaEvaluationEngine.runParsedScript(agents.get(i), agents.get(i).myTemplate.behavior.javaScript.parsedScript);
+                        } else {
+                            myMainModel.pythonEvaluationEngine.runScript(agents.get(i).myTemplate.behavior.pythonScript);
+                        }
+                    }
+                } else {
 //                for (int i = 0; i < agents.size(); i++) {
 //                    
 //                }
-                int numProcessors = numCPU;
-                if (numProcessors > Runtime.getRuntime().availableProcessors()) {
-                    numProcessors = Runtime.getRuntime().availableProcessors();
-                }
-                ParallelAgentEvaluator parallelAgentEval[] = new ParallelAgentEvaluator[numProcessors];
-
-                for (int i = 0; i < numProcessors - 1; i++) {
-                    parallelAgentEval[i] = new ParallelAgentEvaluator(myMainModel, agents, (int) Math.floor(i * ((agents.size()) / numProcessors)), (int) Math.floor((i + 1) * ((agents.size()) / numProcessors)));
-                }
-                parallelAgentEval[numProcessors - 1] = new ParallelAgentEvaluator(myMainModel, agents, (int) Math.floor((numProcessors - 1) * ((agents.size()) / numProcessors)), agents.size());
-
-                for (int i = 0; i < numProcessors; i++) {
-                    parallelAgentEval[i].myThread.start();
-                }
-                for (int i = 0; i < numProcessors; i++) {
-                    try {
-                        parallelAgentEval[i].myThread.join();
-//                        System.out.println("thread " + i + "finished for records: " + parallelAgentEval[i].myStartIndex + " | " + parallelAgentEval[i].myEndIndex);
-                    } catch (InterruptedException ie) {
-                        System.out.println(ie.toString());
+                    int numProcessors = numCPU;
+                    if (numProcessors > Runtime.getRuntime().availableProcessors()) {
+                        numProcessors = Runtime.getRuntime().availableProcessors();
                     }
-                }
+                    ParallelAgentEvaluator parallelAgentEval[] = new ParallelAgentEvaluator[numProcessors];
+
+                    for (int i = 0; i < numProcessors - 1; i++) {
+                        parallelAgentEval[i] = new ParallelAgentEvaluator(myMainModel, agents, (int) Math.floor(i * ((agents.size()) / numProcessors)), (int) Math.floor((i + 1) * ((agents.size()) / numProcessors)), isHardCoded);
+                    }
+                    parallelAgentEval[numProcessors - 1] = new ParallelAgentEvaluator(myMainModel, agents, (int) Math.floor((numProcessors - 1) * ((agents.size()) / numProcessors)), agents.size(), isHardCoded);
+
+                    for (int i = 0; i < numProcessors; i++) {
+                        parallelAgentEval[i].myThread.start();
+                    }
+                    for (int i = 0; i < numProcessors; i++) {
+                        try {
+                            parallelAgentEval[i].myThread.join();
+//                        System.out.println("thread " + i + "finished for records: " + parallelAgentEval[i].myStartIndex + " | " + parallelAgentEval[i].myEndIndex);
+                        } catch (InterruptedException ie) {
+                            System.out.println(ie.toString());
+                        }
+                    }
 //                for (int i = 0; i < numProcessors; i++) {
 //                    recordsLocal.addAll(parallelPatternParsers[i].records);
 //                }
-            }
+                }
 
-        } catch (Exception ex) {
-            System.out.println("ERROR ON AGENT TYPE:");
-            System.out.println(currentEvaluatingAgent[0].myTemplate.agentTypeName);
-            System.out.println("ERROR ON AGENT INDEX:");
-            System.out.println(currentEvaluatingAgent[0].myIndex);
-            ex.printStackTrace();
+            } catch (Exception ex) {
+                System.out.println("ERROR ON AGENT TYPE:");
+                System.out.println(currentEvaluatingAgent[0].myTemplate.agentTypeName);
+                System.out.println("ERROR ON AGENT INDEX:");
+                System.out.println(currentEvaluatingAgent[0].myIndex);
+                ex.printStackTrace();
+            }
+        } else {
+            Agent currentEvaluatingAgent[] = new Agent[1];
+            try {
+                currentEvaluatingAgent[0] = rootAgent;
+                
+                currentEvaluatingAgent[0].behavior(myMainModel);
+                
+//                if (rootAgent.myTemplate.behavior.isJavaScriptActive == true) {
+//                    //myMainModel.javaEvaluationEngine.runScript(rootAgent.myTemplate.behavior.javaScript.script);
+//
+//                    myMainModel.javaEvaluationEngine.runParsedScript(rootAgent, rootAgent.myTemplate.behavior.javaScript.parsedScript);
+//
+//                } else {
+//                    myMainModel.pythonEvaluationEngine.runScript(rootAgent.myTemplate.behavior.pythonScript);
+//                }
+                if (isParallel == false) {
+                    for (int i = 0; i < agents.size(); i++) {
+                        currentEvaluatingAgent[0] = agents.get(i);
+                        currentEvaluatingAgent[0].behavior(myMainModel);
+                        
+//                        if (agents.get(i).myTemplate.behavior.isJavaScriptActive == true) {
+//                            //myMainModel.javaEvaluationEngine.runScript(agents.get(i).myTemplate.behavior.javaScript.script);
+//
+//                            myMainModel.javaEvaluationEngine.runParsedScript(agents.get(i), agents.get(i).myTemplate.behavior.javaScript.parsedScript);
+//                        } else {
+//                            myMainModel.pythonEvaluationEngine.runScript(agents.get(i).myTemplate.behavior.pythonScript);
+//                        }
+                    }
+                } else {
+//                for (int i = 0; i < agents.size(); i++) {
+//                    
+//                }
+                    int numProcessors = numCPU;
+                    if (numProcessors > Runtime.getRuntime().availableProcessors()) {
+                        numProcessors = Runtime.getRuntime().availableProcessors();
+                    }
+                    ParallelAgentEvaluator parallelAgentEval[] = new ParallelAgentEvaluator[numProcessors];
+
+                    for (int i = 0; i < numProcessors - 1; i++) {
+                        parallelAgentEval[i] = new ParallelAgentEvaluator(myMainModel, agents, (int) Math.floor(i * ((agents.size()) / numProcessors)), (int) Math.floor((i + 1) * ((agents.size()) / numProcessors)), isHardCoded);
+                    }
+                    parallelAgentEval[numProcessors - 1] = new ParallelAgentEvaluator(myMainModel, agents, (int) Math.floor((numProcessors - 1) * ((agents.size()) / numProcessors)), agents.size(), isHardCoded);
+
+                    for (int i = 0; i < numProcessors; i++) {
+                        parallelAgentEval[i].myThread.start();
+                    }
+                    for (int i = 0; i < numProcessors; i++) {
+                        try {
+                            parallelAgentEval[i].myThread.join();
+//                        System.out.println("thread " + i + "finished for records: " + parallelAgentEval[i].myStartIndex + " | " + parallelAgentEval[i].myEndIndex);
+                        } catch (InterruptedException ie) {
+                            System.out.println(ie.toString());
+                        }
+                    }
+//                for (int i = 0; i < numProcessors; i++) {
+//                    recordsLocal.addAll(parallelPatternParsers[i].records);
+//                }
+                }
+
+            } catch (Exception ex) {
+                System.out.println("ERROR ON AGENT TYPE:");
+                System.out.println(currentEvaluatingAgent[0].myType);
+                System.out.println("ERROR ON AGENT INDEX:");
+                System.out.println(currentEvaluatingAgent[0].myIndex);
+                ex.printStackTrace();
+            }
+        }
+
+    }
+
+    public Agent makeAgentByType(String agentTemplate) {
+        switch (agentTemplate) {
+            case "Person":
+                AgentTemplate template = null;
+                for (int i = 0; i < agentTemplates.size(); i++) {
+                    if (agentTemplates.get(i).agentTypeName.equals(agentTemplate)) {
+                        template = agentTemplates.get(i);
+                        Person output = new Person();
+                        output.statusNames = template.statusNames;
+                        output.statusValues = template.statusValues;
+                        output.myIndex = agents.size();
+                        agents.add(output);
+                        output.constructor(myMainModel);
+                        return output;
+                    }
+                }
+            case "CBG":
+                CBG output = new CBG();
+//                template = null;
+                for (int i = 0; i < agentTemplates.size(); i++) {
+                    if (agentTemplates.get(i).agentTypeName.equals(agentTemplate)) {
+//                        template = agentTemplates.get(i);
+                        output.statusNames = agentTemplates.get(i).statusNames;
+                        output.statusValues = agentTemplates.get(i).statusValues;
+                    }
+                }
+                output.myIndex = agents.size();
+                agents.add(output);
+                output.constructor(myMainModel);
+                return output;
+            default: // Optional
+                Agent output_default = new Agent();
+                output_default.myIndex = agents.size();
+                agents.add(output_default);
+                output_default.constructor(myMainModel);
+                return output_default;
         }
     }
 
-//    public Agent getCurrentAgent() {
-//        return currentEvaluatingAgent[0];
-//    }
     public Agent makeAgent(String agentTemplate) {
 //        Agent currentEvaluatingAgent[] = new Agent[1];
 //        Agent oldCurrentEvaluatingAgent[] = new Agent[1];
@@ -154,14 +262,14 @@ public class AgentBasedModel {
 //                oldCurrentEvaluatingAgent[0] = self;
 //                currentEvaluatingAgent = new Agent[1];
 //                currentEvaluatingAgent[0] = output;
-                output.myTemplate.constructor.javaScript.myShell=new GroovyShell(new Binding());
-                output.myTemplate.behavior.javaScript.myShell=new GroovyShell(new Binding());
-                output.myTemplate.destructor.javaScript.myShell=new GroovyShell(new Binding());
+                output.myTemplate.constructor.javaScript.myShell = new GroovyShell(new Binding());
+                output.myTemplate.behavior.javaScript.myShell = new GroovyShell(new Binding());
+                output.myTemplate.destructor.javaScript.myShell = new GroovyShell(new Binding());
 
-                output.myTemplate.constructor.javaScript.parsedScript=output.myTemplate.constructor.javaScript.myShell.parse(output.myTemplate.constructor.javaScript.script);
-                output.myTemplate.behavior.javaScript.parsedScript=output.myTemplate.behavior.javaScript.myShell.parse(output.myTemplate.behavior.javaScript.script);
-                output.myTemplate.destructor.javaScript.parsedScript=output.myTemplate.destructor.javaScript.myShell.parse(output.myTemplate.destructor.javaScript.script);
-                
+                output.myTemplate.constructor.javaScript.parsedScript = output.myTemplate.constructor.javaScript.myShell.parse(output.myTemplate.constructor.javaScript.script);
+                output.myTemplate.behavior.javaScript.parsedScript = output.myTemplate.behavior.javaScript.myShell.parse(output.myTemplate.behavior.javaScript.script);
+                output.myTemplate.destructor.javaScript.parsedScript = output.myTemplate.destructor.javaScript.myShell.parse(output.myTemplate.destructor.javaScript.script);
+
                 output.myTemplate.constructor.javaScript.parsedScript.setBinding(new Binding());
                 output.myTemplate.constructor.javaScript.parsedScript.getBinding().setVariable("modelRoot", myMainModel);
                 output.myTemplate.constructor.javaScript.parsedScript.getBinding().setVariable("currentAgent", output);
@@ -180,7 +288,7 @@ public class AgentBasedModel {
                     myMainModel.pythonEvaluationEngine.runScript(output.myTemplate.constructor.pythonScript);
                 }
 //                currentEvaluatingAgent[0] = oldCurrentEvaluatingAgent[0];
-                
+
 //                if(output.myTemplate.agentTypeName.equals("Person")){
 //                    System.out.println(output.myIndex);
 //                    System.out.println("!!!!");
@@ -194,7 +302,37 @@ public class AgentBasedModel {
 //        currentEvaluatingAgent[0] = oldCurrentEvaluatingAgent[0];
         return null;
     }
-    
+
+    public Root makeRootAgentHardCoded() {
+        //        Agent currentEvaluatingAgent[] = new Agent[1];
+//        Agent oldCurrentEvaluatingAgent[] = new Agent[1];
+        try {
+            AgentTemplate template = null;
+            for (int i = 0; i < agentTemplates.size(); i++) {
+                if (agentTemplates.get(i).agentTypeName.equals("root")) {
+                    template = agentTemplates.get(i);
+                    break;
+                }
+            }
+            if (template == null) {
+                System.out.println("ERROR: MAKE AGENT: AGENT TEMPLATE NOT FOUND");
+                return null;
+            } else {
+                Root output = new Root(myMainModel);
+                output.myIndex = agents.size();
+                output.statusNames = template.statusNames;
+                output.statusValues = template.statusValues;
+                agents.add(output);
+
+                return output;
+            }
+        } catch (Exception ex) {
+            System.out.println(ex.toString());
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
     public Agent makeRootAgent() {
 //        Agent currentEvaluatingAgent[] = new Agent[1];
 //        Agent oldCurrentEvaluatingAgent[] = new Agent[1];
@@ -223,14 +361,14 @@ public class AgentBasedModel {
 //                oldCurrentEvaluatingAgent[0] = self;
 //                currentEvaluatingAgent = new Agent[1];
 //                currentEvaluatingAgent[0] = output;
-                output.myTemplate.constructor.javaScript.myShell=new GroovyShell(new Binding());
-                output.myTemplate.behavior.javaScript.myShell=new GroovyShell(new Binding());
-                output.myTemplate.destructor.javaScript.myShell=new GroovyShell(new Binding());
+                output.myTemplate.constructor.javaScript.myShell = new GroovyShell(new Binding());
+                output.myTemplate.behavior.javaScript.myShell = new GroovyShell(new Binding());
+                output.myTemplate.destructor.javaScript.myShell = new GroovyShell(new Binding());
 
-                output.myTemplate.constructor.javaScript.parsedScript=output.myTemplate.constructor.javaScript.myShell.parse(output.myTemplate.constructor.javaScript.script);
-                output.myTemplate.behavior.javaScript.parsedScript=output.myTemplate.behavior.javaScript.myShell.parse(output.myTemplate.behavior.javaScript.script);
-                output.myTemplate.destructor.javaScript.parsedScript=output.myTemplate.destructor.javaScript.myShell.parse(output.myTemplate.destructor.javaScript.script);
-                
+                output.myTemplate.constructor.javaScript.parsedScript = output.myTemplate.constructor.javaScript.myShell.parse(output.myTemplate.constructor.javaScript.script);
+                output.myTemplate.behavior.javaScript.parsedScript = output.myTemplate.behavior.javaScript.myShell.parse(output.myTemplate.behavior.javaScript.script);
+                output.myTemplate.destructor.javaScript.parsedScript = output.myTemplate.destructor.javaScript.myShell.parse(output.myTemplate.destructor.javaScript.script);
+
                 output.myTemplate.constructor.javaScript.parsedScript.setBinding(new Binding());
                 output.myTemplate.constructor.javaScript.parsedScript.getBinding().setVariable("modelRoot", myMainModel);
                 output.myTemplate.constructor.javaScript.parsedScript.getBinding().setVariable("currentAgent", output);
@@ -240,8 +378,7 @@ public class AgentBasedModel {
                 output.myTemplate.destructor.javaScript.parsedScript.setBinding(new Binding());
                 output.myTemplate.destructor.javaScript.parsedScript.getBinding().setVariable("modelRoot", myMainModel);
                 output.myTemplate.destructor.javaScript.parsedScript.getBinding().setVariable("currentAgent", output);
-                
-                
+
                 return output;
             }
         } catch (Exception ex) {
