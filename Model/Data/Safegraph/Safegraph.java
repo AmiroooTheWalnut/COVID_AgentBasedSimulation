@@ -424,9 +424,9 @@ public class Safegraph extends Dataset implements Serializable {
         }
         if (isParallel == true) {
             int numProcessors = numCPU;
-            if (numProcessors > Runtime.getRuntime().availableProcessors()) {
-                numProcessors = Runtime.getRuntime().availableProcessors();
-            }
+//            if (numProcessors > Runtime.getRuntime().availableProcessors()) {
+//                numProcessors = Runtime.getRuntime().availableProcessors();
+//            }
             ParallelPatternPlaceConnection parallelPatternPlaceConnection[] = new ParallelPatternPlaceConnection[numProcessors];
 
             for (int i = 0; i < numProcessors - 1; i++) {

@@ -40,7 +40,7 @@ public class MainFrame extends javax.swing.JFrame {
     public MainFrame() {
         initComponents();
 
-        jSpinner1.setModel(new javax.swing.SpinnerNumberModel(Runtime.getRuntime().availableProcessors() / 2, 1, Runtime.getRuntime().availableProcessors(), 1));
+        jSpinner1.setModel(new javax.swing.SpinnerNumberModel(Runtime.getRuntime().availableProcessors() / 2, 1, 1000, 1));
 
         numProcessors = (int) jSpinner1.getValue();
 

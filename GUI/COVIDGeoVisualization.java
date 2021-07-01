@@ -81,7 +81,7 @@ public class COVIDGeoVisualization extends PApplet {
         background(0);
         this.map.draw();
         
-//        drawPolygons();
+        drawPolygons();
     }
     
     public void drawPolygons() {

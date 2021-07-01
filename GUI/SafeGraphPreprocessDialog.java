@@ -10,7 +10,6 @@ import COVID_AgentBasedSimulation.Model.Data.Safegraph.AllSafegraphPlaces;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.Patterns;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.Safegraph;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.SafegraphPlaces;
-import static COVID_AgentBasedSimulation.Model.Data.Safegraph.SafegraphPlaces.getBuildingAreaOnline;
 import COVID_AgentBasedSimulation.Model.MainModel;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -698,7 +697,7 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
 
     private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
         if (jList2.getSelectedIndex() != -1) {
-            SafegraphPlaces.connectToOSMBuildingArea(mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(jList2.getSelectedIndex()).placesRecords, (int) jSpinner1.getValue());
+            SafegraphPlaces.connectToOSMBuildingAreaLevels(mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(jList2.getSelectedIndex()).placesRecords, (int) jSpinner1.getValue());
             Safegraph.saveSafegraphPlacesKryo("./datasets/Safegraph/FullData/" + jList2.getSelectedValue() + "/processedData_withArea", mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(jList2.getSelectedIndex()));
         }
     }//GEN-LAST:event_jButton10ActionPerformed

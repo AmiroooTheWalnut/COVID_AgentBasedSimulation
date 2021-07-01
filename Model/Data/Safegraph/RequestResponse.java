@@ -14,6 +14,8 @@ import org.locationtech.jts.geom.Polygon;
  */
 public class RequestResponse {
     public ArrayList<Polygon> data;
+    public Polygon finalPolygon;
+    public int numLevels;
     public boolean needRetry=false;
     
     public RequestResponse(){

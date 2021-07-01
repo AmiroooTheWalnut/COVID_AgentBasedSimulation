@@ -7,7 +7,6 @@ package COVID_AgentBasedSimulation.Model.HardcodedSimulator;
 
 import COVID_AgentBasedSimulation.Model.AgentBasedModel.Agent;
 import COVID_AgentBasedSimulation.Model.AgentBasedModel.AgentBasedModel;
-import COVID_AgentBasedSimulation.Model.AgentBasedModel.AgentTemplate;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.DwellTime;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.PatternsRecordProcessed;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.SafegraphPlace;
@@ -36,6 +35,11 @@ public class Person extends Agent {
     public int travelStartDecisionCounter;
     public int cumulativeDestinationFreqs;
     public CBG cBG;
+    public SafegraphPlace currentSafegraphPlace;
+
+    public double infectionDistances[] = {0.125825731, 0.147845234, 0.209185278, 0.264234036, 0.309845863, 0.350739226, 0.388486946, 0.424661843, 0.462409563, 0.500157282, 0.539477823, 0.581944008, 0.629128657, 0.677886128, 0.736080528, 0.802139037, 0.877634476, 0.896508336, 0.959421202, 0.979867883, 1.04435357, 1.066373073, 1.135577226, 1.157596729, 1.226800881, 1.248820384, 1.318024536, 1.340044039, 1.412393835, 1.432840516, 1.50361749, 1.525636993, 1.607423718, 1.698647373, 1.79144385, 1.884240327, 1.975463982, 2.068260459, 2.161056936, 2.252280591, 2.343504247, 2.436300723};
+    public double infectionProbabilities[] = {0.629424019, 0.627712467, 0.605544261, 0.568491183, 0.528141159, 0.485879701, 0.443518805, 0.40159828, 0.35807253, 0.315569579, 0.273876342, 0.231813762, 0.190889203, 0.153456048, 0.117188034, 0.085150685, 0.058392628, 0.05161957, 0.038360245, 0.034925089, 0.024547303, 0.021799178, 0.015218142, 0.01384408, 0.009504936, 0.008805851, 0.006561301, 0.005888982, 0.004153324, 0.003502453, 0.001911433, 0.001615923, 0.001311433, 0.001115923, 0.001115923, 0.001115923, 0.001115923, 0.001115923, 0.001115923, 0.001115923, 0.001115923, 0.001115923};
+
     public int dstIndex;
     public DwellTime dwellTime;
     public CensusBlockGroup dayCBG;
@@ -45,6 +49,8 @@ public class Person extends Agent {
     public int minutesTravelFromWorkFrom16;
     public boolean isDestinedToDeath;
     public boolean isPotentiallyWorkAtHome;
+
+    public boolean isGeometryBuildingUsed = false;
 
     enum statusEnum {
         SUSCEPTIBLE, EXPOSED, INFECTED_SYM, INFECTED_ASYM, RECOVERED, DEAD;
@@ -140,6 +146,7 @@ public class Person extends Agent {
                             currentAgent.dstIndex = destination;
                             currentAgent.lat = currentLocation.getLat();
                             currentAgent.lon = currentLocation.getLon();
+                            currentAgent.currentSafegraphPlace = ((SafegraphPlace) (((PatternsRecordProcessed) (((ArrayList) currentAgent.destinationPlaces).get(destination))).getPlace()));
 
                             if (((Agent) (currentAgent.cBG)) != null) {
                                 ((CBG) (currentAgent.cBG)).N = (int) (((CBG) (currentAgent.cBG)).N) - 1;
@@ -161,6 +168,9 @@ public class Person extends Agent {
                                 if (rootModel.getABM().agents.get(n).myType.equals("CBG")) {
                                     if (currentLocation.getId() == ((CensusBlockGroup) (((CBG) (((CopyOnWriteArrayList<Agent>) (((AgentBasedModel) (rootModel.getABM())).getAgents())).get(n))).cbgVal)).getId()) {
                                         currentAgent.cBG = ((CBG) (((CopyOnWriteArrayList<Agent>) (((AgentBasedModel) (rootModel.getABM())).getAgents())).get(n)));
+                                        if ((int) (currentAgent.status) == statusEnum.SUSCEPTIBLE.ordinal()) {
+                                            currentAgent.status = statusEnum.EXPOSED.ordinal();//NOW EXPOSED
+                                        }
                                         break;
                                     }
                                 }
@@ -225,9 +235,9 @@ public class Person extends Agent {
                 if (Math.random() < (float) (travelStartDecisionCounter - dwellTime.dwellDuration[0]) / (float) (dwellTime.dwellDuration[1] - dwellTime.dwellDuration[0])) {
                     if ((boolean) currentAgent.isAtWork == false) {
                         currentLocation = (CensusBlockGroup) (currentAgent.home);
-                        if ((int) (currentAgent.status) == statusEnum.EXPOSED.ordinal()) {
-                            currentAgent.status = statusEnum.SUSCEPTIBLE.ordinal();//NOW SAFE
-                        }
+//                        if ((int) (currentAgent.status) == statusEnum.EXPOSED.ordinal()) {
+//                            currentAgent.status = statusEnum.SUSCEPTIBLE.ordinal();//NOW SAFE
+//                        }
                     } else {
                         currentLocation = (CensusBlockGroup) (currentAgent.dayCBG);
                     }
@@ -236,6 +246,7 @@ public class Person extends Agent {
                     currentAgent.lon = currentLocation.getLon();
                     travelStartDecisionCounter = 0;
                     currentAgent.dstIndex = -1;
+                    currentAgent.currentSafegraphPlace = null;
 
                     if (((Agent) (currentAgent.cBG)) != null) {
                         ((CBG) (currentAgent.cBG)).N = (int) (((CBG) (currentAgent.cBG)).N) - 1;
@@ -265,6 +276,11 @@ public class Person extends Agent {
                     }
                     if (isFound == false) {
                         currentAgent.cBG = null;
+                    }
+                    if ((boolean) currentAgent.isAtWork == false) {
+                        if ((int) (currentAgent.status) == statusEnum.EXPOSED.ordinal()) {
+                            currentAgent.status = statusEnum.SUSCEPTIBLE.ordinal();//NOW SAFE
+                        }
                     }
 
                     if (((Agent) (currentAgent.cBG)) != null) {
@@ -309,9 +325,9 @@ public class Person extends Agent {
                             currentAgent.lon = currentLocation.getLon();
                             currentAgent.isAtWork = true;
                             currentAgent.minutesTravelFromWorkFrom16 = -1;
-                            if ((int) (currentAgent.status) == statusEnum.SUSCEPTIBLE.ordinal()) {
-                                currentAgent.status = statusEnum.EXPOSED.ordinal();//NOW EXPOSED
-                            }
+//                            if ((int) (currentAgent.status) == statusEnum.SUSCEPTIBLE.ordinal()) {
+//                                currentAgent.status = statusEnum.EXPOSED.ordinal();//NOW EXPOSED
+//                            }
 
                             if (((Agent) (currentAgent.cBG)) != null) {
                                 ((CBG) (currentAgent.cBG)).N = (int) (((CBG) (currentAgent.cBG)).N) - 1;
@@ -336,6 +352,10 @@ public class Person extends Agent {
                                         break;
                                     }
                                 }
+                            }
+
+                            if ((int) (currentAgent.status) == statusEnum.SUSCEPTIBLE.ordinal()) {
+                                currentAgent.status = statusEnum.EXPOSED.ordinal();//NOW EXPOSED
                             }
 
                             if (((Agent) (currentAgent.cBG)) != null) {
@@ -375,9 +395,6 @@ public class Person extends Agent {
                         currentAgent.lon = currentLocation.getLon();
                         currentAgent.isAtWork = false;
                         currentAgent.minutesTravelToWorkFrom7 = -1;
-                        if ((int) (currentAgent.status) == statusEnum.EXPOSED.ordinal()) {
-                            currentAgent.status = statusEnum.SUSCEPTIBLE.ordinal();//NOW SAFE
-                        }
 
                         if (((Agent) (currentAgent.cBG)) != null) {
                             ((CBG) (currentAgent.cBG)).N = (int) (((CBG) (currentAgent.cBG)).N) - 1;
@@ -407,6 +424,10 @@ public class Person extends Agent {
                         }
                         if (isFound == false) {
                             currentAgent.cBG = null;
+                        }
+
+                        if ((int) (currentAgent.status) == statusEnum.EXPOSED.ordinal()) {
+                            currentAgent.status = statusEnum.SUSCEPTIBLE.ordinal();//NOW SAFE
                         }
 
                         if (((Agent) (currentAgent.cBG)) != null) {
@@ -446,14 +467,46 @@ public class Person extends Agent {
                     if (minsSick > 20160) {
                         if (Math.random() < Math.pow((double) (minsSick - 30240) / (double) (30240), 5)) {
                             currentAgent.minutesSick = -1;
+                            if (((Agent) (currentAgent.cBG)) != null) {
+                                if ((int) (currentAgent.status) == statusEnum.SUSCEPTIBLE.ordinal()) {
+                                    ((CBG) (currentAgent.cBG)).S = (int) (((CBG) (currentAgent.cBG)).S) - 1;
+                                } else if ((int) (currentAgent.status) == statusEnum.EXPOSED.ordinal()) {
+                                    ((CBG) (currentAgent.cBG)).E = (int) (((CBG) (currentAgent.cBG)).E) - 1;
+                                } else if ((int) (currentAgent.status) == statusEnum.INFECTED_SYM.ordinal()) {
+                                    ((CBG) (currentAgent.cBG)).IS = (int) (((CBG) (currentAgent.cBG)).IS) - 1;
+                                } else if ((int) (currentAgent.status) == statusEnum.INFECTED_ASYM.ordinal()) {
+                                    ((CBG) (currentAgent.cBG)).IAS = (int) (((CBG) (currentAgent.cBG)).IAS) - 1;
+                                } else if ((int) (currentAgent.status) == statusEnum.RECOVERED.ordinal()) {
+                                    ((CBG) (currentAgent.cBG)).R = (int) (((CBG) (currentAgent.cBG)).R) - 1;
+                                }
+                            }
                             currentAgent.status = statusEnum.RECOVERED.ordinal();//RECOVERED
+                            if (((Agent) (currentAgent.cBG)) != null) {
+                                ((CBG) (currentAgent.cBG)).R = (int) (((CBG) (currentAgent.cBG)).R) + 1;
+                            }
                         }
                     }
                 } else {
                     if (minsSick > 10080) {
                         if (Math.random() < Math.pow((double) (minsSick - 20160) / (double) (20160), 5)) {
                             currentAgent.minutesSick = -1;
+                            if (((Agent) (currentAgent.cBG)) != null) {
+                                if ((int) (currentAgent.status) == statusEnum.SUSCEPTIBLE.ordinal()) {
+                                    ((CBG) (currentAgent.cBG)).S = (int) (((CBG) (currentAgent.cBG)).S) - 1;
+                                } else if ((int) (currentAgent.status) == statusEnum.EXPOSED.ordinal()) {
+                                    ((CBG) (currentAgent.cBG)).E = (int) (((CBG) (currentAgent.cBG)).E) - 1;
+                                } else if ((int) (currentAgent.status) == statusEnum.INFECTED_SYM.ordinal()) {
+                                    ((CBG) (currentAgent.cBG)).IS = (int) (((CBG) (currentAgent.cBG)).IS) - 1;
+                                } else if ((int) (currentAgent.status) == statusEnum.INFECTED_ASYM.ordinal()) {
+                                    ((CBG) (currentAgent.cBG)).IAS = (int) (((CBG) (currentAgent.cBG)).IAS) - 1;
+                                } else if ((int) (currentAgent.status) == statusEnum.RECOVERED.ordinal()) {
+                                    ((CBG) (currentAgent.cBG)).R = (int) (((CBG) (currentAgent.cBG)).R) - 1;
+                                }
+                            }
                             currentAgent.status = statusEnum.DEAD.ordinal();
+                            if (((Agent) (currentAgent.cBG)) != null) {
+                                ((CBG) (currentAgent.cBG)).N = (int) (((CBG) (currentAgent.cBG)).N) - 1;
+                            }
                         }
                     }
                 }
@@ -461,22 +514,91 @@ public class Person extends Agent {
         }
         if ((int) (currentAgent.dstIndex) != -1 || (boolean) (currentAgent.isAtWork) == true) {
             if ((int) (currentAgent.status) == statusEnum.SUSCEPTIBLE.ordinal()) {
+                if (((Agent) (currentAgent.cBG)) != null) {
+                    ((CBG) (currentAgent.cBG)).S = (int) (((CBG) (currentAgent.cBG)).S) - 1;
+                    ((CBG) (currentAgent.cBG)).E = (int) (((CBG) (currentAgent.cBG)).E) + 1;
+                }
                 currentAgent.status = statusEnum.EXPOSED.ordinal();//NOW EXPOSED
             }
         }
 
         if ((int) (currentAgent.status) == statusEnum.EXPOSED.ordinal()) {
-            if (((Agent) (currentAgent.cBG)) != null) {
-                int numIS = (int) (((CBG) (currentAgent.cBG)).IS);
-                int numIAS = (int) (((CBG) (currentAgent.cBG)).IAS);
-                int N = (int) (((CBG) (currentAgent.cBG)).N);
-                if (Math.random() < (((float) (numIS + numIAS) / (float) (N))) * 0.00002f) {
-                    if (Math.random() > 0.7) {
-                        currentAgent.status = statusEnum.INFECTED_ASYM.ordinal();
-                        currentAgent.minutesSick = -1;
-                    } else {
-                        currentAgent.status = statusEnum.INFECTED_SYM.ordinal();
-                        currentAgent.minutesSick = -1;
+            if (currentAgent.dstIndex != -1) {
+                if (isGeometryBuildingUsed == true) {
+                    if (((Agent) (currentAgent.cBG)) != null) {
+                        int numIS = (int) (((CBG) (currentAgent.cBG)).IS);
+                        int numIAS = (int) (((CBG) (currentAgent.cBG)).IAS);
+                        int N = (int) (((CBG) (currentAgent.cBG)).N);
+
+                        if (Math.random() < (((float) (numIS + numIAS) / (float) (N))) * 0.00002) {
+                            if (Math.random() > 0.7) {
+                                if (((Agent) (currentAgent.cBG)) != null) {
+                                    ((CBG) (currentAgent.cBG)).E = (int) (((CBG) (currentAgent.cBG)).E) - 1;
+                                    ((CBG) (currentAgent.cBG)).IAS = (int) (((CBG) (currentAgent.cBG)).IAS) + 1;
+                                }
+                                currentAgent.status = statusEnum.INFECTED_ASYM.ordinal();
+                                currentAgent.minutesSick = -1;
+                            } else {
+                                if (((Agent) (currentAgent.cBG)) != null) {
+                                    ((CBG) (currentAgent.cBG)).E = (int) (((CBG) (currentAgent.cBG)).E) - 1;
+                                    ((CBG) (currentAgent.cBG)).IS = (int) (((CBG) (currentAgent.cBG)).IS) + 1;
+                                }
+                                currentAgent.status = statusEnum.INFECTED_SYM.ordinal();
+                                currentAgent.minutesSick = -1;
+                            }
+                        }
+                    }
+                } else {
+                    int hourInDay = currentTime.getHour();
+                    int numVisitsInHour = ((PatternsRecordProcessed) (((ArrayList) currentAgent.destinationPlaces).get(currentAgent.dstIndex))).popularity_by_hour[hourInDay];
+                    double distance = Math.sqrt(currentSafegraphPlace.landArea / numVisitsInHour) * 0.98d;
+                    double probability = 0.0001;
+                    for (int d = 0; d < infectionDistances.length; d++) {
+                        if (distance < infectionDistances[d]) {
+                            probability = infectionProbabilities[d];
+                            break;
+                        }
+                    }
+                    if (Math.random() < (1 / 20) * probability) {
+                        if (Math.random() > 0.7) {
+                            if (((Agent) (currentAgent.cBG)) != null) {
+                                ((CBG) (currentAgent.cBG)).E = (int) (((CBG) (currentAgent.cBG)).E) - 1;
+                                ((CBG) (currentAgent.cBG)).IAS = (int) (((CBG) (currentAgent.cBG)).IAS) + 1;
+                            }
+                            currentAgent.status = statusEnum.INFECTED_ASYM.ordinal();
+                            currentAgent.minutesSick = -1;
+                        } else {
+                            if (((Agent) (currentAgent.cBG)) != null) {
+                                ((CBG) (currentAgent.cBG)).E = (int) (((CBG) (currentAgent.cBG)).E) - 1;
+                                ((CBG) (currentAgent.cBG)).IS = (int) (((CBG) (currentAgent.cBG)).IS) + 1;
+                            }
+                            currentAgent.status = statusEnum.INFECTED_SYM.ordinal();
+                            currentAgent.minutesSick = -1;
+                        }
+                    }
+                }
+            } else {
+                if (((Agent) (currentAgent.cBG)) != null) {
+                    int numIS = (int) (((CBG) (currentAgent.cBG)).IS);
+                    int numIAS = (int) (((CBG) (currentAgent.cBG)).IAS);
+                    int N = (int) (((CBG) (currentAgent.cBG)).N);
+
+                    if (Math.random() < (((float) (numIS + numIAS) / (float) (N))) * 0.00002) {
+                        if (Math.random() > 0.7) {
+                            if (((Agent) (currentAgent.cBG)) != null) {
+                                ((CBG) (currentAgent.cBG)).E = (int) (((CBG) (currentAgent.cBG)).E) - 1;
+                                ((CBG) (currentAgent.cBG)).IAS = (int) (((CBG) (currentAgent.cBG)).IAS) + 1;
+                            }
+                            currentAgent.status = statusEnum.INFECTED_ASYM.ordinal();
+                            currentAgent.minutesSick = -1;
+                        } else {
+                            if (((Agent) (currentAgent.cBG)) != null) {
+                                ((CBG) (currentAgent.cBG)).E = (int) (((CBG) (currentAgent.cBG)).E) - 1;
+                                ((CBG) (currentAgent.cBG)).IS = (int) (((CBG) (currentAgent.cBG)).IS) + 1;
+                            }
+                            currentAgent.status = statusEnum.INFECTED_SYM.ordinal();
+                            currentAgent.minutesSick = -1;
+                        }
                     }
                 }
             }

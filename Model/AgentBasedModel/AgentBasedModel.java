@@ -92,9 +92,9 @@ public class AgentBasedModel {
 //                    
 //                }
                     int numProcessors = numCPU;
-                    if (numProcessors > Runtime.getRuntime().availableProcessors()) {
-                        numProcessors = Runtime.getRuntime().availableProcessors();
-                    }
+//                    if (numProcessors > Runtime.getRuntime().availableProcessors()) {
+//                        numProcessors = Runtime.getRuntime().availableProcessors();
+//                    }
                     ParallelAgentEvaluator parallelAgentEval[] = new ParallelAgentEvaluator[numProcessors];
 
                     for (int i = 0; i < numProcessors - 1; i++) {
@@ -158,9 +158,9 @@ public class AgentBasedModel {
 //                    
 //                }
                     int numProcessors = numCPU;
-                    if (numProcessors > Runtime.getRuntime().availableProcessors()) {
-                        numProcessors = Runtime.getRuntime().availableProcessors();
-                    }
+//                    if (numProcessors > Runtime.getRuntime().availableProcessors()) {
+//                        numProcessors = Runtime.getRuntime().availableProcessors();
+//                    }
                     ParallelAgentEvaluator parallelAgentEval[] = new ParallelAgentEvaluator[numProcessors];
 
                     for (int i = 0; i < numProcessors - 1; i++) {

@@ -136,9 +136,9 @@ public class SafegraphPlaces implements Serializable {
 
             if (isParallel == true) {
                 int numProcessors = numCPU;
-                if (numProcessors > Runtime.getRuntime().availableProcessors()) {
-                    numProcessors = Runtime.getRuntime().availableProcessors();
-                }
+//                if (numProcessors > Runtime.getRuntime().availableProcessors()) {
+//                    numProcessors = Runtime.getRuntime().availableProcessors();
+//                }
                 ParallelSafegraphParser parallelSafegraphParsers[] = new ParallelSafegraphParser[numProcessors];
 
                 for (int i = 0; i < numProcessors - 1; i++) {
@@ -228,17 +228,19 @@ public class SafegraphPlaces implements Serializable {
         return null;
     }
 
-    public static void connectToOSMBuildingArea(ArrayList<SafegraphPlace> input, int numSamples) {
+    public static void connectToOSMBuildingAreaLevels(ArrayList<SafegraphPlace> input, int numSamples) {
         int counter = 0;
         int largerCounter = 0;
         int counterInterval = 10;
-        int maxIter=Math.min(numSamples, input.size());
-        if(maxIter==0){
-            maxIter=input.size();
+        int maxIter = Math.min(numSamples, input.size());
+        if (maxIter == 0) {
+            maxIter = input.size();
         }
         for (int i = 0; i < maxIter; i++) {
-            float result = getBuildingAreaOnline(input.get(i).lat, input.get(i).lon, false);
-            input.get(i).landArea = result;
+            float[] result = getBuildingAreaLevelsOnline(input.get(i).lat, input.get(i).lon, false);
+            input.get(i).landArea = result[0];
+
+            input.get(i).buldingLevels = (int) result[1];
 
             counter = counter + 1;
             if (counter > counterInterval) {
@@ -248,47 +250,91 @@ public class SafegraphPlaces implements Serializable {
             }
 
         }
-        double avg = 0;
-        double std = 0;
-        int avgCounter=0;
+        double avgArea = 0;
+        double stdArea = 0;
+
+        double avgNumLevels = 0;
+        double stdNumLevels = 0;
+
+        int avgAreaCounter = 0;
+        int avgNumLevelsCounter = 0;
+
         for (int i = 0; i < input.size(); i++) {
-            if (input.get(i).landArea != -1 && input.get(i).landArea != 0) {
-                avg = avg + input.get(i).landArea;
-                avgCounter=avgCounter+1;
+            if (input.get(i).landArea != -1 && input.get(i).landArea != 0 && !Double.isNaN(input.get(i).landArea)) {
+                avgArea = avgArea + input.get(i).landArea;
+                avgAreaCounter = avgAreaCounter + 1;
+            }
+            if (input.get(i).buldingLevels != -1 && input.get(i).buldingLevels != 0 && !Double.isNaN(input.get(i).buldingLevels)) {
+                avgNumLevels = avgNumLevels + input.get(i).buldingLevels;
+                avgNumLevelsCounter = avgNumLevelsCounter + 1;
             }
         }
-        avg = avg / (double) avgCounter;
+        avgArea = avgArea / (double) avgAreaCounter;
+        avgNumLevels = avgNumLevels / (double) avgNumLevelsCounter;
         for (int i = 0; i < input.size(); i++) {
-            if (input.get(i).landArea != -1 && input.get(i).landArea != 0) {
-                std = std + Math.pow(input.get(i).landArea - avg, 2);
+            if (input.get(i).landArea != -1 && input.get(i).landArea != 0 && !Double.isNaN(input.get(i).landArea)) {
+                stdArea = stdArea + Math.pow(input.get(i).landArea - avgArea, 2);
+            }
+            if (input.get(i).buldingLevels != -1 && input.get(i).buldingLevels != 0 && !Double.isNaN(input.get(i).buldingLevels)) {
+                stdNumLevels = stdNumLevels + Math.pow(input.get(i).buldingLevels - avgNumLevels, 2);
             }
         }
-        std = std / (avgCounter - 1);
-        std = Math.sqrt(std);
+        stdArea = stdArea / (avgAreaCounter - 1);
+        stdArea = Math.sqrt(stdArea);
+
+        stdNumLevels = stdNumLevels / (avgNumLevelsCounter - 1);
+        stdNumLevels = Math.sqrt(stdNumLevels);
         for (int i = 0; i < input.size(); i++) {
-            if (input.get(i).landArea == -1 || input.get(i).landArea == 0) {
-                input.get(i).landArea = (float) (avg + Math.random() * 0.5 * std);
+            if (input.get(i).landArea == -1 || input.get(i).landArea == 0 || Double.isNaN(input.get(i).landArea)) {
+                input.get(i).landArea = (float) (avgArea + Math.random() * 0.5 * stdArea);
+            }
+            if (input.get(i).buldingLevels == -1 || input.get(i).buldingLevels == 0 || Double.isNaN(input.get(i).buldingLevels)) {
+                if (avgNumLevels > 0 && stdNumLevels > 0) {
+                    input.get(i).buldingLevels = (int) (Math.max(avgNumLevels + (Math.random() - 0.7) * stdNumLevels, 1));
+                } else {
+                    input.get(i).buldingLevels = 1;
+                }
             }
         }
+
+        for (int i = 0; i < input.size(); i++) {
+            if (input.get(i).landArea == -1 || input.get(i).landArea == 0 || Double.isNaN(input.get(i).landArea)) {
+                System.out.println("!"+input.get(i).landArea);
+            }
+            if (input.get(i).buldingLevels == -1 || input.get(i).buldingLevels == 0 || Double.isNaN(input.get(i).buldingLevels)) {
+                System.out.println("!!"+input.get(i).buldingLevels);
+            }
+        }
+
+        System.out.println("FINISHED GETTING BUILDING AREA LEVELS");
     }
 
-    public static float getBuildingAreaOnline(float lat, float lon, boolean isDebug) {
+    public static float[] getBuildingAreaLevelsOnline(float lat, float lon, boolean isDebug) {
         try {
-            Polygon ret = findBuildingSize(lat, lon, isDebug);
+            RequestResponse ret = findBuildingSize(lat, lon, isDebug);
             if (ret == null) {
-                return -1;
+                float[] output = new float[2];
+                output[0] = -1;
+                output[1] = -1;
+                return output;
             } else {
-                Coordinate[] coords = ret.getCoordinates();
+                Coordinate[] coords = ret.finalPolygon.getCoordinates();
                 float dist = distFrom((float) coords[0].x, (float) coords[0].y, (float) coords[1].x, (float) coords[1].y);
                 float latLonDist = (float) Math.sqrt(Math.pow((float) coords[0].x - (float) coords[1].x, 2) + Math.pow((float) coords[0].y - (float) coords[1].y, 2));
-                float adjustedArea = (float) ret.getArea() * ((float) Math.pow(dist / latLonDist, 2));
-                return adjustedArea;
+                float adjustedArea = (float) ret.finalPolygon.getArea() * ((float) Math.pow(dist / latLonDist, 2));
+                float[] output = new float[2];
+                output[0] = adjustedArea;
+                output[1] = ret.numLevels;
+                return output;
             }
         } catch (Exception ex) {
             System.out.println("BUILDING AREA FAILED TO OBTAIN FROM OPENSTREETMAP!");
             System.out.println(ex.getMessage());
             ex.printStackTrace();
-            return -1;
+            float[] output = new float[2];
+            output[0] = -1;
+            output[1] = -1;
+            return output;
         }
     }
 
@@ -305,9 +351,9 @@ public class SafegraphPlaces implements Serializable {
         return dist;
     }
 
-    private static Polygon findBuildingSize(float lat, float lon, boolean isDebug) {
+    private static RequestResponse findBuildingSize(float lat, float lon, boolean isDebug) {
         float initSize = 0.002f;
-        Polygon outputPolygon;
+        RequestResponse outputPolygonRes;
         Polygon anyPolygon = null;
 
         try {
@@ -341,17 +387,21 @@ public class SafegraphPlaces implements Serializable {
                         Thread.sleep(10);
 
                         if (ret != null) {
-                            outputPolygon = ret;
+                            outputPolygonRes = new RequestResponse();
+                            outputPolygonRes.finalPolygon = ret;
+                            outputPolygonRes.numLevels = reponse.numLevels;
                             if (isDebug == true) {
                                 System.out.println("Location polygon found with size: " + initSize);
                             }
-                            return outputPolygon;
+                            return outputPolygonRes;
                         } else if (anyPolygon != null) {
-                            outputPolygon = anyPolygon;
+                            outputPolygonRes = new RequestResponse();
+                            outputPolygonRes.finalPolygon = anyPolygon;
+                            outputPolygonRes.numLevels = reponse.numLevels;
                             if (isDebug == true) {
                                 System.out.println("Close polygon found with size: " + initSize);
                             }
-                            return outputPolygon;
+                            return outputPolygonRes;
                         }
                     }
                 }
@@ -361,7 +411,7 @@ public class SafegraphPlaces implements Serializable {
             Logger.getLogger(SafegraphPlaces.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        return anyPolygon;
+        return null;
     }
 
     private static RequestResponse requestRegion(float size, float lat, float lon) {
@@ -397,6 +447,8 @@ public class SafegraphPlaces implements Serializable {
 
             //System.out.println(textBuilder.toString());
             ArrayList<Polygon> polygons = new ArrayList();
+
+            int numLevels = -1;
 
             SAXBuilder saxBuilder = new SAXBuilder();
             org.jdom2.Document document = saxBuilder.build(new StringReader(textBuilder.toString()));
@@ -441,6 +493,18 @@ public class SafegraphPlaces implements Serializable {
                                     }
 
                                 }
+                                if (((Element) ((Element) cl.getContent(i)).getContent(j)).getName().equals("tag")) {
+//                                    System.out.println(((Element) ((Element) cl.getContent(i)).getContent(j)).getAttributes().get(0));
+//                                    System.out.println(((Element) ((Element) cl.getContent(i)).getContent(j)).getAttributes().get(0).getValue());
+                                    if (((Element) ((Element) cl.getContent(i)).getContent(j)).getAttributes().get(0).getValue().equals("building:levels")) {
+                                        try {
+                                            float temp = Float.valueOf(((Element) ((Element) cl.getContent(i)).getContent(j)).getAttributes().get(1).getValue());
+                                            numLevels = (int) (temp);
+                                        } catch (NumberFormatException e) {
+
+                                        }
+                                    }
+                                }
                             }
                         }
 
@@ -475,12 +539,14 @@ public class SafegraphPlaces implements Serializable {
                 RequestResponse out = new RequestResponse();
                 out.data = polygons;
                 out.needRetry = false;
+                out.numLevels = numLevels;
                 return out;
             } else {
                 polygons = new ArrayList();
                 RequestResponse out = new RequestResponse();
                 out.data = polygons;
                 out.needRetry = false;
+                out.numLevels = numLevels;
                 return out;
             }
 

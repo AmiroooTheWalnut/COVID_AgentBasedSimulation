@@ -112,9 +112,9 @@ public class Patterns implements Serializable {
             CsvContainer data = cSVReader.read(patternFile, StandardCharsets.UTF_8);
             if (isParallel == true) {
                 int numProcessors = numCPU;
-                if (numProcessors > Runtime.getRuntime().availableProcessors()) {
-                    numProcessors = Runtime.getRuntime().availableProcessors();
-                }
+//                if (numProcessors > Runtime.getRuntime().availableProcessors()) {
+//                    numProcessors = Runtime.getRuntime().availableProcessors();
+//                }
                 ParallelPatternParser parallelPatternParsers[] = new ParallelPatternParser[numProcessors];
 
                 for (int i = 0; i < numProcessors - 1; i++) {

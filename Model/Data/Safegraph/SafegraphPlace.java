@@ -36,6 +36,7 @@ public class SafegraphPlace implements Serializable, Comparable<SafegraphPlace> 
     // category_tags,opened_on	closed_on,tracking_opened_since,tracking_closed_since DROPPED
     
     public float landArea=-1;
+    public int buldingLevels=-1;
 
     @Override
     public int compareTo(SafegraphPlace o) {
