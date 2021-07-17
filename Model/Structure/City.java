@@ -15,6 +15,10 @@ public class City extends Marker implements Serializable, Comparable<City> {
     static final long serialVersionUID = softwareVersion;
     public String name;
     public ArrayList<CensusTract> censusTracts;
+    
+    public transient ArrayList<VDCell> vDCells;
+    public transient ArrayList<CBGVDCell> cBGVDCells;
+    
     public transient boolean isLatLonCalculated=false;
     
     public void getLatLonSizeFromChildren(){

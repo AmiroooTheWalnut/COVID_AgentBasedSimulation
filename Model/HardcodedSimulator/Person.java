@@ -26,6 +26,7 @@ public class Person extends Agent {
     Person currentAgent = this;
 
     public CensusBlockGroup home;
+    //public CensusBlockGroup home;
     public int status;
     public CensusBlockGroup currentLocation;
 

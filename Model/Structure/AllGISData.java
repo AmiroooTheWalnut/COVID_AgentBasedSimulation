@@ -315,6 +315,35 @@ public class AllGISData extends Dataset implements Serializable {
         } catch (IOException ex) {
             Logger.getLogger(Patterns.class.getName()).log(Level.SEVERE, (String) null, ex);
         }
+        
+        for (int i = 0; i < countries.size(); i++) {
+            for (int j = 0; j < countries.get(i).states.size(); j++) {
+                for (int k = 0; k < countries.get(i).states.get(j).counties.size(); k++) {
+                    if (countries.get(i).states.get(j).counties.get(k).cities != null) {
+                        for (int m = 0; m < countries.get(i).states.get(j).counties.get(k).cities.size(); m++) {
+                            
+                            City targetCity=countries.get(i).states.get(j).counties.get(k).cities.get(m);
+                            
+                            for (int n = 0; n < countries.get(i).states.get(j).counties.size(); n++) {
+                                if (countries.get(i).states.get(j).counties.get(n).cities != null) {
+                                    for (int d = 0; d < countries.get(i).states.get(j).counties.get(n).cities.size(); d++) {
+                                        if(targetCity.name.equals(countries.get(i).states.get(j).counties.get(n).cities.get(d).name)){
+                                            if(targetCity.censusTracts.get(0).id!=countries.get(i).states.get(j).counties.get(n).cities.get(d).censusTracts.get(0).id){
+                                                for(int f=0;f<countries.get(i).states.get(j).counties.get(n).cities.get(d).censusTracts.size();f++){
+                                                    targetCity.censusTracts.add(countries.get(i).states.get(j).counties.get(n).cities.get(d).censusTracts.get(f));
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            
+                        }
+                    }
+                }
+            }
+        }
 
         for (int i = 0; i < countries.size(); i++) {
             countries.get(i).getLatLonSizeFromChildren();

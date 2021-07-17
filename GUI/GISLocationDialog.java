@@ -7,8 +7,11 @@ package COVID_AgentBasedSimulation.GUI;
 
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.LocationNodeSafegraph;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.PatternsRecordProcessed;
+import COVID_AgentBasedSimulation.Model.Structure.CBGVDCell;
 import COVID_AgentBasedSimulation.Model.Structure.CensusBlockGroup;
+import COVID_AgentBasedSimulation.Model.Structure.City;
 import COVID_AgentBasedSimulation.Model.Structure.Marker;
+import COVID_AgentBasedSimulation.Model.Structure.VDCell;
 import esmaieeli.gisFastLocationOptimization.GIS3D.Grid;
 import esmaieeli.gisFastLocationOptimization.GIS3D.LayerDefinition;
 import esmaieeli.gisFastLocationOptimization.GIS3D.LocationNode;
@@ -109,6 +112,9 @@ public class GISLocationDialog extends javax.swing.JDialog {
         jButton21 = new javax.swing.JButton();
         jButton22 = new javax.swing.JButton();
         jButton23 = new javax.swing.JButton();
+        jPanel5 = new javax.swing.JPanel();
+        jButton24 = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -402,6 +408,38 @@ public class GISLocationDialog extends javax.swing.JDialog {
                 .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        jPanel5.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+
+        jButton24.setText("Update city casestudy VD/CBGVD");
+        jButton24.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton24ActionPerformed(evt);
+            }
+        });
+
+        jLabel1.setText("STATUS");
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButton24)
+                    .addComponent(jLabel1))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jButton24)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel1)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -409,12 +447,16 @@ public class GISLocationDialog extends javax.swing.JDialog {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 1160, Short.MAX_VALUE))
+                .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 1022, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
@@ -2017,6 +2059,77 @@ public class GISLocationDialog extends javax.swing.JDialog {
         mainFParent.refreshLayersList();
     }//GEN-LAST:event_jButton23ActionPerformed
 
+    private void jButton24ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton24ActionPerformed
+        if(myParent.mainModel.ABM.studyScopeGeography instanceof City){
+            City city=(City)(myParent.mainModel.ABM.studyScopeGeography);
+            
+            city.vDCells=new ArrayList();
+            int vDLayerIndex=mainFParent.findLayer("voronoi_combination_v");
+            int cBGLayerIndex=mainFParent.findLayer("censusBlockGroups");
+            for(int vdIndex=1;vdIndex<((LayerDefinition)(mainFParent.allData.all_Layers.get(vDLayerIndex))).categories.length;vdIndex++){
+                city.vDCells.add(new VDCell());
+                city.vDCells.get(vdIndex-1).cBGsInvolved=new ArrayList();
+                city.vDCells.get(vdIndex-1).cBGsPercentageInvolved=new ArrayList();
+                HashMap<CensusBlockGroup, Integer> cBGNumNodesHashMap=new HashMap();
+                for(int i=0;i<mainFParent.allData.all_Nodes.length;i++){
+                    if(((short[])(mainFParent.allData.all_Nodes[i].layers.get(vDLayerIndex)))[0]==vdIndex){
+                        Double value= Double.valueOf(Math.round(((LayerDefinition)(mainFParent.allData.all_Layers.get(cBGLayerIndex))).values[((short[])(mainFParent.allData.all_Nodes[i].layers.get(cBGLayerIndex)))[0]]));
+                        CensusBlockGroup cBG=myParent.mainModel.allGISData.findCensusBlockGroup(value.longValue());
+                        if(cBGNumNodesHashMap.containsKey(cBG)){
+                            cBGNumNodesHashMap.put(cBG, cBGNumNodesHashMap.get(cBG)+1);
+                        }else{
+                            cBGNumNodesHashMap.put(cBG, 1);
+                        }
+                    }
+                }
+                
+                double sumNodes=0;
+                for (Map.Entry<CensusBlockGroup, Integer> set : cBGNumNodesHashMap.entrySet()) {
+                    sumNodes+=set.getValue();
+                }
+                for (Map.Entry<CensusBlockGroup, Integer> set : cBGNumNodesHashMap.entrySet()) {
+		    city.vDCells.get(vdIndex-1).cBGsInvolved.add(set.getKey());
+                    city.vDCells.get(vdIndex-1).cBGsPercentageInvolved.add((double)(set.getValue())/sumNodes);
+		}
+            }
+            
+            
+            city.cBGVDCells=new ArrayList();
+            int cBGVDLayerIndex=mainFParent.findLayer("VDs_CBGs");
+//            int cBGLayerIndex=mainFParent.findLayer("censusBlockGroups");
+            for(int cBGVDIndex=1;cBGVDIndex<((LayerDefinition)(mainFParent.allData.all_Layers.get(cBGVDLayerIndex))).categories.length;cBGVDIndex++){
+                city.cBGVDCells.add(new CBGVDCell());
+                city.cBGVDCells.get(cBGVDIndex-1).cBGsInvolved=new ArrayList();
+                city.cBGVDCells.get(cBGVDIndex-1).cBGsPercentageInvolved=new ArrayList();
+                HashMap<CensusBlockGroup, Integer> cBGNumNodesHashMap=new HashMap();
+                for(int i=0;i<mainFParent.allData.all_Nodes.length;i++){
+                    if(((short[])(mainFParent.allData.all_Nodes[i].layers.get(cBGVDLayerIndex)))[0]==cBGVDIndex){
+                        Double value= Double.valueOf(Math.round(((LayerDefinition)(mainFParent.allData.all_Layers.get(cBGLayerIndex))).values[((short[])(mainFParent.allData.all_Nodes[i].layers.get(cBGLayerIndex)))[0]]));
+                        CensusBlockGroup cBG=myParent.mainModel.allGISData.findCensusBlockGroup(value.longValue());
+                        if(cBGNumNodesHashMap.containsKey(cBG)){
+                            cBGNumNodesHashMap.put(cBG, cBGNumNodesHashMap.get(cBG)+1);
+                        }else{
+                            cBGNumNodesHashMap.put(cBG, 1);
+                        }
+                    }
+                }
+                
+                double sumNodes=0;
+                for (Map.Entry<CensusBlockGroup, Integer> set : cBGNumNodesHashMap.entrySet()) {
+                    sumNodes+=set.getValue();
+                }
+                for (Map.Entry<CensusBlockGroup, Integer> set : cBGNumNodesHashMap.entrySet()) {
+		    city.cBGVDCells.get(cBGVDIndex-1).cBGsInvolved.add(set.getKey());
+                    city.cBGVDCells.get(cBGVDIndex-1).cBGsPercentageInvolved.add((double)(set.getValue())/sumNodes);
+		}
+            }
+            
+            
+        }else{
+            jLabel1.setText("HALT! CITY SCOPE IS ONLY IMPLEMENTED!");
+        }
+    }//GEN-LAST:event_jButton24ActionPerformed
+
     public static boolean isShop(int naicsCode) {
         String naicsString = String.valueOf(naicsCode);
         if (naicsString.startsWith("44511") || naicsString.startsWith("44512") || naicsString.startsWith("44711")) {
@@ -2468,6 +2581,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
     private javax.swing.JButton jButton21;
     private javax.swing.JButton jButton22;
     private javax.swing.JButton jButton23;
+    private javax.swing.JButton jButton24;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
@@ -2475,9 +2589,11 @@ public class GISLocationDialog extends javax.swing.JDialog {
     private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton8;
     private javax.swing.JButton jButton9;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
     // End of variables declaration//GEN-END:variables
 }
