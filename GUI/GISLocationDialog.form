@@ -28,8 +28,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jPanel5" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jPanel1" min="-2" pref="1022" max="-2" attributes="0"/>
-              <EmptySpace max="32767" attributes="0"/>
+              <Component id="jPanel1" pref="1082" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -422,6 +421,7 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="jButton24" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Component id="jLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="jButton25" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
@@ -434,6 +434,8 @@
                   <Component id="jButton24" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                  <Component id="jButton25" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
@@ -442,7 +444,7 @@
       <SubComponents>
         <Component class="javax.swing.JButton" name="jButton24">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Update city casestudy VD/CBGVD"/>
+            <Property name="text" type="java.lang.String" value="Update city sup by app"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton24ActionPerformed"/>
@@ -452,6 +454,15 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="STATUS"/>
           </Properties>
+        </Component>
+        <Component class="javax.swing.JButton" name="jButton25">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Update city sup by data"/>
+            <Property name="toolTipText" type="java.lang.String" value=""/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton25ActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>

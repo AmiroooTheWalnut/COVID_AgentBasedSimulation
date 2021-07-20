@@ -11,11 +11,15 @@ import COVID_AgentBasedSimulation.Model.Data.CovidCsseJhu.CovidCsseJhu;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.Safegraph;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Root;
 import COVID_AgentBasedSimulation.Model.Structure.AllGISData;
+import COVID_AgentBasedSimulation.Model.Structure.CensusBlockGroup;
+import COVID_AgentBasedSimulation.Model.Structure.SupplementaryCaseStudyData;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryo.util.DefaultInstantiatorStrategy;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -45,6 +49,7 @@ public class MainModel extends Dataset {
 
     public Safegraph safegraph;
     public AllGISData allGISData;
+    public SupplementaryCaseStudyData supplementaryCaseStudyData;
     public CovidCsseJhu covidCsseJhu;
 
 //    public ArrayList<Person> people;
@@ -82,6 +87,102 @@ public class MainModel extends Dataset {
         allGISData.setDatasetTemplate();
         covidCsseJhu = new CovidCsseJhu();
         covidCsseJhu.setDatasetTemplate();
+    }
+
+    public void loadAndConnectSupplementaryCaseStudyDataKryo(String passed_file_path) {
+        if (allGISData != null) {
+            SupplementaryCaseStudyData scsd = loadSupplementaryCaseStudyDataKryo(passed_file_path);
+            for (int i = 0; i < scsd.vDCells.size(); i++) {
+                scsd.vDCells.get(i).cBGsInvolved = new ArrayList();
+                for (int j = 0; j < scsd.vDCells.get(i).cBGsIDsInvolved.size(); j++) {
+                    CensusBlockGroup cbg=allGISData.findCensusBlockGroup(scsd.vDCells.get(i).cBGsIDsInvolved.get(j));
+                    if(cbg==null){
+                        System.out.println("SVERE ERROR WHILE CONNECTING SUPPLEMENTARY DATA: CBG IS NULL!");
+                    }else{
+                        scsd.vDCells.get(i).cBGsInvolved.add(cbg);
+                    }
+                }
+            }
+            for (int i = 0; i < scsd.cBGVDCells.size(); i++) {
+                scsd.cBGVDCells.get(i).cBGsInvolved = new ArrayList();
+                for (int j = 0; j < scsd.cBGVDCells.get(i).cBGsIDsInvolved.size(); j++) {
+                    CensusBlockGroup cbg=allGISData.findCensusBlockGroup(scsd.cBGVDCells.get(i).cBGsIDsInvolved.get(j));
+                    if(cbg==null){
+                        System.out.println("SVERE ERROR WHILE CONNECTING SUPPLEMENTARY DATA: CBG IS NULL!");
+                    }else{
+                        scsd.cBGVDCells.get(i).cBGsInvolved.add(cbg);
+                    }
+                }
+            }
+        }
+    }
+
+    public static SupplementaryCaseStudyData loadSupplementaryCaseStudyDataKryo(String passed_file_path) {
+        Kryo kryo = new Kryo();
+        kryo.register(COVID_AgentBasedSimulation.Model.Structure.SupplementaryCaseStudyData.class);
+        kryo.register(COVID_AgentBasedSimulation.Model.Structure.CensusBlockGroup.class);
+        kryo.register(COVID_AgentBasedSimulation.Model.Structure.CensusTract.class);
+        kryo.register(COVID_AgentBasedSimulation.Model.Structure.City.class);
+        kryo.register(COVID_AgentBasedSimulation.Model.Structure.Country.class);
+        kryo.register(COVID_AgentBasedSimulation.Model.Structure.County.class);
+        kryo.register(COVID_AgentBasedSimulation.Model.Structure.State.class);
+        kryo.register(COVID_AgentBasedSimulation.Model.Structure.ZipCode.class);
+        kryo.register(java.util.ArrayList.class);
+        kryo.register(int[].class);
+        kryo.register(java.lang.String[].class);
+        kryo.register(java.lang.String.class);
+        kryo.register(java.lang.Long.class);
+        kryo.register(java.lang.Float.class);
+        kryo.register(java.time.ZonedDateTime.class);
+        kryo.setReferences(true);
+        kryo.setInstantiatorStrategy(new DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
+//        kryo.setInstantiatorStrategy(new Kryo.DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
+        kryo.register(java.time.ZonedDateTime.class);
+        kryo.register(COVID_AgentBasedSimulation.Model.DatasetTemplate.class);
+        kryo.register(COVID_AgentBasedSimulation.Model.RecordTemplate.class);
+        Input input;
+        try {
+            input = new Input(new FileInputStream(passed_file_path));
+            SupplementaryCaseStudyData supplementaryCaseStudyData = kryo.readObject(input, SupplementaryCaseStudyData.class);
+            input.close();
+
+            return supplementaryCaseStudyData;
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(AllGISData.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+
+    public static void saveSupplementaryCaseStudyDataKryo(String passed_file_path, SupplementaryCaseStudyData supplementaryCaseStudyData) {
+        Kryo kryo = new Kryo();
+        kryo.register(COVID_AgentBasedSimulation.Model.Structure.SupplementaryCaseStudyData.class);
+        kryo.register(COVID_AgentBasedSimulation.Model.Structure.CensusBlockGroup.class);
+        kryo.register(COVID_AgentBasedSimulation.Model.Structure.CensusTract.class);
+        kryo.register(COVID_AgentBasedSimulation.Model.Structure.City.class);
+        kryo.register(COVID_AgentBasedSimulation.Model.Structure.Country.class);
+        kryo.register(COVID_AgentBasedSimulation.Model.Structure.County.class);
+        kryo.register(COVID_AgentBasedSimulation.Model.Structure.State.class);
+        kryo.register(COVID_AgentBasedSimulation.Model.Structure.ZipCode.class);
+        kryo.register(java.util.ArrayList.class);
+        kryo.register(int[].class);
+        kryo.register(java.lang.String[].class);
+        kryo.register(java.lang.String.class);
+        kryo.register(java.lang.Long.class);
+        kryo.register(java.lang.Float.class);
+        kryo.setReferences(true);
+        kryo.setInstantiatorStrategy(new DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
+//        kryo.setInstantiatorStrategy(new Kryo.DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
+        kryo.register(java.time.ZonedDateTime.class);
+        kryo.register(COVID_AgentBasedSimulation.Model.DatasetTemplate.class);
+        kryo.register(COVID_AgentBasedSimulation.Model.RecordTemplate.class);
+        Output output;
+        try {
+            output = new Output(new FileOutputStream(passed_file_path + ".bin"));
+            kryo.writeObject(output, supplementaryCaseStudyData);
+            output.close();
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(MainModel.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @Override

@@ -7,10 +7,12 @@ package COVID_AgentBasedSimulation.GUI;
 
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.LocationNodeSafegraph;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.PatternsRecordProcessed;
+import COVID_AgentBasedSimulation.Model.MainModel;
 import COVID_AgentBasedSimulation.Model.Structure.CBGVDCell;
 import COVID_AgentBasedSimulation.Model.Structure.CensusBlockGroup;
 import COVID_AgentBasedSimulation.Model.Structure.City;
 import COVID_AgentBasedSimulation.Model.Structure.Marker;
+import COVID_AgentBasedSimulation.Model.Structure.SupplementaryCaseStudyData;
 import COVID_AgentBasedSimulation.Model.Structure.VDCell;
 import esmaieeli.gisFastLocationOptimization.GIS3D.Grid;
 import esmaieeli.gisFastLocationOptimization.GIS3D.LayerDefinition;
@@ -58,7 +60,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
     FacilityLocation[] shopFacilities;
     FacilityLocation[] schoolFacilities;
 
-    float shopMergeThreshold = 0.0129f;
+    float shopMergeThreshold = 0.008f;
     float templeMergeThreshold = 0.012f;
 
     COVIDGeoVisualization sketch;
@@ -115,6 +117,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
         jPanel5 = new javax.swing.JPanel();
         jButton24 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
+        jButton25 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -410,7 +413,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
 
         jPanel5.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
-        jButton24.setText("Update city casestudy VD/CBGVD");
+        jButton24.setText("Update city sup by app");
         jButton24.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton24ActionPerformed(evt);
@@ -418,6 +421,14 @@ public class GISLocationDialog extends javax.swing.JDialog {
         });
 
         jLabel1.setText("STATUS");
+
+        jButton25.setText("Update city sup by data");
+        jButton25.setToolTipText("");
+        jButton25.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton25ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
@@ -427,7 +438,8 @@ public class GISLocationDialog extends javax.swing.JDialog {
                 .addContainerGap()
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jButton24)
-                    .addComponent(jLabel1))
+                    .addComponent(jLabel1)
+                    .addComponent(jButton25))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel5Layout.setVerticalGroup(
@@ -437,6 +449,8 @@ public class GISLocationDialog extends javax.swing.JDialog {
                 .addComponent(jButton24)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel1)
+                .addGap(18, 18, 18)
+                .addComponent(jButton25)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -449,8 +463,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 1022, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 1082, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -818,6 +831,17 @@ public class GISLocationDialog extends javax.swing.JDialog {
 
         LinkedHashSet<Long> censusBlockGroupsEncounteredUniqueSetHS = new LinkedHashSet(censusBlockGroupsEncounteredList);
         ArrayList<Long> censusBlockGroupsEncounteredUniqueList = new ArrayList(censusBlockGroupsEncounteredUniqueSetHS);
+        for(int i=censusBlockGroupsEncounteredUniqueList.size()-1;i>=0;i--){
+            if(censusBlockGroupsEncounteredUniqueList.get(i)==null){
+                censusBlockGroupsEncounteredUniqueList.set(i, -1l);
+//                System.out.println(i);
+            }
+        }
+        for (int u = 0; u < mainFParent.allData.all_Nodes.length; u++) {
+            if (cBGForNodes[u]==null) {
+                cBGForNodes[u]=-1l;
+            }
+        }
         Collections.sort(censusBlockGroupsEncounteredUniqueList);
         int numCBGs = censusBlockGroupsEncounteredUniqueList.size();
         int indices[] = new int[numCBGs];
@@ -2073,7 +2097,12 @@ public class GISLocationDialog extends javax.swing.JDialog {
                 HashMap<CensusBlockGroup, Integer> cBGNumNodesHashMap=new HashMap();
                 for(int i=0;i<mainFParent.allData.all_Nodes.length;i++){
                     if(((short[])(mainFParent.allData.all_Nodes[i].layers.get(vDLayerIndex)))[0]==vdIndex){
-                        Double value= Double.valueOf(Math.round(((LayerDefinition)(mainFParent.allData.all_Layers.get(cBGLayerIndex))).values[((short[])(mainFParent.allData.all_Nodes[i].layers.get(cBGLayerIndex)))[0]]));
+//                        System.out.println(((LayerDefinition)(mainFParent.allData.all_Layers.get(cBGLayerIndex))).values.length);
+//                        System.out.println("M: "+((short[])(mainFParent.allData.all_Nodes[i].layers.get(cBGLayerIndex)))[0]);
+//                        if(((short[])(mainFParent.allData.all_Nodes[i].layers.get(cBGLayerIndex)))[0]==97){
+//                            System.out.println("!!!");
+//                        }
+                        Double value= Double.valueOf(Math.round(((LayerDefinition)(mainFParent.allData.all_Layers.get(cBGLayerIndex))).values[((short[])(mainFParent.allData.all_Nodes[i].layers.get(cBGLayerIndex)))[0]-1]));
                         CensusBlockGroup cBG=myParent.mainModel.allGISData.findCensusBlockGroup(value.longValue());
                         if(cBGNumNodesHashMap.containsKey(cBG)){
                             cBGNumNodesHashMap.put(cBG, cBGNumNodesHashMap.get(cBG)+1);
@@ -2104,7 +2133,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
                 HashMap<CensusBlockGroup, Integer> cBGNumNodesHashMap=new HashMap();
                 for(int i=0;i<mainFParent.allData.all_Nodes.length;i++){
                     if(((short[])(mainFParent.allData.all_Nodes[i].layers.get(cBGVDLayerIndex)))[0]==cBGVDIndex){
-                        Double value= Double.valueOf(Math.round(((LayerDefinition)(mainFParent.allData.all_Layers.get(cBGLayerIndex))).values[((short[])(mainFParent.allData.all_Nodes[i].layers.get(cBGLayerIndex)))[0]]));
+                        Double value= Double.valueOf(Math.round(((LayerDefinition)(mainFParent.allData.all_Layers.get(cBGLayerIndex))).values[((short[])(mainFParent.allData.all_Nodes[i].layers.get(cBGLayerIndex)))[0]-1]));
                         CensusBlockGroup cBG=myParent.mainModel.allGISData.findCensusBlockGroup(value.longValue());
                         if(cBGNumNodesHashMap.containsKey(cBG)){
                             cBGNumNodesHashMap.put(cBG, cBGNumNodesHashMap.get(cBG)+1);
@@ -2124,11 +2153,50 @@ public class GISLocationDialog extends javax.swing.JDialog {
 		}
             }
             
+            SupplementaryCaseStudyData scsd=new SupplementaryCaseStudyData();
+            scsd.shopMergePrecision=shopMergeThreshold;
+            scsd.schoolMergePrecision=0;
+            scsd.templeMergePrecision=templeMergeThreshold;
+            scsd.vDCells=new ArrayList(city.vDCells.size());
+            for(int i=0;i<city.vDCells.size();i++){
+                VDCell vDCell=new VDCell();
+                vDCell.cBGsIDsInvolved=new ArrayList();
+                vDCell.cBGsPercentageInvolved=new ArrayList();
+                vDCell.shopPlacesKeys=new ArrayList();
+                vDCell.schoolPlacesKeys=new ArrayList();
+                vDCell.templePlacesKeys=new ArrayList();
+                vDCell.remainingFreqs=new ArrayList();
+                for(int j=0;j<city.vDCells.get(i).cBGsInvolved.size();j++){
+                    vDCell.cBGsIDsInvolved.add(city.vDCells.get(i).cBGsInvolved.get(j).id);
+                }
+                scsd.vDCells.add(vDCell);
+            }
+            
+            scsd.cBGVDCells=new ArrayList(city.cBGVDCells.size());
+            for(int i=0;i<city.cBGVDCells.size();i++){
+                CBGVDCell cBGVDCell=new CBGVDCell();
+                for(int j=0;j<city.cBGVDCells.get(i).cBGsInvolved.size();j++){
+                    cBGVDCell.cBGsIDsInvolved.add(city.cBGVDCells.get(i).cBGsInvolved.get(j).id);
+                }
+                scsd.cBGVDCells.add(cBGVDCell);
+            }
+            
+            String directoryPath = "./datasets/Safegraph/" + myParent.mainModel.ABM.studyScope;
+            File directory = new File(directoryPath);
+            if (!directory.exists()) {
+                directory.mkdir();
+            }
+            
+            MainModel.saveSupplementaryCaseStudyDataKryo(directoryPath+"/supplementaryGIS", scsd);
             
         }else{
-            jLabel1.setText("HALT! CITY SCOPE IS ONLY IMPLEMENTED!");
+            jLabel1.setText("HALT! ONLY CITY SCOPE IS IMPLEMENTED!");
         }
     }//GEN-LAST:event_jButton24ActionPerformed
+
+    private void jButton25ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton25ActionPerformed
+        myParent.mainModel.loadAndConnectSupplementaryCaseStudyDataKryo(myParent.mainModel.ABM.studyScope+"/supplementaryGIS.bin");
+    }//GEN-LAST:event_jButton25ActionPerformed
 
     public static boolean isShop(int naicsCode) {
         String naicsString = String.valueOf(naicsCode);
@@ -2379,7 +2447,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
         LinkedHashSet<Integer> indicesUniqueSetHS = new LinkedHashSet(indicesList);
         ArrayList<Integer> indicesUniqueList = new ArrayList(indicesUniqueSetHS);
 
-        System.out.println("Initial number of shops: " + schoolLocations.size());
+        System.out.println("Initial number of schools: " + schoolLocations.size());
         ArrayList<LocationNodeSafegraph> schools = mergeFacilitiesWithIndices(schoolLocations, indicesList, indicesUniqueList);
 
         int numFacilities = schools.size();
@@ -2395,7 +2463,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
             output[i].isDecoyable = true;
             output[i].tollOff = 0.5;//IMP
         }
-        System.out.println("shops generated: " + output.length);
+        System.out.println("schools generated: " + output.length);
         return output;
     }
 
@@ -2582,6 +2650,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
     private javax.swing.JButton jButton22;
     private javax.swing.JButton jButton23;
     private javax.swing.JButton jButton24;
+    private javax.swing.JButton jButton25;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;

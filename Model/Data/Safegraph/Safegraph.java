@@ -2,15 +2,18 @@ package COVID_AgentBasedSimulation.Model.Data.Safegraph;
 
 import COVID_AgentBasedSimulation.Model.Dataset;
 import COVID_AgentBasedSimulation.Model.DatasetTemplate;
+import COVID_AgentBasedSimulation.Model.HardcodedSimulator.CBGVD;
 import static COVID_AgentBasedSimulation.Model.MainModel.softwareVersion;
 import COVID_AgentBasedSimulation.Model.RecordTemplate;
 import COVID_AgentBasedSimulation.Model.Structure.AllGISData;
+import COVID_AgentBasedSimulation.Model.Structure.CBGVDCell;
 import COVID_AgentBasedSimulation.Model.Structure.CensusBlockGroup;
 import COVID_AgentBasedSimulation.Model.Structure.CensusTract;
 import COVID_AgentBasedSimulation.Model.Structure.City;
 import COVID_AgentBasedSimulation.Model.Structure.Country;
 import COVID_AgentBasedSimulation.Model.Structure.County;
 import COVID_AgentBasedSimulation.Model.Structure.State;
+import COVID_AgentBasedSimulation.Model.Structure.VDCell;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
@@ -406,6 +409,10 @@ public class Safegraph extends Dataset implements Serializable {
             }
         }
     }
+    
+    public void addSupplemenrayToGIS() {
+        
+    }
 
     public void connectPatternsAndPlaces(Patterns patterns, SafegraphPlaces places, AllGISData allGISData, boolean isParallel, int numCPU) {
         //System.out.println(patterns.patternRecords);
@@ -657,6 +664,28 @@ public class Safegraph extends Dataset implements Serializable {
                 for (int m = 0; m < temp.censusTracts.get(k).censusBlocks.size(); m++) {
                     output.add(temp.censusTracts.get(k).censusBlocks.get(m));
                 }
+            }
+        }
+        return output;
+    }
+    
+    public ArrayList<VDCell> getVDsFromCaseStudy(Object restriction) {
+        ArrayList<VDCell> output = new ArrayList();
+        if (restriction instanceof City) {//SO FAR ONLY CITY IS SUPPORT
+            City temp = ((City) restriction);
+            for (int k = 0; k < temp.vDCells.size(); k++) {
+                output.add(temp.vDCells.get(k));
+            }
+        }
+        return output;
+    }
+    
+    public ArrayList<CBGVDCell> getCBGVDsFromCaseStudy(Object restriction) {
+        ArrayList<CBGVDCell> output = new ArrayList();
+        if (restriction instanceof City) {//SO FAR ONLY CITY IS SUPPORT
+            City temp = ((City) restriction);
+            for (int k = 0; k < temp.cBGVDCells.size(); k++) {
+                output.add(temp.cBGVDCells.get(k));
             }
         }
         return output;

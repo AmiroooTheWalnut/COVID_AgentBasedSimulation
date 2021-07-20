@@ -21,6 +21,7 @@ import COVID_AgentBasedSimulation.Model.Structure.County;
 import COVID_AgentBasedSimulation.Model.Structure.City;
 import COVID_AgentBasedSimulation.Model.Structure.CensusTract;
 import COVID_AgentBasedSimulation.Model.Data.CovidCsseJhu.DailyConfirmedCases;
+import COVID_AgentBasedSimulation.Model.Structure.VDCell;
 import esmaieeli.utilities.taskThreading.ParallelProcessor;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -405,22 +406,22 @@ public class Root extends Agent {
     }
 
     ArrayList makeVDs(MainModel modelRoot) {
-        ArrayList<CensusBlockGroup> cBGsListRaw = modelRoot.getSafegraph().getCBGsFromCaseStudy(modelRoot.getABM().getStudyScopeGeography());
-        ArrayList cBGsList = new ArrayList();
-        for (int i = 0; i < cBGsListRaw.size(); i++) {
+        ArrayList<VDCell> vDsListRaw = modelRoot.getSafegraph().getVDsFromCaseStudy(modelRoot.getABM().getStudyScopeGeography());
+        ArrayList vDsList = new ArrayList();
+        for (int i = 0; i < vDsListRaw.size(); i++) {
             VD agent = (VD) modelRoot.getABM().makeAgentByType("VD");
 //            agent.cbgVal = cBGsListRaw.get(i);
-            agent.lat = cBGsListRaw.get(i).getLat();
-            agent.lon = cBGsListRaw.get(i).getLon();
+            agent.lat = vDsListRaw.get(i).getLat();
+            agent.lon = vDsListRaw.get(i).getLon();
             agent.N = 0;
             agent.S = 0;
             agent.E = 0;
             agent.IS = 0;
             agent.IAS = 0;
             agent.R = 0;
-            cBGsList.add(agent);
+            vDsList.add(agent);
         }
-        return cBGsList;
+        return vDsList;
     }
     
     ArrayList makeCBGVDs(MainModel modelRoot) {
