@@ -337,12 +337,27 @@ public class SimulatorDialog extends javax.swing.JDialog {
         buttonGroup2.add(jRadioButton9);
         jRadioButton9.setSelected(true);
         jRadioButton9.setText("CBG only");
+        jRadioButton9.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton9ActionPerformed(evt);
+            }
+        });
 
         buttonGroup2.add(jRadioButton10);
         jRadioButton10.setText("VDs only");
+        jRadioButton10.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton10ActionPerformed(evt);
+            }
+        });
 
         buttonGroup2.add(jRadioButton11);
         jRadioButton11.setText("Hybrid CBGs VDs");
+        jRadioButton11.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton11ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel21Layout = new javax.swing.GroupLayout(jPanel21);
         jPanel21.setLayout(jPanel21Layout);
@@ -1239,8 +1254,10 @@ public class SimulatorDialog extends javax.swing.JDialog {
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         myParent.mainModel.javaEvaluationEngine.connectToConsole(jTextArea1);
         myParent.mainModel.pythonEvaluationEngine.connectToConsole(jTextArea2);
+        myParent.mainModel.loadAndConnectSupplementaryCaseStudyDataKryo("./datasets/safegraph/"+myParent.mainModel.ABM.studyScope + "/supplementaryGIS.bin");
         myParent.mainModel.initModelHardCoded(true, jCheckBox1.isSelected(), myParent.numProcessors);
         jLabel2.setText(myParent.mainModel.ABM.startTime.toString());
+        
         Timer refreshSimulationDialogTimer = new Timer();
         refreshSimulationDialogTimer.schedule(new TimerTask() {
             @Override
@@ -1359,6 +1376,19 @@ public class SimulatorDialog extends javax.swing.JDialog {
             jToggleButton4.setText("Run");
         }
     }//GEN-LAST:event_jToggleButton4ActionPerformed
+
+    private void jRadioButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton9ActionPerformed
+        myParent.mainModel.scenario="CBG";
+        
+    }//GEN-LAST:event_jRadioButton9ActionPerformed
+
+    private void jRadioButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton10ActionPerformed
+        myParent.mainModel.scenario="VD";
+    }//GEN-LAST:event_jRadioButton10ActionPerformed
+
+    private void jRadioButton11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton11ActionPerformed
+        myParent.mainModel.scenario="CBGVD";
+    }//GEN-LAST:event_jRadioButton11ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

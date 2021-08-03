@@ -18,4 +18,5 @@ public class LocationNodeSafegraph {
     public ArrayList<String> placeKeys;
     public SafegraphPlace place;
     public ArrayList<SafegraphPlace> places;
+    //public double remainingVisits;
 }

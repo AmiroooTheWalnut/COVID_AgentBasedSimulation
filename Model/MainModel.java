@@ -12,6 +12,7 @@ import COVID_AgentBasedSimulation.Model.Data.Safegraph.Safegraph;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Root;
 import COVID_AgentBasedSimulation.Model.Structure.AllGISData;
 import COVID_AgentBasedSimulation.Model.Structure.CensusBlockGroup;
+import COVID_AgentBasedSimulation.Model.Structure.City;
 import COVID_AgentBasedSimulation.Model.Structure.SupplementaryCaseStudyData;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
@@ -74,6 +75,8 @@ public class MainModel extends Dataset {
 
     public int newSimulationDelayTime = -2;
 
+    public String scenario = "CBG";
+
     private Thread thread;
 
     public void startScriptEngines() {
@@ -90,56 +93,67 @@ public class MainModel extends Dataset {
     }
 
     public void loadAndConnectSupplementaryCaseStudyDataKryo(String passed_file_path) {
-        if (allGISData != null) {
-            SupplementaryCaseStudyData scsd = loadSupplementaryCaseStudyDataKryo(passed_file_path);
-            for (int i = 0; i < scsd.vDCells.size(); i++) {
-                scsd.vDCells.get(i).cBGsInvolved = new ArrayList();
-                for (int j = 0; j < scsd.vDCells.get(i).cBGsIDsInvolved.size(); j++) {
-                    CensusBlockGroup cbg=allGISData.findCensusBlockGroup(scsd.vDCells.get(i).cBGsIDsInvolved.get(j));
-                    if(cbg==null){
-                        System.out.println("SVERE ERROR WHILE CONNECTING SUPPLEMENTARY DATA: CBG IS NULL!");
-                    }else{
-                        scsd.vDCells.get(i).cBGsInvolved.add(cbg);
+        if (ABM.studyScopeGeography instanceof City) {
+            if (allGISData != null) {
+                City city = (City) (ABM.studyScopeGeography);
+                SupplementaryCaseStudyData scsd = loadSupplementaryCaseStudyDataKryo(passed_file_path);
+                for (int i = 0; i < scsd.vDCells.size(); i++) {
+                    scsd.vDCells.get(i).cBGsInvolved = new ArrayList();
+                    float avgLat = 0;
+                    float avgLon = 0;
+                    int counter = 0;
+                    for (int j = 0; j < scsd.vDCells.get(i).cBGsIDsInvolved.size(); j++) {
+                        CensusBlockGroup cbg = allGISData.findCensusBlockGroup(scsd.vDCells.get(i).cBGsIDsInvolved.get(j));
+                        if (cbg == null) {
+                            System.out.println("SVERE ERROR WHILE CONNECTING SUPPLEMENTARY DATA: CBG IS NULL!");
+                        } else {
+                            avgLat = avgLat + cbg.lat;
+                            avgLon = avgLon + cbg.lon;
+                            counter += 1;
+                            scsd.vDCells.get(i).cBGsInvolved.add(cbg);
+                            scsd.vDCells.get(i).population += cbg.population * scsd.vDCells.get(i).cBGsPercentageInvolved.get(j);
+                        }
                     }
+                    scsd.vDCells.get(i).lat = avgLat / ((float) counter);
+                    scsd.vDCells.get(i).lon = avgLon / ((float) counter);
                 }
-            }
-            for (int i = 0; i < scsd.cBGVDCells.size(); i++) {
-                scsd.cBGVDCells.get(i).cBGsInvolved = new ArrayList();
-                for (int j = 0; j < scsd.cBGVDCells.get(i).cBGsIDsInvolved.size(); j++) {
-                    CensusBlockGroup cbg=allGISData.findCensusBlockGroup(scsd.cBGVDCells.get(i).cBGsIDsInvolved.get(j));
-                    if(cbg==null){
-                        System.out.println("SVERE ERROR WHILE CONNECTING SUPPLEMENTARY DATA: CBG IS NULL!");
-                    }else{
-                        scsd.cBGVDCells.get(i).cBGsInvolved.add(cbg);
+                for (int i = 0; i < scsd.cBGVDCells.size(); i++) {
+                    scsd.cBGVDCells.get(i).cBGsInvolved = new ArrayList();
+                    float avgLat = 0;
+                    float avgLon = 0;
+                    int counter = 0;
+                    for (int j = 0; j < scsd.cBGVDCells.get(i).cBGsIDsInvolved.size(); j++) {
+                        CensusBlockGroup cbg = allGISData.findCensusBlockGroup(scsd.cBGVDCells.get(i).cBGsIDsInvolved.get(j));
+                        if (cbg == null) {
+                            System.out.println("SVERE ERROR WHILE CONNECTING SUPPLEMENTARY DATA: CBG IS NULL!");
+                        } else {
+                            avgLat = avgLat + cbg.lat;
+                            avgLon = avgLon + cbg.lon;
+                            counter += 1;
+                            scsd.cBGVDCells.get(i).cBGsInvolved.add(cbg);
+                            scsd.cBGVDCells.get(i).population += cbg.population * scsd.cBGVDCells.get(i).cBGsPercentageInvolved.get(j);
+                        }
                     }
+                    scsd.cBGVDCells.get(i).lat = avgLat / ((float) counter);
+                    scsd.cBGVDCells.get(i).lon = avgLon / ((float) counter);
                 }
+                city.vDCells = scsd.vDCells;
+                city.cBGVDCells = scsd.cBGVDCells;
             }
+        } else {
+            System.out.println("HALT! ONLY CITY SCOPE IS IMPLEMENTED!");
         }
     }
 
     public static SupplementaryCaseStudyData loadSupplementaryCaseStudyDataKryo(String passed_file_path) {
         Kryo kryo = new Kryo();
         kryo.register(COVID_AgentBasedSimulation.Model.Structure.SupplementaryCaseStudyData.class);
-        kryo.register(COVID_AgentBasedSimulation.Model.Structure.CensusBlockGroup.class);
-        kryo.register(COVID_AgentBasedSimulation.Model.Structure.CensusTract.class);
-        kryo.register(COVID_AgentBasedSimulation.Model.Structure.City.class);
-        kryo.register(COVID_AgentBasedSimulation.Model.Structure.Country.class);
-        kryo.register(COVID_AgentBasedSimulation.Model.Structure.County.class);
-        kryo.register(COVID_AgentBasedSimulation.Model.Structure.State.class);
-        kryo.register(COVID_AgentBasedSimulation.Model.Structure.ZipCode.class);
+        kryo.register(COVID_AgentBasedSimulation.Model.Structure.CBGVDCell.class);
+        kryo.register(COVID_AgentBasedSimulation.Model.Structure.VDCell.class);
         kryo.register(java.util.ArrayList.class);
-        kryo.register(int[].class);
-        kryo.register(java.lang.String[].class);
         kryo.register(java.lang.String.class);
         kryo.register(java.lang.Long.class);
-        kryo.register(java.lang.Float.class);
-        kryo.register(java.time.ZonedDateTime.class);
-        kryo.setReferences(true);
         kryo.setInstantiatorStrategy(new DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
-//        kryo.setInstantiatorStrategy(new Kryo.DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
-        kryo.register(java.time.ZonedDateTime.class);
-        kryo.register(COVID_AgentBasedSimulation.Model.DatasetTemplate.class);
-        kryo.register(COVID_AgentBasedSimulation.Model.RecordTemplate.class);
         Input input;
         try {
             input = new Input(new FileInputStream(passed_file_path));
@@ -156,25 +170,13 @@ public class MainModel extends Dataset {
     public static void saveSupplementaryCaseStudyDataKryo(String passed_file_path, SupplementaryCaseStudyData supplementaryCaseStudyData) {
         Kryo kryo = new Kryo();
         kryo.register(COVID_AgentBasedSimulation.Model.Structure.SupplementaryCaseStudyData.class);
-        kryo.register(COVID_AgentBasedSimulation.Model.Structure.CensusBlockGroup.class);
-        kryo.register(COVID_AgentBasedSimulation.Model.Structure.CensusTract.class);
-        kryo.register(COVID_AgentBasedSimulation.Model.Structure.City.class);
-        kryo.register(COVID_AgentBasedSimulation.Model.Structure.Country.class);
-        kryo.register(COVID_AgentBasedSimulation.Model.Structure.County.class);
-        kryo.register(COVID_AgentBasedSimulation.Model.Structure.State.class);
-        kryo.register(COVID_AgentBasedSimulation.Model.Structure.ZipCode.class);
+        kryo.register(COVID_AgentBasedSimulation.Model.Structure.CBGVDCell.class);
+        kryo.register(COVID_AgentBasedSimulation.Model.Structure.VDCell.class);
         kryo.register(java.util.ArrayList.class);
-        kryo.register(int[].class);
-        kryo.register(java.lang.String[].class);
         kryo.register(java.lang.String.class);
         kryo.register(java.lang.Long.class);
-        kryo.register(java.lang.Float.class);
-        kryo.setReferences(true);
         kryo.setInstantiatorStrategy(new DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
 //        kryo.setInstantiatorStrategy(new Kryo.DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
-        kryo.register(java.time.ZonedDateTime.class);
-        kryo.register(COVID_AgentBasedSimulation.Model.DatasetTemplate.class);
-        kryo.register(COVID_AgentBasedSimulation.Model.RecordTemplate.class);
         Output output;
         try {
             output = new Output(new FileOutputStream(passed_file_path + ".bin"));
@@ -256,7 +258,13 @@ public class MainModel extends Dataset {
 
         ABM.rootAgent = ABM.makeRootAgentHardCoded();
 
-        ((Root) (ABM.rootAgent)).constructor(this);
+        if (scenario.equals("CBG")) {
+            ((Root) (ABM.rootAgent)).constructor(this);
+        } else if (scenario.equals("VD")) {
+            ((Root) (ABM.rootAgent)).constructorVD(this);
+        } else if (scenario.equals("CBGVD")) {
+            ((Root) (ABM.rootAgent)).constructorCBGVD(this);
+        }
 
         resetTimerTask(isParallelBehaviorEvaluation, numCPUs, true);
     }

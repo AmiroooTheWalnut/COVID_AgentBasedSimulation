@@ -6,9 +6,7 @@
 package COVID_AgentBasedSimulation.Model.HardcodedSimulator;
 
 import COVID_AgentBasedSimulation.Model.AgentBasedModel.Agent;
-import COVID_AgentBasedSimulation.Model.Data.Safegraph.SafegraphPlace;
 import COVID_AgentBasedSimulation.Model.Structure.VDCell;
-import java.util.ArrayList;
 
 /**
  *

@@ -7,8 +7,10 @@ package COVID_AgentBasedSimulation.Model.AgentBasedModel;
 
 import COVID_AgentBasedSimulation.GUI.MainFrame;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.CBG;
+import COVID_AgentBasedSimulation.Model.HardcodedSimulator.CBGVD;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Person;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Root;
+import COVID_AgentBasedSimulation.Model.HardcodedSimulator.VD;
 import COVID_AgentBasedSimulation.Model.MainModel;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -212,19 +214,47 @@ public class AgentBasedModel {
                     }
                 }
             case "CBG":
-                CBG output = new CBG();
+                CBG cbg = new CBG();
 //                template = null;
                 for (int i = 0; i < agentTemplates.size(); i++) {
                     if (agentTemplates.get(i).agentTypeName.equals(agentTemplate)) {
 //                        template = agentTemplates.get(i);
-                        output.statusNames = agentTemplates.get(i).statusNames;
-                        output.statusValues = agentTemplates.get(i).statusValues;
+                        cbg.statusNames = agentTemplates.get(i).statusNames;
+                        cbg.statusValues = agentTemplates.get(i).statusValues;
                     }
                 }
-                output.myIndex = agents.size();
-                agents.add(output);
-                output.constructor(myMainModel);
-                return output;
+                cbg.myIndex = agents.size();
+                agents.add(cbg);
+                cbg.constructor(myMainModel);
+                return cbg;
+            case "VD":
+                VD vd = new VD();
+//                template = null;
+                for (int i = 0; i < agentTemplates.size(); i++) {
+                    if (agentTemplates.get(i).agentTypeName.equals(agentTemplate)) {
+//                        template = agentTemplates.get(i);
+                        vd.statusNames = agentTemplates.get(i).statusNames;
+                        vd.statusValues = agentTemplates.get(i).statusValues;
+                    }
+                }
+                vd.myIndex = agents.size();
+                agents.add(vd);
+                vd.constructor(myMainModel);
+                return vd;
+            case "CBGVD":
+                CBGVD cbgvd = new CBGVD();
+//                template = null;
+                for (int i = 0; i < agentTemplates.size(); i++) {
+                    if (agentTemplates.get(i).agentTypeName.equals(agentTemplate)) {
+//                        template = agentTemplates.get(i);
+                        cbgvd.statusNames = agentTemplates.get(i).statusNames;
+                        cbgvd.statusValues = agentTemplates.get(i).statusValues;
+                    }
+                }
+                cbgvd.myIndex = agents.size();
+                agents.add(cbgvd);
+                cbgvd.constructor(myMainModel);
+                return cbgvd;
             default: // Optional
                 Agent output_default = new Agent();
                 output_default.myIndex = agents.size();
