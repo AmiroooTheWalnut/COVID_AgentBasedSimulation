@@ -37,8 +37,9 @@ public class City extends Marker implements Serializable, Comparable<City> {
                     }
                 }
                 if(Math.pow(vDCells.get(i).lat-input.lat,2)+Math.pow(vDCells.get(i).lon-input.lon,2)<dist){
+                    dist=Math.pow(vDCells.get(i).lat-input.lat,2)+Math.pow(vDCells.get(i).lon-input.lon,2);
                     closest[0]=vDCells.get(i);
-                    //closest[1]=vDCells.get(i).cBGsPercentageInvolved.get(j);
+                    closest[1]=vDCells.get(i).cBGsPercentageInvolved.get((int)(Math.random()*vDCells.get(i).cBGsPercentageInvolved.size()-1));
                 }
             }
             return closest;

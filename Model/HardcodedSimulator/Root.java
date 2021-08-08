@@ -790,7 +790,7 @@ public class Root extends Agent {
                     selectedCBG = null;
                     for (int j = 0; j < ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(selectedIndex))).getVisitor_daytime_cbgs_place()).size(); j++) {
                         cumulativeNumPeople = cumulativeNumPeople + ((Integer) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(selectedIndex))).getVisitor_daytime_cbgs_place()).get(j)).getValue());
-                        if (cumulativeNumPeople >= cumulativePeopleHomesIndex) {
+                        if (cumulativeNumPeople >= cumulativePeopleDaytimeIndex) {
                             //println("j: "+j);
                             selectedCBG = ((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(selectedIndex))).getVisitor_daytime_cbgs_place()).get(j)).getKey());
                             break;
@@ -864,7 +864,7 @@ public class Root extends Agent {
 
                 int cumulativeDestinationFreqs = 0;
                 for (int k = 0; k < destinationPlacesFreq.size(); k++) {
-                    cumulativeDestinationFreqs = cumulativeDestinationFreqs + (Integer) (destinationPlacesFreq.get(k));
+                    cumulativeDestinationFreqs = cumulativeDestinationFreqs + ((Double) (destinationPlacesFreq.get(k))).intValue();
                 }
                 agent.cumulativeDestinationFreqs = cumulativeDestinationFreqs;
             }
@@ -1748,8 +1748,21 @@ public class Root extends Agent {
                             //}
                             if (((ZonedDateTime) (((AgentBasedModel) (modelRoot.getABM())).getCurrentTime())).equals(((ZonedDateTime) (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getDate()))) == true) {
                                 //percentageSickInCounties[i]=((DailyConfirmedCases)(dailyConfirmedCases.get(d))).getNumActiveCases()/((County)(((CensusTract)(((ArrayList<CensusTract>)(scope.getCensusTracts())).get(i))).getCounty())).getPopulation();
+                                System.out.println("D");
+                                System.out.println(d);
+                                System.out.println(dailyConfirmedCases.get(d).getNumActiveCases());
+
+                                System.out.println("VD");
+                                System.out.println(i);
+                                System.out.println(scope.vDCells.size());
+
+                                System.out.println("VD CBGs involved");
+                                System.out.println(scope.vDCells.get(i).cBGsInvolved.size());
+                                if(scope.vDCells.get(i).cBGsInvolved.size()==0){
+                                    System.out.println("!!!!!");
+                                }
                                 percentageSickInVDs[i] = (((float) (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getNumActiveCases())) * ((float) (((scope.vDCells.get(i)).getPopulation())) / (float) (((County) ((scope.vDCells.get(i).cBGsInvolved.get(0)).getCounty())).getPopulation()))) / ((float) (((scope.vDCells.get(i)).getPopulation())));
-//                                System.out.println(i);
+
                             }
                         }
                     }
