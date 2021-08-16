@@ -83,6 +83,8 @@ public class Person extends Agent {
             runVD(currentAgent, modelRoot, modelRoot.getABM().getCurrentTime());
         } else if (modelRoot.scenario.equals("CBGVD")) {
             runCBGVD(currentAgent, modelRoot, modelRoot.getABM().getCurrentTime());
+        } else if (modelRoot.scenario.equals("ABSVD")) {
+            runVD(currentAgent, modelRoot, modelRoot.getABM().getCurrentTime());
         }
 
     }
@@ -655,7 +657,7 @@ public class Person extends Agent {
                 int destination = -1;
                 ArrayList destFreqs = (ArrayList) (currentAgent.destinationPlacesFreq);
                 for (int i = 0; i < destFreqs.size(); i++) {
-                    destinationCumulative = destinationCumulative + (int) destFreqs.get(i);
+                    destinationCumulative = destinationCumulative + ((Integer)(destFreqs.get(i)));
                     //println("dest loop: "+destinationCumulative);
                     //println("destinationCumulativeThresh: "+(destinationCumulativeThresh-1));
                     if (destinationCumulative >= (destinationCumulativeThresh - 1)) {

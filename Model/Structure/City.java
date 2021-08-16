@@ -49,6 +49,8 @@ public class City extends Marker implements Serializable, Comparable<City> {
 
     public Object[] getCBGVDFromCBG(CensusBlockGroup input) {
         if (cBGVDCells != null) {
+            double dist=Double.MAX_VALUE;
+            Object[] closest=new Object[2];
             for (int i = 0; i < cBGVDCells.size(); i++) {
                 for (int j = 0; j < cBGVDCells.get(i).cBGsIDsInvolved.size(); j++) {
                     if (cBGVDCells.get(i).cBGsIDsInvolved.get(j) == input.id) {
@@ -58,7 +60,14 @@ public class City extends Marker implements Serializable, Comparable<City> {
                         return output;
                     }
                 }
+                if(Math.pow(cBGVDCells.get(i).lat-input.lat,2)+Math.pow(cBGVDCells.get(i).lon-input.lon,2)<dist){
+                    dist=Math.pow(cBGVDCells.get(i).lat-input.lat,2)+Math.pow(cBGVDCells.get(i).lon-input.lon,2);
+                    closest[0]=cBGVDCells.get(i);
+                    closest[1]=cBGVDCells.get(i).cBGsPercentageInvolved.get((int)(Math.random()*cBGVDCells.get(i).cBGsPercentageInvolved.size()-1));
+                }
             }
+            return closest;
+            
         }
         return null;
     }

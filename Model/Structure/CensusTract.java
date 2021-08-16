@@ -18,7 +18,7 @@ import lombok.Setter;
 @Getter @Setter
 public class CensusTract extends Marker implements Serializable, Comparable<CensusTract> {
     static final long serialVersionUID = softwareVersion;
-    public int id;
+    public long id;
     public transient boolean isLatLonCalculated=false;
     public ArrayList<CensusBlockGroup> censusBlocks;
     

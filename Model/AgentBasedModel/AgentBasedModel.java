@@ -433,6 +433,7 @@ public class AgentBasedModel {
     public void saveModel(String path) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String result = gson.toJson(this);
+        //System.out.println(result);
         BufferedWriter writer;
         try {
             FileWriter out = new FileWriter(path);

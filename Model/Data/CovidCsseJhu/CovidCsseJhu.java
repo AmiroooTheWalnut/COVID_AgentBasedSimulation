@@ -94,9 +94,8 @@ public class CovidCsseJhu extends Dataset implements Serializable {
 //                        if (fipsCode.equals("55111")) {
 //                            System.out.println("!!!");
 //                        }
-
                         if (!(fipsCode.length() - 3 < 0)) {
-                            String countyCode = fipsCode.substring(fipsCode.length() - 3, fipsCode.length());
+                            String countyCode = fipsCode;
 
                             String stateCode = fipsCode.substring(0, fipsCode.length() - 3);
 
@@ -134,6 +133,18 @@ public class CovidCsseJhu extends Dataset implements Serializable {
                 }
             }
 
+//            //ACTIVE CASES
+//            for (int i = 0; i < dailyConfirmedCasesList.size(); i++) {
+//                int activeCases = 0;
+//                for (int j = 13; j >=0; j--) {
+//                    if (i - j > -1) {
+//                        dailyConfirmedCasesList.get(i).numActiveCases=dailyConfirmedCasesList.get(i).numDailyCases-dailyConfirmedCasesList.get(i - j).numDailyCases;
+//                        break;
+//                    }
+//                }
+//            }
+//            //ACTIVE CASES
+            //SUM ACTIVE CASES
             for (int i = 0; i < dailyConfirmedCasesList.size(); i++) {
                 int sumInfected = 0;
                 for (int j = 0; j < 14; j++) {
@@ -143,7 +154,13 @@ public class CovidCsseJhu extends Dataset implements Serializable {
                 }
                 dailyConfirmedCasesList.get(i).numActiveCases = sumInfected;
             }
-
+            //SUM ACTIVE CASES
+//            //TOTAL CASES
+//            for (int i = 0; i < dailyConfirmedCasesList.size(); i++) {
+//                dailyConfirmedCasesList.get(i).numActiveCases=dailyConfirmedCasesList.get(i).numDailyCases;
+//            }
+//            //TOTAL CASES
+            
             CovidCsseJhu.saveDailyConfirmedCasesListKryo("./datasets/ProcessedCasesData", this);
 
         } catch (IOException ex) {

@@ -51,8 +51,11 @@ public class Root extends Agent {
     public int residentPopulation;
     public int startCountyIndex;
     public int endCountyIndex;
+
+    ArrayList<DailyConfirmedCases> relevantDailyConfirmedCases;
+
     public int counter;
-    int numAgents = 2000;
+    int numAgents = 10000;
 
     public boolean isLocalAllowed = true;
 
@@ -93,7 +96,7 @@ public class Root extends Agent {
                     if (((String) (((State) (((County) (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getCounty())).getState())).getName())).equals(scope.getName())) {
                         if (((County) (((ArrayList<County>) (scope.getCounties())).get(j))).getId() == ((County) (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getCounty())).getId()) {
                             if (((ZonedDateTime) (((ZonedDateTime) (((AgentBasedModel) (modelRoot.getABM())).getCurrentTime())).truncatedTo(ChronoUnit.DAYS))).equals(((ZonedDateTime) (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getDate()))) == true) {
-                                numActiveInfected = numActiveInfected + ((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getNumActiveCases();
+                                numActiveInfected = numActiveInfected + ((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getNumActiveCases() * 100;
                                 //println(d);
                             }
                         }
@@ -134,13 +137,121 @@ public class Root extends Agent {
             System.out.println("Infection for less than county level not implemented yet!");
         }
 
+        ArrayList<County> counties = new ArrayList();
+        for (int i = 0; i < ((City) modelRoot.ABM.studyScopeGeography).censusTracts.size(); i++) {
+            boolean isCountyFound = false;
+            for (int j = 0; j < counties.size(); j++) {
+                if (counties.get(j).id == ((City) modelRoot.ABM.studyScopeGeography).censusTracts.get(i).county.id) {
+                    isCountyFound = true;
+                    break;
+                }
+            }
+            if (isCountyFound == false) {
+                counties.add(((City) modelRoot.ABM.studyScopeGeography).censusTracts.get(i).county);
+            }
+        }
+        int numCounties = counties.size();
+
+        relevantDailyConfirmedCases = new ArrayList();
+
+        for (int d = 0; d < dailyConfirmedCases.size(); d++) {
+            for (int j = 0; j < counties.size(); j++) {
+                if (dailyConfirmedCases.get(d).county.id == counties.get(j).id) {
+                    relevantDailyConfirmedCases.add(dailyConfirmedCases.get(d));
+                }
+            }
+        }
+
         initialInfectPeopleVDs(modelRoot, vDsList);
         end = System.currentTimeMillis();
         System.out.println("Finished infecting people: " + (end - start) + " miliSeconds.");
 
+        initOutputFileHeader(modelRoot, counties);
+
+        counter = 0;
+    }
+
+    public void constructorABSVD(MainModel modelRoot) {
+        System.out.println("ROOT CONSTRUCTOR VD: " + Math.random());
+
+        ArrayList patternRecords = modelRoot.getSafegraph().getAllPatterns().getMonthlyPatternsList().get(0).getPatternRecords();
+
+        ArrayList vDsList = makeVDs(modelRoot);
+        System.out.println("VD size: " + vDsList.size());
+
+        runGenPeople(numAgents, modelRoot, patternRecords, -1, vDsList);
+
+        ArrayList<County> counties = new ArrayList();
+        for (int i = 0; i < ((City) modelRoot.ABM.studyScopeGeography).censusTracts.size(); i++) {
+            boolean isCountyFound = false;
+            for (int j = 0; j < counties.size(); j++) {
+                if (counties.get(j).id == ((City) modelRoot.ABM.studyScopeGeography).censusTracts.get(i).county.id) {
+                    isCountyFound = true;
+                    break;
+                }
+            }
+            if (isCountyFound == false) {
+                counties.add(((City) modelRoot.ABM.studyScopeGeography).censusTracts.get(i).county);
+            }
+        }
+        int numCounties = counties.size();
+
+        ArrayList<DailyConfirmedCases> dailyConfirmedCases = ((CovidCsseJhu) (modelRoot.covidCsseJhu)).dailyConfirmedCasesList;
+
+        relevantDailyConfirmedCases = new ArrayList();
+
+        for (int d = 0; d < dailyConfirmedCases.size(); d++) {
+            for (int j = 0; j < counties.size(); j++) {
+                if (dailyConfirmedCases.get(d).county.id == counties.get(j).id) {
+                    relevantDailyConfirmedCases.add(dailyConfirmedCases.get(d));
+                }
+            }
+        }
+
+        initialInfectPeopleVDs(modelRoot, vDsList);
+
+        initOutputFileHeader(modelRoot, counties);
+    }
+
+    public void initOutputFileHeader(MainModel modelRoot, ArrayList<County> counties) {
+        int numCounties = counties.size();
+
+        if (modelRoot.ABM.studyScope.equals("USA_NY_Richmond County_New York")) {
+
+            try {
+                //String data = "Date,Susceptible,Exposed,Infected_sym,Infected_asym,Recovered,Dead,UNKNOWN,SimulatedInfectedToPop,REALInfected,RealInfectedToPop\n";
+                String data = "Date";
+                for (int n = 0; n < numCounties; n++) {
+                    data = data + "," + counties.get(n).name + "_Susceptible,";
+                    data = data + counties.get(n).name + "_Exposed,";
+                    data = data + counties.get(n).name + "_Infected_sym,";
+                    data = data + counties.get(n).name + "_Infected_asym,";
+                    data = data + counties.get(n).name + "_Recovered,";
+                    data = data + counties.get(n).name + "_Dead,";
+                    data = data + counties.get(n).name + "_UNKNOWN,";
+                    data = data + counties.get(n).name + "_SimulatedInfectedToPop,";
+                    data = data + counties.get(n).name + "_REALInfected,";
+                    data = data + counties.get(n).name + "_RealInfectedToPop";
+                }
+                data = data + "\n";
+                File f1 = new File("./output_NEWYORK_EXCEPTION_" + modelRoot.ABM.studyScope + "_" + modelRoot.scenario + "_" + modelRoot.ABM.startTime.getYear() + "_" + modelRoot.ABM.startTime.getMonth() + ".csv");
+                if (!f1.exists()) {
+                    f1.createNewFile();
+                }
+
+                FileWriter fileWritter = new FileWriter(f1.getName(), false);
+                BufferedWriter bw = new BufferedWriter(fileWritter);
+                bw.write(data);
+                bw.close();
+                System.out.println("Done");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
         try {
             String data = "Date,Susceptible,Exposed,Infected_sym,Infected_asym,Recovered,Dead,UNKNOWN,SimulatedInfectedToPop,REALInfected,RealInfectedToPop\n";
-            File f1 = new File("./output.csv");
+            File f1 = new File("./output_" + modelRoot.ABM.studyScope + "_" + modelRoot.scenario + "_" + modelRoot.ABM.startTime.getYear() + "_" + modelRoot.ABM.startTime.getMonth() + ".csv");
             if (!f1.exists()) {
                 f1.createNewFile();
             }
@@ -153,8 +264,6 @@ public class Root extends Agent {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        counter = 0;
     }
 
     public void constructorCBG(MainModel modelRoot) {
@@ -165,7 +274,6 @@ public class Root extends Agent {
         int numAllVisits = getGeneralInformation(patternRecords);
 
         long start = System.currentTimeMillis();
-        int numAgents = 8000;
 
         ArrayList cBGsList = makeCBGs(modelRoot);
         System.out.println("CBG size: " + cBGsList.size());
@@ -191,7 +299,7 @@ public class Root extends Agent {
                     if (((String) (((State) (((County) (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getCounty())).getState())).getName())).equals(scope.getName())) {
                         if (((County) (((ArrayList<County>) (scope.getCounties())).get(j))).getId() == ((County) (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getCounty())).getId()) {
                             if (((ZonedDateTime) (((ZonedDateTime) (((AgentBasedModel) (modelRoot.getABM())).getCurrentTime())).truncatedTo(ChronoUnit.DAYS))).equals(((ZonedDateTime) (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getDate()))) == true) {
-                                numActiveInfected = numActiveInfected + ((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getNumActiveCases();
+                                numActiveInfected = numActiveInfected + ((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getNumActiveCases() * 100;
                                 //println(d);
                             }
                         }
@@ -232,25 +340,36 @@ public class Root extends Agent {
             System.out.println("Infection for less than county level not implemented yet!");
         }
 
+        ArrayList<County> counties = new ArrayList();
+        for (int i = 0; i < ((City) modelRoot.ABM.studyScopeGeography).censusTracts.size(); i++) {
+            boolean isCountyFound = false;
+            for (int j = 0; j < counties.size(); j++) {
+                if (counties.get(j).id == ((City) modelRoot.ABM.studyScopeGeography).censusTracts.get(i).county.id) {
+                    isCountyFound = true;
+                    break;
+                }
+            }
+            if (isCountyFound == false) {
+                counties.add(((City) modelRoot.ABM.studyScopeGeography).censusTracts.get(i).county);
+            }
+        }
+        int numCounties = counties.size();
+
+        relevantDailyConfirmedCases = new ArrayList();
+
+        for (int d = 0; d < dailyConfirmedCases.size(); d++) {
+            for (int j = 0; j < counties.size(); j++) {
+                if (dailyConfirmedCases.get(d).county.id == counties.get(j).id) {
+                    relevantDailyConfirmedCases.add(dailyConfirmedCases.get(d));
+                }
+            }
+        }
+
         initialInfectPeopleCBG(modelRoot, cBGsList);
         end = System.currentTimeMillis();
         System.out.println("Finished infecting people: " + (end - start) + " miliSeconds.");
 
-        try {
-            String data = "Date,Susceptible,Exposed,Infected_sym,Infected_asym,Recovered,Dead,UNKNOWN,SimulatedInfectedToPop,REALInfected,RealInfectedToPop\n";
-            File f1 = new File("./output.csv");
-            if (!f1.exists()) {
-                f1.createNewFile();
-            }
-
-            FileWriter fileWritter = new FileWriter(f1.getName(), false);
-            BufferedWriter bw = new BufferedWriter(fileWritter);
-            bw.write(data);
-            bw.close();
-            System.out.println("Done");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        initOutputFileHeader(modelRoot, counties);
 
         counter = 0;
     }
@@ -288,7 +407,7 @@ public class Root extends Agent {
                     if (((String) (((State) (((County) (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getCounty())).getState())).getName())).equals(scope.getName())) {
                         if (((County) (((ArrayList<County>) (scope.getCounties())).get(j))).getId() == ((County) (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getCounty())).getId()) {
                             if (((ZonedDateTime) (((ZonedDateTime) (((AgentBasedModel) (modelRoot.getABM())).getCurrentTime())).truncatedTo(ChronoUnit.DAYS))).equals(((ZonedDateTime) (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getDate()))) == true) {
-                                numActiveInfected = numActiveInfected + ((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getNumActiveCases();
+                                numActiveInfected = numActiveInfected + ((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getNumActiveCases() * 100;
                                 //println(d);
                             }
                         }
@@ -329,25 +448,36 @@ public class Root extends Agent {
             System.out.println("Infection for less than county level not implemented yet!");
         }
 
+        ArrayList<County> counties = new ArrayList();
+        for (int i = 0; i < ((City) modelRoot.ABM.studyScopeGeography).censusTracts.size(); i++) {
+            boolean isCountyFound = false;
+            for (int j = 0; j < counties.size(); j++) {
+                if (counties.get(j).id == ((City) modelRoot.ABM.studyScopeGeography).censusTracts.get(i).county.id) {
+                    isCountyFound = true;
+                    break;
+                }
+            }
+            if (isCountyFound == false) {
+                counties.add(((City) modelRoot.ABM.studyScopeGeography).censusTracts.get(i).county);
+            }
+        }
+        int numCounties = counties.size();
+
+        relevantDailyConfirmedCases = new ArrayList();
+
+        for (int d = 0; d < dailyConfirmedCases.size(); d++) {
+            for (int j = 0; j < counties.size(); j++) {
+                if (dailyConfirmedCases.get(d).county.id == counties.get(j).id) {
+                    relevantDailyConfirmedCases.add(dailyConfirmedCases.get(d));
+                }
+            }
+        }
+
         initialInfectPeopleCBGVDs(modelRoot, cBGVDsList);
         end = System.currentTimeMillis();
         System.out.println("Finished infecting people: " + (end - start) + " miliSeconds.");
 
-        try {
-            String data = "Date,Susceptible,Exposed,Infected_sym,Infected_asym,Recovered,Dead,UNKNOWN,SimulatedInfectedToPop,REALInfected,RealInfectedToPop\n";
-            File f1 = new File("./output.csv");
-            if (!f1.exists()) {
-                f1.createNewFile();
-            }
-
-            FileWriter fileWritter = new FileWriter(f1.getName(), false);
-            BufferedWriter bw = new BufferedWriter(fileWritter);
-            bw.write(data);
-            bw.close();
-            System.out.println("Done");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        initOutputFileHeader(modelRoot, counties);
 
         counter = 0;
     }
@@ -417,11 +547,12 @@ public class Root extends Agent {
     }
 
     ArrayList makeCBGVDs(MainModel modelRoot) {
-        ArrayList<CensusBlockGroup> cBGsListRaw = modelRoot.getSafegraph().getCBGsFromCaseStudy(modelRoot.getABM().getStudyScopeGeography());
-        ArrayList cBGsList = new ArrayList();
+        ArrayList<CBGVDCell> cBGsListRaw = modelRoot.getSafegraph().getCBGVDsFromCaseStudy(modelRoot.getABM().getStudyScopeGeography());
+        ArrayList cBGVDsList = new ArrayList();
         for (int i = 0; i < cBGsListRaw.size(); i++) {
             CBGVD agent = (CBGVD) modelRoot.getABM().makeAgentByType("CBGVD");
 //            agent.cbgVal = cBGsListRaw.get(i);
+            agent.cbgvdVal = cBGsListRaw.get(i);
             agent.lat = cBGsListRaw.get(i).getLat();
             agent.lon = cBGsListRaw.get(i).getLon();
             agent.N = 0;
@@ -430,9 +561,9 @@ public class Root extends Agent {
             agent.IS = 0;
             agent.IAS = 0;
             agent.R = 0;
-            cBGsList.add(agent);
+            cBGVDsList.add(agent);
         }
-        return cBGsList;
+        return cBGVDsList;
     }
 
 //@CompileStatic
@@ -463,10 +594,200 @@ public class Root extends Agent {
                         runParallelVD(modelRoot, patternRecords, numAllVisits, cBGs, startIndex, endIndex, threadIndex);
                     } else if (modelRoot.scenario.equals("CBGVD")) {
                         runParallelCBGVD(modelRoot, patternRecords, numAllVisits, cBGs, startIndex, endIndex, threadIndex);
+                    } else if (modelRoot.scenario.equals("ABSVD")) {
+                        runParallelABSVD(modelRoot, patternRecords, cBGs, startIndex, endIndex, threadIndex);
                     }
 
                 }
             });
+        }
+
+        void runParallelABSVD(MainModel modelRoot, ArrayList patternRecords, ArrayList cBGs, int startIndex, int endIndex, int threadIndex) {
+            for (int i = startIndex; i < endIndex; i++) {
+
+                if (modelRoot.ABM.studyScopeGeography instanceof Country) {
+
+                }
+                if (modelRoot.ABM.studyScopeGeography instanceof State) {
+
+                }
+                if (modelRoot.ABM.studyScopeGeography instanceof County) {
+
+                }
+                if (modelRoot.ABM.studyScopeGeography instanceof City) {
+//                    long start = System.currentTimeMillis();
+                    int sumPopulation = 0;
+                    City scope = (City) (modelRoot.ABM.studyScopeGeography);
+                    sumPopulation = scope.population;
+                    int popGen = (int) (Math.floor(Math.random() * sumPopulation));
+                    int cumulativePop = 0;
+                    int CTIndex = -1;
+                    for (int k = 0; k < scope.censusTracts.size(); k++) {
+                        cumulativePop = cumulativePop + scope.censusTracts.get(k).population;
+                        if (cumulativePop > popGen) {
+                            CTIndex = k;
+                            break;
+                        }
+                    }
+
+                    int cBGIndex = (int) (Math.floor(Math.random() * scope.censusTracts.get(CTIndex).censusBlocks.size()));
+                    CensusBlockGroup selectedCBG = scope.censusTracts.get(CTIndex).censusBlocks.get(cBGIndex);
+
+//                    long end = System.currentTimeMillis();
+                    
+//                    System.out.println("CBG SELECTED: "+(end-start));
+                    
+//                    start = System.currentTimeMillis();
+
+                    Person agent = (Person) modelRoot.getABM().makeAgentByType("Person");
+
+                    System.out.println("AGENT GET INDEX: " + agent.getMyIndex());
+
+                    agent.isAtWork = false;
+
+                    agent.homeCBG = selectedCBG;
+                    agent.homeVD = (VDCell) (((City) (modelRoot.getABM().studyScopeGeography)).getVDFromCBG(selectedCBG))[0];
+
+                    for (int n = 0; n < cBGs.size(); n++) {
+                        //println("%%%");
+//                    System.out.println(selectedCBG);
+//                    System.out.println(cBGs.get(n));
+                        if (((VD) (cBGs.get(n))).vdVal == null) {
+                            System.out.println(cBGs.get(n));
+                        }
+                        if (((CensusBlockGroup) selectedCBG) == null) {
+                            System.out.println(((CensusBlockGroup) selectedCBG));
+                        }
+                        if (selectedCBG == null) {
+                            System.out.println(selectedCBG);
+                        }
+                        if (cBGs.get(n) == null) {
+                            System.out.println(cBGs.get(n));
+                        }
+                        if (((VDCell) agent.homeVD).shopPlacesKeys.get(0).equals((((VD) (cBGs.get(n))).vdVal).shopPlacesKeys.get(0))) {
+                            ((VD) (cBGs.get(n))).N = (int) (((VD) (cBGs.get(n))).N) + 1;
+                            ((VD) (cBGs.get(n))).S = (int) (((VD) (cBGs.get(n))).S) + 1;
+                            agent.vD = ((VD) (cBGs.get(n)));
+                            //println("AGENT CBG SET: "+agent.getMyIndex());
+                            //println("AGENT IN THREAD: "+threadIndex);
+                            break;
+                        }
+                    }
+                    
+//                    end = System.currentTimeMillis();
+//
+//                    System.out.println("ADD AGENT TO VD: "+(end-start));
+//                    
+//                    start = System.currentTimeMillis();
+
+                    agent.dayVD = agent.homeVD;
+                    agent.status = statusEnum.SUSCEPTIBLE.ordinal();
+                    agent.minutesSick = -1;
+                    agent.minutesTravelToWorkFrom7 = -1;
+                    agent.minutesTravelFromWorkFrom16 = -1;
+                    agent.currentLocationVD = agent.homeVD;
+
+                    agent.lat = (agent.currentLocationVD).getLat();
+                    agent.lon = (agent.currentLocationVD).getLon();
+
+                    //println("lat: "+agent.getPropertyValue("currentLocation").getLat());
+                    //println("lon: "+agent.getPropertyValue("currentLocation").getLon());
+                    ArrayList destinationPlaces = new ArrayList();
+                    ArrayList destinationPlacesFreq = new ArrayList();
+
+                    for (int j = 0; j < patternRecords.size(); j++) {
+                        if (((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place() != null) {
+                            int naics_code = ((PatternsRecordProcessed) patternRecords.get(j)).place.naics_code;
+                            if (isShop(naics_code) || isSchool(naics_code) || isReligiousOrganization(naics_code)) {
+                                for (int k = 0; k < ((ArrayList) (((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place())).size(); k++) {
+                                    Object[] vDReturn = (((City) (modelRoot.getABM().studyScopeGeography)).getVDFromCBG(((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey())));
+                                    VDCell vd = (VDCell) (vDReturn[0]);
+                                    if (vd != null) {
+                                        destinationPlaces.add(((PatternsRecordProcessed) (patternRecords.get(j))));
+                                        destinationPlacesFreq.add(((CensusBlockGroupIntegerTuple) (((ArrayList) (((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place())).get(k))).getValue() * ((double) (vDReturn[1])));
+                                    }
+
+                                }
+
+                            }
+                        }
+                    }
+                    
+                    double first=Double.POSITIVE_INFINITY;
+                    double second=Double.POSITIVE_INFINITY;
+                    double third=Double.POSITIVE_INFINITY;
+                    double fourth=Double.POSITIVE_INFINITY;
+                    double fith=Double.POSITIVE_INFINITY;
+                    double sxith=Double.POSITIVE_INFINITY;
+                    PatternsRecordProcessed firstPattern=null;
+                    PatternsRecordProcessed secondPattern=null;
+                    PatternsRecordProcessed thirdPattern=null;
+                    PatternsRecordProcessed fourthPattern=null;
+                    PatternsRecordProcessed fithPattern=null;
+                    PatternsRecordProcessed sxithPattern=null;
+//                    double firstFreq;
+//                    double secondFreq;
+//                    double thirdFreq;
+//                    double fourthFreq;
+//                    double fithFreq;
+//                    double sxithFreq;
+                    for(int j=0;j<destinationPlaces.size();j++){
+                        double dist = Math.sqrt(Math.pow(((PatternsRecordProcessed)(destinationPlaces.get(j))).place.lat-agent.homeVD.lat,2)+Math.pow(((PatternsRecordProcessed)(destinationPlaces.get(j))).place.lon-agent.homeVD.lon,2));
+                        if(dist<first){
+                            firstPattern=(PatternsRecordProcessed)(destinationPlaces.get(j));
+                        }if(dist<second){
+                            secondPattern=(PatternsRecordProcessed)(destinationPlaces.get(j));
+                        }if(dist<third){
+                            thirdPattern=(PatternsRecordProcessed)(destinationPlaces.get(j));
+                        }if(dist<fourth){
+                            fourthPattern=(PatternsRecordProcessed)(destinationPlaces.get(j));
+                        }if(dist<fith){
+                            fithPattern=(PatternsRecordProcessed)(destinationPlaces.get(j));
+                        }if(dist<sxith){
+                            sxithPattern=(PatternsRecordProcessed)(destinationPlaces.get(j));
+                        }
+                    }
+                    
+                    destinationPlaces = new ArrayList();
+                    destinationPlaces.add(firstPattern);
+                    destinationPlaces.add(secondPattern);
+                    destinationPlaces.add(thirdPattern);
+                    destinationPlaces.add(fourthPattern);
+                    destinationPlaces.add(fithPattern);
+                    destinationPlaces.add(sxithPattern);
+                    destinationPlacesFreq = new ArrayList();
+                    destinationPlacesFreq.add(30);
+                    destinationPlacesFreq.add(14);
+                    destinationPlacesFreq.add(11);
+                    destinationPlacesFreq.add(9);
+                    destinationPlacesFreq.add(6);
+                    destinationPlacesFreq.add(3);
+                    
+//                    end = System.currentTimeMillis();
+//
+//                    System.out.println("SET DESTINATIONS: "+(end-start));
+//                    
+//                    start = System.currentTimeMillis();
+
+                    agent.destinationPlaces = destinationPlaces;
+                    agent.destinationPlacesFreq = destinationPlacesFreq;
+                    agent.travelStartDecisionCounter = 0;
+                    agent.dstIndex = -1;//THIS IS USED TO DETECT IF THE PERSON IS AT HOME OR NOT
+
+                    int cumulativeDestinationFreqs = 0;
+                    for (int k = 0; k < destinationPlacesFreq.size(); k++) {
+                        cumulativeDestinationFreqs = cumulativeDestinationFreqs + ((Integer) (destinationPlacesFreq.get(k)));
+                    }
+                    
+//                    end = System.currentTimeMillis();
+
+//                    System.out.println("CUMULATIVE FREQS: "+(end-start));
+
+                    agent.cumulativeDestinationFreqs = cumulativeDestinationFreqs;
+                    
+                    
+                }
+            }
         }
 
 //@CompileStatic
@@ -611,6 +932,8 @@ public class Root extends Agent {
                         selectedCBG = (CensusBlockGroup) (agent.homeCBG);
                     }
                 }
+                
+                long start = System.currentTimeMillis();
 
                 agent.dayCBG = selectedCBG;
 
@@ -657,6 +980,10 @@ public class Root extends Agent {
                 agent.destinationPlacesFreq = destinationPlacesFreq;
                 agent.travelStartDecisionCounter = 0;
                 agent.dstIndex = -1;//THIS IS USED TO DETECT IF THE PERSON IS AT HOME OR NOT
+                
+                long end = System.currentTimeMillis();
+                
+                System.out.println("SET DEST DURATION: "+(end -start));
 
                 int cumulativeDestinationFreqs = 0;
                 for (int k = 0; k < destinationPlacesFreq.size(); k++) {
@@ -749,6 +1076,7 @@ public class Root extends Agent {
                 if (selectedCBG == null) {
                     System.out.println("SEVERE ERROR: HOME CENSUS BLOCK NOT FOUND!");
                 }
+                agent.homeCBG = selectedCBG;
                 agent.homeVD = (VDCell) (((City) (modelRoot.getABM().studyScopeGeography)).getVDFromCBG(selectedCBG))[0];
 
                 for (int n = 0; n < cBGs.size(); n++) {
@@ -801,14 +1129,14 @@ public class Root extends Agent {
                         System.out.println("KNOWN EXCEPTION: DAYTIME CENSUS BLOCK NOT FOUND!");
                         System.out.println("USING HOME AS WORK CENSUS BLOCK");
 
-                        selectedVD = (VDCell) (((City) (modelRoot.getABM().studyScopeGeography)).getVDFromCBG(agent.homeCBG))[0];
+                        selectedVD = agent.homeVD;
 
                     }
                 } else {
                     if (selectedVD == null) {
                         System.out.println("KNOWN EXCEPTION: DAYTIME VD NOT FOUND!");
                         System.out.println("USING HOME AS WORK VD");
-                        selectedVD = (agent.homeVD);
+                        selectedVD = agent.homeVD;
                     }
                 }
                 agent.dayVD = selectedVD;
@@ -928,7 +1256,7 @@ public class Root extends Agent {
                 int cumulativePeopleHomesIndex = (int) ((Math.random() * (numAllPeopleHomes - 1)));
                 cumulativeNumPeople = 0;
                 CensusBlockGroup selectedCBG = null;
-                VDCell selectedVD = null;
+                //VDCell selectedVD = null;
                 CBGVDCell selectedCBGVD = null;
                 for (int j = 0; j < ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(selectedIndex))).getVisitor_home_cbgs_place()).size(); j++) {
                     if (isLocalAllowed == false) {
@@ -954,66 +1282,92 @@ public class Root extends Agent {
                 if (selectedCBG == null) {
                     System.out.println("SEVERE ERROR: HOME CENSUS BLOCK NOT FOUND!");
                 }
-                if (modelRoot.scenario.equals("CBG")) {
-                    agent.homeCBG = selectedCBG;
+                agent.homeCBG = selectedCBG;
+                agent.homeCBGVD = (CBGVDCell) (((City) (modelRoot.getABM().studyScopeGeography)).getCBGVDFromCBG(selectedCBG))[0];
+//                if (modelRoot.scenario.equals("CBG")) {
+//                    agent.homeCBG = selectedCBG;
+//
+//                    //println("@@@");
+//                    for (int n = 0; n < cBGs.size(); n++) {
+//                        //println("%%%");
+////                    System.out.println(selectedCBG);
+////                    System.out.println(cBGs.get(n));
+//                        if (((CBG) (cBGs.get(n))).cbgVal == null) {
+//                            System.out.println(cBGs.get(n));
+//                        }
+//                        if (((CensusBlockGroup) selectedCBG) == null) {
+//                            System.out.println(((CensusBlockGroup) selectedCBG));
+//                        }
+//                        if (selectedCBG == null) {
+//                            System.out.println(selectedCBG);
+//                        }
+//                        if (cBGs.get(n) == null) {
+//                            System.out.println(cBGs.get(n));
+//                        }
+//                        if (((CensusBlockGroup) selectedCBG).getId() == ((CensusBlockGroup) (((CBG) (cBGs.get(n))).cbgVal)).getId()) {
+//                            ((CBG) (cBGs.get(n))).N = (int) (((CBG) (cBGs.get(n))).N) + 1;
+//                            ((CBG) (cBGs.get(n))).S = (int) (((CBG) (cBGs.get(n))).S) + 1;
+//                            agent.cBG = ((CBG) (cBGs.get(n)));
+//                            //println("AGENT CBG SET: "+agent.getMyIndex());
+//                            //println("AGENT IN THREAD: "+threadIndex);
+//                            break;
+//                        }
+//                    }
+//
+//                } else if (modelRoot.scenario.equals("VD")) {
+//                    agent.homeVD = (VDCell) (((City) (modelRoot.getABM().studyScopeGeography)).getVDFromCBG(selectedCBG))[0];
+//
+//                    for (int n = 0; n < cBGs.size(); n++) {
+//                        //println("%%%");
+////                    System.out.println(selectedCBG);
+////                    System.out.println(cBGs.get(n));
+//                        if (((VD) (cBGs.get(n))).vdVal == null) {
+//                            System.out.println(cBGs.get(n));
+//                        }
+//                        if (((CensusBlockGroup) selectedCBG) == null) {
+//                            System.out.println(((CensusBlockGroup) selectedCBG));
+//                        }
+//                        if (selectedCBG == null) {
+//                            System.out.println(selectedCBG);
+//                        }
+//                        if (cBGs.get(n) == null) {
+//                            System.out.println(cBGs.get(n));
+//                        }
+//                        if (((CensusBlockGroup) selectedCBG).getId() == ((CensusBlockGroup) (((CBG) (cBGs.get(n))).cbgVal)).getId()) {
+//                            ((CBG) (cBGs.get(n))).N = (int) (((CBG) (cBGs.get(n))).N) + 1;
+//                            ((CBG) (cBGs.get(n))).S = (int) (((CBG) (cBGs.get(n))).S) + 1;
+//                            agent.cBG = ((CBG) (cBGs.get(n)));
+//                            //println("AGENT CBG SET: "+agent.getMyIndex());
+//                            //println("AGENT IN THREAD: "+threadIndex);
+//                            break;
+//                        }
+//                    }
+//                } else if (modelRoot.scenario.equals("CBGVD")) {
+//                    
+//                }
 
-                    //println("@@@");
-                    for (int n = 0; n < cBGs.size(); n++) {
-                        //println("%%%");
+                for (int n = 0; n < cBGs.size(); n++) {
+                    //println("%%%");
 //                    System.out.println(selectedCBG);
 //                    System.out.println(cBGs.get(n));
-                        if (((CBG) (cBGs.get(n))).cbgVal == null) {
-                            System.out.println(cBGs.get(n));
-                        }
-                        if (((CensusBlockGroup) selectedCBG) == null) {
-                            System.out.println(((CensusBlockGroup) selectedCBG));
-                        }
-                        if (selectedCBG == null) {
-                            System.out.println(selectedCBG);
-                        }
-                        if (cBGs.get(n) == null) {
-                            System.out.println(cBGs.get(n));
-                        }
-                        if (((CensusBlockGroup) selectedCBG).getId() == ((CensusBlockGroup) (((CBG) (cBGs.get(n))).cbgVal)).getId()) {
-                            ((CBG) (cBGs.get(n))).N = (int) (((CBG) (cBGs.get(n))).N) + 1;
-                            ((CBG) (cBGs.get(n))).S = (int) (((CBG) (cBGs.get(n))).S) + 1;
-                            agent.cBG = ((CBG) (cBGs.get(n)));
-                            //println("AGENT CBG SET: "+agent.getMyIndex());
-                            //println("AGENT IN THREAD: "+threadIndex);
-                            break;
-                        }
+                    if (cBGs.get(n) == null) {
+                        System.out.println("NULL CBGVD: " + cBGs.get(n));
+                    }
+                    if (((CBGVD) (cBGs.get(n))).cbgvdVal == null) {
+                        System.out.println("NULL CBGVD VALUE: " + cBGs.get(n));
+                    }
+                    if (selectedCBG == null) {
+                        System.out.println("NULL SELECTED CBG: " + ((CensusBlockGroup) selectedCBG));
                     }
 
-                } else if (modelRoot.scenario.equals("VD")) {
-                    agent.homeVD = (VDCell) (((City) (modelRoot.getABM().studyScopeGeography)).getVDFromCBG(selectedCBG))[0];
-
-                    for (int n = 0; n < cBGs.size(); n++) {
-                        //println("%%%");
-//                    System.out.println(selectedCBG);
-//                    System.out.println(cBGs.get(n));
-                        if (((VD) (cBGs.get(n))).vdVal == null) {
-                            System.out.println(cBGs.get(n));
-                        }
-                        if (((CensusBlockGroup) selectedCBG) == null) {
-                            System.out.println(((CensusBlockGroup) selectedCBG));
-                        }
-                        if (selectedCBG == null) {
-                            System.out.println(selectedCBG);
-                        }
-                        if (cBGs.get(n) == null) {
-                            System.out.println(cBGs.get(n));
-                        }
-                        if (((CensusBlockGroup) selectedCBG).getId() == ((CensusBlockGroup) (((CBG) (cBGs.get(n))).cbgVal)).getId()) {
-                            ((CBG) (cBGs.get(n))).N = (int) (((CBG) (cBGs.get(n))).N) + 1;
-                            ((CBG) (cBGs.get(n))).S = (int) (((CBG) (cBGs.get(n))).S) + 1;
-                            agent.cBG = ((CBG) (cBGs.get(n)));
-                            //println("AGENT CBG SET: "+agent.getMyIndex());
-                            //println("AGENT IN THREAD: "+threadIndex);
-                            break;
-                        }
+                    if (((CBGVDCell) agent.homeCBGVD).shopPlacesKeys.get(0).equals((((CBGVD) (cBGs.get(n))).cbgvdVal).shopPlacesKeys.get(0))) {
+                        ((CBGVD) (cBGs.get(n))).N = (int) (((CBGVD) (cBGs.get(n))).N) + 1;
+                        ((CBGVD) (cBGs.get(n))).S = (int) (((CBGVD) (cBGs.get(n))).S) + 1;
+                        agent.cBGVD = ((CBGVD) (cBGs.get(n)));
+                        //println("AGENT CBG SET: "+agent.getMyIndex());
+                        //println("AGENT IN THREAD: "+threadIndex);
+                        break;
                     }
-                } else if (modelRoot.scenario.equals("CBGVD")) {
-                    agent.homeCBGVD = (CBGVDCell) (((City) (modelRoot.getABM().studyScopeGeography)).getCBGVDFromCBG(selectedCBG))[0];
                 }
 
                 //println("###");
@@ -1029,53 +1383,28 @@ public class Root extends Agent {
                     selectedCBG = null;
                     for (int j = 0; j < ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(selectedIndex))).getVisitor_daytime_cbgs_place()).size(); j++) {
                         cumulativeNumPeople = cumulativeNumPeople + ((Integer) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(selectedIndex))).getVisitor_daytime_cbgs_place()).get(j)).getValue());
-                        if (cumulativeNumPeople >= cumulativePeopleHomesIndex) {
+                        if (cumulativeNumPeople >= cumulativePeopleDaytimeIndex) {
                             //println("j: "+j);
                             selectedCBG = ((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(selectedIndex))).getVisitor_daytime_cbgs_place()).get(j)).getKey());
                             break;
                         }
                     }
+                    selectedCBGVD = (CBGVDCell) (((City) (modelRoot.getABM().studyScopeGeography)).getCBGVDFromCBG(selectedCBG))[0];
                     if (selectedCBG == null) {
                         System.out.println("KNOWN EXCEPTION: DAYTIME CENSUS BLOCK NOT FOUND!");
                         System.out.println("USING HOME AS WORK CENSUS BLOCK");
 
-                        if (modelRoot.scenario.equals("CBG")) {
-                            selectedCBG = (CensusBlockGroup) (agent.homeCBG);
-                        } else if (modelRoot.scenario.equals("VD")) {
-                            selectedVD = (VDCell) (((City) (modelRoot.getABM().studyScopeGeography)).getVDFromCBG(agent.homeCBG))[0];
-                        } else if (modelRoot.scenario.equals("CBGVD")) {
-                            selectedCBGVD = (CBGVDCell) (((City) (modelRoot.getABM().studyScopeGeography)).getCBGVDFromCBG(selectedCBG))[0];
-                        }
+                        selectedCBGVD = agent.homeCBGVD;
 
                     }
                 } else {
-                    if (modelRoot.scenario.equals("CBG")) {
-                        if (selectedCBG == null) {
-                            System.out.println("KNOWN EXCEPTION: DAYTIME CENSUS BLOCK NOT FOUND!");
-                            System.out.println("USING HOME AS WORK CENSUS BLOCK");
-                            selectedCBG = (CensusBlockGroup) (agent.homeCBG);
-                        }
-                    } else if (modelRoot.scenario.equals("VD")) {
-                        if (selectedVD == null) {
-                            System.out.println("KNOWN EXCEPTION: DAYTIME VD NOT FOUND!");
-                            System.out.println("USING HOME AS WORK VD");
-                            selectedVD = (agent.homeVD);
-                        }
-                    } else if (modelRoot.scenario.equals("CBGVD")) {
-                        if (selectedCBGVD == null) {
-                            System.out.println("KNOWN EXCEPTION: DAYTIME CBGVD NOT FOUND!");
-                            System.out.println("USING HOME AS WORK CBGVD");
-                            selectedCBGVD = (agent.homeCBGVD);
-                        }
+                    if (selectedCBGVD == null) {
+                        System.out.println("KNOWN EXCEPTION: DAYTIME VD NOT FOUND!");
+                        System.out.println("USING HOME AS WORK VD");
+                        selectedCBGVD = agent.homeCBGVD;
                     }
                 }
-                if (modelRoot.scenario.equals("CBG")) {
-                    agent.dayCBG = selectedCBG;
-                } else if (modelRoot.scenario.equals("VD")) {
-                    agent.dayVD = selectedVD;
-                } else if (modelRoot.scenario.equals("CBGVD")) {
-                    agent.dayCBGVD = selectedCBGVD;
-                }
+                agent.dayCBGVD = selectedCBGVD;
 
                 //^^^ Select daytime cbg of agent
                 //println("lat: "+selectedCBG.getLat());
@@ -1115,48 +1444,20 @@ public class Root extends Agent {
                             if (isLocalAllowed == false) {
                                 int naics_code = ((PatternsRecordProcessed) patternRecords.get(j)).place.naics_code;
                                 if (!isShop(naics_code) && !isSchool(naics_code) && !isReligiousOrganization(naics_code)) {
-                                    if (modelRoot.scenario.equals("CBG")) {
-                                        if (((CensusBlockGroup) (agent.homeCBG)).id == ((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey()).getId()) {
-                                            destinationPlaces.add(((PatternsRecordProcessed) (patternRecords.get(j))));
-                                            destinationPlacesFreq.add(((CensusBlockGroupIntegerTuple) (((ArrayList) (((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place())).get(k))).getValue());
-                                        }
-                                    } else if (modelRoot.scenario.equals("VD")) {
-                                        Object[] vDReturn = (((City) (modelRoot.getABM().studyScopeGeography)).getVDFromCBG(((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey())));
-                                        VDCell vd = (VDCell) (vDReturn[0]);
-                                        if (vd != null) {
-                                            destinationPlaces.add(((PatternsRecordProcessed) (patternRecords.get(j))));
-                                            destinationPlacesFreq.add(((CensusBlockGroupIntegerTuple) (((ArrayList) (((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place())).get(k))).getValue() * ((double) (vDReturn[1])));
-                                        }
-                                    } else if (modelRoot.scenario.equals("CBGVD")) {
-                                        Object[] cBGVDReturn = (((City) (modelRoot.getABM().studyScopeGeography)).getCBGVDFromCBG(((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey())));
-                                        CBGVDCell cbgvd = (CBGVDCell) (cBGVDReturn[0]);
-                                        if (cbgvd != null) {
-                                            destinationPlaces.add(((PatternsRecordProcessed) (patternRecords.get(j))));
-                                            destinationPlacesFreq.add(((CensusBlockGroupIntegerTuple) (((ArrayList) (((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place())).get(k))).getValue() * ((double) (cBGVDReturn[1])));
-                                        }
-                                    }
-
-                                }
-                            } else {
-                                if (modelRoot.scenario.equals("CBG")) {
-                                    if (((CensusBlockGroup) (agent.homeCBG)).id == ((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey()).getId()) {
-                                        destinationPlaces.add(((PatternsRecordProcessed) (patternRecords.get(j))));
-                                        destinationPlacesFreq.add(((CensusBlockGroupIntegerTuple) (((ArrayList) (((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place())).get(k))).getValue());
-                                    }
-                                } else if (modelRoot.scenario.equals("VD")) {
-                                    Object[] vDReturn = (((City) (modelRoot.getABM().studyScopeGeography)).getVDFromCBG(((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey())));
-                                    VDCell vd = (VDCell) (vDReturn[0]);
-                                    if (vd != null) {
-                                        destinationPlaces.add(((PatternsRecordProcessed) (patternRecords.get(j))));
-                                        destinationPlacesFreq.add(((CensusBlockGroupIntegerTuple) (((ArrayList) (((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place())).get(k))).getValue() * ((double) (vDReturn[1])));
-                                    }
-                                } else if (modelRoot.scenario.equals("CBGVD")) {
                                     Object[] cBGVDReturn = (((City) (modelRoot.getABM().studyScopeGeography)).getCBGVDFromCBG(((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey())));
                                     CBGVDCell cbgvd = (CBGVDCell) (cBGVDReturn[0]);
                                     if (cbgvd != null) {
                                         destinationPlaces.add(((PatternsRecordProcessed) (patternRecords.get(j))));
                                         destinationPlacesFreq.add(((CensusBlockGroupIntegerTuple) (((ArrayList) (((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place())).get(k))).getValue() * ((double) (cBGVDReturn[1])));
                                     }
+
+                                }
+                            } else {
+                                Object[] cBGVDReturn = (((City) (modelRoot.getABM().studyScopeGeography)).getCBGVDFromCBG(((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey())));
+                                CBGVDCell cbgvd = (CBGVDCell) (cBGVDReturn[0]);
+                                if (cbgvd != null) {
+                                    destinationPlaces.add(((PatternsRecordProcessed) (patternRecords.get(j))));
+                                    destinationPlacesFreq.add(((CensusBlockGroupIntegerTuple) (((ArrayList) (((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place())).get(k))).getValue() * ((double) (cBGVDReturn[1])));
                                 }
                             }
 
@@ -1170,7 +1471,7 @@ public class Root extends Agent {
 
                 int cumulativeDestinationFreqs = 0;
                 for (int k = 0; k < destinationPlacesFreq.size(); k++) {
-                    cumulativeDestinationFreqs = cumulativeDestinationFreqs + (Integer) (destinationPlacesFreq.get(k));
+                    cumulativeDestinationFreqs = cumulativeDestinationFreqs + ((Double) (destinationPlacesFreq.get(k))).intValue();
                 }
                 agent.cumulativeDestinationFreqs = cumulativeDestinationFreqs;
             }
@@ -1501,20 +1802,20 @@ public class Root extends Agent {
 
     }
 
+    void initialInfectPeopleABSVD(MainModel modelRoot, ArrayList cBGs) {
+
+    }
+
 //@CompileStatic
     void initialInfectPeopleCBG(MainModel modelRoot, ArrayList cBGs) {
         //println("1");
-        ArrayList<DailyConfirmedCases> dailyConfirmedCases = ((CovidCsseJhu) (modelRoot.covidCsseJhu)).dailyConfirmedCasesList;
+
         //println("2");
         //println(dailyConfirmedCases);
-
         if (((AgentBasedModel) (modelRoot.getABM())).studyScopeGeography instanceof County) {
-            for (int i = 0; i < ((List) ((AgentBasedModel) (modelRoot.getABM())).getAgents()).size(); i++) {
-                if (modelRoot.getABM().agents.get(i).myType.equals("Person")) {
 
-                }
-            }
         } else if (((AgentBasedModel) (modelRoot.getABM())).studyScopeGeography instanceof State) {
+            ArrayList<DailyConfirmedCases> dailyConfirmedCases = ((CovidCsseJhu) (modelRoot.covidCsseJhu)).dailyConfirmedCasesList;
             State scope = (State) (((AgentBasedModel) (modelRoot.getABM())).studyScopeGeography);
             double[] percentageSickInCounties = new double[((ArrayList<County>) (scope.getCounties())).size()];
             for (int i = 0; i < percentageSickInCounties.length; i++) {
@@ -1531,7 +1832,7 @@ public class Root extends Agent {
                         //	println("NULL FOUND!");
                         //}
                         if (((ZonedDateTime) (((AgentBasedModel) (modelRoot.getABM())).getCurrentTime())).equals(((ZonedDateTime) (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getDate()))) == true) {
-                            percentageSickInCounties[i] = ((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getNumActiveCases() / ((County) (((ArrayList<County>) (scope.getCounties())).get(i))).getPopulation();
+                            percentageSickInCounties[i] = (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getNumActiveCases() * 100) / ((County) (((ArrayList<County>) (scope.getCounties())).get(i))).getPopulation();
                         }
                     }
 
@@ -1602,19 +1903,18 @@ public class Root extends Agent {
             //ArrayList<Double> percentageSickInCounties=new ArrayList();
             double[] percentageSickInTracts = new double[((ArrayList<CensusTract>) (scope.getCensusTracts())).size()];
             for (int i = 0; i < percentageSickInTracts.length; i++) {
-                int startingDateIndex = -1;
-                for (int d = 0; d < dailyConfirmedCases.size(); d++) {
-                    if (((String) (((State) (((County) (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getCounty())).getState())).getName())).equals(scope.censusTracts.get(0).state.name)) {
-                        if (((County) (((CensusTract) (((ArrayList<CensusTract>) (scope.getCensusTracts())).get(i))).getCounty())).getId() == ((County) (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getCounty())).getId()) {
+                for (int d = 0; d < relevantDailyConfirmedCases.size(); d++) {
+                    if ((relevantDailyConfirmedCases.get(d).county.state.name).equals(scope.censusTracts.get(i).state.name)) {
+                        if (scope.censusTracts.get(i).county.id == relevantDailyConfirmedCases.get(d).county.id) {
                             //if(((ZonedDateTime)(((AgentBasedModel)(modelRoot.getABM())).getCurrentTime()))==null){
                             //	println("777");
                             //}
                             //if(((ZonedDateTime)(((DailyConfirmedCases)(dailyConfirmedCases.get(d))).getDate()))==null){
                             //	println("888");
                             //}
-                            if (((ZonedDateTime) (((AgentBasedModel) (modelRoot.getABM())).getCurrentTime())).equals(((ZonedDateTime) (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getDate()))) == true) {
+                            if ((modelRoot.ABM.currentTime).equals(relevantDailyConfirmedCases.get(d).date) == true) {
                                 //percentageSickInCounties[i]=((DailyConfirmedCases)(dailyConfirmedCases.get(d))).getNumActiveCases()/((County)(((CensusTract)(((ArrayList<CensusTract>)(scope.getCensusTracts())).get(i))).getCounty())).getPopulation();
-                                percentageSickInTracts[i] = (((float) (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getNumActiveCases())) * ((float) ((((CensusTract) (((ArrayList<CensusTract>) (scope.getCensusTracts())).get(i))).getPopulation())) / (float) (((County) (((CensusTract) (((ArrayList<CensusTract>) (scope.getCensusTracts())).get(i))).getCounty())).getPopulation()))) / ((float) ((((CensusTract) (((ArrayList<CensusTract>) (scope.getCensusTracts())).get(i))).getPopulation())));
+                                percentageSickInTracts[i] = (((float) (((DailyConfirmedCases) (relevantDailyConfirmedCases.get(d))).numActiveCases * 100)) * ((float) ((((CensusTract) (((ArrayList<CensusTract>) (scope.censusTracts)).get(i))).population)) / (float) (((County) (((CensusTract) (((ArrayList<CensusTract>) (scope.censusTracts)).get(i))).county)).population))) / ((float) ((((CensusTract) (((ArrayList<CensusTract>) (scope.censusTracts)).get(i))).population)));
 //                                System.out.println(i);
                             }
                         }
@@ -1622,11 +1922,11 @@ public class Root extends Agent {
                 }
             }
 
-            double[] generatedPopulationInTracts = new double[((ArrayList<CensusTract>) (scope.getCensusTracts())).size()];
-            for (int i = 0; i < modelRoot.getABM().agents.size(); i++) {
-                if (modelRoot.getABM().agents.get(i).myType.equals("Person")) {
-                    for (int j = 0; j < ((ArrayList<CensusTract>) (scope.getCensusTracts())).size(); j++) {
-                        if (((CensusTract) (((CensusBlockGroup) (((Person) (((List) ((AgentBasedModel) (modelRoot.getABM())).getAgents()).get(i))).homeCBG)).getCensusTract())).getId() == ((CensusTract) (((ArrayList<CensusTract>) (scope.getCensusTracts())).get(j))).getId()) {
+            double[] generatedPopulationInTracts = new double[((ArrayList<CensusTract>) (scope.censusTracts)).size()];
+            for (int i = 0; i < modelRoot.ABM.agents.size(); i++) {
+                if (modelRoot.ABM.agents.get(i).myType.equals("Person")) {
+                    for (int j = 0; j < ((ArrayList<CensusTract>) (scope.censusTracts)).size(); j++) {
+                        if (((CensusTract) (((CensusBlockGroup) (((Person) (((List) ((AgentBasedModel) (modelRoot.ABM)).agents).get(i))).homeCBG)).censusTract)).getId() == ((CensusTract) (((ArrayList<CensusTract>) (scope.censusTracts)).get(j))).id) {
                             generatedPopulationInTracts[j] = generatedPopulationInTracts[j] + 1;
                         }
                     }
@@ -1637,7 +1937,7 @@ public class Root extends Agent {
                 sumResident = sumResident + (int) generatedPopulationInTracts[i];
             }
             //println(sumResident);
-            ((Root) ((((AgentBasedModel) (modelRoot.getABM())).getRootAgent()))).residentPopulation = sumResident;
+            ((Root) ((((AgentBasedModel) (modelRoot.ABM)).rootAgent))).residentPopulation = sumResident;
 
             int sumAllInfections = 0;
 
@@ -1646,18 +1946,18 @@ public class Root extends Agent {
             int scopePopulation = scope.getPopulation();
             int start = currentAgent.startCountyIndex;
             int end = currentAgent.endCountyIndex;
-            for (int j = 0; j < ((ArrayList<CensusTract>) (scope.getCensusTracts())).size(); j++) {
-                for (int d = start; d <= end; d++) {
-                    if (((String) (((State) (((County) (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getCounty())).getState())).getName())).equals(((State) (((CensusTract) (((ArrayList<CensusTract>) (scope.getCensusTracts())).get(j))).getState())).getName())) {
-                        if (((County) (((CensusTract) (((ArrayList<CensusTract>) (scope.getCensusTracts())).get(j))).getCounty())).getId() == ((County) (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getCounty())).getId()) {
-                            if (((ZonedDateTime) (((ZonedDateTime) (((AgentBasedModel) (modelRoot.getABM())).getCurrentTime())).truncatedTo(ChronoUnit.DAYS))).equals(((ZonedDateTime) (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getDate()))) == true) {
+            for (int j = 0; j < ((ArrayList<CensusTract>) (scope.censusTracts)).size(); j++) {
+                for (int d = 0; d < relevantDailyConfirmedCases.size(); d++) {
+                    if (((String) (((State) (((County) (((DailyConfirmedCases) (relevantDailyConfirmedCases.get(d))).county)).state)).name)).equals(((State) (((CensusTract) (((ArrayList<CensusTract>) (scope.censusTracts)).get(j))).state)).name)) {
+                        if (((County) (((CensusTract) (((ArrayList<CensusTract>) (scope.censusTracts)).get(j))).county)).id == ((County) (((DailyConfirmedCases) (relevantDailyConfirmedCases.get(d))).county)).id) {
+                            if (((ZonedDateTime) (((ZonedDateTime) (((AgentBasedModel) (modelRoot.ABM)).currentTime)).truncatedTo(ChronoUnit.DAYS))).equals(((ZonedDateTime) (((DailyConfirmedCases) (relevantDailyConfirmedCases.get(d))).date))) == true) {
                                 //println("daily county cases: "+(int)(((DailyConfirmedCases)(dailyConfirmedCases.get(d))).getNumActiveCases()));
                                 //println("county population: "+(float)(((County)(((CensusTract)(((ArrayList<CensusTract>)(scope.getCensusTracts())).get(j))).getCounty())).getPopulation()));
                                 //println("census tract population: "+(float)(((CensusTract)(((ArrayList<CensusTract>)(scope.getCensusTracts())).get(j))).getPopulation()));
                                 //println("numActiveInfected: "+numActiveInfected);
                                 //println("fraction: "+((float)(((County)(((CensusTract)(((ArrayList<CensusTract>)(scope.getCensusTracts())).get(j))).getCounty())).getPopulation())/(float)(((CensusTract)(((ArrayList<CensusTract>)(scope.getCensusTracts())).get(j))).getPopulation())));
                                 //println("add: "+(int)(((DailyConfirmedCases)(dailyConfirmedCases.get(d))).getNumActiveCases()*((float)(((County)(((CensusTract)(((ArrayList<CensusTract>)(scope.getCensusTracts())).get(j))).getCounty())).getPopulation())/(float)(((CensusTract)(((ArrayList<CensusTract>)(scope.getCensusTracts())).get(j))).getPopulation()))));
-                                numActiveInfected = numActiveInfected + (int) ((((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getNumActiveCases()) * ((float) (((CensusTract) (((ArrayList<CensusTract>) (scope.getCensusTracts())).get(j))).getPopulation()) / (float) (((County) (((CensusTract) (((ArrayList<CensusTract>) (scope.getCensusTracts())).get(j))).getCounty())).getPopulation())));
+                                numActiveInfected = numActiveInfected + (int) ((((DailyConfirmedCases) (relevantDailyConfirmedCases.get(d))).numActiveCases * 100) * ((float) (((CensusTract) (((ArrayList<CensusTract>) (scope.censusTracts)).get(j))).population) / (float) (((County) (((CensusTract) (((ArrayList<CensusTract>) (scope.censusTracts)).get(j))).county)).population)));
 //                                System.out.println(numActiveInfected);
                             }
                         }
@@ -1665,20 +1965,20 @@ public class Root extends Agent {
                 }
             }
 
-            double[] currentNumberOfInfectedInTract = new double[((ArrayList<CensusTract>) (scope.getCensusTracts())).size()];
+            double[] currentNumberOfInfectedInTract = new double[((ArrayList<CensusTract>) (scope.censusTracts)).size()];
             for (int u = 0; u < 5; u++) {
-                for (int i = 0; i < ((List) ((AgentBasedModel) (modelRoot.getABM())).getAgents()).size(); i++) {
-                    if (modelRoot.getABM().agents.get(i).myType.equals("Person")) {
-                        for (int j = 0; j < ((ArrayList<CensusTract>) (scope.getCensusTracts())).size(); j++) {
-                            if (((CensusTract) (((CensusBlockGroup) (((Person) (((List) ((AgentBasedModel) (modelRoot.getABM())).getAgents()).get(i))).homeCBG)).getCensusTract())).getId() == ((CensusTract) (((ArrayList<CensusTract>) (scope.getCensusTracts())).get(j))).getId()) {
+                for (int i = 0; i < ((List) ((AgentBasedModel) (modelRoot.ABM)).agents).size(); i++) {
+                    if (modelRoot.ABM.agents.get(i).myType.equals("Person")) {
+                        for (int j = 0; j < ((ArrayList<CensusTract>) (scope.censusTracts)).size(); j++) {
+                            if (((CensusTract) (((CensusBlockGroup) (((Person) (((List) ((AgentBasedModel) (modelRoot.ABM)).agents).get(i))).homeCBG)).censusTract)).id == ((CensusTract) (((ArrayList<CensusTract>) (scope.censusTracts)).get(j))).id) {
                                 //println("before infecting");
-                                if (((double) currentNumberOfInfectedInTract[j] / (double) generatedPopulationInTracts[j]) <= percentageSickInTracts[j] && ((double) sumAllInfections / (double) ((Root) (modelRoot.getABM().rootAgent)).residentPopulation) <= ((double) numActiveInfected / (double) scopePopulation)) {
+                                if (((double) currentNumberOfInfectedInTract[j] / (double) generatedPopulationInTracts[j]) / 3.2d <= percentageSickInTracts[j] && (((double) sumAllInfections / (double) ((Root) (modelRoot.ABM.rootAgent)).residentPopulation)) / 50d <= ((double) numActiveInfected / (double) scopePopulation)) {
                                     if (Math.random() < 0.7) {
                                         //println("IS");
-                                        ((Person) (((List) ((AgentBasedModel) (modelRoot.getABM())).getAgents()).get(i))).status = statusEnum.INFECTED_SYM.ordinal();
+                                        ((Person) (((List) ((AgentBasedModel) (modelRoot.ABM)).agents).get(i))).status = statusEnum.INFECTED_SYM.ordinal();
                                         for (int n = 0; n < cBGs.size(); n++) {
                                             //println("%%%");
-                                            if ((((CensusBlockGroup) (((Person) (((List) ((AgentBasedModel) (modelRoot.getABM())).getAgents()).get(i))).homeCBG)).getId() == ((CensusBlockGroup) (((CBG) (cBGs.get(n))).cbgVal)).getId())) {
+                                            if ((((CensusBlockGroup) (((Person) (((List) ((AgentBasedModel) (modelRoot.ABM)).agents).get(i))).homeCBG)).id == ((CensusBlockGroup) (((CBG) (cBGs.get(n))).cbgVal)).id)) {
                                                 ((CBG) (cBGs.get(n))).IS = (int) (((CBG) (cBGs.get(n))).IS) + 1;
                                                 ((CBG) (cBGs.get(n))).S = (int) (((CBG) (cBGs.get(n))).S) - 1;
                                                 break;
@@ -1687,10 +1987,10 @@ public class Root extends Agent {
 
                                     } else {
                                         //println("IAS");
-                                        ((Person) (((List) ((AgentBasedModel) (modelRoot.getABM())).getAgents()).get(i))).status = statusEnum.INFECTED_ASYM.ordinal();
+                                        ((Person) (((List) ((AgentBasedModel) (modelRoot.ABM)).agents).get(i))).status = statusEnum.INFECTED_ASYM.ordinal();
                                         for (int n = 0; n < cBGs.size(); n++) {
                                             //println("%%%");
-                                            if ((((CensusBlockGroup) (((Person) (((List) ((AgentBasedModel) (modelRoot.getABM())).getAgents()).get(i))).homeCBG)).getId() == ((CensusBlockGroup) (((CBG) (cBGs.get(n))).cbgVal)).getId())) {
+                                            if ((((CensusBlockGroup) (((Person) (((List) ((AgentBasedModel) (modelRoot.ABM)).agents).get(i))).homeCBG)).id == ((CensusBlockGroup) (((CBG) (cBGs.get(n))).cbgVal)).id)) {
                                                 ((CBG) (cBGs.get(n))).IAS = (int) (((CBG) (cBGs.get(n))).IAS) + 1;
                                                 ((CBG) (cBGs.get(n))).S = (int) (((CBG) (cBGs.get(n))).S) - 1;
                                                 break;
@@ -1721,13 +2021,13 @@ public class Root extends Agent {
 
     void initialInfectPeopleVDs(MainModel modelRoot, ArrayList vDs) {
         //println("1");
-        ArrayList<DailyConfirmedCases> dailyConfirmedCases = ((CovidCsseJhu) (modelRoot.covidCsseJhu)).dailyConfirmedCasesList;
+
         //println("2");
         //println(dailyConfirmedCases);
-
         if (((AgentBasedModel) (modelRoot.getABM())).studyScopeGeography instanceof County) {
             System.out.println("Infection for county level not implemented yet!");
         } else if (((AgentBasedModel) (modelRoot.getABM())).studyScopeGeography instanceof State) {
+            ArrayList<DailyConfirmedCases> dailyConfirmedCases = ((CovidCsseJhu) (modelRoot.covidCsseJhu)).dailyConfirmedCasesList;
             System.out.println("Infection for State level not implemented yet!");
         } else if (((AgentBasedModel) (modelRoot.getABM())).studyScopeGeography instanceof Country) {
             System.out.println("Infection for country level not implemented yet!");
@@ -1736,32 +2036,34 @@ public class Root extends Agent {
             //ArrayList<Double> percentageSickInCounties=new ArrayList();
             double[] percentageSickInVDs = new double[scope.vDCells.size()];
             for (int i = 0; i < percentageSickInVDs.length; i++) {
-                int startingDateIndex = -1;
-                for (int d = 0; d < dailyConfirmedCases.size(); d++) {
-                    if (((String) (((State) (((County) (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getCounty())).getState())).getName())).equals(scope.censusTracts.get(0).state.name)) {
-                        if (((County) (((CensusTract) (((ArrayList<CensusTract>) (scope.getCensusTracts())).get(i))).getCounty())).getId() == ((County) (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getCounty())).getId()) {
+                if (scope.vDCells.get(i).cBGsInvolved.size() == 0) {
+                    continue;
+                }
+                for (int d = 0; d < relevantDailyConfirmedCases.size(); d++) {
+                    if (((String) (((State) (((County) (((DailyConfirmedCases) (relevantDailyConfirmedCases.get(d))).getCounty())).getState())).getName())).equals(scope.censusTracts.get(0).state.name)) {
+                        if (((County) (((((scope.vDCells).get(i)).cBGsInvolved.get(0))).getCounty())).getId() == ((County) (((DailyConfirmedCases) (relevantDailyConfirmedCases.get(d))).getCounty())).getId()) {
                             //if(((ZonedDateTime)(((AgentBasedModel)(modelRoot.getABM())).getCurrentTime()))==null){
                             //	println("777");
                             //}
                             //if(((ZonedDateTime)(((DailyConfirmedCases)(dailyConfirmedCases.get(d))).getDate()))==null){
                             //	println("888");
                             //}
-                            if (((ZonedDateTime) (((AgentBasedModel) (modelRoot.getABM())).getCurrentTime())).equals(((ZonedDateTime) (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getDate()))) == true) {
+                            if (((ZonedDateTime) (((AgentBasedModel) (modelRoot.getABM())).getCurrentTime())).equals(((ZonedDateTime) (((DailyConfirmedCases) (relevantDailyConfirmedCases.get(d))).getDate()))) == true) {
                                 //percentageSickInCounties[i]=((DailyConfirmedCases)(dailyConfirmedCases.get(d))).getNumActiveCases()/((County)(((CensusTract)(((ArrayList<CensusTract>)(scope.getCensusTracts())).get(i))).getCounty())).getPopulation();
-                                System.out.println("D");
-                                System.out.println(d);
-                                System.out.println(dailyConfirmedCases.get(d).getNumActiveCases());
-
-                                System.out.println("VD");
-                                System.out.println(i);
-                                System.out.println(scope.vDCells.size());
-
-                                System.out.println("VD CBGs involved");
-                                System.out.println(scope.vDCells.get(i).cBGsInvolved.size());
-                                if(scope.vDCells.get(i).cBGsInvolved.size()==0){
-                                    System.out.println("!!!!!");
-                                }
-                                percentageSickInVDs[i] = (((float) (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getNumActiveCases())) * ((float) (((scope.vDCells.get(i)).getPopulation())) / (float) (((County) ((scope.vDCells.get(i).cBGsInvolved.get(0)).getCounty())).getPopulation()))) / ((float) (((scope.vDCells.get(i)).getPopulation())));
+//                                System.out.println("D");
+//                                System.out.println(d);
+//                                System.out.println(dailyConfirmedCases.get(d).getNumActiveCases());
+//
+//                                System.out.println("VD");
+//                                System.out.println(i);
+//                                System.out.println(scope.vDCells.size());
+//
+//                                System.out.println("VD CBGs involved");
+//                                System.out.println(scope.vDCells.get(i).cBGsInvolved.size());
+//                                if(scope.vDCells.get(i).cBGsInvolved.size()==0){
+//                                    System.out.println("!!!!!");
+//                                }
+                                percentageSickInVDs[i] = (((float) (((DailyConfirmedCases) (relevantDailyConfirmedCases.get(d))).getNumActiveCases() * 100)) * ((float) (((scope.vDCells.get(i)).getPopulation())) / (float) (((County) ((scope.vDCells.get(i).cBGsInvolved.get(0)).getCounty())).getPopulation()))) / ((float) (((scope.vDCells.get(i)).getPopulation())));
 
                             }
                         }
@@ -1794,17 +2096,17 @@ public class Root extends Agent {
             int start = currentAgent.startCountyIndex;
             int end = currentAgent.endCountyIndex;
             for (int j = 0; j < ((ArrayList<CensusTract>) (scope.getCensusTracts())).size(); j++) {
-                for (int d = start; d <= end; d++) {
-                    if (((String) (((State) (((County) (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getCounty())).getState())).getName())).equals(((State) (((CensusTract) (((ArrayList<CensusTract>) (scope.getCensusTracts())).get(j))).getState())).getName())) {
-                        if (((County) (((CensusTract) (((ArrayList<CensusTract>) (scope.getCensusTracts())).get(j))).getCounty())).getId() == ((County) (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getCounty())).getId()) {
-                            if (((ZonedDateTime) (((ZonedDateTime) (((AgentBasedModel) (modelRoot.getABM())).getCurrentTime())).truncatedTo(ChronoUnit.DAYS))).equals(((ZonedDateTime) (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getDate()))) == true) {
+                for (int d = 0; d < relevantDailyConfirmedCases.size(); d++) {
+                    if (((String) (((State) (((County) (((DailyConfirmedCases) (relevantDailyConfirmedCases.get(d))).getCounty())).getState())).getName())).equals(((State) (((CensusTract) (((ArrayList<CensusTract>) (scope.getCensusTracts())).get(j))).getState())).getName())) {
+                        if (((County) (((CensusTract) (((ArrayList<CensusTract>) (scope.getCensusTracts())).get(j))).getCounty())).getId() == ((County) (((DailyConfirmedCases) (relevantDailyConfirmedCases.get(d))).getCounty())).getId()) {
+                            if (((ZonedDateTime) (((ZonedDateTime) (((AgentBasedModel) (modelRoot.getABM())).getCurrentTime())).truncatedTo(ChronoUnit.DAYS))).equals(((ZonedDateTime) (((DailyConfirmedCases) (relevantDailyConfirmedCases.get(d))).getDate()))) == true) {
                                 //println("daily county cases: "+(int)(((DailyConfirmedCases)(dailyConfirmedCases.get(d))).getNumActiveCases()));
                                 //println("county population: "+(float)(((County)(((CensusTract)(((ArrayList<CensusTract>)(scope.getCensusTracts())).get(j))).getCounty())).getPopulation()));
                                 //println("census tract population: "+(float)(((CensusTract)(((ArrayList<CensusTract>)(scope.getCensusTracts())).get(j))).getPopulation()));
                                 //println("numActiveInfected: "+numActiveInfected);
                                 //println("fraction: "+((float)(((County)(((CensusTract)(((ArrayList<CensusTract>)(scope.getCensusTracts())).get(j))).getCounty())).getPopulation())/(float)(((CensusTract)(((ArrayList<CensusTract>)(scope.getCensusTracts())).get(j))).getPopulation())));
                                 //println("add: "+(int)(((DailyConfirmedCases)(dailyConfirmedCases.get(d))).getNumActiveCases()*((float)(((County)(((CensusTract)(((ArrayList<CensusTract>)(scope.getCensusTracts())).get(j))).getCounty())).getPopulation())/(float)(((CensusTract)(((ArrayList<CensusTract>)(scope.getCensusTracts())).get(j))).getPopulation()))));
-                                numActiveInfected = numActiveInfected + (int) ((((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getNumActiveCases()) * ((float) (((CensusTract) (((ArrayList<CensusTract>) (scope.getCensusTracts())).get(j))).getPopulation()) / (float) (((County) (((CensusTract) (((ArrayList<CensusTract>) (scope.getCensusTracts())).get(j))).getCounty())).getPopulation())));
+                                numActiveInfected = numActiveInfected + (int) ((((DailyConfirmedCases) (relevantDailyConfirmedCases.get(d))).getNumActiveCases() * 100) * ((float) (((CensusTract) (((ArrayList<CensusTract>) (scope.getCensusTracts())).get(j))).getPopulation()) / (float) (((County) (((CensusTract) (((ArrayList<CensusTract>) (scope.getCensusTracts())).get(j))).getCounty())).getPopulation())));
 //                                System.out.println(numActiveInfected);
                             }
                         }
@@ -1812,14 +2114,14 @@ public class Root extends Agent {
                 }
             }
 
-            double[] currentNumberOfInfectedInTract = new double[((ArrayList<CensusTract>) (scope.getCensusTracts())).size()];
+            double[] currentNumberOfInfectedInVD = new double[scope.vDCells.size()];
             for (int u = 0; u < 5; u++) {
                 for (int i = 0; i < ((List) ((AgentBasedModel) (modelRoot.getABM())).getAgents()).size(); i++) {
                     if (modelRoot.getABM().agents.get(i).myType.equals("Person")) {
                         for (int j = 0; j < scope.vDCells.size(); j++) {
                             if ((((Person) (((List) ((AgentBasedModel) (modelRoot.getABM())).getAgents()).get(i))).homeVD).shopPlacesKeys.get(0).equals(scope.vDCells.get(j).shopPlacesKeys.get(0))) {
                                 //println("before infecting");
-                                if (((double) currentNumberOfInfectedInTract[j] / (double) generatedPopulationInVDs[j]) <= generatedPopulationInVDs[j] && ((double) sumAllInfections / (double) ((Root) (modelRoot.getABM().rootAgent)).residentPopulation) <= ((double) numActiveInfected / (double) scopePopulation)) {
+                                if (((double) currentNumberOfInfectedInVD[j] / (double) generatedPopulationInVDs[j]) / 3.2d <= percentageSickInVDs[j] && ((double) sumAllInfections / (double) ((Root) (modelRoot.getABM().rootAgent)).residentPopulation) / 50d <= ((double) numActiveInfected / (double) scopePopulation)) {
                                     if (Math.random() < 0.7) {
                                         //println("IS");
                                         ((Person) (((List) ((AgentBasedModel) (modelRoot.getABM())).getAgents()).get(i))).status = statusEnum.INFECTED_SYM.ordinal();
@@ -1845,7 +2147,7 @@ public class Root extends Agent {
                                         }
                                     }
 
-                                    currentNumberOfInfectedInTract[j] = currentNumberOfInfectedInTract[j] + 1;
+                                    currentNumberOfInfectedInVD[j] = currentNumberOfInfectedInVD[j] + 1;
                                     sumAllInfections = sumAllInfections + 1;
                                     //println("did infecting");
                                 }
@@ -1854,9 +2156,9 @@ public class Root extends Agent {
                     }
                 }
             }
-            double sumCurrentNumberOfInfectedInTract = 0;
-            for (int j = 0; j < currentNumberOfInfectedInTract.length; j++) {
-                sumCurrentNumberOfInfectedInTract = sumCurrentNumberOfInfectedInTract + currentNumberOfInfectedInTract[j];
+            double sumCurrentNumberOfInfectedInVD = 0;
+            for (int j = 0; j < currentNumberOfInfectedInVD.length; j++) {
+                sumCurrentNumberOfInfectedInVD = sumCurrentNumberOfInfectedInVD + currentNumberOfInfectedInVD[j];
             }
 //            System.out.println(sumCurrentNumberOfInfectedInTract + " " + sumCurrentNumberOfInfectedInTract / ((Root) ((((AgentBasedModel) (modelRoot.getABM())).getRootAgent()))).residentPopulation);
 //            System.out.println("END INFECTION!");
@@ -1868,13 +2170,13 @@ public class Root extends Agent {
 
     void initialInfectPeopleCBGVDs(MainModel modelRoot, ArrayList cBGVDs) {
         //println("1");
-        ArrayList<DailyConfirmedCases> dailyConfirmedCases = ((CovidCsseJhu) (modelRoot.covidCsseJhu)).dailyConfirmedCasesList;
+
         //println("2");
         //println(dailyConfirmedCases);
-
         if (((AgentBasedModel) (modelRoot.getABM())).studyScopeGeography instanceof County) {
             System.out.println("Infection for County level not implemented yet!");
         } else if (((AgentBasedModel) (modelRoot.getABM())).studyScopeGeography instanceof State) {
+            ArrayList<DailyConfirmedCases> dailyConfirmedCases = ((CovidCsseJhu) (modelRoot.covidCsseJhu)).dailyConfirmedCasesList;
             System.out.println("Infection for State level not implemented yet!");
         } else if (((AgentBasedModel) (modelRoot.getABM())).studyScopeGeography instanceof Country) {
             System.out.println("Infection for country level not implemented yet!");
@@ -1883,19 +2185,18 @@ public class Root extends Agent {
             //ArrayList<Double> percentageSickInCounties=new ArrayList();
             double[] percentageSickInCBGVDs = new double[scope.cBGVDCells.size()];
             for (int i = 0; i < percentageSickInCBGVDs.length; i++) {
-                int startingDateIndex = -1;
-                for (int d = 0; d < dailyConfirmedCases.size(); d++) {
-                    if (((String) (((State) (((County) (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getCounty())).getState())).getName())).equals(scope.censusTracts.get(0).state.name)) {
-                        if (((County) (((CensusTract) (((ArrayList<CensusTract>) (scope.getCensusTracts())).get(i))).getCounty())).getId() == ((County) (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getCounty())).getId()) {
+                for (int d = 0; d < relevantDailyConfirmedCases.size(); d++) {
+                    if (((String) (((State) (((County) (((DailyConfirmedCases) (relevantDailyConfirmedCases.get(d))).getCounty())).getState())).getName())).equals(scope.censusTracts.get(0).state.name)) {
+                        if (((County) (((CensusTract) (((ArrayList<CensusTract>) (scope.getCensusTracts())).get(i))).getCounty())).getId() == ((County) (((DailyConfirmedCases) (relevantDailyConfirmedCases.get(d))).getCounty())).getId()) {
                             //if(((ZonedDateTime)(((AgentBasedModel)(modelRoot.getABM())).getCurrentTime()))==null){
                             //	println("777");
                             //}
                             //if(((ZonedDateTime)(((DailyConfirmedCases)(dailyConfirmedCases.get(d))).getDate()))==null){
                             //	println("888");
                             //}
-                            if (((ZonedDateTime) (((AgentBasedModel) (modelRoot.getABM())).getCurrentTime())).equals(((ZonedDateTime) (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getDate()))) == true) {
+                            if (((ZonedDateTime) (((AgentBasedModel) (modelRoot.getABM())).getCurrentTime())).equals(((ZonedDateTime) (((DailyConfirmedCases) (relevantDailyConfirmedCases.get(d))).getDate()))) == true) {
                                 //percentageSickInCounties[i]=((DailyConfirmedCases)(dailyConfirmedCases.get(d))).getNumActiveCases()/((County)(((CensusTract)(((ArrayList<CensusTract>)(scope.getCensusTracts())).get(i))).getCounty())).getPopulation();
-                                percentageSickInCBGVDs[i] = (((float) (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getNumActiveCases())) * ((float) (((scope.vDCells.get(i)).getPopulation())) / (float) (((County) (((CensusTract) (((ArrayList<CensusTract>) (scope.getCensusTracts())).get(i))).getCounty())).getPopulation()))) / ((float) (((scope.vDCells.get(i)).getPopulation())));
+                                percentageSickInCBGVDs[i] = (((float) (((DailyConfirmedCases) (relevantDailyConfirmedCases.get(d))).getNumActiveCases() * 100)) * ((float) (((scope.vDCells.get(i)).getPopulation())) / (float) (((County) (((CensusTract) (((ArrayList<CensusTract>) (scope.getCensusTracts())).get(i))).getCounty())).getPopulation()))) / ((float) (((scope.vDCells.get(i)).getPopulation())));
 //                                System.out.println(i);
                             }
                         }
@@ -1928,17 +2229,17 @@ public class Root extends Agent {
             int start = currentAgent.startCountyIndex;
             int end = currentAgent.endCountyIndex;
             for (int j = 0; j < ((ArrayList<CensusTract>) (scope.getCensusTracts())).size(); j++) {
-                for (int d = start; d <= end; d++) {
-                    if (((String) (((State) (((County) (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getCounty())).getState())).getName())).equals(((State) (((CensusTract) (((ArrayList<CensusTract>) (scope.getCensusTracts())).get(j))).getState())).getName())) {
-                        if (((County) (((CensusTract) (((ArrayList<CensusTract>) (scope.getCensusTracts())).get(j))).getCounty())).getId() == ((County) (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getCounty())).getId()) {
-                            if (((ZonedDateTime) (((ZonedDateTime) (((AgentBasedModel) (modelRoot.getABM())).getCurrentTime())).truncatedTo(ChronoUnit.DAYS))).equals(((ZonedDateTime) (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getDate()))) == true) {
+                for (int d = 0; d < relevantDailyConfirmedCases.size(); d++) {
+                    if (((String) (((State) (((County) (((DailyConfirmedCases) (relevantDailyConfirmedCases.get(d))).getCounty())).getState())).getName())).equals(((State) (((CensusTract) (((ArrayList<CensusTract>) (scope.getCensusTracts())).get(j))).getState())).getName())) {
+                        if (((County) (((CensusTract) (((ArrayList<CensusTract>) (scope.getCensusTracts())).get(j))).getCounty())).getId() == ((County) (((DailyConfirmedCases) (relevantDailyConfirmedCases.get(d))).getCounty())).getId()) {
+                            if (((ZonedDateTime) (((ZonedDateTime) (((AgentBasedModel) (modelRoot.getABM())).getCurrentTime())).truncatedTo(ChronoUnit.DAYS))).equals(((ZonedDateTime) (((DailyConfirmedCases) (relevantDailyConfirmedCases.get(d))).getDate()))) == true) {
                                 //println("daily county cases: "+(int)(((DailyConfirmedCases)(dailyConfirmedCases.get(d))).getNumActiveCases()));
                                 //println("county population: "+(float)(((County)(((CensusTract)(((ArrayList<CensusTract>)(scope.getCensusTracts())).get(j))).getCounty())).getPopulation()));
                                 //println("census tract population: "+(float)(((CensusTract)(((ArrayList<CensusTract>)(scope.getCensusTracts())).get(j))).getPopulation()));
                                 //println("numActiveInfected: "+numActiveInfected);
                                 //println("fraction: "+((float)(((County)(((CensusTract)(((ArrayList<CensusTract>)(scope.getCensusTracts())).get(j))).getCounty())).getPopulation())/(float)(((CensusTract)(((ArrayList<CensusTract>)(scope.getCensusTracts())).get(j))).getPopulation())));
                                 //println("add: "+(int)(((DailyConfirmedCases)(dailyConfirmedCases.get(d))).getNumActiveCases()*((float)(((County)(((CensusTract)(((ArrayList<CensusTract>)(scope.getCensusTracts())).get(j))).getCounty())).getPopulation())/(float)(((CensusTract)(((ArrayList<CensusTract>)(scope.getCensusTracts())).get(j))).getPopulation()))));
-                                numActiveInfected = numActiveInfected + (int) ((((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getNumActiveCases()) * ((float) (((CensusTract) (((ArrayList<CensusTract>) (scope.getCensusTracts())).get(j))).getPopulation()) / (float) (((County) (((CensusTract) (((ArrayList<CensusTract>) (scope.getCensusTracts())).get(j))).getCounty())).getPopulation())));
+                                numActiveInfected = numActiveInfected + (int) ((((DailyConfirmedCases) (relevantDailyConfirmedCases.get(d))).getNumActiveCases() * 100) * ((float) (((CensusTract) (((ArrayList<CensusTract>) (scope.getCensusTracts())).get(j))).getPopulation()) / (float) (((County) (((CensusTract) (((ArrayList<CensusTract>) (scope.getCensusTracts())).get(j))).getCounty())).getPopulation())));
 //                                System.out.println(numActiveInfected);
                             }
                         }
@@ -1953,7 +2254,7 @@ public class Root extends Agent {
                         for (int j = 0; j < scope.cBGVDCells.size(); j++) {
                             if ((((Person) (((List) ((AgentBasedModel) (modelRoot.getABM())).getAgents()).get(i))).homeCBGVD).shopPlacesKeys.get(0).equals(scope.cBGVDCells.get(j).shopPlacesKeys.get(0))) {
                                 //println("before infecting");
-                                if (((double) currentNumberOfInfectedInCBGVD[j] / (double) generatedPopulationInCBGVDs[j]) <= percentageSickInCBGVDs[j] && ((double) sumAllInfections / (double) ((Root) (modelRoot.getABM().rootAgent)).residentPopulation) <= ((double) numActiveInfected / (double) scopePopulation)) {
+                                if (((double) currentNumberOfInfectedInCBGVD[j] / (double) generatedPopulationInCBGVDs[j]) / 3.2d <= percentageSickInCBGVDs[j] && ((double) sumAllInfections / (double) ((Root) (modelRoot.getABM().rootAgent)).residentPopulation) / 50d <= ((double) numActiveInfected / (double) scopePopulation)) {
                                     if (Math.random() < 0.7) {
                                         //println("IS");
                                         ((Person) (((List) ((AgentBasedModel) (modelRoot.getABM())).getAgents()).get(i))).status = statusEnum.INFECTED_SYM.ordinal();
@@ -2138,6 +2439,162 @@ public class ParallelStateReporter extends ParallelProcessor {
 //@CompileStatic
     void writeMinuteRecord(MainModel modelRoot, Root currentAgent, ZonedDateTime currentDate) {
         if (currentDate.getHour() == 0 && currentDate.getMinute() == 1) {
+            if (modelRoot.ABM.studyScope.equals("USA_NY_Richmond County_New York")) {
+
+                ArrayList<County> counties = new ArrayList();
+                for (int i = 0; i < ((City) modelRoot.ABM.studyScopeGeography).censusTracts.size(); i++) {
+                    boolean isCountyFound = false;
+                    for (int j = 0; j < counties.size(); j++) {
+                        if (counties.get(j).id == ((City) modelRoot.ABM.studyScopeGeography).censusTracts.get(i).county.id) {
+                            isCountyFound = true;
+                            break;
+                        }
+                    }
+                    if (isCountyFound == false) {
+                        counties.add(((City) modelRoot.ABM.studyScopeGeography).censusTracts.get(i).county);
+                    }
+                }
+                int numCounties = counties.size();
+
+                CopyOnWriteArrayList<Agent> agents = ((AgentBasedModel) (modelRoot.getABM())).getAgents();
+                int numAgents = agents.size();
+                int statusSusceptible[] = new int[numCounties];
+                int statusExposed[] = new int[numCounties];
+                int statusInfected_sym[] = new int[numCounties];
+                int statusInfected_asym[] = new int[numCounties];
+                int statusRecovered[] = new int[numCounties];
+                int statusDead[] = new int[numCounties];
+                int statusUnknown[] = new int[numCounties];
+                for (int i = 0; i < numAgents; i++) {
+                    if (modelRoot.getABM().agents.get(i).myType.equals("Person")) {
+                        int status = (int) (((Person) (agents.get(i))).status);
+                        int countyIndex = -1;
+                        if (modelRoot.scenario.equals("CBG")) {
+                            for (int k = 0; k < counties.size(); k++) {
+                                if (((Person) (modelRoot.getABM().agents.get(i))).homeCBG.county.id == counties.get(k).id) {
+                                    countyIndex = k;
+                                    break;
+                                }
+                            }
+                        } else if (modelRoot.scenario.equals("VD")) {
+                            for (int k = 0; k < counties.size(); k++) {
+                                if (((Person) (modelRoot.getABM().agents.get(i))).homeCBG.county.id == counties.get(k).id) {
+                                    countyIndex = k;
+                                    break;
+                                }
+                            }
+                        } else if (modelRoot.scenario.equals("CBGVD")) {
+                            for (int k = 0; k < counties.size(); k++) {
+                                if (((Person) (modelRoot.getABM().agents.get(i))).homeCBG.county.id == counties.get(k).id) {
+                                    countyIndex = k;
+                                    break;
+                                }
+                            }
+                        }
+                        if (countyIndex == -1) {
+                            //System.out.println("COUNTY NOT FOUND!!!");
+                            continue;
+                        }
+                        if (status == 0) {
+                            statusSusceptible[countyIndex] = statusSusceptible[countyIndex] + 1;
+                        } else if (status == 1) {
+                            statusExposed[countyIndex] = statusExposed[countyIndex] + 1;
+                        } else if (status == 2) {
+                            statusInfected_sym[countyIndex] = statusInfected_sym[countyIndex] + 1;
+                        } else if (status == 3) {
+                            statusInfected_asym[countyIndex] = statusInfected_asym[countyIndex] + 1;
+                        } else if (status == 4) {
+                            statusRecovered[countyIndex] = statusRecovered[countyIndex] + 1;
+                        } else if (status == 5) {
+                            statusDead[countyIndex] = statusDead[countyIndex] + 1;
+                        } else if (status == -1) {
+                            statusUnknown[countyIndex] = statusUnknown[countyIndex] + 1;
+                        }
+                    }
+                }
+                if (((AgentBasedModel) (modelRoot.getABM())).studyScopeGeography instanceof County) {
+                    System.out.println("Infection for County level not implemented for NEWYORK!");
+                } else if (((AgentBasedModel) (modelRoot.getABM())).studyScopeGeography instanceof State) {
+                    System.out.println("Infection for State level not implemented for NEWYORK!");
+                } else if (((AgentBasedModel) (modelRoot.getABM())).studyScopeGeography instanceof Country) {
+                    System.out.println("Infection for County level not implemented for NEWYORK!");
+                } else if (((AgentBasedModel) (modelRoot.getABM())).studyScopeGeography instanceof City) {
+                    ArrayList<DailyConfirmedCases> dailyConfirmedCases = ((CovidCsseJhu) (modelRoot.covidCsseJhu)).dailyConfirmedCasesList;
+                    int realInfection[] = new int[numCounties];
+                    int numActiveInfected[] = new int[numCounties];
+                    int scopePopulation[] = new int[numCounties];
+                    City scope = (City) (((AgentBasedModel) (modelRoot.getABM())).studyScopeGeography);
+                    for (int n = 0; n < numCounties; n++) {
+                        scopePopulation[n] = counties.get(n).population;
+                    }
+
+                    int start = currentAgent.startCountyIndex;
+                    int end = currentAgent.endCountyIndex;
+
+                    for (int j = 0; j < counties.size(); j++) {
+                        for (int d = 0; d < dailyConfirmedCases.size(); d++) {
+                            if (((String) (((State) (((County) (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getCounty())).getState())).getName())).equals(counties.get(j).state.name)) {
+                                if (counties.get(j).id == ((County) (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getCounty())).getId()) {
+                                    if (((ZonedDateTime) (((ZonedDateTime) (((AgentBasedModel) (modelRoot.getABM())).getCurrentTime())).truncatedTo(ChronoUnit.DAYS))).equals(((ZonedDateTime) (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getDate()))) == true) {
+                                        //println("daily county cases: "+(int)(((DailyConfirmedCases)(dailyConfirmedCases.get(d))).getNumActiveCases()));
+                                        //println("county population: "+(float)(((County)(((CensusTract)(((ArrayList<CensusTract>)(scope.getCensusTracts())).get(j))).getCounty())).getPopulation()));
+                                        //println("census tract population: "+(float)(((CensusTract)(((ArrayList<CensusTract>)(scope.getCensusTracts())).get(j))).getPopulation()));
+                                        //println("numActiveInfected: "+numActiveInfected);
+                                        //println("fraction: "+((float)(((County)(((CensusTract)(((ArrayList<CensusTract>)(scope.getCensusTracts())).get(j))).getCounty())).getPopulation())/(float)(((CensusTract)(((ArrayList<CensusTract>)(scope.getCensusTracts())).get(j))).getPopulation())));
+                                        //println("add: "+(int)(((DailyConfirmedCases)(dailyConfirmedCases.get(d))).getNumActiveCases()*((float)(((County)(((CensusTract)(((ArrayList<CensusTract>)(scope.getCensusTracts())).get(j))).getCounty())).getPopulation())/(float)(((CensusTract)(((ArrayList<CensusTract>)(scope.getCensusTracts())).get(j))).getPopulation()))));
+                                        numActiveInfected[j] = (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getNumActiveCases() * 100);
+                                        //System.out.println(numActiveInfected);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    try {
+                        StringBuilder data = new StringBuilder();
+
+                        data.append(currentDate.toString());
+
+                        for (int n = 0; n < numCounties; n++) {
+                            data.append(",");
+                            data.append(statusSusceptible[n]);
+                            data.append(",");
+                            data.append(statusExposed[n]);
+                            data.append(",");
+                            data.append(statusInfected_sym[n]);
+                            data.append(",");
+                            data.append(statusInfected_asym[n]);
+                            data.append(",");
+                            data.append(statusRecovered[n]);
+                            data.append(",");
+                            data.append(statusDead[n]);
+                            data.append(",");
+                            data.append(statusUnknown[n]);
+                            data.append(",");
+                            int residentPop = (int) (((Root) ((((AgentBasedModel) (modelRoot.getABM())).getRootAgent()))).residentPopulation);
+                            data.append((float) (statusInfected_sym[n] + statusInfected_asym[n]) / (float) (residentPop));
+                            data.append(",");
+                            data.append(numActiveInfected[n]);
+                            data.append(",");
+                            data.append((float) (numActiveInfected[n]) / (float) (scopePopulation[n]));
+                        }
+                        data.append("\n");
+                        File f1 = new File("./output_NEWYORK_EXCEPTION_" + modelRoot.ABM.studyScope + "_" + modelRoot.scenario + "_" + modelRoot.ABM.startTime.getYear() + "_" + modelRoot.ABM.startTime.getMonth() + ".csv");
+                        if (!f1.exists()) {
+                            f1.createNewFile();
+                        }
+
+                        FileWriter fileWritter = new FileWriter(f1.getName(), true);
+                        BufferedWriter bw = new BufferedWriter(fileWritter);
+                        bw.write(data.toString());
+                        bw.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
+            }
             try {
                 CopyOnWriteArrayList<Agent> agents = ((AgentBasedModel) (modelRoot.getABM())).getAgents();
                 StringBuilder data = new StringBuilder();
@@ -2225,10 +2682,10 @@ public class ParallelStateReporter extends ParallelProcessor {
 				}
 			}
                  */
-                ArrayList<DailyConfirmedCases> dailyConfirmedCases = ((CovidCsseJhu) (modelRoot.covidCsseJhu)).dailyConfirmedCasesList;
                 if (((AgentBasedModel) (modelRoot.getABM())).studyScopeGeography instanceof County) {
 
                 } else if (((AgentBasedModel) (modelRoot.getABM())).studyScopeGeography instanceof State) {
+                    ArrayList<DailyConfirmedCases> dailyConfirmedCases = ((CovidCsseJhu) (modelRoot.covidCsseJhu)).dailyConfirmedCasesList;
                     State scope = (State) (((AgentBasedModel) (modelRoot.getABM())).studyScopeGeography);
                     scopePopulation = scope.getPopulation();
                     for (int j = 0; j < ((ArrayList<County>) (scope.getCounties())).size(); j++) {
@@ -2236,7 +2693,7 @@ public class ParallelStateReporter extends ParallelProcessor {
                             if (((String) (((State) (((County) (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getCounty())).getState())).getName())).equals(scope.getName())) {
                                 if (((County) (((ArrayList<County>) (scope.getCounties())).get(j))).getId() == ((County) (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getCounty())).getId()) {
                                     if (((ZonedDateTime) (((ZonedDateTime) (((AgentBasedModel) (modelRoot.getABM())).getCurrentTime())).truncatedTo(ChronoUnit.DAYS))).equals(((ZonedDateTime) (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getDate()))) == true) {
-                                        numActiveInfected = numActiveInfected + ((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getNumActiveCases();
+                                        numActiveInfected = numActiveInfected + ((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getNumActiveCases() * 100;
                                         //println(d);
                                     }
                                 }
@@ -2251,17 +2708,17 @@ public class ParallelStateReporter extends ParallelProcessor {
                     int start = currentAgent.startCountyIndex;
                     int end = currentAgent.endCountyIndex;
                     for (int j = 0; j < ((ArrayList<CensusTract>) (scope.getCensusTracts())).size(); j++) {
-                        for (int d = start; d <= end; d++) {
-                            if (((String) (((State) (((County) (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getCounty())).getState())).getName())).equals(((State) (((CensusTract) (((ArrayList<CensusTract>) (scope.getCensusTracts())).get(0))).getState())).getName())) {
-                                if (((County) (((CensusTract) (((ArrayList<CensusTract>) (scope.getCensusTracts())).get(j))).getCounty())).getId() == ((County) (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getCounty())).getId()) {
-                                    if (((ZonedDateTime) (((ZonedDateTime) (((AgentBasedModel) (modelRoot.getABM())).getCurrentTime())).truncatedTo(ChronoUnit.DAYS))).equals(((ZonedDateTime) (((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getDate()))) == true) {
+                        for (int d = 0; d < relevantDailyConfirmedCases.size(); d++) {
+                            if (((String) (((State) (((County) (((DailyConfirmedCases) (relevantDailyConfirmedCases.get(d))).getCounty())).getState())).getName())).equals(((State) (((CensusTract) (((ArrayList<CensusTract>) (scope.getCensusTracts())).get(0))).getState())).getName())) {
+                                if (((County) (((CensusTract) (((ArrayList<CensusTract>) (scope.getCensusTracts())).get(j))).getCounty())).getId() == ((County) (((DailyConfirmedCases) (relevantDailyConfirmedCases.get(d))).getCounty())).getId()) {
+                                    if (((ZonedDateTime) (((ZonedDateTime) (((AgentBasedModel) (modelRoot.getABM())).getCurrentTime())).truncatedTo(ChronoUnit.DAYS))).equals(((ZonedDateTime) (((DailyConfirmedCases) (relevantDailyConfirmedCases.get(d))).getDate()))) == true) {
                                         //println("daily county cases: "+(int)(((DailyConfirmedCases)(dailyConfirmedCases.get(d))).getNumActiveCases()));
                                         //println("county population: "+(float)(((County)(((CensusTract)(((ArrayList<CensusTract>)(scope.getCensusTracts())).get(j))).getCounty())).getPopulation()));
                                         //println("census tract population: "+(float)(((CensusTract)(((ArrayList<CensusTract>)(scope.getCensusTracts())).get(j))).getPopulation()));
                                         //println("numActiveInfected: "+numActiveInfected);
                                         //println("fraction: "+((float)(((County)(((CensusTract)(((ArrayList<CensusTract>)(scope.getCensusTracts())).get(j))).getCounty())).getPopulation())/(float)(((CensusTract)(((ArrayList<CensusTract>)(scope.getCensusTracts())).get(j))).getPopulation())));
                                         //println("add: "+(int)(((DailyConfirmedCases)(dailyConfirmedCases.get(d))).getNumActiveCases()*((float)(((County)(((CensusTract)(((ArrayList<CensusTract>)(scope.getCensusTracts())).get(j))).getCounty())).getPopulation())/(float)(((CensusTract)(((ArrayList<CensusTract>)(scope.getCensusTracts())).get(j))).getPopulation()))));
-                                        numActiveInfected = numActiveInfected + (int) ((((DailyConfirmedCases) (dailyConfirmedCases.get(d))).getNumActiveCases()) * ((float) (((CensusTract) (((ArrayList<CensusTract>) (scope.getCensusTracts())).get(j))).getPopulation()) / (float) (((County) (((CensusTract) (((ArrayList<CensusTract>) (scope.getCensusTracts())).get(j))).getCounty())).getPopulation())));
+                                        numActiveInfected = numActiveInfected + (int) ((((DailyConfirmedCases) (relevantDailyConfirmedCases.get(d))).getNumActiveCases() * 100) * ((float) (((CensusTract) (((ArrayList<CensusTract>) (scope.getCensusTracts())).get(j))).getPopulation()) / (float) (((County) (((CensusTract) (((ArrayList<CensusTract>) (scope.getCensusTracts())).get(j))).getCounty())).getPopulation())));
                                         //System.out.println(numActiveInfected);
                                     }
                                 }
@@ -2297,7 +2754,7 @@ public class ParallelStateReporter extends ParallelProcessor {
                 data.append(",");
                 data.append((float) (numActiveInfected) / (float) (scopePopulation));
                 data.append("\n");
-                File f1 = new File("./output.csv");
+                File f1 = new File("./output_" + modelRoot.ABM.studyScope + "_" + modelRoot.scenario + "_" + modelRoot.ABM.startTime.getYear() + "_" + modelRoot.ABM.startTime.getMonth() + ".csv");
                 if (!f1.exists()) {
                     f1.createNewFile();
                 }
@@ -2315,7 +2772,7 @@ public class ParallelStateReporter extends ParallelProcessor {
 
                 CopyOnWriteArrayList<Agent> agents = ((AgentBasedModel) (modelRoot.getABM())).getAgents();
                 for (int i = 0; i < agents.size(); i++) {
-                    if (modelRoot.getABM().agents.get(i).myType.equals("CBG")) {
+                    if (modelRoot.getABM().agents.get(i).myType.equals("CBG") || modelRoot.getABM().agents.get(i).myType.equals("VD") || modelRoot.getABM().agents.get(i).myType.equals("CBGVD")) {
                         if (modelRoot.scenario.equals("CBG")) {
                             ((CBG) (agents.get(i))).N = 0;
                             ((CBG) (agents.get(i))).S = 0;

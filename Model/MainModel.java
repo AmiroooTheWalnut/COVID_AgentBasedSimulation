@@ -259,11 +259,13 @@ public class MainModel extends Dataset {
         ABM.rootAgent = ABM.makeRootAgentHardCoded();
 
         if (scenario.equals("CBG")) {
-            ((Root) (ABM.rootAgent)).constructor(this);
+            ((Root) (ABM.rootAgent)).constructorCBG(this);
         } else if (scenario.equals("VD")) {
             ((Root) (ABM.rootAgent)).constructorVD(this);
         } else if (scenario.equals("CBGVD")) {
             ((Root) (ABM.rootAgent)).constructorCBGVD(this);
+        } else if (scenario.equals("ABSVD")) {
+            ((Root) (ABM.rootAgent)).constructorABSVD(this);
         }
 
         resetTimerTask(isParallelBehaviorEvaluation, numCPUs, true);

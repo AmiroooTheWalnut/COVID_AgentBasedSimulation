@@ -622,6 +622,7 @@ public class SimulatorSettingsDialog extends javax.swing.JDialog {
             if (jFormattedTextField1.getText().length() > 0) {
                 ZonedDateTime zonedDateTime = ZonedDateTime.parse(jFormattedTextField1.getText() + "+00:00");
                 myMainModel.ABM.startTime = zonedDateTime;
+                myMainModel.ABM.startTimeString = zonedDateTime.toString() + "[UTC]";
             }
         }
     }//GEN-LAST:event_jFormattedTextField1PropertyChange
@@ -631,6 +632,7 @@ public class SimulatorSettingsDialog extends javax.swing.JDialog {
             if (jFormattedTextField2.getText().length() > 0) {
                 ZonedDateTime zonedDateTime = ZonedDateTime.parse(jFormattedTextField2.getText() + "+00:00");
                 myMainModel.ABM.endTime = zonedDateTime;
+                myMainModel.ABM.endTimeString = zonedDateTime.toString() + "[UTC]";
             }
         }
     }//GEN-LAST:event_jFormattedTextField2PropertyChange

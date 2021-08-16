@@ -130,6 +130,7 @@ public class SimulatorDialog extends javax.swing.JDialog {
         jRadioButton9 = new javax.swing.JRadioButton();
         jRadioButton10 = new javax.swing.JRadioButton();
         jRadioButton11 = new javax.swing.JRadioButton();
+        jRadioButton12 = new javax.swing.JRadioButton();
         jPanel8 = new javax.swing.JPanel();
         jToggleButton2 = new javax.swing.JToggleButton();
         jToggleButton3 = new javax.swing.JToggleButton();
@@ -359,6 +360,14 @@ public class SimulatorDialog extends javax.swing.JDialog {
             }
         });
 
+        buttonGroup2.add(jRadioButton12);
+        jRadioButton12.setText("VD only (no safegraph)");
+        jRadioButton12.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton12ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel21Layout = new javax.swing.GroupLayout(jPanel21);
         jPanel21.setLayout(jPanel21Layout);
         jPanel21Layout.setHorizontalGroup(
@@ -366,6 +375,7 @@ public class SimulatorDialog extends javax.swing.JDialog {
             .addGroup(jPanel21Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel21Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jRadioButton12)
                     .addComponent(jRadioButton11)
                     .addComponent(jRadioButton10)
                     .addComponent(jRadioButton9)
@@ -381,12 +391,14 @@ public class SimulatorDialog extends javax.swing.JDialog {
             .addGroup(jPanel21Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jButton3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jRadioButton9)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jRadioButton10)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jRadioButton11)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jRadioButton12)
                 .addGap(18, 18, 18)
                 .addGroup(jPanel21Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jToggleButton4)
@@ -1390,6 +1402,10 @@ public class SimulatorDialog extends javax.swing.JDialog {
         myParent.mainModel.scenario="CBGVD";
     }//GEN-LAST:event_jRadioButton11ActionPerformed
 
+    private void jRadioButton12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton12ActionPerformed
+        myParent.mainModel.scenario="ABSVD";
+    }//GEN-LAST:event_jRadioButton12ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
@@ -1433,6 +1449,7 @@ public class SimulatorDialog extends javax.swing.JDialog {
     private javax.swing.JRadioButton jRadioButton1;
     private javax.swing.JRadioButton jRadioButton10;
     private javax.swing.JRadioButton jRadioButton11;
+    private javax.swing.JRadioButton jRadioButton12;
     private javax.swing.JRadioButton jRadioButton2;
     private javax.swing.JRadioButton jRadioButton3;
     private javax.swing.JRadioButton jRadioButton4;

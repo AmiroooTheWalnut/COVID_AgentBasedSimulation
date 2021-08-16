@@ -86,8 +86,8 @@ public class AllGISData extends Dataset implements Serializable {
             return null;
         }
         byte stateID = (byte) getMidDigits(id, 11, 12);
-        int countyID = (int) getMidDigits(id, 8, 10);
-        int censusTractID = (int) getMidDigits(id, 2, 7);
+        int countyID = (int) getMidDigits(id, 8, 12);
+        long censusTractID = (long) getMidDigits(id, 2, 12);
 //        byte censusBlockGroupID=(byte)getMidDigits(id,1,1);
         for (int i = 0; i < countries.size(); i++) {
             State state = countries.get(i).findState(stateID);
@@ -108,9 +108,10 @@ public class AllGISData extends Dataset implements Serializable {
         System.out.println("READING STATES");
         File statesFile = new File(geographyDirectory + "/US_States.json");
         try (BufferedReader br = new BufferedReader(new FileReader(statesFile))) {
-            if (countries == null) {
-                countries = new ArrayList();
-            }
+//            if (countries == null) {
+//                countries = new ArrayList();
+//            }
+            countries = new ArrayList();
             Country us = findAndInsertCountry("USA");
             us.states = new ArrayList();
 
@@ -153,10 +154,13 @@ public class AllGISData extends Dataset implements Serializable {
                 if (line.contains("{ \"type\": \"Feature\", \"properties\":")) {
                     JSONObject root = new JSONObject(line);
                     JSONObject properties = root.getJSONObject("properties");
-                    byte stateId = Byte.parseByte(properties.getString("STATEFP"));
+                    String stateIdString=properties.getString("STATEFP");
+                    byte stateId = Byte.parseByte(stateIdString);
                     State state = countries.get(countries.size() - 1).findAndInsertState(stateId);
 
-                    int countyId = Integer.parseInt(properties.getString("COUNTYFP"));
+                    String countyIdString=properties.getString("COUNTYFP");
+                    String countyIdRevised=stateIdString+countyIdString;
+                    int countyId = Integer.parseInt(countyIdRevised);
                     County county = state.findAndInsertCounty(countyId);
                     if (!properties.isNull("NAMELSAD")) {
                         county.name = properties.getString("NAMELSAD");
@@ -189,14 +193,19 @@ public class AllGISData extends Dataset implements Serializable {
                 if (line.contains("{ \"type\": \"Feature\", \"properties\":")) {
                     JSONObject root = new JSONObject(line);
                     JSONObject properties = root.getJSONObject("properties");
+                    String stateIdString=properties.getString("STATEFP");
                     byte stateId = Byte.parseByte(properties.getString("STATEFP"));
                     State state = countries.get(countries.size() - 1).findAndInsertState(stateId);
 
-                    int countyId = Integer.parseInt(properties.getString("COUNTYFP"));
+                    String countyIdString=properties.getString("COUNTYFP");
+                    String countyIdRevised=stateIdString+countyIdString;
+                    int countyId=Integer.parseInt(countyIdRevised);
                     County county = state.findAndInsertCounty(countyId);
 
-                    int censusTractInt = properties.getInt("TRACTCE");
-                    CensusTract censusTract = county.findAndInsertCensusTract(censusTractInt);
+                    String censusTractIdString=properties.getString("TRACTCE");
+                    String censusTractIdRevised=stateIdString+countyIdString+censusTractIdString;
+                    long censusTractId=Long.parseLong(censusTractIdRevised);
+                    CensusTract censusTract = county.findAndInsertCensusTract(censusTractId);
                     censusTract.country = countries.get(countries.size() - 1);
                     censusTract.state = state;
                     censusTract.county = county;
@@ -207,8 +216,8 @@ public class AllGISData extends Dataset implements Serializable {
                     censusBlock.county = county;
                     censusBlock.censusTract = censusTract;
 
-                    censusBlock.lon = Float.valueOf(properties.getString("INTPTLAT"));
-                    censusBlock.lat = Float.valueOf(properties.getString("INTPTLON"));
+                    censusBlock.lon = Float.parseFloat(properties.getString("INTPTLAT"));
+                    censusBlock.lat = Float.parseFloat(properties.getString("INTPTLON"));
                     censusBlock.size = 0.008f;
                 }
                 deguggingCounter = deguggingCounter + 1;
@@ -240,8 +249,8 @@ public class AllGISData extends Dataset implements Serializable {
 //                    if(i==11){
 //                        System.out.println(i);
 //                    }
-                int censusTractID = Integer.parseInt(censusTractString.substring(censusTractString.length() - 6));
-                int countyID = Integer.parseInt(censusTractString.substring(censusTractString.length() - 9, censusTractString.length() - 6));
+                long censusTractID = Long.parseLong(censusTractString);
+                int countyID = Integer.parseInt(censusTractString.substring(0, censusTractString.length() - 6));
                 byte stateID = Byte.parseByte(censusTractString.substring(0, censusTractString.length() - 9));
                 State state = countries.get(countries.size() - 1).findState(stateID);
                 County county = state.findCounty(countyID);
@@ -277,8 +286,8 @@ public class AllGISData extends Dataset implements Serializable {
 
                 int censusBlockGroupID = Integer.parseInt(cBGString.substring(cBGString.length() - 1));
                 //int censusTractID = Integer.parseInt(censusTractString.substring(censusTractString.length() - 6));
-                int censusTractID = Integer.parseInt(cBGString.substring(cBGString.length() - 7, cBGString.length() - 1));
-                int countyID = Integer.parseInt(cBGString.substring(cBGString.length() - 10, cBGString.length() - 7));
+                long censusTractID = Long.parseLong(cBGString.substring(0, cBGString.length() - 1));
+                int countyID = Integer.parseInt(cBGString.substring(0, cBGString.length() - 7));
                 byte stateID = Byte.parseByte(cBGString.substring(0, cBGString.length() - 10));
                 State state = countries.get(countries.size() - 1).findState(stateID);
 //                if(state==null){

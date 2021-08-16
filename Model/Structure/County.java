@@ -138,7 +138,7 @@ public class County extends Marker implements Serializable, Comparable<County>{
         return null;
     }
 
-    public CensusTract findCensusTract(int input) {
+    public CensusTract findCensusTract(long input) {
         if (censusTracts == null) {
             censusTracts = new ArrayList();
             return null;
@@ -192,7 +192,7 @@ public class County extends Marker implements Serializable, Comparable<County>{
         return zipcodes.get(zipcodes.size() - 1);
     }
 
-    public CensusTract findAndInsertCensusTract(int input) {
+    public CensusTract findAndInsertCensusTract(long input) {
         if (censusTracts == null) {
             censusTracts = new ArrayList();
             CensusTract temp = new CensusTract();
