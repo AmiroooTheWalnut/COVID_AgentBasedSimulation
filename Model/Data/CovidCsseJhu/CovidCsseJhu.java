@@ -144,22 +144,27 @@ public class CovidCsseJhu extends Dataset implements Serializable {
 //                }
 //            }
 //            //ACTIVE CASES
-            //SUM ACTIVE CASES
-            for (int i = 0; i < dailyConfirmedCasesList.size(); i++) {
-                int sumInfected = 0;
-                for (int j = 0; j < 14; j++) {
-                    if (i - j > -1) {
-                        sumInfected = sumInfected + dailyConfirmedCasesList.get(i - j).numDailyCases;
-                    }
-                }
-                dailyConfirmedCasesList.get(i).numActiveCases = sumInfected;
-            }
-            //SUM ACTIVE CASES
-//            //TOTAL CASES
+//            //SUM ACTIVE CASES
 //            for (int i = 0; i < dailyConfirmedCasesList.size(); i++) {
-//                dailyConfirmedCasesList.get(i).numActiveCases=dailyConfirmedCasesList.get(i).numDailyCases;
+//                int sumInfected = 0;
+//                for (int j = 0; j < 14; j++) {
+//                    if (i - j > -1) {
+//                        sumInfected = sumInfected + dailyConfirmedCasesList.get(i - j).numDailyCases;
+//                    }
+//                }
+//                dailyConfirmedCasesList.get(i).numActiveCases = sumInfected;
 //            }
-//            //TOTAL CASES
+//            //SUM ACTIVE CASES
+            //TOTAL CASES
+            for (int i = 0; i < dailyConfirmedCasesList.size(); i++) {
+                if(dailyConfirmedCasesList.get(i).county.name.equals("King County")){
+                    System.out.println(dailyConfirmedCasesList.get(i).date.toString());
+                    System.out.println(dailyConfirmedCasesList.get(i).numDailyCases);
+                    System.out.println("!!!");
+                }
+                dailyConfirmedCasesList.get(i).numActiveCases=dailyConfirmedCasesList.get(i).numDailyCases;
+            }
+            //TOTAL CASES
             
             CovidCsseJhu.saveDailyConfirmedCasesListKryo("./datasets/ProcessedCasesData", this);
 

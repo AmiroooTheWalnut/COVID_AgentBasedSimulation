@@ -76,6 +76,8 @@ public class MainModel extends Dataset {
     public int newSimulationDelayTime = -2;
 
     public String scenario = "CBG";
+    
+    public double sparsifyFraction=1;
 
     private Thread thread;
 
@@ -259,7 +261,7 @@ public class MainModel extends Dataset {
         ABM.rootAgent = ABM.makeRootAgentHardCoded();
 
         if (scenario.equals("CBG")) {
-            ((Root) (ABM.rootAgent)).constructorCBG(this);
+            ((Root) (ABM.rootAgent)).constructorCBG(this, sparsifyFraction);
         } else if (scenario.equals("VD")) {
             ((Root) (ABM.rootAgent)).constructorVD(this);
         } else if (scenario.equals("CBGVD")) {

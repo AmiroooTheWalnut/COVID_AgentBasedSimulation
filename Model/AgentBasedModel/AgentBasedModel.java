@@ -48,6 +48,8 @@ public class AgentBasedModel {
 
     public String studyScope = "FullData";
     public transient Object studyScopeGeography;
+    
+    public boolean isReportContactRate=true;
 
     private transient MainModel myMainModel;
 

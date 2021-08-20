@@ -61,6 +61,11 @@ public class Person extends Agent {
     public int minutesTravelFromWorkFrom16;
     public boolean isDestinedToDeath;
     public boolean isPotentiallyWorkAtHome;
+    
+    public ArrayList<Integer> dailyContact;
+    public ArrayList<Double> dailyContactDistance;
+    public int minutesAtHome_Work;
+    public int minutesAtPOI;
 
     public boolean isGeometryBuildingUsed = false;
 
