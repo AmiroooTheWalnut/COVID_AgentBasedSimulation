@@ -23,11 +23,13 @@ import COVID_AgentBasedSimulation.Model.Structure.CensusTract;
 import COVID_AgentBasedSimulation.Model.Data.CovidCsseJhu.DailyConfirmedCases;
 import COVID_AgentBasedSimulation.Model.Structure.CBGVDCell;
 import COVID_AgentBasedSimulation.Model.Structure.VDCell;
+import de.siegmar.fastcsv.writer.CsvWriter;
 import esmaieeli.utilities.taskThreading.ParallelProcessor;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -48,6 +50,8 @@ public class Root extends Agent {
 
     Root currentAgent = this;
 
+    public ArrayList<Person> residents;
+
     public int residentPopulation;
     public int startCountyIndex;
     public int endCountyIndex;
@@ -55,12 +59,15 @@ public class Root extends Agent {
     ArrayList<DailyConfirmedCases> relevantDailyConfirmedCases;
 
     public int counter;
-    int numAgents = 10000;
+    int numAgents = 8000;
 
     public boolean isLocalAllowed = true;
 
+    public int agentPairContact[][];
+
     public Root(MainModel modelRoot) {
         myType = "root";
+        residents = new ArrayList();
     }
 
     public void constructorVD(MainModel modelRoot) {
@@ -486,20 +493,39 @@ public class Root extends Agent {
         writeMinuteRecord(modelRoot, currentAgent, modelRoot.getABM().getCurrentTime());
         writeDailyContactRate(modelRoot);
     }
-    
-    public void calcContactRate(MainModel modelRoot){
-        if(modelRoot.ABM.isReportContactRate==true){
-            for(int i=0;i<modelRoot.ABM.agents.size();i++){
-                if(modelRoot.ABM.agents.get(i).myType.equals("Person")){
-                    
+
+    public void calcContactRate(MainModel modelRoot) {
+        if (modelRoot.ABM.isReportContactRate == true) {
+            for (int i = 0; i < modelRoot.ABM.agents.size(); i++) {
+                if (modelRoot.ABM.agents.get(i).myType.equals("Person")) {
+
                 }
             }
         }
     }
-    
-    public void writeDailyContactRate(MainModel modelRoot){
-        if(modelRoot.ABM.isReportContactRate==true){
-            //for(int i=0;i<)
+
+    public void writeDailyContactRate(MainModel modelRoot) {
+        if (modelRoot.ABM.isReportContactRate == true) {
+            ZonedDateTime currentDate = modelRoot.getABM().getCurrentTime();
+            if (currentDate.getHour() == 0 && currentDate.getMinute() == 1) {
+                ArrayList<String[]> data = new ArrayList();
+                for (int i = 0; i < agentPairContact.length; i++) {
+                    String[] row = new String[agentPairContact[i].length];
+                    for (int j = 0; j < agentPairContact[i].length; j++) {
+                        row[j] = String.valueOf(agentPairContact[i][j]);
+//                        if (agentPairContact[i][j] != 0) {
+//                            System.out.println("!!!!!!!!!!!!!!!!!!!!");
+//                        }
+                    }
+                    data.add(row);
+                }
+                CsvWriter writer = new CsvWriter();
+                try {
+                    writer.write(new File(modelRoot.ABM.studyScope + "_agentPairContact.csv"), Charset.forName("US-ASCII"), data);
+                } catch (IOException ex) {
+                    Logger.getLogger(Root.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
         }
     }
 
@@ -1865,10 +1891,12 @@ public class Root extends Agent {
                     for (int j = 0; j < ((ArrayList<County>) (scope.getCounties())).size(); j++) {
                         if (((County) (((CensusBlockGroup) (((Person) (((List) ((AgentBasedModel) (modelRoot.getABM())).getAgents()).get(i))).homeCBG)).getCounty())).getId() == ((County) (((ArrayList<County>) (scope.getCounties())).get(j))).getId()) {
                             generatedPopulationInCounties[j] = generatedPopulationInCounties[j] + 1;
+                            residents.add((Person) (modelRoot.getABM().agents.get(i)));
                         }
                     }
                 }
             }
+            agentPairContact = new int[residents.size()][residents.size()];
             int sumResident = 0;
             for (int i = 0; i < generatedPopulationInCounties.length; i++) {
                 sumResident = sumResident + (int) generatedPopulationInCounties[i];
@@ -1947,10 +1975,12 @@ public class Root extends Agent {
                     for (int j = 0; j < ((ArrayList<CensusTract>) (scope.censusTracts)).size(); j++) {
                         if (((CensusTract) (((CensusBlockGroup) (((Person) (((List) ((AgentBasedModel) (modelRoot.ABM)).agents).get(i))).homeCBG)).censusTract)).getId() == ((CensusTract) (((ArrayList<CensusTract>) (scope.censusTracts)).get(j))).id) {
                             generatedPopulationInTracts[j] = generatedPopulationInTracts[j] + 1;
+                            residents.add((Person) (modelRoot.getABM().agents.get(i)));
                         }
                     }
                 }
             }
+            agentPairContact = new int[residents.size()][residents.size()];
             int sumResident = 0;
             for (int i = 0; i < generatedPopulationInTracts.length; i++) {
                 sumResident = sumResident + (int) generatedPopulationInTracts[i];
@@ -2096,10 +2126,12 @@ public class Root extends Agent {
                     for (int j = 0; j < scope.vDCells.size(); j++) {
                         if ((((Person) (((List) ((AgentBasedModel) (modelRoot.getABM())).getAgents()).get(i))).homeVD).shopPlacesKeys.get(0).equals(scope.vDCells.get(j).shopPlacesKeys.get(0))) {
                             generatedPopulationInVDs[j] = generatedPopulationInVDs[j] + 1;
+                            residents.add((Person) (modelRoot.getABM().agents.get(i)));
                         }
                     }
                 }
             }
+            agentPairContact = new int[residents.size()][residents.size()];
             int sumResident = 0;
             for (int i = 0; i < generatedPopulationInVDs.length; i++) {
                 sumResident = sumResident + (int) generatedPopulationInVDs[i];
@@ -2229,10 +2261,12 @@ public class Root extends Agent {
                     for (int j = 0; j < scope.cBGVDCells.size(); j++) {
                         if ((((Person) (((List) ((AgentBasedModel) (modelRoot.getABM())).getAgents()).get(i))).homeCBGVD).shopPlacesKeys.get(0).equals(scope.cBGVDCells.get(j).shopPlacesKeys.get(0))) {
                             generatedPopulationInCBGVDs[j] = generatedPopulationInCBGVDs[j] + 1;
+                            residents.add((Person) (modelRoot.getABM().agents.get(i)));
                         }
                     }
                 }
             }
+            agentPairContact = new int[residents.size()][residents.size()];
             int sumResident = 0;
             for (int i = 0; i < generatedPopulationInCBGVDs.length; i++) {
                 sumResident = sumResident + (int) generatedPopulationInCBGVDs[i];
@@ -2370,15 +2404,15 @@ public class Root extends Agent {
                         statusExposed = statusExposed + 1;
                     } else if (status == 2) {
                         if (((Person) (modelRoot.getABM().agents.get(i))).homeCBG != null) {
-                            if (isInScope(modelRoot, ((Person) (modelRoot.getABM().agents.get(i))))==true) {
-                                statusInfected_sym=statusInfected_sym+1;
+                            if (isInScope(modelRoot, ((Person) (modelRoot.getABM().agents.get(i)))) == true) {
+                                statusInfected_sym = statusInfected_sym + 1;
                             }
                         }
                         statusInfected_sym = statusInfected_sym + 1;
                     } else if (status == 3) {
                         if (((Person) (modelRoot.getABM().agents.get(i))).homeCBG != null) {
-                            if (isInScope(modelRoot, ((Person) (modelRoot.getABM().agents.get(i))))==true) {
-                                statusInfected_asym=statusInfected_asym+1;
+                            if (isInScope(modelRoot, ((Person) (modelRoot.getABM().agents.get(i)))) == true) {
+                                statusInfected_asym = statusInfected_asym + 1;
                             }
                         }
                         statusInfected_asym = statusInfected_asym + 1;
@@ -3075,7 +3109,7 @@ public class ParallelStateReporter extends ParallelProcessor {
             City scope = (City) ((modelRoot.ABM).studyScopeGeography);
             for (int i = 0; i < scope.censusTracts.size(); i++) {
                 for (int j = 0; j < scope.censusTracts.get(i).censusBlocks.size(); j++) {
-                    if(person.homeCBG.id==scope.censusTracts.get(i).censusBlocks.get(j).id){
+                    if (person.homeCBG.id == scope.censusTracts.get(i).censusBlocks.get(j).id) {
                         return true;
                     }
                 }

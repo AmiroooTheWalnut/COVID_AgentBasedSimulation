@@ -78,6 +78,8 @@ public class MainModel extends Dataset {
     public String scenario = "CBG";
     
     public double sparsifyFraction=1;
+    public int lastMonthLoaded;//NOT USED
+    public int lastYearLoaded;//NOT USED
 
     private Thread thread;
 

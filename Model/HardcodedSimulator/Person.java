@@ -61,7 +61,7 @@ public class Person extends Agent {
     public int minutesTravelFromWorkFrom16;
     public boolean isDestinedToDeath;
     public boolean isPotentiallyWorkAtHome;
-    
+
     public ArrayList<Integer> dailyContact;
     public ArrayList<Double> dailyContactDistance;
     public int minutesAtHome_Work;
@@ -249,6 +249,9 @@ public class Person extends Agent {
                 //currentAgent.setPropertyValue("lon",currentLocation.getLon());
             }
         } else {
+
+            pollContact(rootModel);
+
             //println("%%%");
             //UNIFORMLY RETURN BASED ON DWELL DURATION DETERMINED AT THE BEGINING OF THE TRAVEL	
             DwellTime dwellTime = (DwellTime) (currentAgent.dwellTime);
@@ -662,7 +665,7 @@ public class Person extends Agent {
                 int destination = -1;
                 ArrayList destFreqs = (ArrayList) (currentAgent.destinationPlacesFreq);
                 for (int i = 0; i < destFreqs.size(); i++) {
-                    destinationCumulative = destinationCumulative + ((Integer)(destFreqs.get(i)));
+                    destinationCumulative = destinationCumulative + ((Integer) (destFreqs.get(i)));
                     //println("dest loop: "+destinationCumulative);
                     //println("destinationCumulativeThresh: "+(destinationCumulativeThresh-1));
                     if (destinationCumulative >= (destinationCumulativeThresh - 1)) {
@@ -785,6 +788,9 @@ public class Person extends Agent {
                 //currentAgent.setPropertyValue("lon",currentLocation.getLon());
             }
         } else {
+
+            pollContact(rootModel);
+
             //println("%%%");
             //UNIFORMLY RETURN BASED ON DWELL DURATION DETERMINED AT THE BEGINING OF THE TRAVEL	
             DwellTime dwellTime = (DwellTime) (currentAgent.dwellTime);
@@ -1321,6 +1327,9 @@ public class Person extends Agent {
                 //currentAgent.setPropertyValue("lon",currentLocation.getLon());
             }
         } else {
+
+            pollContact(rootModel);
+
             //println("%%%");
             //UNIFORMLY RETURN BASED ON DWELL DURATION DETERMINED AT THE BEGINING OF THE TRAVEL	
             DwellTime dwellTime = (DwellTime) (currentAgent.dwellTime);
@@ -1700,6 +1709,30 @@ public class Person extends Agent {
                 }
             }
         }
+    }
+
+    private void pollContact(MainModel rootModel) {
+        //\/\/\/ POLL WHICH AGENTS HAVE CONTACT EACH MINUTE
+        int thisPersonIndex = -1;
+        for (int m = 0; m < ((Root) rootModel.ABM.rootAgent).residents.size(); m++) {
+            if (myIndex == ((Root) rootModel.ABM.rootAgent).residents.get(m).myIndex) {
+                thisPersonIndex = m;
+                break;
+            }
+        }
+        if (thisPersonIndex != -1) {
+            for (int m = 0; m < ((Root) rootModel.ABM.rootAgent).residents.size(); m++) {
+                if (myIndex != ((Root) rootModel.ABM.rootAgent).residents.get(m).myIndex) {
+                    //System.out.println();
+                    if (((Root) rootModel.ABM.rootAgent).residents.get(m).dstIndex > -1) {
+                        if (currentSafegraphPlace.placeKey.equals(((Root) rootModel.ABM.rootAgent).residents.get(m).currentSafegraphPlace.placeKey)) {
+                            ((Root) rootModel.ABM.rootAgent).agentPairContact[thisPersonIndex][m] = ((Root) rootModel.ABM.rootAgent).agentPairContact[thisPersonIndex][m] + 1;
+                        }
+                    }
+                }
+            }
+        }
+        //^^^ POLL WHICH AGENTS HAVE CONTACT EACH MINUTE
     }
 
 }
