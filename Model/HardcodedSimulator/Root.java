@@ -23,12 +23,16 @@ import COVID_AgentBasedSimulation.Model.Structure.CensusTract;
 import COVID_AgentBasedSimulation.Model.Data.CovidCsseJhu.DailyConfirmedCases;
 import COVID_AgentBasedSimulation.Model.Structure.CBGVDCell;
 import COVID_AgentBasedSimulation.Model.Structure.VDCell;
+import com.opencsv.CSVWriter;
 import de.siegmar.fastcsv.writer.CsvWriter;
 import esmaieeli.utilities.taskThreading.ParallelProcessor;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.nio.charset.Charset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
@@ -59,7 +63,7 @@ public class Root extends Agent {
     ArrayList<DailyConfirmedCases> relevantDailyConfirmedCases;
 
     public int counter;
-    int numAgents = 8000;
+    int numAgents = 30000;
 
     public boolean isLocalAllowed = true;
 
@@ -508,22 +512,82 @@ public class Root extends Agent {
         if (modelRoot.ABM.isReportContactRate == true) {
             ZonedDateTime currentDate = modelRoot.getABM().getCurrentTime();
             if (currentDate.getHour() == 0 && currentDate.getMinute() == 1) {
-                ArrayList<String[]> data = new ArrayList();
-                for (int i = 0; i < agentPairContact.length; i++) {
-                    String[] row = new String[agentPairContact[i].length];
-                    for (int j = 0; j < agentPairContact[i].length; j++) {
-                        row[j] = String.valueOf(agentPairContact[i][j]);
-//                        if (agentPairContact[i][j] != 0) {
-//                            System.out.println("!!!!!!!!!!!!!!!!!!!!");
-//                        }
+                //System.out.println("FFF: "+counter);
+                if (currentAgent.counter == 110) {
+//                ArrayList<String[]> data = new ArrayList();
+//                for (int i = 0; i < agentPairContact.length; i++) {
+//                    String[] row = new String[agentPairContact[i].length];
+//                    for (int j = 0; j < agentPairContact[i].length; j++) {
+//                        row[j] = String.valueOf(agentPairContact[i][j]);
+////                        if (agentPairContact[i][j] != 0) {
+////                            System.out.println("!!!!!!!!!!!!!!!!!!!!");
+////                        }
+//                    }
+//                    data.add(row);
+//                }
+                    System.out.println("GOING TO WRITE DOWN THE DATA!!!! "+currentAgent.counter);
+
+                    Writer writer = null;
+
+                    try {
+                        writer = new BufferedWriter(new OutputStreamWriter(
+                                new FileOutputStream(modelRoot.ABM.studyScope + "_agentPairContact.csv"), "ascii"));
+                        int sum = 0;
+                        for (int i = 0; i < agentPairContact.length; i++) {
+                            for (int j = 0; j < agentPairContact[i].length - 1; j++) {
+                                sum = sum + agentPairContact[i][j];
+                                writer.write(String.valueOf(agentPairContact[i][j]));
+                                writer.write(",");
+                            }
+                            writer.write(String.valueOf(agentPairContact[i][agentPairContact[i].length - 1]));
+                            writer.write(System.lineSeparator());
+                        }
+                        System.out.println("sum: " + sum);
+                    } catch (IOException ex) {
+                        // Report
+                    } finally {
+                        try {
+                            writer.close();
+                        } catch (Exception ex) {/*ignore*/
+                        }
                     }
-                    data.add(row);
-                }
-                CsvWriter writer = new CsvWriter();
-                try {
-                    writer.write(new File(modelRoot.ABM.studyScope + "_agentPairContact.csv"), Charset.forName("US-ASCII"), data);
-                } catch (IOException ex) {
-                    Logger.getLogger(Root.class.getName()).log(Level.SEVERE, null, ex);
+
+//                CSVWriter writer;
+//                try {
+//                    writer = new CSVWriter(new FileWriter(modelRoot.ABM.studyScope + "_agentPairContact.csv"));
+//                    for (int i = 0; i < agentPairContact.length; i++) {
+//                        String[] row = new String[agentPairContact[i].length];
+//                        for (int j = 0; j < agentPairContact[i].length; j++) {
+//                            row[j] = String.valueOf(agentPairContact[i][j]);
+////                        if (agentPairContact[i][j] != 0) {
+////                            System.out.println("!!!!!!!!!!!!!!!!!!!!");
+////                        }
+//                        }
+//                        writer.writeNext(row);
+//                    }
+//                    writer.flush();
+//                    writer.close();
+//                } catch (IOException ex) {
+//                    Logger.getLogger(Root.class.getName()).log(Level.SEVERE, null, ex);
+//                }
+//                writer=null;
+                    System.gc();
+
+//                try {
+//                    CSVWriter writer;
+//                    writer = new CSVWriter(new FileWriter(modelRoot.ABM.studyScope + "_agentPairContact.csv"));
+//                    writer.writeAll(data);
+//                    writer.close();
+//                } catch (IOException ex) {
+//                    Logger.getLogger(Root.class.getName()).log(Level.SEVERE, null, ex);
+//                }
+//                CsvWriter writer = new CsvWriter();
+//                try {
+//                    writer.write(new File(modelRoot.ABM.studyScope + "_agentPairContact.csv"), Charset.forName("US-ASCII"), data);
+//                    //writer.
+//                } catch (IOException ex) {
+//                    Logger.getLogger(Root.class.getName()).log(Level.SEVERE, null, ex);
+//                }
                 }
             }
         }
