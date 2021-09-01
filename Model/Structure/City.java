@@ -23,23 +23,25 @@ public class City extends Marker implements Serializable, Comparable<City> {
 
     public transient boolean isLatLonCalculated = false;
 
-    public Object[] getVDFromCBG(CensusBlockGroup input) {
+    public Object[] getVDFromCBG(CensusBlockGroup input, boolean noNull) {
         if (vDCells != null) {
-            double dist=Double.MAX_VALUE;
-            Object[] closest=new Object[2];
+            double dist = Double.MAX_VALUE;
+            Object[] closest = new Object[2];
             for (int i = 0; i < vDCells.size(); i++) {
                 for (int j = 0; j < vDCells.get(i).cBGsIDsInvolved.size(); j++) {
                     if (vDCells.get(i).cBGsIDsInvolved.get(j) == input.id) {
-                        Object[] output=new Object[2];
-                        output[0]=vDCells.get(i);
-                        output[1]=vDCells.get(i).cBGsPercentageInvolved.get(j);
+                        Object[] output = new Object[2];
+                        output[0] = vDCells.get(i);
+                        output[1] = vDCells.get(i).cBGsPercentageInvolved.get(j);
                         return output;
                     }
                 }
-                if(Math.pow(vDCells.get(i).lat-input.lat,2)+Math.pow(vDCells.get(i).lon-input.lon,2)<dist){
-                    dist=Math.pow(vDCells.get(i).lat-input.lat,2)+Math.pow(vDCells.get(i).lon-input.lon,2);
-                    closest[0]=vDCells.get(i);
-                    closest[1]=vDCells.get(i).cBGsPercentageInvolved.get((int)(Math.random()*vDCells.get(i).cBGsPercentageInvolved.size()-1));
+                if (noNull == true) {
+                    if (Math.pow(vDCells.get(i).lat - input.lat, 2) + Math.pow(vDCells.get(i).lon - input.lon, 2) < dist) {
+                        dist = Math.pow(vDCells.get(i).lat - input.lat, 2) + Math.pow(vDCells.get(i).lon - input.lon, 2);
+                        closest[0] = vDCells.get(i);
+                        closest[1] = vDCells.get(i).cBGsPercentageInvolved.get((int) (Math.random() * vDCells.get(i).cBGsPercentageInvolved.size() - 1));
+                    }
                 }
             }
             return closest;
@@ -47,27 +49,29 @@ public class City extends Marker implements Serializable, Comparable<City> {
         return null;
     }
 
-    public Object[] getCBGVDFromCBG(CensusBlockGroup input) {
+    public Object[] getCBGVDFromCBG(CensusBlockGroup input, boolean noNull) {
         if (cBGVDCells != null) {
-            double dist=Double.MAX_VALUE;
-            Object[] closest=new Object[2];
+            double dist = Double.MAX_VALUE;
+            Object[] closest = new Object[2];
             for (int i = 0; i < cBGVDCells.size(); i++) {
                 for (int j = 0; j < cBGVDCells.get(i).cBGsIDsInvolved.size(); j++) {
                     if (cBGVDCells.get(i).cBGsIDsInvolved.get(j) == input.id) {
-                        Object[] output=new Object[2];
-                        output[0]=cBGVDCells.get(i);
-                        output[1]=cBGVDCells.get(i).cBGsPercentageInvolved.get(j);
+                        Object[] output = new Object[2];
+                        output[0] = cBGVDCells.get(i);
+                        output[1] = cBGVDCells.get(i).cBGsPercentageInvolved.get(j);
                         return output;
                     }
                 }
-                if(Math.pow(cBGVDCells.get(i).lat-input.lat,2)+Math.pow(cBGVDCells.get(i).lon-input.lon,2)<dist){
-                    dist=Math.pow(cBGVDCells.get(i).lat-input.lat,2)+Math.pow(cBGVDCells.get(i).lon-input.lon,2);
-                    closest[0]=cBGVDCells.get(i);
-                    closest[1]=cBGVDCells.get(i).cBGsPercentageInvolved.get((int)(Math.random()*cBGVDCells.get(i).cBGsPercentageInvolved.size()-1));
+                if (noNull == true) {
+                    if (Math.pow(cBGVDCells.get(i).lat - input.lat, 2) + Math.pow(cBGVDCells.get(i).lon - input.lon, 2) < dist) {
+                        dist = Math.pow(cBGVDCells.get(i).lat - input.lat, 2) + Math.pow(cBGVDCells.get(i).lon - input.lon, 2);
+                        closest[0] = cBGVDCells.get(i);
+                        closest[1] = cBGVDCells.get(i).cBGsPercentageInvolved.get((int) (Math.random() * cBGVDCells.get(i).cBGsPercentageInvolved.size() - 1));
+                    }
                 }
             }
             return closest;
-            
+
         }
         return null;
     }

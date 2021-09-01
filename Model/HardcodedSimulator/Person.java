@@ -661,11 +661,11 @@ public class Person extends Agent {
                 int destinationCumulativeThresh = (int) (Math.floor(Math.random() * cumulativeDestinationFreqs));
                 //println("cumulativeDestinationFreqs: "+cumulativeDestinationFreqs);
                 //println("destinationCumulativeThreshooo: "+destinationCumulativeThresh);
-                int destinationCumulative = 0;
+                float destinationCumulative = 0;
                 int destination = -1;
                 ArrayList destFreqs = (ArrayList) (currentAgent.destinationPlacesFreq);
                 for (int i = 0; i < destFreqs.size(); i++) {
-                    destinationCumulative = destinationCumulative + ((Integer) (destFreqs.get(i)));
+                    destinationCumulative = destinationCumulative + ((Float) (destFreqs.get(i)));
                     //println("dest loop: "+destinationCumulative);
                     //println("destinationCumulativeThresh: "+(destinationCumulativeThresh-1));
                     if (destinationCumulative >= (destinationCumulativeThresh - 1)) {
@@ -705,7 +705,7 @@ public class Person extends Agent {
                             //println("traveled!!! "+currentAgent.getMyIndex());
                             //println(currentTime.getMinute());
                             travelStartDecisionCounter = 0;
-                            Object[] vd = ((City) (rootModel.ABM.studyScopeGeography)).getVDFromCBG(((CensusBlockGroup) ((SafegraphPlace) (((PatternsRecordProcessed) (((ArrayList) currentAgent.destinationPlaces).get(destination))).getPlace())).getCensusBlock()));
+                            Object[] vd = ((City) (rootModel.ABM.studyScopeGeography)).getVDFromCBG(((CensusBlockGroup) ((SafegraphPlace) (((PatternsRecordProcessed) (((ArrayList) currentAgent.destinationPlaces).get(destination))).getPlace())).getCensusBlock()),true);
                             currentLocation = (VDCell) (vd[0]);
                             currentAgent.dstIndex = destination;
                             currentAgent.lat = currentLocation.getLat();
@@ -1200,11 +1200,11 @@ public class Person extends Agent {
                 int destinationCumulativeThresh = (int) (Math.floor(Math.random() * cumulativeDestinationFreqs));
                 //println("cumulativeDestinationFreqs: "+cumulativeDestinationFreqs);
                 //println("destinationCumulativeThreshooo: "+destinationCumulativeThresh);
-                int destinationCumulative = 0;
+                float destinationCumulative = 0;
                 int destination = -1;
                 ArrayList destFreqs = (ArrayList) (currentAgent.destinationPlacesFreq);
                 for (int i = 0; i < destFreqs.size(); i++) {
-                    destinationCumulative = destinationCumulative + (int) destFreqs.get(i);
+                    destinationCumulative = destinationCumulative + (float) destFreqs.get(i);
                     //println("dest loop: "+destinationCumulative);
                     //println("destinationCumulativeThresh: "+(destinationCumulativeThresh-1));
                     if (destinationCumulative >= (destinationCumulativeThresh - 1)) {
@@ -1244,7 +1244,7 @@ public class Person extends Agent {
                             //println("traveled!!! "+currentAgent.getMyIndex());
                             //println(currentTime.getMinute());
                             travelStartDecisionCounter = 0;
-                            Object[] cbgvd = ((City) (rootModel.ABM.studyScopeGeography)).getVDFromCBG(((CensusBlockGroup) ((SafegraphPlace) (((PatternsRecordProcessed) (((ArrayList) currentAgent.destinationPlaces).get(destination))).getPlace())).getCensusBlock()));
+                            Object[] cbgvd = ((City) (rootModel.ABM.studyScopeGeography)).getCBGVDFromCBG(((CensusBlockGroup) ((SafegraphPlace) (((PatternsRecordProcessed) (((ArrayList) currentAgent.destinationPlaces).get(destination))).getPlace())).getCensusBlock()),true);
                             currentLocation = (CBGVDCell) (cbgvd[0]);
                             currentAgent.dstIndex = destination;
                             currentAgent.lat = currentLocation.getLat();

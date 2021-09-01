@@ -63,7 +63,7 @@ public class Root extends Agent {
     ArrayList<DailyConfirmedCases> relevantDailyConfirmedCases;
 
     public int counter;
-    int numAgents = 30000;
+    int numAgents = 10000;
 
     public boolean isLocalAllowed = true;
 
@@ -525,13 +525,13 @@ public class Root extends Agent {
 //                    }
 //                    data.add(row);
 //                }
-                    System.out.println("GOING TO WRITE DOWN THE DATA!!!! "+currentAgent.counter);
+                    System.out.println("GOING TO WRITE DOWN THE DATA!!!! " + currentAgent.counter);
 
                     Writer writer = null;
 
                     try {
                         writer = new BufferedWriter(new OutputStreamWriter(
-                                new FileOutputStream(modelRoot.ABM.studyScope + "_agentPairContact.csv"), "ascii"));
+                                new FileOutputStream(modelRoot.ABM.studyScope + "_agentPairContact_" + modelRoot.scenario + "_" + numAgents + ".csv"), "ascii"));
                         int sum = 0;
                         for (int i = 0; i < agentPairContact.length; i++) {
                             for (int j = 0; j < agentPairContact[i].length - 1; j++) {
@@ -750,7 +750,7 @@ public class Root extends Agent {
                     agent.isAtWork = false;
 
                     agent.homeCBG = selectedCBG;
-                    agent.homeVD = (VDCell) (((City) (modelRoot.getABM().studyScopeGeography)).getVDFromCBG(selectedCBG))[0];
+                    agent.homeVD = (VDCell) (((City) (modelRoot.getABM().studyScopeGeography)).getVDFromCBG(selectedCBG, true))[0];
 
                     for (int n = 0; n < cBGs.size(); n++) {
                         //println("%%%");
@@ -803,7 +803,7 @@ public class Root extends Agent {
                             int naics_code = ((PatternsRecordProcessed) patternRecords.get(j)).place.naics_code;
                             if (isShop(naics_code) || isSchool(naics_code) || isReligiousOrganization(naics_code)) {
                                 for (int k = 0; k < ((ArrayList) (((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place())).size(); k++) {
-                                    Object[] vDReturn = (((City) (modelRoot.getABM().studyScopeGeography)).getVDFromCBG(((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey())));
+                                    Object[] vDReturn = (((City) (modelRoot.getABM().studyScopeGeography)).getVDFromCBG(((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey()), false));
                                     VDCell vd = (VDCell) (vDReturn[0]);
                                     if (vd != null) {
                                         destinationPlaces.add(((PatternsRecordProcessed) (patternRecords.get(j))));
@@ -1186,7 +1186,7 @@ public class Root extends Agent {
                     System.out.println("SEVERE ERROR: HOME CENSUS BLOCK NOT FOUND!");
                 }
                 agent.homeCBG = selectedCBG;
-                agent.homeVD = (VDCell) (((City) (modelRoot.getABM().studyScopeGeography)).getVDFromCBG(selectedCBG))[0];
+                agent.homeVD = (VDCell) (((City) (modelRoot.getABM().studyScopeGeography)).getVDFromCBG(selectedCBG, true))[0];
 
                 for (int n = 0; n < cBGs.size(); n++) {
                     //println("%%%");
@@ -1233,7 +1233,7 @@ public class Root extends Agent {
                             break;
                         }
                     }
-                    selectedVD = (VDCell) (((City) (modelRoot.getABM().studyScopeGeography)).getVDFromCBG(selectedCBG))[0];
+                    selectedVD = (VDCell) (((City) (modelRoot.getABM().studyScopeGeography)).getVDFromCBG(selectedCBG, true))[0];
                     if (selectedCBG == null) {
                         System.out.println("KNOWN EXCEPTION: DAYTIME CENSUS BLOCK NOT FOUND!");
                         System.out.println("USING HOME AS WORK CENSUS BLOCK");
@@ -1265,7 +1265,13 @@ public class Root extends Agent {
                 //println("lat: "+agent.getPropertyValue("currentLocation").getLat());
                 //println("lon: "+agent.getPropertyValue("currentLocation").getLon());
                 ArrayList destinationPlaces = new ArrayList();
+                ArrayList destinationShopPlaces = new ArrayList();
+                ArrayList destinationSchoolPlaces = new ArrayList();
+                ArrayList destinationReligiousPlaces = new ArrayList();
                 ArrayList destinationPlacesFreq = new ArrayList();
+                ArrayList destinationShopPlacesFreq = new ArrayList();
+                ArrayList destinationSchoolPlacesFreq = new ArrayList();
+                ArrayList destinationReligiousPlacesFreq = new ArrayList();
 
                 //println("&&&&");
                 for (int j = 0; j < patternRecords.size(); j++) {
@@ -1274,26 +1280,80 @@ public class Root extends Agent {
                             if (isLocalAllowed == false) {
                                 int naics_code = ((PatternsRecordProcessed) patternRecords.get(j)).place.naics_code;
                                 if (!isShop(naics_code) && !isSchool(naics_code) && !isReligiousOrganization(naics_code)) {
-                                    Object[] vDReturn = (((City) (modelRoot.getABM().studyScopeGeography)).getVDFromCBG(((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey())));
+                                    Object[] vDReturn = (((City) (modelRoot.getABM().studyScopeGeography)).getVDFromCBG(((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey()), false));
                                     VDCell vd = (VDCell) (vDReturn[0]);
                                     if (vd != null) {
                                         destinationPlaces.add(((PatternsRecordProcessed) (patternRecords.get(j))));
-                                        destinationPlacesFreq.add(((CensusBlockGroupIntegerTuple) (((ArrayList) (((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place())).get(k))).getValue() * ((double) (vDReturn[1])));
+                                        destinationPlacesFreq.add(((CensusBlockGroupIntegerTuple) (((ArrayList) (((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place())).get(k))).getValue() * (((Double) (vDReturn[1])).floatValue()));
                                     }
 
                                 }
                             } else {
-                                Object[] vDReturn = (((City) (modelRoot.getABM().studyScopeGeography)).getVDFromCBG(((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey())));
-                                VDCell vd = (VDCell) (vDReturn[0]);
-                                if (vd != null) {
-                                    destinationPlaces.add(((PatternsRecordProcessed) (patternRecords.get(j))));
-                                    destinationPlacesFreq.add(((CensusBlockGroupIntegerTuple) (((ArrayList) (((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place())).get(k))).getValue() * ((double) (vDReturn[1])));
+                                int naics_code = ((PatternsRecordProcessed) patternRecords.get(j)).place.naics_code;
+                                if (isShop(naics_code) == true) {
+                                    Object[] vDReturn = (((City) (modelRoot.getABM().studyScopeGeography)).getVDFromCBG(((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey()), false));
+                                    VDCell vd = (VDCell) (vDReturn[0]);
+                                    if (vd != null) {
+                                        destinationShopPlaces.add(((PatternsRecordProcessed) (patternRecords.get(j))));
+                                        destinationShopPlacesFreq.add(((CensusBlockGroupIntegerTuple) (((ArrayList) (((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place())).get(k))).getValue() * (((Double) (vDReturn[1])).floatValue()));
+                                    }
+                                } else if (isSchool(naics_code) == true) {
+                                    Object[] vDReturn = (((City) (modelRoot.getABM().studyScopeGeography)).getVDFromCBG(((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey()), false));
+                                    VDCell vd = (VDCell) (vDReturn[0]);
+                                    if (vd != null) {
+                                        destinationSchoolPlaces.add(((PatternsRecordProcessed) (patternRecords.get(j))));
+                                        destinationSchoolPlacesFreq.add(((CensusBlockGroupIntegerTuple) (((ArrayList) (((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place())).get(k))).getValue() * (((Double) (vDReturn[1])).floatValue()));
+                                    }
+                                } else if (isReligiousOrganization(naics_code) == true) {
+                                    Object[] vDReturn = (((City) (modelRoot.getABM().studyScopeGeography)).getVDFromCBG(((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey()), false));
+                                    VDCell vd = (VDCell) (vDReturn[0]);
+                                    if (vd != null) {
+                                        destinationReligiousPlaces.add(((PatternsRecordProcessed) (patternRecords.get(j))));
+                                        destinationReligiousPlacesFreq.add(((CensusBlockGroupIntegerTuple) (((ArrayList) (((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place())).get(k))).getValue() * (((Double) (vDReturn[1])).floatValue()));
+                                    }
+                                } else {
+
+                                    if (((CensusBlockGroup) (agent.homeCBG)).id == ((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey()).getId()) {
+                                        destinationPlaces.add(((PatternsRecordProcessed) (patternRecords.get(j))));
+                                        destinationPlacesFreq.add(((CensusBlockGroupIntegerTuple) (((ArrayList) (((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place())).get(k))).getValue());
+                                    }
+
+//                                    Object[] vDReturn = (((City) (modelRoot.getABM().studyScopeGeography)).getVDFromCBG(((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey()), false));
+//                                    VDCell vd = (VDCell) (vDReturn[0]);
+//                                    if (vd != null) {
+//                                        destinationPlaces.add(((PatternsRecordProcessed) (patternRecords.get(j))));
+//                                        destinationPlacesFreq.add(((CensusBlockGroupIntegerTuple) (((ArrayList) (((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place())).get(k))).getValue() * (((Double) (vDReturn[1])).floatValue()));
+//                                    }
                                 }
                             }
 
                         }
                     }
                 }
+
+                Object shopResults[] = getClosenessAdjustmentVD(agent, destinationShopPlaces, destinationShopPlacesFreq);
+                Object schoolResults[] = getClosenessAdjustmentVD(agent, destinationSchoolPlaces, destinationSchoolPlacesFreq);
+                Object religiousResults[] = getClosenessAdjustmentVD(agent, destinationReligiousPlaces, destinationReligiousPlacesFreq);
+                for (int h = 0; h < ((ArrayList<PatternsRecordProcessed>) shopResults[0]).size(); h++) {
+                    destinationPlaces.add(((ArrayList<PatternsRecordProcessed>) shopResults[0]).get(h));
+                    destinationPlacesFreq.add(((ArrayList<Double>) shopResults[1]).get(h));
+                }
+                for (int h = 0; h < ((ArrayList<PatternsRecordProcessed>) schoolResults[0]).size(); h++) {
+                    destinationPlaces.add(((ArrayList<PatternsRecordProcessed>) schoolResults[0]).get(h));
+                    destinationPlacesFreq.add(((ArrayList<Double>) schoolResults[1]).get(h));
+                }
+                for (int h = 0; h < ((ArrayList<PatternsRecordProcessed>) religiousResults[0]).size(); h++) {
+                    destinationPlaces.add(((ArrayList<PatternsRecordProcessed>) religiousResults[0]).get(h));
+                    destinationPlacesFreq.add(((ArrayList<Double>) religiousResults[1]).get(h));
+                }
+
+                destinationShopPlaces.clear();
+                destinationSchoolPlaces.clear();
+                destinationReligiousPlaces.clear();
+                shopResults = null;
+                schoolResults = null;
+                religiousResults = null;
+
                 agent.destinationPlaces = destinationPlaces;
                 agent.destinationPlacesFreq = destinationPlacesFreq;
                 agent.travelStartDecisionCounter = 0;
@@ -1301,7 +1361,12 @@ public class Root extends Agent {
 
                 int cumulativeDestinationFreqs = 0;
                 for (int k = 0; k < destinationPlacesFreq.size(); k++) {
-                    cumulativeDestinationFreqs = cumulativeDestinationFreqs + ((Double) (destinationPlacesFreq.get(k))).intValue();
+                    if ((destinationPlacesFreq.get(k)) instanceof Double) {
+                        destinationPlacesFreq.set(k, ((Double) (destinationPlacesFreq.get(k))).floatValue());
+                    }else if ((destinationPlacesFreq.get(k)) instanceof Integer) {
+                        destinationPlacesFreq.set(k, ((Integer) (destinationPlacesFreq.get(k))).floatValue());
+                    }
+                    cumulativeDestinationFreqs = cumulativeDestinationFreqs + ((Float) (destinationPlacesFreq.get(k))).intValue();
                 }
                 agent.cumulativeDestinationFreqs = cumulativeDestinationFreqs;
             }
@@ -1392,7 +1457,7 @@ public class Root extends Agent {
                     System.out.println("SEVERE ERROR: HOME CENSUS BLOCK NOT FOUND!");
                 }
                 agent.homeCBG = selectedCBG;
-                agent.homeCBGVD = (CBGVDCell) (((City) (modelRoot.getABM().studyScopeGeography)).getCBGVDFromCBG(selectedCBG))[0];
+                agent.homeCBGVD = (CBGVDCell) (((City) (modelRoot.getABM().studyScopeGeography)).getCBGVDFromCBG(selectedCBG,true))[0];
 //                if (modelRoot.scenario.equals("CBG")) {
 //                    agent.homeCBG = selectedCBG;
 //
@@ -1498,7 +1563,7 @@ public class Root extends Agent {
                             break;
                         }
                     }
-                    selectedCBGVD = (CBGVDCell) (((City) (modelRoot.getABM().studyScopeGeography)).getCBGVDFromCBG(selectedCBG))[0];
+                    selectedCBGVD = (CBGVDCell) (((City) (modelRoot.getABM().studyScopeGeography)).getCBGVDFromCBG(selectedCBG,true))[0];
                     if (selectedCBG == null) {
                         System.out.println("KNOWN EXCEPTION: DAYTIME CENSUS BLOCK NOT FOUND!");
                         System.out.println("USING HOME AS WORK CENSUS BLOCK");
@@ -1544,7 +1609,13 @@ public class Root extends Agent {
                 //println("lat: "+agent.getPropertyValue("currentLocation").getLat());
                 //println("lon: "+agent.getPropertyValue("currentLocation").getLon());
                 ArrayList destinationPlaces = new ArrayList();
+                ArrayList destinationShopPlaces = new ArrayList();
+                ArrayList destinationSchoolPlaces = new ArrayList();
+                ArrayList destinationReligiousPlaces = new ArrayList();
                 ArrayList destinationPlacesFreq = new ArrayList();
+                ArrayList destinationShopPlacesFreq = new ArrayList();
+                ArrayList destinationSchoolPlacesFreq = new ArrayList();
+                ArrayList destinationReligiousPlacesFreq = new ArrayList();
 
                 //println("&&&&");
                 for (int j = 0; j < patternRecords.size(); j++) {
@@ -1553,7 +1624,7 @@ public class Root extends Agent {
                             if (isLocalAllowed == false) {
                                 int naics_code = ((PatternsRecordProcessed) patternRecords.get(j)).place.naics_code;
                                 if (!isShop(naics_code) && !isSchool(naics_code) && !isReligiousOrganization(naics_code)) {
-                                    Object[] cBGVDReturn = (((City) (modelRoot.getABM().studyScopeGeography)).getCBGVDFromCBG(((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey())));
+                                    Object[] cBGVDReturn = (((City) (modelRoot.getABM().studyScopeGeography)).getCBGVDFromCBG(((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey()),false));
                                     CBGVDCell cbgvd = (CBGVDCell) (cBGVDReturn[0]);
                                     if (cbgvd != null) {
                                         destinationPlaces.add(((PatternsRecordProcessed) (patternRecords.get(j))));
@@ -1562,17 +1633,64 @@ public class Root extends Agent {
 
                                 }
                             } else {
-                                Object[] cBGVDReturn = (((City) (modelRoot.getABM().studyScopeGeography)).getCBGVDFromCBG(((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey())));
-                                CBGVDCell cbgvd = (CBGVDCell) (cBGVDReturn[0]);
-                                if (cbgvd != null) {
-                                    destinationPlaces.add(((PatternsRecordProcessed) (patternRecords.get(j))));
-                                    destinationPlacesFreq.add(((CensusBlockGroupIntegerTuple) (((ArrayList) (((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place())).get(k))).getValue() * ((double) (cBGVDReturn[1])));
+                                int naics_code = ((PatternsRecordProcessed) patternRecords.get(j)).place.naics_code;
+                                if (isShop(naics_code) == true) {
+                                    Object[] cBGVDReturn = (((City) (modelRoot.getABM().studyScopeGeography)).getCBGVDFromCBG(((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey()),false));
+                                    CBGVDCell cbgvd = (CBGVDCell) (cBGVDReturn[0]);
+                                    if (cbgvd != null) {
+                                        destinationShopPlaces.add(((PatternsRecordProcessed) (patternRecords.get(j))));
+                                        destinationShopPlacesFreq.add(((CensusBlockGroupIntegerTuple) (((ArrayList) (((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place())).get(k))).getValue() * ((double) (cBGVDReturn[1])));
+                                    }
+                                } else if (isSchool(naics_code) == true) {
+                                    Object[] cBGVDReturn = (((City) (modelRoot.getABM().studyScopeGeography)).getCBGVDFromCBG(((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey()),false));
+                                    CBGVDCell cbgvd = (CBGVDCell) (cBGVDReturn[0]);
+                                    if (cbgvd != null) {
+                                        destinationSchoolPlaces.add(((PatternsRecordProcessed) (patternRecords.get(j))));
+                                        destinationSchoolPlacesFreq.add(((CensusBlockGroupIntegerTuple) (((ArrayList) (((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place())).get(k))).getValue() * ((double) (cBGVDReturn[1])));
+                                    }
+                                } else if (isReligiousOrganization(naics_code) == true) {
+                                    Object[] cBGVDReturn = (((City) (modelRoot.getABM().studyScopeGeography)).getCBGVDFromCBG(((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey()),false));
+                                    CBGVDCell cbgvd = (CBGVDCell) (cBGVDReturn[0]);
+                                    if (cbgvd != null) {
+                                        destinationReligiousPlaces.add(((PatternsRecordProcessed) (patternRecords.get(j))));
+                                        destinationReligiousPlacesFreq.add(((CensusBlockGroupIntegerTuple) (((ArrayList) (((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place())).get(k))).getValue() * ((double) (cBGVDReturn[1])));
+                                    }
+                                } else {
+                                    
+                                    if (((CensusBlockGroup) (agent.homeCBG)).id == ((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey()).getId()) {
+                                        destinationPlaces.add(((PatternsRecordProcessed) (patternRecords.get(j))));
+                                        destinationPlacesFreq.add(((CensusBlockGroupIntegerTuple) (((ArrayList) (((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place())).get(k))).getValue());
+                                    }
+                                    
+//                                    Object[] cBGVDReturn = (((City) (modelRoot.getABM().studyScopeGeography)).getCBGVDFromCBG(((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey())));
+//                                    CBGVDCell cbgvd = (CBGVDCell) (cBGVDReturn[0]);
+//                                    if (cbgvd != null) {
+//                                        destinationPlaces.add(((PatternsRecordProcessed) (patternRecords.get(j))));
+//                                        destinationPlacesFreq.add(((CensusBlockGroupIntegerTuple) (((ArrayList) (((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place())).get(k))).getValue() * ((double) (cBGVDReturn[1])));
+//                                    }
                                 }
                             }
 
                         }
                     }
                 }
+
+                Object shopResults[] = getClosenessAdjustmentCBGVD(agent, destinationShopPlaces, destinationShopPlacesFreq);
+                Object schoolResults[] = getClosenessAdjustmentCBGVD(agent, destinationSchoolPlaces, destinationSchoolPlacesFreq);
+                Object religiousResults[] = getClosenessAdjustmentCBGVD(agent, destinationReligiousPlaces, destinationReligiousPlacesFreq);
+                for (int h = 0; h < ((ArrayList<PatternsRecordProcessed>) shopResults[0]).size(); h++) {
+                    destinationPlaces.add(((ArrayList<PatternsRecordProcessed>) shopResults[0]).get(h));
+                    destinationPlacesFreq.add(((ArrayList<Double>) shopResults[1]).get(h));
+                }
+                for (int h = 0; h < ((ArrayList<PatternsRecordProcessed>) schoolResults[0]).size(); h++) {
+                    destinationPlaces.add(((ArrayList<PatternsRecordProcessed>) schoolResults[0]).get(h));
+                    destinationPlacesFreq.add(((ArrayList<Double>) schoolResults[1]).get(h));
+                }
+                for (int h = 0; h < ((ArrayList<PatternsRecordProcessed>) religiousResults[0]).size(); h++) {
+                    destinationPlaces.add(((ArrayList<PatternsRecordProcessed>) religiousResults[0]).get(h));
+                    destinationPlacesFreq.add(((ArrayList<Double>) religiousResults[1]).get(h));
+                }
+
                 agent.destinationPlaces = destinationPlaces;
                 agent.destinationPlacesFreq = destinationPlacesFreq;
                 agent.travelStartDecisionCounter = 0;
@@ -1580,7 +1698,12 @@ public class Root extends Agent {
 
                 int cumulativeDestinationFreqs = 0;
                 for (int k = 0; k < destinationPlacesFreq.size(); k++) {
-                    cumulativeDestinationFreqs = cumulativeDestinationFreqs + ((Double) (destinationPlacesFreq.get(k))).intValue();
+                    if ((destinationPlacesFreq.get(k)) instanceof Double) {
+                        destinationPlacesFreq.set(k, ((Double) (destinationPlacesFreq.get(k))).floatValue());
+                    }else if ((destinationPlacesFreq.get(k)) instanceof Integer) {
+                        destinationPlacesFreq.set(k, ((Integer) (destinationPlacesFreq.get(k))).floatValue());
+                    }
+                    cumulativeDestinationFreqs = cumulativeDestinationFreqs + ((Float) (destinationPlacesFreq.get(k))).intValue();
                 }
                 agent.cumulativeDestinationFreqs = cumulativeDestinationFreqs;
             }
@@ -1718,9 +1841,9 @@ public class Root extends Agent {
             if (modelRoot.scenario.equals("CBG")) {
                 agent.homeCBG = selectedCBG;
             } else if (modelRoot.scenario.equals("VD")) {
-                agent.homeVD = (VDCell) (((City) (modelRoot.getABM().studyScopeGeography)).getVDFromCBG(selectedCBG))[0];
+                agent.homeVD = (VDCell) (((City) (modelRoot.getABM().studyScopeGeography)).getVDFromCBG(selectedCBG, true))[0];
             } else if (modelRoot.scenario.equals("CBGVD")) {
-                agent.homeCBGVD = (CBGVDCell) (((City) (modelRoot.getABM().studyScopeGeography)).getCBGVDFromCBG(selectedCBG))[0];
+                agent.homeCBGVD = (CBGVDCell) (((City) (modelRoot.getABM().studyScopeGeography)).getCBGVDFromCBG(selectedCBG,true))[0];
             }
 
             //println("@@@");
@@ -1776,9 +1899,9 @@ public class Root extends Agent {
                     if (modelRoot.scenario.equals("CBG")) {
                         selectedCBG = (CensusBlockGroup) (agent.homeCBG);
                     } else if (modelRoot.scenario.equals("VD")) {
-                        selectedVD = (VDCell) (((City) (modelRoot.getABM().studyScopeGeography)).getVDFromCBG(agent.homeCBG))[0];
+                        selectedVD = (VDCell) (((City) (modelRoot.getABM().studyScopeGeography)).getVDFromCBG(agent.homeCBG, true))[0];
                     } else if (modelRoot.scenario.equals("CBGVD")) {
-                        selectedCBGVD = (CBGVDCell) (((City) (modelRoot.getABM().studyScopeGeography)).getCBGVDFromCBG(selectedCBG))[0];
+                        selectedCBGVD = (CBGVDCell) (((City) (modelRoot.getABM().studyScopeGeography)).getCBGVDFromCBG(selectedCBG,true))[0];
                     }
 
                 }
@@ -1855,14 +1978,14 @@ public class Root extends Agent {
                                         destinationPlacesFreq.add(((CensusBlockGroupIntegerTuple) (((ArrayList) (((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place())).get(k))).getValue());
                                     }
                                 } else if (modelRoot.scenario.equals("VD")) {
-                                    Object[] vDReturn = (((City) (modelRoot.getABM().studyScopeGeography)).getVDFromCBG(((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey())));
+                                    Object[] vDReturn = (((City) (modelRoot.getABM().studyScopeGeography)).getVDFromCBG(((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey()), false));
                                     VDCell vd = (VDCell) (vDReturn[0]);
                                     if (vd != null) {
                                         destinationPlaces.add(((PatternsRecordProcessed) (patternRecords.get(j))));
                                         destinationPlacesFreq.add(((CensusBlockGroupIntegerTuple) (((ArrayList) (((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place())).get(k))).getValue() * ((double) (vDReturn[1])));
                                     }
                                 } else if (modelRoot.scenario.equals("CBGVD")) {
-                                    Object[] cBGVDReturn = (((City) (modelRoot.getABM().studyScopeGeography)).getCBGVDFromCBG(((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey())));
+                                    Object[] cBGVDReturn = (((City) (modelRoot.getABM().studyScopeGeography)).getCBGVDFromCBG(((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey()),false));
                                     CBGVDCell cbgvd = (CBGVDCell) (cBGVDReturn[0]);
                                     if (cbgvd != null) {
                                         destinationPlaces.add(((PatternsRecordProcessed) (patternRecords.get(j))));
@@ -1878,14 +2001,14 @@ public class Root extends Agent {
                                     destinationPlacesFreq.add(((CensusBlockGroupIntegerTuple) (((ArrayList) (((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place())).get(k))).getValue());
                                 }
                             } else if (modelRoot.scenario.equals("VD")) {
-                                Object[] vDReturn = (((City) (modelRoot.getABM().studyScopeGeography)).getVDFromCBG(((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey())));
+                                Object[] vDReturn = (((City) (modelRoot.getABM().studyScopeGeography)).getVDFromCBG(((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey()), false));
                                 VDCell vd = (VDCell) (vDReturn[0]);
                                 if (vd != null) {
                                     destinationPlaces.add(((PatternsRecordProcessed) (patternRecords.get(j))));
                                     destinationPlacesFreq.add(((CensusBlockGroupIntegerTuple) (((ArrayList) (((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place())).get(k))).getValue() * ((double) (vDReturn[1])));
                                 }
                             } else if (modelRoot.scenario.equals("CBGVD")) {
-                                Object[] cBGVDReturn = (((City) (modelRoot.getABM().studyScopeGeography)).getCBGVDFromCBG(((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey())));
+                                Object[] cBGVDReturn = (((City) (modelRoot.getABM().studyScopeGeography)).getCBGVDFromCBG(((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey()),false));
                                 CBGVDCell cbgvd = (CBGVDCell) (cBGVDReturn[0]);
                                 if (cbgvd != null) {
                                     destinationPlaces.add(((PatternsRecordProcessed) (patternRecords.get(j))));
@@ -2191,6 +2314,7 @@ public class Root extends Agent {
                         if ((((Person) (((List) ((AgentBasedModel) (modelRoot.getABM())).getAgents()).get(i))).homeVD).shopPlacesKeys.get(0).equals(scope.vDCells.get(j).shopPlacesKeys.get(0))) {
                             generatedPopulationInVDs[j] = generatedPopulationInVDs[j] + 1;
                             residents.add((Person) (modelRoot.getABM().agents.get(i)));
+                            break;
                         }
                     }
                 }
@@ -2300,9 +2424,12 @@ public class Root extends Agent {
             //ArrayList<Double> percentageSickInCounties=new ArrayList();
             double[] percentageSickInCBGVDs = new double[scope.cBGVDCells.size()];
             for (int i = 0; i < percentageSickInCBGVDs.length; i++) {
+                if (scope.cBGVDCells.get(i).cBGsInvolved.size() == 0) {
+                    continue;
+                }
                 for (int d = 0; d < relevantDailyConfirmedCases.size(); d++) {
                     if (((String) (((State) (((County) (((DailyConfirmedCases) (relevantDailyConfirmedCases.get(d))).getCounty())).getState())).getName())).equals(scope.censusTracts.get(0).state.name)) {
-                        if (((County) (((CensusTract) (((ArrayList<CensusTract>) (scope.getCensusTracts())).get(i))).getCounty())).getId() == ((County) (((DailyConfirmedCases) (relevantDailyConfirmedCases.get(d))).getCounty())).getId()) {
+                        if (((County) (((((scope.cBGVDCells).get(i)).cBGsInvolved.get(0))).getCounty())).getId() == ((County) (((DailyConfirmedCases) (relevantDailyConfirmedCases.get(d))).getCounty())).getId()) {
                             //if(((ZonedDateTime)(((AgentBasedModel)(modelRoot.getABM())).getCurrentTime()))==null){
                             //	println("777");
                             //}
@@ -2311,7 +2438,8 @@ public class Root extends Agent {
                             //}
                             if (((ZonedDateTime) (((AgentBasedModel) (modelRoot.getABM())).getCurrentTime())).equals(((ZonedDateTime) (((DailyConfirmedCases) (relevantDailyConfirmedCases.get(d))).getDate()))) == true) {
                                 //percentageSickInCounties[i]=((DailyConfirmedCases)(dailyConfirmedCases.get(d))).getNumActiveCases()/((County)(((CensusTract)(((ArrayList<CensusTract>)(scope.getCensusTracts())).get(i))).getCounty())).getPopulation();
-                                percentageSickInCBGVDs[i] = (((float) (((DailyConfirmedCases) (relevantDailyConfirmedCases.get(d))).getNumActiveCases())) * ((float) (((scope.vDCells.get(i)).getPopulation())) / (float) (((County) (((CensusTract) (((ArrayList<CensusTract>) (scope.getCensusTracts())).get(i))).getCounty())).getPopulation()))) / ((float) (((scope.vDCells.get(i)).getPopulation())));
+                                percentageSickInCBGVDs[i] = (((float) (((DailyConfirmedCases) (relevantDailyConfirmedCases.get(d))).getNumActiveCases())) * ((float) (((scope.cBGVDCells.get(i)).getPopulation())) / (float) (((County) ((scope.cBGVDCells.get(i).cBGsInvolved.get(0)).getCounty())).getPopulation()))) / ((float) (((scope.cBGVDCells.get(i)).getPopulation())));
+                                
 //                                System.out.println(i);
                             }
                         }
@@ -2326,6 +2454,7 @@ public class Root extends Agent {
                         if ((((Person) (((List) ((AgentBasedModel) (modelRoot.getABM())).getAgents()).get(i))).homeCBGVD).shopPlacesKeys.get(0).equals(scope.cBGVDCells.get(j).shopPlacesKeys.get(0))) {
                             generatedPopulationInCBGVDs[j] = generatedPopulationInCBGVDs[j] + 1;
                             residents.add((Person) (modelRoot.getABM().agents.get(i)));
+                            break;
                         }
                     }
                 }
@@ -3180,6 +3309,266 @@ public class ParallelStateReporter extends ParallelProcessor {
             }
         }
         return false;
+    }
+
+    public Object[] getClosenessAdjustmentVD(Person agent, ArrayList<PatternsRecordProcessed> dests, ArrayList<Float> destFreqs) {
+        double first = Double.POSITIVE_INFINITY;
+        double second = Double.POSITIVE_INFINITY;
+        double third = Double.POSITIVE_INFINITY;
+        double fourth = Double.POSITIVE_INFINITY;
+        double fith = Double.POSITIVE_INFINITY;
+        double sxith = Double.POSITIVE_INFINITY;
+        PatternsRecordProcessed firstPattern = null;
+        PatternsRecordProcessed secondPattern = null;
+        PatternsRecordProcessed thirdPattern = null;
+        PatternsRecordProcessed fourthPattern = null;
+        PatternsRecordProcessed fithPattern = null;
+        PatternsRecordProcessed sxithPattern = null;
+
+        ArrayList destinationPlaces = new ArrayList();
+
+        if (firstPattern != null) {
+            destinationPlaces.add(firstPattern);
+            if (!secondPattern.placeKey.equals(firstPattern.placeKey)) {
+                destinationPlaces.add(secondPattern);
+                if (!thirdPattern.placeKey.equals(secondPattern.placeKey)) {
+                    destinationPlaces.add(thirdPattern);
+                    if (!fourthPattern.placeKey.equals(thirdPattern.placeKey)) {
+                        destinationPlaces.add(fourthPattern);
+                        if (!fithPattern.placeKey.equals(fourthPattern.placeKey)) {
+                            destinationPlaces.add(fithPattern);
+                            if (!sxithPattern.placeKey.equals(fithPattern.placeKey)) {
+                                destinationPlaces.add(sxithPattern);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < dests.size(); i++) {
+            if (firstPattern != null) {
+                if (!dests.get(i).placeKey.equals(firstPattern.placeKey)) {
+                    if (!dests.get(i).placeKey.equals(secondPattern.placeKey)) {
+                        if (!dests.get(i).placeKey.equals(thirdPattern.placeKey)) {
+                            if (!dests.get(i).placeKey.equals(fourthPattern.placeKey)) {
+                                if (!dests.get(i).placeKey.equals(fithPattern.placeKey)) {
+                                    if (!dests.get(i).placeKey.equals(sxithPattern.placeKey)) {
+                                        destinationPlaces.add(dests.get(i));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                destinationPlaces.add(dests.get(i));
+            }
+        }
+
+        ArrayList destinationPlacesFreq = new ArrayList();
+        ArrayList<Float> destinationPlacesVDFreq = new ArrayList();
+        float sumVD = Math.max(73, 73 + destFreqs.size() - 6);
+
+        switch (destFreqs.size()) {
+            case 0:
+                break;
+            case 1:
+                destinationPlacesVDFreq.add(30f / sumVD);
+                break;
+            case 2:
+                destinationPlacesVDFreq.add(30f / sumVD);
+                destinationPlacesVDFreq.add(14f / sumVD);
+                break;
+            case 3:
+                destinationPlacesVDFreq.add(30f / sumVD);
+                destinationPlacesVDFreq.add(14f / sumVD);
+                destinationPlacesVDFreq.add(11f / sumVD);
+                break;
+            case 4:
+                destinationPlacesVDFreq.add(30f / sumVD);
+                destinationPlacesVDFreq.add(14f / sumVD);
+                destinationPlacesVDFreq.add(11f / sumVD);
+                destinationPlacesVDFreq.add(9f / sumVD);
+                break;
+            case 5:
+                destinationPlacesVDFreq.add(30f / sumVD);
+                destinationPlacesVDFreq.add(14f / sumVD);
+                destinationPlacesVDFreq.add(11f / sumVD);
+                destinationPlacesVDFreq.add(9f / sumVD);
+                destinationPlacesVDFreq.add(6f / sumVD);
+                break;
+            case 6:
+                destinationPlacesVDFreq.add(30f / sumVD);
+                destinationPlacesVDFreq.add(14f / sumVD);
+                destinationPlacesVDFreq.add(11f / sumVD);
+                destinationPlacesVDFreq.add(9f / sumVD);
+                destinationPlacesVDFreq.add(6f / sumVD);
+                destinationPlacesVDFreq.add(3f / sumVD);
+                break;
+            default:
+                destinationPlacesVDFreq.add(30f / sumVD);
+                destinationPlacesVDFreq.add(14f / sumVD);
+                destinationPlacesVDFreq.add(11f / sumVD);
+                destinationPlacesVDFreq.add(9f / sumVD);
+                destinationPlacesVDFreq.add(6f / sumVD);
+                destinationPlacesVDFreq.add(3f / sumVD);
+                for (int i = 0; i < destFreqs.size() - 6; i++) {
+                    destinationPlacesVDFreq.add(1 / sumVD);
+                }
+        }
+
+        double sumOriginal = 0;
+        for (int i = 0; i < destFreqs.size(); i++) {
+            sumOriginal = sumOriginal + destFreqs.get(i);
+        }
+        for (int i = 0; i < destFreqs.size(); i++) {
+            destinationPlacesFreq.add((destinationPlacesVDFreq.get(i)) * sumOriginal);
+        }
+
+        Object[] output = new Object[2];
+        output[0] = destinationPlaces;
+        output[1] = destinationPlacesFreq;
+        return output;
+    }
+
+    public Object[] getClosenessAdjustmentCBGVD(Person agent, ArrayList<PatternsRecordProcessed> dests, ArrayList<Double> destFreqs) {
+        double first = Double.POSITIVE_INFINITY;
+        double second = Double.POSITIVE_INFINITY;
+        double third = Double.POSITIVE_INFINITY;
+        double fourth = Double.POSITIVE_INFINITY;
+        double fith = Double.POSITIVE_INFINITY;
+        double sxith = Double.POSITIVE_INFINITY;
+        PatternsRecordProcessed firstPattern = null;
+        PatternsRecordProcessed secondPattern = null;
+        PatternsRecordProcessed thirdPattern = null;
+        PatternsRecordProcessed fourthPattern = null;
+        PatternsRecordProcessed fithPattern = null;
+        PatternsRecordProcessed sxithPattern = null;
+
+        for (int j = 0; j < dests.size(); j++) {
+            double dist = Math.sqrt(Math.pow(((PatternsRecordProcessed) (dests.get(j))).place.lat - agent.homeCBGVD.lat, 2) + Math.pow(((PatternsRecordProcessed) (dests.get(j))).place.lon - agent.homeCBGVD.lon, 2));
+            if (dist < first) {
+                firstPattern = (PatternsRecordProcessed) (dests.get(j));
+            }
+            if (dist < second) {
+                secondPattern = (PatternsRecordProcessed) (dests.get(j));
+            }
+            if (dist < third) {
+                thirdPattern = (PatternsRecordProcessed) (dests.get(j));
+            }
+            if (dist < fourth) {
+                fourthPattern = (PatternsRecordProcessed) (dests.get(j));
+            }
+            if (dist < fith) {
+                fithPattern = (PatternsRecordProcessed) (dests.get(j));
+            }
+            if (dist < sxith) {
+                sxithPattern = (PatternsRecordProcessed) (dests.get(j));
+            }
+        }
+
+        ArrayList destinationPlaces = new ArrayList();
+
+        if (firstPattern != null) {
+            destinationPlaces.add(firstPattern);
+            if (!secondPattern.placeKey.equals(firstPattern.placeKey)) {
+                destinationPlaces.add(secondPattern);
+                if (!thirdPattern.placeKey.equals(secondPattern.placeKey)) {
+                    destinationPlaces.add(thirdPattern);
+                    if (!fourthPattern.placeKey.equals(thirdPattern.placeKey)) {
+                        destinationPlaces.add(fourthPattern);
+                        if (!fithPattern.placeKey.equals(fourthPattern.placeKey)) {
+                            destinationPlaces.add(fithPattern);
+                            if (!sxithPattern.placeKey.equals(fithPattern.placeKey)) {
+                                destinationPlaces.add(sxithPattern);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < dests.size(); i++) {
+            if (!dests.get(i).placeKey.equals(firstPattern.placeKey)) {
+                if (!dests.get(i).placeKey.equals(secondPattern.placeKey)) {
+                    if (!dests.get(i).placeKey.equals(thirdPattern.placeKey)) {
+                        if (!dests.get(i).placeKey.equals(fourthPattern.placeKey)) {
+                            if (!dests.get(i).placeKey.equals(fithPattern.placeKey)) {
+                                if (!dests.get(i).placeKey.equals(sxithPattern.placeKey)) {
+                                    destinationPlaces.add(dests.get(i));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        ArrayList destinationPlacesFreq = new ArrayList();
+        ArrayList<Double> destinationPlacesVDFreq = new ArrayList();
+        double sumCBGVD = Math.max(73, 73 + destFreqs.size() - 6);
+
+        switch (destFreqs.size()) {
+            case 0:
+                break;
+            case 1:
+                destinationPlacesVDFreq.add(30d / sumCBGVD);
+                break;
+            case 2:
+                destinationPlacesVDFreq.add(30d / sumCBGVD);
+                destinationPlacesVDFreq.add(14d / sumCBGVD);
+                break;
+            case 3:
+                destinationPlacesVDFreq.add(30d / sumCBGVD);
+                destinationPlacesVDFreq.add(14d / sumCBGVD);
+                destinationPlacesVDFreq.add(11d / sumCBGVD);
+                break;
+            case 4:
+                destinationPlacesVDFreq.add(30d / sumCBGVD);
+                destinationPlacesVDFreq.add(14d / sumCBGVD);
+                destinationPlacesVDFreq.add(11d / sumCBGVD);
+                destinationPlacesVDFreq.add(9d / sumCBGVD);
+                break;
+            case 5:
+                destinationPlacesVDFreq.add(30d / sumCBGVD);
+                destinationPlacesVDFreq.add(14d / sumCBGVD);
+                destinationPlacesVDFreq.add(11d / sumCBGVD);
+                destinationPlacesVDFreq.add(9d / sumCBGVD);
+                destinationPlacesVDFreq.add(6d / sumCBGVD);
+                break;
+            case 6:
+                destinationPlacesVDFreq.add(30d / sumCBGVD);
+                destinationPlacesVDFreq.add(14d / sumCBGVD);
+                destinationPlacesVDFreq.add(11d / sumCBGVD);
+                destinationPlacesVDFreq.add(9d / sumCBGVD);
+                destinationPlacesVDFreq.add(6d / sumCBGVD);
+                destinationPlacesVDFreq.add(3d / sumCBGVD);
+                break;
+            default:
+                destinationPlacesVDFreq.add(30d / sumCBGVD);
+                destinationPlacesVDFreq.add(14d / sumCBGVD);
+                destinationPlacesVDFreq.add(11d / sumCBGVD);
+                destinationPlacesVDFreq.add(9d / sumCBGVD);
+                destinationPlacesVDFreq.add(6d / sumCBGVD);
+                destinationPlacesVDFreq.add(3d / sumCBGVD);
+                for (int i = 0; i < destFreqs.size() - 6; i++) {
+                    destinationPlacesVDFreq.add(1 / sumCBGVD);
+                }
+        }
+
+        double sumOriginal = 0;
+        for (int i = 0; i < destFreqs.size(); i++) {
+            sumOriginal = sumOriginal + destFreqs.get(i);
+        }
+        for (int i = 0; i < destFreqs.size(); i++) {
+            destinationPlacesFreq.add(((destinationPlacesVDFreq.get(i) + (destFreqs.get(i) / sumOriginal)) / 2d) * sumOriginal);
+        }
+
+        Object[] output = new Object[2];
+        output[0] = destinationPlaces;
+        output[1] = destinationPlacesFreq;
+        return output;
     }
 
 }
