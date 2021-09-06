@@ -64,7 +64,11 @@ public class Safegraph extends Dataset implements Serializable {
         clearPatternsPlaces();
         for (int i = 0; i < years.length; i++) {
             for (int j = 0; j < months[i].length; j++) {
-                loadPatternsPlacesSet(years[i] + "_" + months[i][j], allGISData, project, isParallel, numCPU);
+                if (years[i] != null && months[i][j] != null) {
+                    if (years[i].length() > 0 && months[i][j].length() > 0) {
+                        loadPatternsPlacesSet(years[i] + "_" + months[i][j], allGISData, project, isParallel, numCPU);
+                    }
+                }
                 //connectPatternsAndPlaces(allPatterns.monthlyPatternsList.get(allPatterns.monthlyPatternsList.size()-1),allSafegraphPlaces.monthlySafegraphPlacesList.get(allSafegraphPlaces.monthlySafegraphPlacesList.size()-1),allGISData,isParallel,numCPU);
             }
         }
@@ -409,9 +413,9 @@ public class Safegraph extends Dataset implements Serializable {
             }
         }
     }
-    
+
     public void addSupplemenrayToGIS() {
-        
+
     }
 
     public void connectPatternsAndPlaces(Patterns patterns, SafegraphPlaces places, AllGISData allGISData, boolean isParallel, int numCPU) {
@@ -668,7 +672,7 @@ public class Safegraph extends Dataset implements Serializable {
         }
         return output;
     }
-    
+
     public ArrayList<VDCell> getVDsFromCaseStudy(Object restriction) {
         ArrayList<VDCell> output = new ArrayList();
         if (restriction instanceof City) {//SO FAR ONLY CITY IS SUPPORT
@@ -679,7 +683,7 @@ public class Safegraph extends Dataset implements Serializable {
         }
         return output;
     }
-    
+
     public ArrayList<CBGVDCell> getCBGVDsFromCaseStudy(Object restriction) {
         ArrayList<CBGVDCell> output = new ArrayList();
         if (restriction instanceof City) {//SO FAR ONLY CITY IS SUPPORT
