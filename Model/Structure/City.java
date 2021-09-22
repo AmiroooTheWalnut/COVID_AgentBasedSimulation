@@ -52,13 +52,15 @@ public class City extends Marker implements Serializable, Comparable<City> {
     public Object[] getCBGVDFromCBG(CensusBlockGroup input, boolean noNull) {
         if (cBGVDCells != null) {
             double dist = Double.MAX_VALUE;
-            Object[] closest = new Object[2];
+            Object[] closest = new Object[3];
+            closest[2] = false;
             for (int i = 0; i < cBGVDCells.size(); i++) {
                 for (int j = 0; j < cBGVDCells.get(i).cBGsIDsInvolved.size(); j++) {
                     if (cBGVDCells.get(i).cBGsIDsInvolved.get(j) == input.id) {
-                        Object[] output = new Object[2];
+                        Object[] output = new Object[3];
                         output[0] = cBGVDCells.get(i);
                         output[1] = cBGVDCells.get(i).cBGsPercentageInvolved.get(j);
+                        output[2] = true;
                         return output;
                     }
                 }
@@ -75,6 +77,20 @@ public class City extends Marker implements Serializable, Comparable<City> {
         }
         return null;
     }
+    
+    public void getCBGVDFromCBGForAllCBGs(){
+        for (int i = 0; i < censusTracts.size(); i++) {
+            for (int j = 0; j < censusTracts.get(i).censusBlocks.size(); j++) {
+                Object[] result=getCBGVDFromCBG(censusTracts.get(i).censusBlocks.get(j),true);
+                if(((boolean)(result[2]))==true){
+                    censusTracts.get(i).censusBlocks.get(j).cBGVDFromCBGResultFound=result;
+                }else{
+                    censusTracts.get(i).censusBlocks.get(j).cBGVDFromCBGResultClosest=result;
+                }
+            }
+        }
+    }
+    
 
     public void getLatLonSizeFromChildren() {
         float minLat = Float.MAX_VALUE;

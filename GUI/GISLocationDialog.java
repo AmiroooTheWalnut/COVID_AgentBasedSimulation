@@ -613,15 +613,15 @@ public class GISLocationDialog extends javax.swing.JDialog {
 
 //        months[0][0] = "03";
 //        months[0][1] = "04";
-//        months[0][2] = "05";
-//        months[0][3] = "06";
-//        months[0][4] = "07";
-//        months[0][5] = "08";
+        months[0][0] = "05";
+        months[0][1] = "06";
+        months[0][2] = "07";
+        months[0][3] = "08";
 
-        months[0][0] = "09";
-        months[0][1] = "10";
-        months[0][2] = "11";
-        months[0][3] = "12";
+        months[0][4] = "09";
+        months[0][5] = "10";
+        months[0][6] = "11";
+        months[0][7] = "12";
         months[1][0] = "01";
         months[1][1] = "02";
         months[1][2] = "03";

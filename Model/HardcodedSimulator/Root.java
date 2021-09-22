@@ -396,6 +396,20 @@ public class Root extends Agent {
 
         ArrayList cBGVDsList = makeCBGVDs(modelRoot);
         System.out.println("CBGVD size: " + cBGVDsList.size());
+        
+        if (((AgentBasedModel) (modelRoot.getABM())).studyScopeGeography instanceof Country) {
+            System.out.println("PREPROCESS OF CBG TO CBGVD FOR COUNTRY is not implemented yet!");
+        } else if (((AgentBasedModel) (modelRoot.getABM())).studyScopeGeography instanceof State) {
+            System.out.println("PREPROCESS OF CBG TO CBGVD FOR STATE is not implemented yet!");
+        } else if (((AgentBasedModel) (modelRoot.getABM())).studyScopeGeography instanceof County) {
+            System.out.println("PREPROCESS OF CBG TO CBGVD FOR COUNTY is not implemented yet!");
+        } else if (((AgentBasedModel) (modelRoot.getABM())).studyScopeGeography instanceof City) {
+            System.out.println("START PREPROCESS CBG TO CBGVD CONNECTION");
+            ((City)(modelRoot.ABM.studyScopeGeography)).getCBGVDFromCBGForAllCBGs();
+            System.out.println("FINISHED PREPROCESS CBG TO CBGVD CONNECTION");
+        } else {
+            System.out.println("Infection for less than city level not implemented yet!");
+        }
 
         runGenPeople(numAgents, modelRoot, patternRecords, numAllVisits, cBGVDsList, 1);
 //        runGenPeopleSerially(numAgents, modelRoot, patternRecords, numAllVisits, cBGsList);
@@ -456,7 +470,7 @@ public class Root extends Agent {
                 }
             }
         } else {
-            System.out.println("Infection for less than county level not implemented yet!");
+            System.out.println("Infection for less than city level not implemented yet!");
         }
 
         ArrayList<County> counties = new ArrayList();
@@ -1457,7 +1471,16 @@ public class Root extends Agent {
                     System.out.println("SEVERE ERROR: HOME CENSUS BLOCK NOT FOUND!");
                 }
                 agent.homeCBG = selectedCBG;
-                agent.homeCBGVD = (CBGVDCell) (((City) (modelRoot.getABM().studyScopeGeography)).getCBGVDFromCBG(selectedCBG,true))[0];
+                if(selectedCBG.cBGVDFromCBGResultFound!=null){
+                    agent.homeCBGVD = (CBGVDCell) (selectedCBG.cBGVDFromCBGResultFound[0]);
+                }else{
+                    if(selectedCBG.cBGVDFromCBGResultClosest==null){
+                        agent.homeCBGVD = (CBGVDCell) (((City) (modelRoot.getABM().studyScopeGeography)).getCBGVDFromCBG(selectedCBG,true))[0];
+                    }else{
+                        agent.homeCBGVD = (CBGVDCell) (selectedCBG.cBGVDFromCBGResultClosest[0]);
+                    }
+                }
+                
 //                if (modelRoot.scenario.equals("CBG")) {
 //                    agent.homeCBG = selectedCBG;
 //
@@ -1563,13 +1586,25 @@ public class Root extends Agent {
                             break;
                         }
                     }
-                    selectedCBGVD = (CBGVDCell) (((City) (modelRoot.getABM().studyScopeGeography)).getCBGVDFromCBG(selectedCBG,true))[0];
+                    
+                    
+                    //selectedCBGVD = (CBGVDCell) (((City) (modelRoot.getABM().studyScopeGeography)).getCBGVDFromCBG(selectedCBG,true))[0];
                     if (selectedCBG == null) {
                         System.out.println("KNOWN EXCEPTION: DAYTIME CENSUS BLOCK NOT FOUND!");
                         System.out.println("USING HOME AS WORK CENSUS BLOCK");
 
                         selectedCBGVD = agent.homeCBGVD;
 
+                    }else{
+                        if(selectedCBG.cBGVDFromCBGResultFound!=null){
+                            selectedCBGVD = (CBGVDCell) (selectedCBG.cBGVDFromCBGResultFound[0]);
+                        }else{
+                            if(selectedCBG.cBGVDFromCBGResultClosest==null){
+                                selectedCBGVD = (CBGVDCell) (((City) (modelRoot.getABM().studyScopeGeography)).getCBGVDFromCBG(selectedCBG,true))[0];
+                            }else{
+                                selectedCBGVD = (CBGVDCell) (selectedCBG.cBGVDFromCBGResultClosest[0]);
+                            }
+                        }
                     }
                 } else {
                     if (selectedCBGVD == null) {
@@ -1624,37 +1659,85 @@ public class Root extends Agent {
                             if (isLocalAllowed == false) {
                                 int naics_code = ((PatternsRecordProcessed) patternRecords.get(j)).place.naics_code;
                                 if (!isShop(naics_code) && !isSchool(naics_code) && !isReligiousOrganization(naics_code)) {
-                                    Object[] cBGVDReturn = (((City) (modelRoot.getABM().studyScopeGeography)).getCBGVDFromCBG(((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey()),false));
-                                    CBGVDCell cbgvd = (CBGVDCell) (cBGVDReturn[0]);
-                                    if (cbgvd != null) {
-                                        destinationPlaces.add(((PatternsRecordProcessed) (patternRecords.get(j))));
-                                        destinationPlacesFreq.add(((CensusBlockGroupIntegerTuple) (((ArrayList) (((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place())).get(k))).getValue() * ((double) (cBGVDReturn[1])));
+                                    if(((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey()).cBGVDFromCBGResultFound!=null){
+                                        Object[] cBGVDReturn=((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey()).cBGVDFromCBGResultFound;
+                                        if (cBGVDReturn != null) {
+                                            CBGVDCell cbgvd = (CBGVDCell) (cBGVDReturn[0]);
+                                            if (cbgvd != null) {
+                                                destinationPlaces.add(((PatternsRecordProcessed) (patternRecords.get(j))));
+                                                destinationPlacesFreq.add(((CensusBlockGroupIntegerTuple) (((ArrayList) (((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place())).get(k))).getValue() * ((double) (cBGVDReturn[1])));
+                                            }
+                                        }
+                                    }else{
+                                        Object[] cBGVDReturn = (((City) (modelRoot.getABM().studyScopeGeography)).getCBGVDFromCBG(((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey()),false));
+                                        CBGVDCell cbgvd = (CBGVDCell) (cBGVDReturn[0]);
+                                        if (cbgvd != null) {
+                                            destinationPlaces.add(((PatternsRecordProcessed) (patternRecords.get(j))));
+                                            destinationPlacesFreq.add(((CensusBlockGroupIntegerTuple) (((ArrayList) (((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place())).get(k))).getValue() * ((double) (cBGVDReturn[1])));
+                                        }
                                     }
+                                    
+//                                    
 
                                 }
                             } else {
                                 int naics_code = ((PatternsRecordProcessed) patternRecords.get(j)).place.naics_code;
                                 if (isShop(naics_code) == true) {
-                                    Object[] cBGVDReturn = (((City) (modelRoot.getABM().studyScopeGeography)).getCBGVDFromCBG(((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey()),false));
-                                    CBGVDCell cbgvd = (CBGVDCell) (cBGVDReturn[0]);
-                                    if (cbgvd != null) {
-                                        destinationShopPlaces.add(((PatternsRecordProcessed) (patternRecords.get(j))));
-                                        destinationShopPlacesFreq.add(((CensusBlockGroupIntegerTuple) (((ArrayList) (((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place())).get(k))).getValue() * ((double) (cBGVDReturn[1])));
+                                    if(((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey()).cBGVDFromCBGResultFound!=null)
+                                    {
+                                        Object[] cBGVDReturn = ((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey()).cBGVDFromCBGResultFound;
+                                        if (cBGVDReturn != null) {
+                                            CBGVDCell cbgvd = (CBGVDCell) (cBGVDReturn[0]);
+                                            if(cbgvd!=null){
+                                                destinationShopPlaces.add(((PatternsRecordProcessed) (patternRecords.get(j))));
+                                                destinationShopPlacesFreq.add(((CensusBlockGroupIntegerTuple) (((ArrayList) (((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place())).get(k))).getValue() * ((double) (cBGVDReturn[1])));
+                                            }
+                                        }
+                                    }else{
+                                        Object[] cBGVDReturn = (((City) (modelRoot.getABM().studyScopeGeography)).getCBGVDFromCBG(((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey()),false));
+                                        CBGVDCell cbgvd = (CBGVDCell) (cBGVDReturn[0]);
+                                        if (cbgvd != null) {
+                                            destinationShopPlaces.add(((PatternsRecordProcessed) (patternRecords.get(j))));
+                                            destinationShopPlacesFreq.add(((CensusBlockGroupIntegerTuple) (((ArrayList) (((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place())).get(k))).getValue() * ((double) (cBGVDReturn[1])));
+                                        }
                                     }
                                 } else if (isSchool(naics_code) == true) {
-                                    Object[] cBGVDReturn = (((City) (modelRoot.getABM().studyScopeGeography)).getCBGVDFromCBG(((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey()),false));
-                                    CBGVDCell cbgvd = (CBGVDCell) (cBGVDReturn[0]);
-                                    if (cbgvd != null) {
-                                        destinationSchoolPlaces.add(((PatternsRecordProcessed) (patternRecords.get(j))));
-                                        destinationSchoolPlacesFreq.add(((CensusBlockGroupIntegerTuple) (((ArrayList) (((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place())).get(k))).getValue() * ((double) (cBGVDReturn[1])));
+                                    if(((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey()).cBGVDFromCBGResultFound!=null){
+                                        Object[] cBGVDReturn = ((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey()).cBGVDFromCBGResultFound;
+                                        if (cBGVDReturn != null) {
+                                            CBGVDCell cbgvd = (CBGVDCell) (cBGVDReturn[0]);
+                                            if (cbgvd != null) {
+                                                destinationSchoolPlaces.add(((PatternsRecordProcessed) (patternRecords.get(j))));
+                                                destinationSchoolPlacesFreq.add(((CensusBlockGroupIntegerTuple) (((ArrayList) (((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place())).get(k))).getValue() * ((double) (cBGVDReturn[1])));
+                                            }
+                                        }
+                                    }else{
+                                        Object[] cBGVDReturn = (((City) (modelRoot.getABM().studyScopeGeography)).getCBGVDFromCBG(((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey()),false));
+                                        CBGVDCell cbgvd = (CBGVDCell) (cBGVDReturn[0]);
+                                        if (cbgvd != null) {
+                                            destinationSchoolPlaces.add(((PatternsRecordProcessed) (patternRecords.get(j))));
+                                            destinationSchoolPlacesFreq.add(((CensusBlockGroupIntegerTuple) (((ArrayList) (((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place())).get(k))).getValue() * ((double) (cBGVDReturn[1])));
+                                        }
                                     }
                                 } else if (isReligiousOrganization(naics_code) == true) {
-                                    Object[] cBGVDReturn = (((City) (modelRoot.getABM().studyScopeGeography)).getCBGVDFromCBG(((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey()),false));
-                                    CBGVDCell cbgvd = (CBGVDCell) (cBGVDReturn[0]);
-                                    if (cbgvd != null) {
-                                        destinationReligiousPlaces.add(((PatternsRecordProcessed) (patternRecords.get(j))));
-                                        destinationReligiousPlacesFreq.add(((CensusBlockGroupIntegerTuple) (((ArrayList) (((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place())).get(k))).getValue() * ((double) (cBGVDReturn[1])));
+                                    if(((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey()).cBGVDFromCBGResultFound!=null){
+                                        Object[] cBGVDReturn = ((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey()).cBGVDFromCBGResultFound;
+                                        if (cBGVDReturn != null) {
+                                            CBGVDCell cbgvd = (CBGVDCell) (cBGVDReturn[0]);
+                                            if(cbgvd!=null){
+                                                destinationReligiousPlaces.add(((PatternsRecordProcessed) (patternRecords.get(j))));
+                                                destinationReligiousPlacesFreq.add(((CensusBlockGroupIntegerTuple) (((ArrayList) (((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place())).get(k))).getValue() * ((double) (cBGVDReturn[1])));
+                                            }
+                                        }
+                                    }else{
+                                        Object[] cBGVDReturn = (((City) (modelRoot.getABM().studyScopeGeography)).getCBGVDFromCBG(((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey()),false));
+                                        CBGVDCell cbgvd = (CBGVDCell) (cBGVDReturn[0]);
+                                        if (cbgvd != null) {
+                                            destinationReligiousPlaces.add(((PatternsRecordProcessed) (patternRecords.get(j))));
+                                            destinationReligiousPlacesFreq.add(((CensusBlockGroupIntegerTuple) (((ArrayList) (((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place())).get(k))).getValue() * ((double) (cBGVDReturn[1])));
+                                        }
                                     }
+                                    
                                 } else {
                                     
                                     if (((CensusBlockGroup) (agent.homeCBG)).id == ((CensusBlockGroup) ((CensusBlockGroupIntegerTuple) ((ArrayList) ((PatternsRecordProcessed) (patternRecords.get(j))).getVisitor_home_cbgs_place()).get(k)).getKey()).getId()) {

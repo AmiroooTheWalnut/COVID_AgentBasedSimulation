@@ -110,6 +110,7 @@ public class ManualLoadPlacesDialog extends javax.swing.JDialog {
         if (jList1.getSelectedIndex() > -1) {
             myParent.mainModel.safegraph.clearPatternsPlaces();
             SafegraphPlaces safegraphPlaces = Safegraph.loadSafegraphPlacesKryo("./datasets/Safegraph/FullData/" + jList1.getSelectedValue() + "/processedData.bin");
+//            SafegraphPlaces safegraphPlaces1 = Safegraph.loadSafegraphPlacesKryo("./datasets/Safegraph/FullData/" + jList1.getSelectedValue() + "/processedData_withArea.bin");
             boolean isUnique = true;
             if (myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList != null) {
                 for (int i = 0; i < myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.size(); i++) {

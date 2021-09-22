@@ -742,16 +742,41 @@ public class Safegraph extends Dataset implements Serializable {
             output.name = safegraphPlaces.name;
             output.placesRecords = new ArrayList();
             for (int i = 0; i < safegraphPlaces.placesRecords.size(); i++) {
-                for (int j = 0; j < city.censusTracts.size(); j++) {
-                    if (safegraphPlaces.placesRecords.get(i).censusBlock != null) {
-                        if (safegraphPlaces.placesRecords.get(i).censusBlock.censusTract.id == city.censusTracts.get(j).id) {
-                            output.placesRecords.add(safegraphPlaces.placesRecords.get(i));
-                            break;
+                if (safegraphPlaces.placesRecords.get(i).censusBlock != null) {
+                    for (int j = 0; j < city.censusTracts.size(); j++) {
+//                        if (safegraphPlaces.placesRecords.get(i) == null) {
+//                            safegraphPlaces.placesRecords.remove(i);
+//                            i = i - 1;
+//                            continue;
+//                        }
+                        if (safegraphPlaces.placesRecords.get(i).censusBlock.state.name.equals(city.censusTracts.get(j).censusBlocks.get(0).state.name)) {
+                            if (safegraphPlaces.placesRecords.get(i).censusBlock.county.id == city.censusTracts.get(j).censusBlocks.get(0).county.id) {
+                                if (safegraphPlaces.placesRecords.get(i).censusBlock.censusTract.id == city.censusTracts.get(j).id) {
+                                    //System.out.println(city.censusTracts.get(j).censusBlocks.get(0).state.name);
+                                    output.placesRecords.add(safegraphPlaces.placesRecords.get(i));
+                                    break;
+                                }
+                            }
                         }
                     }
                 }
             }
         }
+
+//            City city = ((City) restriction);
+//            output.name = safegraphPlaces.name;
+//            output.placesRecords = new ArrayList();
+//            for (int i = 0; i < safegraphPlaces.placesRecords.size(); i++) {
+//                for (int j = 0; j < city.censusTracts.size(); j++) {
+//                    if (safegraphPlaces.placesRecords.get(i).censusBlock != null) {
+//                        if (safegraphPlaces.placesRecords.get(i).censusBlock.censusTract.id == city.censusTracts.get(j).id) {
+//                            output.placesRecords.add(safegraphPlaces.placesRecords.get(i));
+//                            break;
+//                        }
+//                    }
+//                }
+//            }
+//        }
         return output;
     }
 

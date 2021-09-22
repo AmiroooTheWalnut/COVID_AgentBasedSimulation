@@ -1244,7 +1244,18 @@ public class Person extends Agent {
                             //println("traveled!!! "+currentAgent.getMyIndex());
                             //println(currentTime.getMinute());
                             travelStartDecisionCounter = 0;
-                            Object[] cbgvd = ((City) (rootModel.ABM.studyScopeGeography)).getCBGVDFromCBG(((CensusBlockGroup) ((SafegraphPlace) (((PatternsRecordProcessed) (((ArrayList) currentAgent.destinationPlaces).get(destination))).getPlace())).getCensusBlock()),true);
+                            CensusBlockGroup cbg = (CensusBlockGroup) ((SafegraphPlace) (((PatternsRecordProcessed) (((ArrayList) currentAgent.destinationPlaces).get(destination))).getPlace())).getCensusBlock();
+                            Object[] cbgvd;
+                            if(cbg.cBGVDFromCBGResultFound!=null){
+                                cbgvd = cbg.cBGVDFromCBGResultFound;
+                            }else{
+                                if(cbg.cBGVDFromCBGResultClosest!=null){
+                                    cbgvd = cbg.cBGVDFromCBGResultClosest;
+                                }else{
+                                    cbgvd = ((City) (rootModel.ABM.studyScopeGeography)).getCBGVDFromCBG(((CensusBlockGroup) ((SafegraphPlace) (((PatternsRecordProcessed) (((ArrayList) currentAgent.destinationPlaces).get(destination))).getPlace())).getCensusBlock()),true);
+                                }
+                            }
+                            
                             currentLocation = (CBGVDCell) (cbgvd[0]);
                             currentAgent.dstIndex = destination;
                             currentAgent.lat = currentLocation.getLat();

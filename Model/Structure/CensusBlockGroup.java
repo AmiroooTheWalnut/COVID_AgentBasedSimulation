@@ -35,6 +35,9 @@ public class CensusBlockGroup extends Marker implements Serializable, Comparable
     
     public transient ArrayList<SafegraphPlace> places;
     
+    public transient Object[] cBGVDFromCBGResultFound;
+    public transient Object[] cBGVDFromCBGResultClosest;
+    
     public boolean isNewPlace(String input) {
         if (places == null) {
             places = new ArrayList();
