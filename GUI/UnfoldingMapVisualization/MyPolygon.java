@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package COVID_AgentBasedSimulation.GUI;
+package COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization;
 
 import de.fhpotsdam.unfolding.geo.Location;
 import java.util.ArrayList;
@@ -21,11 +21,11 @@ public class MyPolygon {
     public ArrayList<Location> points = new ArrayList();
     public float severity;
 
-    MyPolygon() {
+    public MyPolygon() {
 
     }
 
-    MyPolygon(MyPolygon passed_polygon) {
+    public MyPolygon(MyPolygon passed_polygon) {
         points = passed_polygon.points;
         severity = passed_polygon.severity;
     }

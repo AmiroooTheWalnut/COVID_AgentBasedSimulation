@@ -5,6 +5,7 @@
  */
 package COVID_AgentBasedSimulation.GUI;
 
+import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.ProcessingMapRenderer;
 import COVID_AgentBasedSimulation.Model.Structure.Marker;
 import de.fhpotsdam.unfolding.geo.Location;
 import java.util.ArrayList;

@@ -12,7 +12,7 @@ import COVID_AgentBasedSimulation.Model.Structure.VDCell;
  *
  * @author Amir Mohammad Esmaieeli Sikaroudi
  */
-public class VD extends Agent{
+public class VD extends Region{
     public VDCell vdVal;
     
     public int N;
@@ -21,8 +21,4 @@ public class VD extends Agent{
     public int IS;
     public int IAS;
     public int R;
-    
-    public VD(){
-        myType="VD";
-    }
 }

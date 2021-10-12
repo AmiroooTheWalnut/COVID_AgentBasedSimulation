@@ -3,25 +3,26 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package COVID_AgentBasedSimulation.GUI;
+package COVID_AgentBasedSimulation.GUI.SafegraphPreprocessor;
 
-import COVID_AgentBasedSimulation.Model.Data.Safegraph.AllSafegraphPlaces;
+import COVID_AgentBasedSimulation.GUI.MainFrame;
+import COVID_AgentBasedSimulation.Model.Data.Safegraph.AllPatterns;
+import COVID_AgentBasedSimulation.Model.Data.Safegraph.Patterns;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.Safegraph;
-import COVID_AgentBasedSimulation.Model.Data.Safegraph.SafegraphPlaces;
 
 /**
  *
  * @author Amir Mohammad Esmaieeli Sikaroudi
  */
-public class ManualCompressPlacesDialog extends javax.swing.JDialog {
+public class ManualCompressPatternsDialog extends javax.swing.JDialog {
 
     MainFrame myParent;
-    String[] placesList;
+    String[] patternsList;
     
     /**
      * Creates new form ManualCompressDialog
      */
-    public ManualCompressPlacesDialog(java.awt.Frame parent, boolean modal) {
+    public ManualCompressPatternsDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         myParent=(MainFrame)parent;
@@ -44,7 +45,7 @@ public class ManualCompressPlacesDialog extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Core places"));
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Patterns"));
 
         jScrollPane1.setViewportView(jList1);
 
@@ -97,23 +98,22 @@ public class ManualCompressPlacesDialog extends javax.swing.JDialog {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         if(jList1.getSelectedIndex()>-1){
-            SafegraphPlaces safegraphPlaces=new SafegraphPlaces();
-            safegraphPlaces.preprocessMonthCorePlaces("./datasets/Safegraph/FullData/"+jList1.getSelectedValue(),jList1.getSelectedValue(),jCheckBox1.isSelected(),myParent.numProcessors);
-            Safegraph.saveSafegraphPlacesKryo("./datasets/Safegraph/FullData/"+jList1.getSelectedValue()+"/processedData", safegraphPlaces);
+            Patterns patterns=new Patterns();
+            patterns.preprocessMonthPatterns("./datasets/Safegraph/FullData/"+jList1.getSelectedValue(),jList1.getSelectedValue(),jCheckBox1.isSelected(),myParent.numProcessors);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     public void refreshList(){
-        placesList=AllSafegraphPlaces.detectAllPlaces("./datasets/Safegraph/FullData");
+        patternsList=AllPatterns.detectAllPatterns("./datasets/Safegraph/FullData");
         jList1.setModel(new javax.swing.AbstractListModel() {
             @Override
             public int getSize() {
-                return placesList.length;
+                return patternsList.length;
             }
 
             @Override
             public Object getElementAt(int index) {
-                return placesList[index];
+                return patternsList[index];
             }
         });
     }

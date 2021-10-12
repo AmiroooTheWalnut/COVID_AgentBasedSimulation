@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package COVID_AgentBasedSimulation.GUI;
+package COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization;
 
+import COVID_AgentBasedSimulation.GUI.VoronoiGIS.GISLocationDialog;
 import de.fhpotsdam.unfolding.UnfoldingMap;
 import de.fhpotsdam.unfolding.geo.Location;
 import de.fhpotsdam.unfolding.marker.SimplePointMarker;
@@ -22,7 +23,7 @@ public class COVIDGeoVisualization extends PApplet {
 
     GISLocationDialog parent;
     
-    ArrayList<MyPolygon> polygons = new ArrayList();
+    public ArrayList<MyPolygon> polygons = new ArrayList();
     
     UnfoldingMap map;
     MapSources mapSources;
@@ -32,10 +33,10 @@ public class COVIDGeoVisualization extends PApplet {
         PApplet.runSketch(myArgs, this);
     }
 
-    COVIDGeoVisualization() {
+    public COVIDGeoVisualization() {
     }
 
-    COVIDGeoVisualization(GISLocationDialog passed_parent) {
+    public COVIDGeoVisualization(GISLocationDialog passed_parent) {
         this.parent = passed_parent;
     }
     

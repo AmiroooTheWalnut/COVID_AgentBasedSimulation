@@ -3,17 +3,19 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package COVID_AgentBasedSimulation.GUI;
+package COVID_AgentBasedSimulation.GUI.SafegraphPreprocessor;
 
-import COVID_AgentBasedSimulation.Model.Data.Safegraph.AllPatterns;
-import COVID_AgentBasedSimulation.Model.Data.Safegraph.Patterns;
+import COVID_AgentBasedSimulation.GUI.MainFrame;
+import COVID_AgentBasedSimulation.Model.Data.Safegraph.AllSafegraphPlaces;
+import COVID_AgentBasedSimulation.Model.Data.Safegraph.SafegraphPlaces;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.Safegraph;
+import java.util.ArrayList;
 
 /**
  *
  * @author Amir Mohammad Esmaieeli Sikaroudi
  */
-public class ManualLoadPatternsDialog extends javax.swing.JDialog {
+public class ManualLoadPlacesDialog extends javax.swing.JDialog {
 
     MainFrame myMainFrameParent;
     SafeGraphPreprocessDialog myParent;
@@ -22,15 +24,15 @@ public class ManualLoadPatternsDialog extends javax.swing.JDialog {
     /**
      * Creates new form ManualLoadSafegraphDialog
      */
-    public ManualLoadPatternsDialog(java.awt.Frame parent, boolean modal, SafeGraphPreprocessDialog passed_SafeGraphPreprocessDialog) {
+    public ManualLoadPlacesDialog(java.awt.Frame parent, boolean modal, SafeGraphPreprocessDialog passed_SafeGraphPreprocessDialog) {
         super(parent, modal);
         initComponents();
         myMainFrameParent = (MainFrame) parent;
-        myParent=passed_SafeGraphPreprocessDialog;
+        myParent = passed_SafeGraphPreprocessDialog;
     }
 
     public void refreshList() {
-        patternsList = AllPatterns.detectAllPatterns("./datasets/Safegraph/FullData");
+        patternsList = AllSafegraphPlaces.detectAllPlaces("./datasets/Safegraph/FullData");
         jList1.setModel(new javax.swing.AbstractListModel() {
             @Override
             public int getSize() {
@@ -108,32 +110,21 @@ public class ManualLoadPatternsDialog extends javax.swing.JDialog {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         if (jList1.getSelectedIndex() > -1) {
             myParent.mainModel.safegraph.clearPatternsPlaces();
-            Patterns patterns = Safegraph.loadPatternsKryo("./datasets/Safegraph/FullData/" + jList1.getSelectedValue() + "/processedData.bin");
-            System.out.println("PATTERNS SIZE: "+patterns.patternRecords.size());
-            double avg_num_visitors=0;
-            for(int i=0;i<patterns.patternRecords.size();i++){
-                avg_num_visitors=avg_num_visitors+patterns.patternRecords.get(i).raw_visitor_counts;
-            }
-            avg_num_visitors=avg_num_visitors/(double)patterns.patternRecords.size();
-            System.out.println("PATTERNS AVERAGE VISITORS: "+avg_num_visitors);
-            
-            double avg_num_visits=0;
-            for(int i=0;i<patterns.patternRecords.size();i++){
-                avg_num_visits=avg_num_visits+patterns.patternRecords.get(i).raw_visit_counts;
-            }
-            avg_num_visits=avg_num_visits/(double)patterns.patternRecords.size();
-            System.out.println("PATTERNS AVERAGE VISITS: "+avg_num_visits);
-            
+            SafegraphPlaces safegraphPlaces = Safegraph.loadSafegraphPlacesKryo("./datasets/Safegraph/FullData/" + jList1.getSelectedValue() + "/processedData.bin");
+//            SafegraphPlaces safegraphPlaces1 = Safegraph.loadSafegraphPlacesKryo("./datasets/Safegraph/FullData/" + jList1.getSelectedValue() + "/processedData_withArea.bin");
             boolean isUnique = true;
-            for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.size(); i++) {
-                if (myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).name.equals(patterns.name)) {
-                    isUnique = false;
+            if (myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList != null) {
+                for (int i = 0; i < myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.size(); i++) {
+                    if (myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).name.equals(safegraphPlaces.name)) {
+                        isUnique = false;
+                    }
                 }
+            }else{
+                myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList=new ArrayList();
             }
             if (isUnique == true) {
-                myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.add(patterns);
-                //byte a=0;
-                myParent.refreshPatternsList();
+                myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.add(safegraphPlaces);
+                myParent.refreshPlacesList();
             }
         }
     }//GEN-LAST:event_jButton1ActionPerformed

@@ -3,8 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package COVID_AgentBasedSimulation.GUI;
+package COVID_AgentBasedSimulation.GUI.Settings;
 
+import COVID_AgentBasedSimulation.GUI.Settings.AgentTemplateDialog;
+import COVID_AgentBasedSimulation.GUI.Settings.AgentBehaviorDialog;
 import COVID_AgentBasedSimulation.Model.MainModel;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;

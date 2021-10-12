@@ -3,8 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package COVID_AgentBasedSimulation.GUI;
+package COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization;
 
+import COVID_AgentBasedSimulation.GUI.MainFrame;
+import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MapSourse;
+import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MapSources;
 import COVID_AgentBasedSimulation.Model.Structure.Marker;
 import com.jogamp.newt.awt.NewtCanvasAWT;
 import com.jogamp.newt.opengl.GLWindow;
@@ -29,7 +32,7 @@ import processing.core.PSurface;
  */
 public class ProcessingMapRenderer extends PApplet {
 
-    UnfoldingMap map;
+    public UnfoldingMap map;
     MainFrame parentMainFrame;
     JPanel parentPanel;
     PSurface mySurface;
@@ -55,15 +58,15 @@ public class ProcessingMapRenderer extends PApplet {
     boolean isReadyPan = false;
     boolean isShowText = false;
 
-    boolean isShowGISMarkers = true;
-    boolean isShowAgentMarkers = true;
+    public boolean isShowGISMarkers = true;
+    public boolean isShowAgentMarkers = true;
 
     ProcessingMapRenderer thisRenderer;
 
-    ProcessingMapRenderer() {
+    public ProcessingMapRenderer() {
     }
 
-    ProcessingMapRenderer(MainFrame mainFrame, JPanel parent) {
+    public ProcessingMapRenderer(MainFrame mainFrame, JPanel parent) {
         parentMainFrame = mainFrame;
         parentPanel = parent;
     }

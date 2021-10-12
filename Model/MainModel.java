@@ -260,17 +260,30 @@ public class MainModel extends Dataset {
 
         ABM.currentTime = ABM.startTime;
 
-        ABM.rootAgent = ABM.makeRootAgentHardCoded();
+//        ABM.rootAgent = ABM.makeRootAgentHardCoded();
+        
+        ABM.root=new Root(this);
 
         if (scenario.equals("CBG")) {
-            ((Root) (ABM.rootAgent)).constructorCBG(this, sparsifyFraction);
+            ABM.root.constructor(this, 20, "CBG", -1);
         } else if (scenario.equals("VD")) {
-            ((Root) (ABM.rootAgent)).constructorVD(this);
+            ABM.root.constructor(this, 20, "VD", -1);
         } else if (scenario.equals("CBGVD")) {
-            ((Root) (ABM.rootAgent)).constructorCBGVD(this);
+            ABM.root.constructor(this, 20, "CBGVD", -1);
         } else if (scenario.equals("ABSVD")) {
-            ((Root) (ABM.rootAgent)).constructorABSVD(this);
+            ABM.root.constructor(this, 20, "ABSVD", -1);
         }
+        
+        
+//        if (scenario.equals("CBG")) {
+//            ((Root) (ABM.rootAgent)).constructorCBG(this, sparsifyFraction);
+//        } else if (scenario.equals("VD")) {
+//            ((Root) (ABM.rootAgent)).constructorVD(this);
+//        } else if (scenario.equals("CBGVD")) {
+//            ((Root) (ABM.rootAgent)).constructorCBGVD(this);
+//        } else if (scenario.equals("ABSVD")) {
+//            ((Root) (ABM.rootAgent)).constructorABSVD(this);
+//        }
 
         resetTimerTask(isParallelBehaviorEvaluation, numCPUs, true);
     }

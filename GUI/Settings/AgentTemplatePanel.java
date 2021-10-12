@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package COVID_AgentBasedSimulation.GUI;
+package COVID_AgentBasedSimulation.GUI.Settings;
 
+import COVID_AgentBasedSimulation.GUI.Settings.AgentTemplateDialog;
 import COVID_AgentBasedSimulation.Model.AgentBasedModel.AgentPropertyTemplate;
 import COVID_AgentBasedSimulation.Model.MainModel;
 import java.awt.event.FocusEvent;
@@ -25,7 +26,7 @@ public class AgentTemplatePanel extends javax.swing.JPanel {
     MainModel myMainModel;
     AgentTemplatePanel thisPanel;
     boolean isSelected;
-    int myIndex;
+    public int myIndex;
 
     /**
      * Creates new form AgentTemplatePanel

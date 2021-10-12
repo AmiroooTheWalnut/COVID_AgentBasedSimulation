@@ -12,7 +12,7 @@ import COVID_AgentBasedSimulation.Model.Structure.CBGVDCell;
  *
  * @author Amir Mohammad Esmaieeli Sikaroudi
  */
-public class CBGVD extends Agent{
+public class CBGVD extends Region{
     public CBGVDCell cbgvdVal;
     
     public int N;
@@ -21,8 +21,4 @@ public class CBGVD extends Agent{
     public int IS;
     public int IAS;
     public int R;
-    
-    public CBGVD(){
-        myType="CBGVD";
-    }
 }

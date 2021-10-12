@@ -3,35 +3,35 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package COVID_AgentBasedSimulation.GUI;
+package COVID_AgentBasedSimulation.GUI.SafegraphPreprocessor;
 
+import COVID_AgentBasedSimulation.GUI.MainFrame;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.AllPatterns;
+import COVID_AgentBasedSimulation.Model.Data.Safegraph.Patterns;
+import COVID_AgentBasedSimulation.Model.Data.Safegraph.Safegraph;
 
 /**
  *
  * @author Amir Mohammad Esmaieeli Sikaroudi
  */
-public class ManualLoadPatternsPlacesDialog extends javax.swing.JDialog {
+public class ManualLoadPatternsDialog extends javax.swing.JDialog {
 
     MainFrame myMainFrameParent;
     SafeGraphPreprocessDialog myParent;
     String[] patternsList;
-    
-    String loadScope;
-    
+
     /**
-     * Creates new form ManualLoadPatternsPlaces
+     * Creates new form ManualLoadSafegraphDialog
      */
-    public ManualLoadPatternsPlacesDialog(java.awt.Frame parent, boolean modal, String passed_loadScope, SafeGraphPreprocessDialog passed_SafeGraphPreprocessDialog) {
+    public ManualLoadPatternsDialog(java.awt.Frame parent, boolean modal, SafeGraphPreprocessDialog passed_SafeGraphPreprocessDialog) {
         super(parent, modal);
         initComponents();
         myMainFrameParent = (MainFrame) parent;
         myParent=passed_SafeGraphPreprocessDialog;
-        loadScope=passed_loadScope;
     }
-    
+
     public void refreshList() {
-        patternsList = AllPatterns.detectAllPatterns("./datasets/Safegraph/"+loadScope);
+        patternsList = AllPatterns.detectAllPatterns("./datasets/Safegraph/FullData");
         jList1.setModel(new javax.swing.AbstractListModel() {
             @Override
             public int getSize() {
@@ -55,22 +55,23 @@ public class ManualLoadPatternsPlacesDialog extends javax.swing.JDialog {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
+        jButton1 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jList1 = new javax.swing.JList<>();
-        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Patterns and places"));
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Patterns"));
 
-        jScrollPane1.setViewportView(jList1);
-
-        jButton1.setText("Load compressed files");
+        jButton1.setText("Load compressed raw data");
+        jButton1.setToolTipText("");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
             }
         });
+
+        jScrollPane1.setViewportView(jList1);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -80,12 +81,12 @@ public class ManualLoadPatternsPlacesDialog extends javax.swing.JDialog {
                 .addContainerGap()
                 .addComponent(jButton1)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 385, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 390, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 362, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 363, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton1)
                 .addContainerGap())
@@ -108,40 +109,35 @@ public class ManualLoadPatternsPlacesDialog extends javax.swing.JDialog {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         if (jList1.getSelectedIndex() > -1) {
             myParent.mainModel.safegraph.clearPatternsPlaces();
-            String temp[]=jList1.getSelectedValue().split("_");
-            myParent.mainModel.safegraph.loadPatternsPlacesSet(temp[1]+"_"+temp[2], myParent.mainModel.allGISData, loadScope, true, myMainFrameParent.numProcessors);
-            myParent.refreshPatternsList();
-            myParent.refreshPlacesList();
-                    
-//            Patterns patterns = Safegraph.loadPatternsKryo("./datasets/Safegraph/FullData/" + jList1.getSelectedValue() + "/processedData.bin");
-//            System.out.println("PATTERNS SIZE: "+patterns.patternRecords.size());
-//            double avg_num_visitors=0;
-//            for(int i=0;i<patterns.patternRecords.size();i++){
-//                avg_num_visitors=avg_num_visitors+patterns.patternRecords.get(i).raw_visitor_counts;
-//            }
-//            avg_num_visitors=avg_num_visitors/(double)patterns.patternRecords.size();
-//            System.out.println("PATTERNS AVERAGE VISITORS: "+avg_num_visitors);
-//            
-//            double avg_num_visits=0;
-//            for(int i=0;i<patterns.patternRecords.size();i++){
-//                avg_num_visits=avg_num_visits+patterns.patternRecords.get(i).raw_visit_counts;
-//            }
-//            avg_num_visits=avg_num_visits/(double)patterns.patternRecords.size();
-//            System.out.println("PATTERNS AVERAGE VISITS: "+avg_num_visits);
-//            
-//            boolean isUnique = true;
-//            for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.size(); i++) {
-//                if (myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).name.equals(patterns.name)) {
-//                    isUnique = false;
-//                }
-//            }
-//            if (isUnique == true) {
-//                myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.add(patterns);
-//                myParent.refreshPatternsList();
-//            }
+            Patterns patterns = Safegraph.loadPatternsKryo("./datasets/Safegraph/FullData/" + jList1.getSelectedValue() + "/processedData.bin");
+            System.out.println("PATTERNS SIZE: "+patterns.patternRecords.size());
+            double avg_num_visitors=0;
+            for(int i=0;i<patterns.patternRecords.size();i++){
+                avg_num_visitors=avg_num_visitors+patterns.patternRecords.get(i).raw_visitor_counts;
+            }
+            avg_num_visitors=avg_num_visitors/(double)patterns.patternRecords.size();
+            System.out.println("PATTERNS AVERAGE VISITORS: "+avg_num_visitors);
+            
+            double avg_num_visits=0;
+            for(int i=0;i<patterns.patternRecords.size();i++){
+                avg_num_visits=avg_num_visits+patterns.patternRecords.get(i).raw_visit_counts;
+            }
+            avg_num_visits=avg_num_visits/(double)patterns.patternRecords.size();
+            System.out.println("PATTERNS AVERAGE VISITS: "+avg_num_visits);
+            
+            boolean isUnique = true;
+            for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.size(); i++) {
+                if (myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).name.equals(patterns.name)) {
+                    isUnique = false;
+                }
+            }
+            if (isUnique == true) {
+                myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.add(patterns);
+                //byte a=0;
+                myParent.refreshPatternsList();
+            }
         }
     }//GEN-LAST:event_jButton1ActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;

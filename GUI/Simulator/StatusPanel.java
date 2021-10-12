@@ -3,8 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package COVID_AgentBasedSimulation.GUI;
+package COVID_AgentBasedSimulation.GUI.Simulator;
 
+import COVID_AgentBasedSimulation.GUI.Settings.AgentTemplateDialog;
+import COVID_AgentBasedSimulation.GUI.Settings.AgentTemplatePanel;
 import COVID_AgentBasedSimulation.Model.AgentBasedModel.AgentTemplate;
 import COVID_AgentBasedSimulation.Model.MainModel;
 import java.awt.Color;
@@ -23,7 +25,7 @@ public class StatusPanel extends javax.swing.JPanel {
     MainModel myMainModel;
     AgentTemplatePanel thisPanel;
 //    boolean isSelected;
-    int myIndex;
+    public int myIndex;
 
     /**
      * Creates new form StatusPanel

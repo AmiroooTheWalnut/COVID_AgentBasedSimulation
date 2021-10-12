@@ -3,8 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package COVID_AgentBasedSimulation.GUI;
+package COVID_AgentBasedSimulation.GUI.VoronoiGIS;
 
+import COVID_AgentBasedSimulation.GUI.MainFrame;
+import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MyPolygon;
+import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.COVIDGeoVisualization;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.LocationNodeSafegraph;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.PatternsRecordProcessed;
 import COVID_AgentBasedSimulation.Model.MainModel;
@@ -70,7 +73,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
     MainFrame myParent;
 
     MainFramePanel mainFParent;
-    COVIDGeoVisualization renderer;
+    public COVIDGeoVisualization renderer;
 
     FacilityLocation[] shopFacilities;
     FacilityLocation[] schoolFacilities;

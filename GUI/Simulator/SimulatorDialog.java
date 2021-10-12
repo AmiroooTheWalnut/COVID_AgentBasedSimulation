@@ -3,9 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package COVID_AgentBasedSimulation.GUI;
+package COVID_AgentBasedSimulation.GUI.Simulator;
 
-import COVID_AgentBasedSimulation.GUI.ProcessingMapRenderer.Vector3f;
+import COVID_AgentBasedSimulation.GUI.MainFrame;
+import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.ProcessingMapRenderer;
+import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.ProcessingMapRenderer.Vector3f;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Person;
 import COVID_AgentBasedSimulation.Model.Structure.Marker;
 import de.fhpotsdam.unfolding.geo.Location;
@@ -1382,7 +1384,7 @@ public class SimulatorDialog extends javax.swing.JDialog {
                                 int status = -1;
                                 lat = (Float) ((Person) myParent.mainModel.ABM.agents.get(i)).lat;
                                 lon = (Float) ((Person) myParent.mainModel.ABM.agents.get(i)).lon;
-                                status = (Integer) ((Person) myParent.mainModel.ABM.agents.get(i)).status;
+                                status = (Integer) ((Person) myParent.mainModel.ABM.agents.get(i)).properties.status;
                                 if (lat != null && lon != null) {
                                     lats.add(lat);
                                     lons.add(lon);

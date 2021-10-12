@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package COVID_AgentBasedSimulation.GUI;
+package COVID_AgentBasedSimulation.GUI.Settings;
 
+import COVID_AgentBasedSimulation.GUI.Simulator.StatusPanel;
 import COVID_AgentBasedSimulation.Model.AgentBasedModel.AgentPropertyTemplate;
 import COVID_AgentBasedSimulation.Model.AgentBasedModel.AgentTemplate;
 import COVID_AgentBasedSimulation.Model.AgentBasedModel.BehaviorScript;
@@ -31,7 +32,7 @@ import javax.swing.tree.TreeSelectionModel;
 public class AgentTemplateDialog extends javax.swing.JDialog {
 
     MainModel myMainModel;
-    AgentTemplate workingAgentTemplate;
+    public AgentTemplate workingAgentTemplate;
     SimulatorSettingsDialog myParent;
     AgentTemplatePanel selectedAgentTemplatePanel;
     AgentPropertyTemplate selectedAgentPropertyTemplate;

@@ -3,8 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package COVID_AgentBasedSimulation.GUI;
+package COVID_AgentBasedSimulation.GUI.SafegraphPreprocessor;
 
+import COVID_AgentBasedSimulation.GUI.MainFrame;
+import COVID_AgentBasedSimulation.GUI.SafegraphPreprocessor.ManualLoadPlacesDialog;
+import COVID_AgentBasedSimulation.GUI.SafegraphPreprocessor.ManualLoadPatternsPlacesDialog;
+import COVID_AgentBasedSimulation.GUI.SafegraphPreprocessor.ManualLoadPatternsDialog;
+import COVID_AgentBasedSimulation.GUI.SafegraphPreprocessor.ManualCompressPlacesDialog;
+import COVID_AgentBasedSimulation.GUI.SafegraphPreprocessor.ManualCompressPatternsDialog;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.AllPatterns;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.AllSafegraphPlaces;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.Patterns;
@@ -24,10 +30,10 @@ import java.util.List;
  */
 public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
 
-    MainFrame myParent;
-    MainModel mainModel;
+    public MainFrame myParent;
+    public MainModel mainModel;
 
-    String[] patternsList;
+    public String[] patternsList;
 
     /**
      * Creates new form SafeGraphPreprocessDialog

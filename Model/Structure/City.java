@@ -77,20 +77,19 @@ public class City extends Marker implements Serializable, Comparable<City> {
         }
         return null;
     }
-    
-    public void getCBGVDFromCBGForAllCBGs(){
+
+    public void getCBGVDFromCBGForAllCBGs() {
         for (int i = 0; i < censusTracts.size(); i++) {
             for (int j = 0; j < censusTracts.get(i).censusBlocks.size(); j++) {
-                Object[] result=getCBGVDFromCBG(censusTracts.get(i).censusBlocks.get(j),true);
-                if(((boolean)(result[2]))==true){
-                    censusTracts.get(i).censusBlocks.get(j).cBGVDFromCBGResultFound=result;
-                }else{
-                    censusTracts.get(i).censusBlocks.get(j).cBGVDFromCBGResultClosest=result;
+                Object[] result = getCBGVDFromCBG(censusTracts.get(i).censusBlocks.get(j), true);
+                if (((boolean) (result[2])) == true) {
+                    censusTracts.get(i).censusBlocks.get(j).cBGVDFromCBGResultFound = result;
+                } else {
+                    censusTracts.get(i).censusBlocks.get(j).cBGVDFromCBGResultClosest = result;
                 }
             }
         }
     }
-    
 
     public void getLatLonSizeFromChildren() {
         float minLat = Float.MAX_VALUE;
@@ -172,6 +171,16 @@ public class City extends Marker implements Serializable, Comparable<City> {
     @Override
     public int compareTo(City o) {
         return name.compareTo(o.name);
+    }
+
+    public CensusBlockGroup findCBG(long id) {
+        for (int i = 0; i < censusTracts.size(); i++) {
+            CensusBlockGroup cBG = censusTracts.get(i).findCensusBlock(id);
+            if(cBG!=null){
+                return cBG;
+            }
+        }
+        return null;
     }
 
 }
