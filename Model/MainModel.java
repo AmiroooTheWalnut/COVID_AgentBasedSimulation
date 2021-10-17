@@ -265,7 +265,7 @@ public class MainModel extends Dataset {
         ABM.root=new Root(this);
 
         if (scenario.equals("CBG")) {
-            ABM.root.constructor(this, 20, "CBG", -1);
+            ABM.root.constructor(this, 8000, "CBG", -1);
         } else if (scenario.equals("VD")) {
             ABM.root.constructor(this, 20, "VD", -1);
         } else if (scenario.equals("CBGVD")) {

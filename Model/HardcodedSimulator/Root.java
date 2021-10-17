@@ -22,7 +22,10 @@ import COVID_AgentBasedSimulation.Model.Structure.City;
 import COVID_AgentBasedSimulation.Model.Structure.CensusTract;
 import COVID_AgentBasedSimulation.Model.Data.CovidCsseJhu.DailyConfirmedCases;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilPersonManager;
-import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilSimulator;
+import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilSimulatorController;
+import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilSimulatorController.endDay;
+import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilSimulatorController.startDay;
+import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilSimulatorController.updateHour;
 import COVID_AgentBasedSimulation.Model.Structure.CBGVDCell;
 import COVID_AgentBasedSimulation.Model.Structure.VDCell;
 import com.opencsv.CSVWriter;
@@ -36,6 +39,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -75,6 +79,8 @@ public class Root extends Agent {
     public boolean isLocalAllowed = true;
 
     public int agentPairContact[][];
+    
+//    ShamilSimulatorController shamilSimulatorController;
 
     public Root(MainModel modelRoot) {
         myType = "root";
@@ -99,7 +105,26 @@ public class Root extends Agent {
         generateSchedules(modelRoot, passed_regionType, regions);
         generateAgents(modelRoot, passed_numAgents);
         
-        ShamilSimulator.shamilAgentGeneration(people);
+        if(modelRoot.ABM.isShamilABMActive==true){
+//            shamilSimulatorController=new ShamilSimulatorController();
+            ShamilSimulatorController.shamilAgentGeneration(people);
+            if(modelRoot.ABM.isOurABMActive==false){
+                ShamilSimulatorController.shamilInitialInfection(people);
+            }else{
+                for(int i=0;i<people.size();i++){
+                people.get(i).isActive=true;
+            }
+            }
+        }else{
+            if(modelRoot.ABM.isOurABMActive==true){
+                for(int i=0;i<people.size();i++){
+                people.get(i).isActive=true;
+            }
+            }
+        }
+        
+        
+        
     }
     
     
@@ -792,7 +817,32 @@ public class Root extends Agent {
 //        counter = 0;
     }
 
+    @Override
     public void behavior(MainModel modelRoot) {
+        if(modelRoot.ABM.isOurABMActive==true && modelRoot.ABM.isShamilABMActive==true){
+            
+        }else if(modelRoot.ABM.isOurABMActive==false && modelRoot.ABM.isShamilABMActive==true){
+            Duration d=Duration.between(modelRoot.ABM.startTime, modelRoot.ABM.currentTime);
+            int day=(int)(d.toDays());
+            if(modelRoot.ABM.currentTime.getHour()==0 && modelRoot.ABM.currentTime.getMinute()==0){
+                startDay(people,day);
+            }
+            if(modelRoot.ABM.currentTime.getMinute()==0){
+                updateHour(people,modelRoot.ABM.currentTime.getHour(),day);
+            }
+            if(modelRoot.ABM.currentTime.getHour()==23 && modelRoot.ABM.currentTime.getMinute()==59){
+                endDay(people,day);
+                int sumInfected=0;
+                for(int i=0;i<people.size();i++){
+                    if(people.get(i).shamilPersonProperties.isInfected==true && !people.get(i).shamilPersonProperties.state.equals("recovered") && people.get(i).shamilPersonProperties.isAlive==true){
+                        sumInfected=sumInfected+1;
+                    }
+                }
+                System.out.println("Day: "+day+" sumInfected: "+sumInfected);
+            }
+        } else if(modelRoot.ABM.isOurABMActive==true && modelRoot.ABM.isShamilABMActive==false){
+            
+        }
 //        writeMinuteRecord(modelRoot, currentAgent, modelRoot.getABM().getCurrentTime());
 //        writeDailyContactRate(modelRoot);
     }

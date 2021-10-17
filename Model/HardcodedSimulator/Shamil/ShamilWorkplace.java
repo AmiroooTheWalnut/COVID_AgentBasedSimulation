@@ -11,6 +11,6 @@ import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilGroup;
  *
  * @author user
  */
-public class ShamilWorkplace extends ShamilGroup{
+public class ShamilWorkplace{
     
 }

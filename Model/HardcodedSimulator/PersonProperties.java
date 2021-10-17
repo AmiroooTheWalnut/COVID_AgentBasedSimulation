@@ -4,7 +4,7 @@
  */
 package COVID_AgentBasedSimulation.Model.HardcodedSimulator;
 
-import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilAction;
+import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilTemplateAction;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilTask;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilProfession;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.DwellTime;

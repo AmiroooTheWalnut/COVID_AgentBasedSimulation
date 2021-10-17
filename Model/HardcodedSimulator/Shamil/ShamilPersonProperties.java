@@ -21,8 +21,8 @@ public class ShamilPersonProperties {
     public ArrayList<ShamilAction> actions;
     
     public ShamilTask currentTask;
-    public boolean isAlive;
-    public boolean isInfected;
+    public boolean isAlive=true;
+    public boolean isInfected=false;
     
     public double infectionLevel;
     public Object infectedBy;

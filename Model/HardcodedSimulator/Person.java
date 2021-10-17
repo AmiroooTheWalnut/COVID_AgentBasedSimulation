@@ -33,6 +33,8 @@ public class Person extends Agent {
 
     public PersonProperties properties = new PersonProperties();
     public ShamilPersonProperties shamilPersonProperties = new ShamilPersonProperties();
+    
+    public boolean isActive=false;//IF OUR ABM IS ACTIVE, THEN THIS CLASS'S BEHAVIOR WILL RUN
 
 //    public CensusBlockGroup homeCBG;
 //    public VDCell homeVD;
@@ -83,9 +85,9 @@ public class Person extends Agent {
 //        SUSCEPTIBLE, EXPOSED, INFECTED_SYM, INFECTED_ASYM, RECOVERED, DEAD;
 //    }
 //
-//    public Person() {
-//        myType = "Person";
-//    }
+    public Person() {
+        myType = "Person";
+    }
 //    
 //    public void activityAtHome(){
 //        
@@ -103,7 +105,14 @@ public class Person extends Agent {
 //
 //    }
 //
-//    public void behavior(MainModel modelRoot) {
+    
+    @Override
+    public void behavior(MainModel modelRoot) {
+        if(isActive==true){
+            
+        }
+        
+        
 //        if (modelRoot.scenario.equals("CBG")) {
 //            runCBG(currentAgent, modelRoot, modelRoot.getABM().getCurrentTime());
 //        } else if (modelRoot.scenario.equals("VD")) {
@@ -113,8 +122,8 @@ public class Person extends Agent {
 //        } else if (modelRoot.scenario.equals("ABSVD")) {
 //            runVD(currentAgent, modelRoot, modelRoot.getABM().getCurrentTime());
 //        }
-//
-//    }
+
+    }
 //
 //    //@CompileStatic
 //    void runCBG(Person currentAgent, MainModel rootModel, ZonedDateTime currentTime) {

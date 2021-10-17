@@ -18,7 +18,7 @@ public class ShamilProfession {
     public int max_age;
     public double percentage;
     
-    public ArrayList<ShamilTemplateTask> tasks_df;
+    public ArrayList<ShamilTemplateTask> tasks_df=new ArrayList();
 
     public ShamilProfession(String passed_name, int passed_min_age, int passed_max_age, double passed_percentage) {
         name = passed_name;
@@ -39,6 +39,7 @@ public class ShamilProfession {
                 tasks_df.add(task);
                 task=new ShamilTemplateTask("Attend Event",12,14,2,4,0.3,0.9);
                 tasks_df.add(task);
+                break;
             case "Driver":
                 task=new ShamilTemplateTask("Stay Home",0,0,6,7,1,1);
                 tasks_df.add(task);
@@ -52,6 +53,7 @@ public class ShamilProfession {
                 tasks_df.add(task);
                 task=new ShamilTemplateTask("Attend Event",12,14,2,4,0.3,0.6);
                 tasks_df.add(task);
+                break;
             case "Doctor":
                 task=new ShamilTemplateTask("Stay Home",0,0,7,8,1,1);
                 tasks_df.add(task);
@@ -65,6 +67,7 @@ public class ShamilProfession {
                 tasks_df.add(task);
                 task=new ShamilTemplateTask("Attend Event",12,14,2,4,0.3,0.7);
                 tasks_df.add(task);
+                break;
             case "Student":
                 task=new ShamilTemplateTask("Stay Home",0,0,7,8,1,1);
                 tasks_df.add(task);
@@ -78,6 +81,7 @@ public class ShamilProfession {
                 tasks_df.add(task);
                 task=new ShamilTemplateTask("Attend Event",12,14,2,4,0.4,0.9);
                 tasks_df.add(task);
+                break;
             case "Unemployed":
                 task=new ShamilTemplateTask("Stay Home",0,0,12,13,1,1);
                 tasks_df.add(task);
@@ -89,12 +93,15 @@ public class ShamilProfession {
                 tasks_df.add(task);
                 task=new ShamilTemplateTask("Attend Event",13,14,2,4,0.35,0.6);
                 tasks_df.add(task);
+                break;
             case "Hospitalized":
                 task=new ShamilTemplateTask("Stay Hospital",0,0,24,24,1,1);
                 tasks_df.add(task);
+                break;
             case "NoOutingAllowed":
                 task=new ShamilTemplateTask("Stay Home",0,0,24,24,1,1);
                 tasks_df.add(task);
+                break;
         }
     }
 

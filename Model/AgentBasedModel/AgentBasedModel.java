@@ -51,6 +51,10 @@ public class AgentBasedModel {
     public transient Object studyScopeGeography;
     
     public boolean isReportContactRate=true;
+    
+    public boolean isOurABMActive=false;
+    public boolean isShamilABMActive=false;
+    public boolean isAirQualityActive=false;
 
     private transient MainModel myMainModel;
 
@@ -133,7 +137,7 @@ public class AgentBasedModel {
         } else {
             Agent currentEvaluatingAgent[] = new Agent[1];
             try {
-                currentEvaluatingAgent[0] = rootAgent;
+                currentEvaluatingAgent[0] = root;
                 
                 currentEvaluatingAgent[0].behavior(myMainModel);
                 
@@ -497,6 +501,9 @@ public class AgentBasedModel {
                     endTime = zonedDateTime;
                 }
             }
+            isOurABMActive = result.isOurABMActive;
+            isShamilABMActive = result.isShamilABMActive;
+            isAirQualityActive = result.isAirQualityActive;
             isPatternBasedTime = result.isPatternBasedTime;
         } catch (FileNotFoundException ex) {
             Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);

@@ -4,6 +4,7 @@
  */
 package COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil;
 
+import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilPersonManager.randn;
 import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilPersonManager.rnd;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,14 +20,14 @@ public class ShamilTaskManager {
         ArrayList<ShamilTask> taskList = new ArrayList();
         
         for (int index = 0; index < profession.tasks_df.size(); index++) {
-            double prob = profession.tasks_df.get(index).min_prob + rnd.nextGaussian() * profession.tasks_df.get(index).max_prob;
+            double prob = randn(profession.tasks_df.get(index).min_prob, profession.tasks_df.get(index).max_prob);
             
             if (prob < 0.5) {
                 
                 continue;
             }
-            double start_time = profession.tasks_df.get(index).min_start_time + rnd.nextGaussian() * profession.tasks_df.get(index).max_start_time;
-            double duration = profession.tasks_df.get(index).min_duration + rnd.nextGaussian() * profession.tasks_df.get(index).max_duration;
+            double start_time = Math.round(randn(profession.tasks_df.get(index).min_start_time,profession.tasks_df.get(index).max_start_time));
+            double duration = Math.round(randn(profession.tasks_df.get(index).min_duration,profession.tasks_df.get(index).max_duration));
             
             taskList.add(new ShamilTask(profession.tasks_df.get(index).task, start_time, start_time + duration));
 
@@ -93,8 +94,9 @@ public class ShamilTaskManager {
         }
 
         // filling up gaps
-        for (int j = 1; j < tasks.size(); j++) {// i in range(1,len(tasks)):
-            tasks.get(i - 1).end_time = tasks.get(i).start_time;
+        newTasks.get(newTasks.size()-1).end_time=24;//ADDED BY AMIROOO
+        for (int j = 1; j < newTasks.size(); j++) {// i in range(1,len(tasks)):
+            newTasks.get(j - 1).end_time = newTasks.get(j).start_time;//EDITED BY AMIROOO
 //            tasks[i-1].end_time = tasks[i].start_time;
         }
         
