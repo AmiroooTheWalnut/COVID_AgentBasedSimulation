@@ -40,7 +40,8 @@ public class ShamilPersonManager {
             put("n_events", 100d);
 //        put("n_persons",10000d);
 //        put("n_infected_init",252d);
-            put("awareness_start", 7d);
+//            put("awareness_start", 7d);//ORIGINAL
+            put("awareness_start", 0d);
             put("quarantine_start", 27d);
 //            put("quarantined_person_ratio", 0.5d);//ORIGINAL
             put("quarantined_person_ratio", 0.01d);
@@ -58,10 +59,14 @@ public class ShamilPersonManager {
 
     static HashMap<String, Double> thresholds_df = new HashMap<String, Double>() {
         {
-            put("ACTION_OCCURRING_PROBABILITY", 0.55);
-            put("ACTION_AFFECTING_PROBABILITY", 0.55);
+//            put("ACTION_OCCURRING_PROBABILITY", 0.55);//ORIGINAL
+//            put("ACTION_AFFECTING_PROBABILITY", 0.55);//ORIGINAL
+            put("ACTION_OCCURRING_PROBABILITY", 0.35);
+            put("ACTION_AFFECTING_PROBABILITY", 0.75);
+            //put("ACTION_INFECT_THRESHOLD", 0.45);//ORIGINAL
             put("ACTION_INFECT_THRESHOLD", 0.45);
-            put("INFECTION_PROBABILITY", 0.55);
+            //put("INFECTION_PROBABILITY", 0.55);//ORIGINAL
+            put("INFECTION_PROBABILITY", 0.6);
             put("PROTECTION_LEVEL_THRESH", 0.4);
         }
     };
@@ -188,7 +193,11 @@ public class ShamilPersonManager {
             } else {
                 selectedProfession = 3;
             }
-            persons.get(i).shamilPersonProperties.profession = profession_df.get(selectedProfession);
+//            persons.get(i).shamilPersonProperties.profession = profession_df.get(selectedProfession);
+            
+            persons.get(i).shamilPersonProperties.profession = new ShamilProfession(profession_df.get(selectedProfession));//ADDED "NEW" TO MAKE SURE A DEEP COPY IS TAKEN
+            persons.get(i).shamilPersonProperties.initialProfession=new ShamilProfession(persons.get(i).shamilPersonProperties.profession);
+            
             age = (int) (profession_df.get(selectedProfession).min_age + Math.random() * (profession_df.get(selectedProfession).max_age - profession_df.get(selectedProfession).min_age));
             if (family_size_counter == 0) {
                 family_id = family_id + 1;
@@ -272,15 +281,15 @@ public class ShamilPersonManager {
 //        if(numInfection==0){//ADDED BY AMIROOO
 //            System.out.println("!!!!!!!!!");//ADDED BY AMIROOO
 //        }//ADDED BY AMIROOO
-        if(person==null){//ADDED BY AMIROOO
-            System.out.println("!!!!!!!!!");//ADDED BY AMIROOO
-        }//ADDED BY AMIROOO
-        if(person.shamilPersonProperties.profession==null){//ADDED BY AMIROOO
-            System.out.println("!!!!!!!!!");//ADDED BY AMIROOO
-        }//ADDED BY AMIROOO
-        if(person.shamilPersonProperties.profession.name==null){//ADDED BY AMIROOO
-            System.out.println("!!!!!!!!!");//ADDED BY AMIROOO
-        }//ADDED BY AMIROOO
+//        if(person==null){//ADDED BY AMIROOO
+//            System.out.println("!!!!!!!!!");//ADDED BY AMIROOO
+//        }//ADDED BY AMIROOO
+//        if(person.shamilPersonProperties.profession==null){//ADDED BY AMIROOO
+//            System.out.println("!!!!!!!!!");//ADDED BY AMIROOO
+//        }//ADDED BY AMIROOO
+//        if(person.shamilPersonProperties.profession.name==null){//ADDED BY AMIROOO
+//            System.out.println("!!!!!!!!!");//ADDED BY AMIROOO
+//        }//ADDED BY AMIROOO
         if (person.shamilPersonProperties.profession.name.equals("Hospitalized") || person.shamilPersonProperties.profession.name.equals("Doctor")) {
             if (randnum > 0.7) {
                 person.shamilPersonProperties.protectionLevel = 0.5 + extra_protection;
@@ -306,7 +315,6 @@ public class ShamilPersonManager {
     }
 
     public static void hospitalize(Person person) {
-
         if (person.shamilPersonProperties.isInfected == true && !(person.shamilPersonProperties.profession.name.equals("Hospitalized"))) {
             double tmp = Math.random();
             if (tmp > 0.75) {

@@ -19,14 +19,14 @@ public class ShamilDaySimulator {
     public static void dayStart(ArrayList<Person> people, int day) {
         double awareness_start = ShamilPersonManager.preference_def.get("awareness_start");
         double quarantine_start = ShamilPersonManager.preference_def.get("quarantine_start");
-        
-        int sumInfected=0;
-        for(int i=0;i<people.size();i++){
-                    if(people.get(i).shamilPersonProperties.isInfected==true && !people.get(i).shamilPersonProperties.state.equals("recovered") && people.get(i).shamilPersonProperties.isAlive==true){
-                        sumInfected=sumInfected+1;
-                    }
-                }
-        
+
+        int sumInfected = 0;
+        for (int i = 0; i < people.size(); i++) {
+            if (people.get(i).shamilPersonProperties.isInfected == true && !people.get(i).shamilPersonProperties.state.equals("recovered") && people.get(i).shamilPersonProperties.isAlive == true) {
+                sumInfected = sumInfected + 1;
+            }
+        }
+
         for (int i = 0; i < people.size(); i++) {
             people.get(i).shamilPersonProperties.infectionLevel = 0;
             if (day >= awareness_start) {
@@ -141,43 +141,45 @@ public class ShamilDaySimulator {
                     } else if (prsn.shamilPersonProperties.infectedDays == 4) {
                         prsn.shamilPersonProperties.state = "contagious_asymptomatic";
                     } else if (prsn.shamilPersonProperties.infectedDays == 6) {
-                        prsn.shamilPersonProperties.state = "contagious_symptomatic";
+                        if (Math.random() > 0.7) {//ADDED BY AMIROOO
+                            prsn.shamilPersonProperties.state = "contagious_symptomatic";
 
-                        // # elif(prsn.infected_days==1):
-                        // #     prsn.setState('contagious_symptomatic')
-                        // #contact trace
-                        if (prsn.shamilPersonProperties.isTraceable == true) {
-                            int TRACING_STARTS_ON_DAY = 21;
-                            if (num_of_day >= TRACING_STARTS_ON_DAY) {
-                                int trace_start = Math.max(1, (num_of_day - trace_days + 1));
-                                int rangeday = num_of_day + 1;
-                                for (int numday = trace_start; numday < rangeday; numday++) {// numday in range(trace_start,rangeday):
+                            // # elif(prsn.infected_days==1):
+                            // #     prsn.setState('contagious_symptomatic')
+                            // #contact trace
+                            if (prsn.shamilPersonProperties.isTraceable == true) {
+                                int TRACING_STARTS_ON_DAY = 21;
+                                if (num_of_day >= TRACING_STARTS_ON_DAY) {
+                                    int trace_start = Math.max(1, (num_of_day - trace_days + 1));
+                                    int rangeday = num_of_day + 1;
+                                    for (int numday = trace_start; numday < rangeday; numday++) {// numday in range(trace_start,rangeday):
 //                                    filename = 'group_info_day_' + str(numday) + '.p'                    
 //                                    groupfile = open(filename,'rb')
 //                                    groupdetails = pickle.load(groupfile)
 //                                    groupfile.close()
 
-                                    for (int k = 0; k < groupdetails.size(); k++) { // hourgroup in groupdetails:
-                                        double record_found_prob = Math.random();
-                                        double PROBABILITY_OF_RECORD_EXISTING = 0.9;
+                                        for (int k = 0; k < groupdetails.size(); k++) { // hourgroup in groupdetails:
+                                            double record_found_prob = Math.random();
+                                            double PROBABILITY_OF_RECORD_EXISTING = 0.9;
 
 //                                        record_found_prob = np.random.rand()
 //                                        PROBABILITY_OF_RECORD_EXISTING = 0.9
-                                        if (record_found_prob < PROBABILITY_OF_RECORD_EXISTING) {
-                                            ArrayList<Integer> grparray = groupdetails.get(k).get(prsn.shamilPersonProperties.id); //[prsn.id]
-                                            for (int m = 0; m < grparray.size(); m++) { // contactperson_id in grparray:
-                                                int contactperson_id = grparray.get(m);
+                                            if (record_found_prob < PROBABILITY_OF_RECORD_EXISTING) {
+                                                ArrayList<Integer> grparray = groupdetails.get(k).get(prsn.shamilPersonProperties.id); //[prsn.id]
+                                                for (int m = 0; m < grparray.size(); m++) { // contactperson_id in grparray:
+                                                    int contactperson_id = grparray.get(m);
 
-                                                // #contactperson.initial_profession = contactperson.profession
-                                                Person contactperson = persons.get(contactperson_id); //[contactperson_id]
-                                                double isolated_prob = Math.random();
-                                                if (isolated_prob < 0.5) {
-                                                    contactperson.shamilPersonProperties.profession.name="Isolated";
-                                                } else {
-                                                    contactperson.shamilPersonProperties.profession.name="Unemployed";
+                                                    // #contactperson.initial_profession = contactperson.profession
+                                                    Person contactperson = persons.get(contactperson_id); //[contactperson_id]
+                                                    double isolated_prob = Math.random();
+                                                    if (isolated_prob < 0.5) {
+                                                        contactperson.shamilPersonProperties.profession.name = "Isolated";
+                                                    } else {
+                                                        contactperson.shamilPersonProperties.profession.name = "Unemployed";
+                                                    }
+                                                    contactperson.shamilPersonProperties.quarantinedDay = 0;
+                                                    // #print("{} has been tracked down!".format(contactperson.id))
                                                 }
-                                                contactperson.shamilPersonProperties.quarantinedDay = 0;
-                                                // #print("{} has been tracked down!".format(contactperson.id))
                                             }
                                         }
                                     }
@@ -188,8 +190,8 @@ public class ShamilDaySimulator {
                         prsn.shamilPersonProperties.state = "recovered";//ADDED BY AMIROOO
                     } else if (prsn.shamilPersonProperties.infectedDays == 60) {//ADDED BY AMIROOO
                         prsn.shamilPersonProperties.state = "Not_infected";
-                        prsn.shamilPersonProperties.isInfected=false;
-                        prsn.shamilPersonProperties.quarantinedDay=-1;
+                        prsn.shamilPersonProperties.isInfected = false;
+                        prsn.shamilPersonProperties.quarantinedDay = -1;
                     }
                 }
             }

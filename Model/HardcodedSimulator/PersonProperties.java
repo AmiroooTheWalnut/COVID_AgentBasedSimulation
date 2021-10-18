@@ -8,6 +8,7 @@ import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilTemplate
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilTask;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilProfession;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.DwellTime;
+import COVID_AgentBasedSimulation.Model.Data.Safegraph.PatternsRecordProcessed;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilPersonProperties;
 import java.util.ArrayList;
 
@@ -24,12 +25,19 @@ public class PersonProperties {
     public Region workRegion;
     public ShamilPersonProperties shamilProperties;
     
+    public PatternsRecordProcessed currentPattern;
+    
     public int status;
     
     public int minutesStayed;
     public DwellTime dwellTime;
-    public boolean isAtWork;
+    public boolean isAtWork=false;
+    public boolean isAtHome=true;
+    public boolean isInTravel;
+    public boolean didTravelFromHome;
+    public boolean didTravelFromWork;
     public int minutesSick;
+    public boolean isDestinedToDeath=false;
     
     public int minutesTravelToWorkFrom7;
     public int minutesTravelFromWorkFrom16;

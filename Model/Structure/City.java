@@ -12,15 +12,13 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class City extends Marker implements Serializable, Comparable<City> {
+public class City extends Scope implements Serializable, Comparable<City> {
 
     static final long serialVersionUID = softwareVersion;
     public String name;
-    public ArrayList<CensusTract> censusTracts;
-
-    public transient ArrayList<VDCell> vDCells;
-    public transient ArrayList<CBGVDCell> cBGVDCells;
-
+    
+    
+    
     public transient boolean isLatLonCalculated = false;
 
     public Object[] getVDFromCBG(CensusBlockGroup input, boolean noNull) {

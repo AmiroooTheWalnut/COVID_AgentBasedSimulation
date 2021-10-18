@@ -16,6 +16,8 @@ public class ScheduleList {
     ArrayList<PatternsRecordProcessed> originalDestinations=new ArrayList();
     ArrayList<Double> originalFrequencies=new ArrayList();
     
+    double originalSumFrequencies=0;
+    
     //FREQUENCIES STORED AFTER COLD RUN
     ArrayList<PatternsRecordProcessed> destinations=new ArrayList();
     ArrayList<Double> frequencies=new ArrayList();

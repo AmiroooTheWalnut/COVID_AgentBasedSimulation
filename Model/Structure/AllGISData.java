@@ -5,6 +5,7 @@
  */
 package COVID_AgentBasedSimulation.Model.Structure;
 
+import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MyPolygon;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.Patterns;
 import COVID_AgentBasedSimulation.Model.Dataset;
 import COVID_AgentBasedSimulation.Model.DatasetTemplate;
@@ -13,6 +14,7 @@ import COVID_AgentBasedSimulation.Model.RecordTemplate;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryo.util.DefaultInstantiatorStrategy;
+import de.fhpotsdam.unfolding.geo.Location;
 import de.siegmar.fastcsv.reader.CsvContainer;
 import de.siegmar.fastcsv.reader.CsvReader;
 import de.siegmar.fastcsv.reader.CsvRow;
@@ -620,6 +622,46 @@ public class AllGISData extends Dataset implements Serializable {
         } else {
             System.out.println("SCOPE UNKNOWN!");
             return false;
+        }
+    }
+    
+    public void loadScopeCBGPolygons(Scope scope){
+        System.out.println("READING CENSUS BLOCK GROUPS");
+        String geographyDirectory="./datasets";
+        File censusBlockGroupFile = new File(geographyDirectory + "/US_CensusBlockGroup.json");
+        try (BufferedReader br = new BufferedReader(new FileReader(censusBlockGroupFile))) {
+            String line;
+            int deguggingCounter = 0;
+            int counter = 0;
+            int largerCounter = 0;
+            int counterInterval = 1000;
+            while ((line = br.readLine()) != null) {
+                if (line.contains("{ \"type\": \"Feature\", \"properties\":")) {
+                    JSONObject root = new JSONObject(line);
+                    JSONObject properties = root.getJSONObject("properties");
+
+                    long censusBlockLong = Long.parseLong(properties.getString("GEOID"));
+                    CensusBlockGroup foundCBG = scope.findCBG(censusBlockLong);
+                    if(foundCBG!=null){
+                        foundCBG.polygon=new MyPolygon();
+                        JSONArray coords = root.getJSONObject("geometry").getJSONArray("coordinates").getJSONArray(0);
+                        for(int i=0;i<coords.length();i++){
+                            double lat = coords.getJSONArray(i).getDouble(0);
+                            double lon = coords.getJSONArray(i).getDouble(1);
+                            foundCBG.polygon.points.add(new Location(lat,lon));
+                        }
+                    }
+                }
+                deguggingCounter = deguggingCounter + 1;
+                counter = counter + 1;
+                if (counter > counterInterval) {
+                    largerCounter = largerCounter + 1;
+                    counter = 0;
+                    System.out.println("Num rows read: " + largerCounter * counterInterval);
+                }
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(AllGISData.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

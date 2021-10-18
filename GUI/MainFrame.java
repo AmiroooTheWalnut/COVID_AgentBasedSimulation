@@ -1,5 +1,6 @@
 package COVID_AgentBasedSimulation.GUI;
 
+import COVID_AgentBasedSimulation.Model.ProjectDefaults;
 import COVID_AgentBasedSimulation.GUI.Settings.SimulatorSettingsDialog;
 import COVID_AgentBasedSimulation.GUI.VoronoiGIS.GISLocationDialog;
 import COVID_AgentBasedSimulation.GUI.Simulator.SimulatorDialog;
@@ -8,6 +9,7 @@ import COVID_AgentBasedSimulation.GUI.SafegraphPreprocessor.SafeGraphPreprocessD
 import COVID_AgentBasedSimulation.Model.AgentBasedModel.AgentBasedModel;
 import COVID_AgentBasedSimulation.Model.Data.CovidCsseJhu.CovidCsseJhu;
 import COVID_AgentBasedSimulation.Model.MainModel;
+import COVID_AgentBasedSimulation.Model.ProjectManager;
 import COVID_AgentBasedSimulation.Model.Structure.AllGISData;
 import COVID_AgentBasedSimulation.Model.Structure.City;
 import COVID_AgentBasedSimulation.Model.Structure.Country;
@@ -39,7 +41,7 @@ import javax.swing.JFileChooser;
 public class MainFrame extends javax.swing.JFrame {
 
     public MainModel mainModel;
-    public ProjectDefaults projectDefaults;
+    public ProjectManager projectManager;
     public ProcessingMapRenderer child;
     public int numProcessors;
 
@@ -50,6 +52,8 @@ public class MainFrame extends javax.swing.JFrame {
     public MainFrame() {
         initComponents();
 
+        projectManager=new ProjectManager();
+        
         jSpinner1.setModel(new javax.swing.SpinnerNumberModel(Runtime.getRuntime().availableProcessors() / 2, 1, 1000, 1));
 
         numProcessors = (int) jSpinner1.getValue();
@@ -87,51 +91,13 @@ public class MainFrame extends javax.swing.JFrame {
             jLabel5.setText("Error in reading");
         }
         try {
-            checkDefaults();
+            projectManager.checkDefaults(this);
         } catch (Exception ex) {
             System.out.println("Error in reading defaults!");
         }
     }
 
-    public void checkDefaults() {
-        projectDefaults = new ProjectDefaults();
-        File file = new File("./ABMDefaults.json");
-        if (file.exists() == true) {
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            FileReader in;
-            try {
-                in = new FileReader("./ABMDefaults.json");
-                BufferedReader br = new BufferedReader(in);
-                StringBuilder sb = new StringBuilder();
-
-                String line;
-                while ((line = br.readLine()) != null) {
-                    sb.append(line).append("\n");
-                }
-                in.close();
-
-                ProjectDefaults result = gson.fromJson(sb.toString(), ProjectDefaults.class);
-                projectDefaults = result;
-                if (projectDefaults != null) {
-                    if (projectDefaults.defaultProjectFileLocation != null) {
-                        //projectDefaults.currentDefaultProjectFileLocation=projectDefaults.defaultProjectFileLocation;
-                        String[] temp = projectDefaults.defaultProjectFileLocation.split("\\\\");
-                        jLabel4.setText(temp[temp.length - 1]);
-                        if (projectDefaults.defaultProjectFileLocation.length() > 0) {
-                            mainModel.ABM.loadModel(projectDefaults.defaultProjectFileLocation);
-                            mainModel.ABM.filePath = projectDefaults.defaultProjectFileLocation;
-                            jLabel7.setText(temp[temp.length - 1]);
-                        }
-                    }
-                }
-
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IOException ex) {
-                Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-    }
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -155,6 +121,7 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         jButton3 = new javax.swing.JButton();
+        jButton7 = new javax.swing.JButton();
         jPanel14 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jSpinner1 = new javax.swing.JSpinner();
@@ -235,6 +202,13 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
+        jButton7.setText("Previous runs");
+        jButton7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton7ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
         jPanel6Layout.setHorizontalGroup(
@@ -252,7 +226,8 @@ public class MainFrame extends javax.swing.JFrame {
                             .addComponent(removeDefaultProjectButton)
                             .addComponent(jLabel3)
                             .addComponent(jLabel6)
-                            .addComponent(jButton3))
+                            .addComponent(jButton3)
+                            .addComponent(jButton7))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -273,6 +248,8 @@ public class MainFrame extends javax.swing.JFrame {
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton7)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(setDefaultProjectButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -616,8 +593,8 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void setDefaultProjectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setDefaultProjectButtonActionPerformed
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        projectDefaults.defaultProjectFileLocation = mainModel.ABM.filePath;
-        String result = gson.toJson(projectDefaults);
+        projectManager.projectDefaults.defaultProjectFileLocation = mainModel.ABM.filePath;
+        String result = gson.toJson(projectManager.projectDefaults);
         BufferedWriter writer;
         try {
             FileWriter out = new FileWriter("./ABMDefaults.json");
@@ -626,7 +603,7 @@ public class MainFrame extends javax.swing.JFrame {
 
             writer.close();
             out.close();
-            String[] temp = projectDefaults.defaultProjectFileLocation.split("\\\\");
+            String[] temp = projectManager.projectDefaults.defaultProjectFileLocation.split("\\\\");
             jLabel4.setText(temp[temp.length - 1]);
         } catch (IOException ex) {
             Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
@@ -635,8 +612,8 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void removeDefaultProjectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeDefaultProjectButtonActionPerformed
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        projectDefaults.defaultProjectFileLocation = "";
-        String result = gson.toJson(projectDefaults);
+        projectManager.projectDefaults.defaultProjectFileLocation = "";
+        String result = gson.toJson(projectManager.projectDefaults);
         BufferedWriter writer;
         try {
             FileWriter out = new FileWriter("./ABMDefaults.json");
@@ -681,6 +658,11 @@ public class MainFrame extends javax.swing.JFrame {
         ContactRateDialog contactRateDialog=new ContactRateDialog(this,false);
         contactRateDialog.setVisible(true);
     }//GEN-LAST:event_jButton6ActionPerformed
+
+    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
+        PreviousRunsDialog previousRunsDialog=new PreviousRunsDialog(this,false);
+        previousRunsDialog.setVisible(true);
+    }//GEN-LAST:event_jButton7ActionPerformed
 
     
     
@@ -730,13 +712,14 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
+    private javax.swing.JButton jButton7;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
+    public javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
+    public javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;

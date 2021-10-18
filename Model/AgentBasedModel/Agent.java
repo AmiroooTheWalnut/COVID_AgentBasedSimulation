@@ -21,6 +21,8 @@ public class Agent {
     public int myIndex;
 
     public AgentTemplate myTemplate;
+    
+    public MainModel myModelRoot;
 
     /*
     * HARD CODED
@@ -55,7 +57,7 @@ public class Agent {
     /*
     * HARD CODED
     */
-    public void behavior(MainModel modelRoot) {
+    public void behavior() {
         
     }
     

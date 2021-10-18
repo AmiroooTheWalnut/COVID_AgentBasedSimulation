@@ -11,7 +11,7 @@ import lombok.Setter;
  * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 @Getter @Setter
-public class Country extends Marker implements Serializable {
+public class Country extends Scope implements Serializable {
     static final long serialVersionUID = softwareVersion;
     public String name;
     public transient boolean isLatLonCalculated=false;

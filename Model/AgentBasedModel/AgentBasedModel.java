@@ -139,7 +139,7 @@ public class AgentBasedModel {
             try {
                 currentEvaluatingAgent[0] = root;
                 
-                currentEvaluatingAgent[0].behavior(myMainModel);
+                currentEvaluatingAgent[0].behavior();
                 
 //                if (rootAgent.myTemplate.behavior.isJavaScriptActive == true) {
 //                    //myMainModel.javaEvaluationEngine.runScript(rootAgent.myTemplate.behavior.javaScript.script);
@@ -152,7 +152,7 @@ public class AgentBasedModel {
                 if (isParallel == false) {
                     for (int i = 0; i < agents.size(); i++) {
                         currentEvaluatingAgent[0] = agents.get(i);
-                        currentEvaluatingAgent[0].behavior(myMainModel);
+                        currentEvaluatingAgent[0].behavior();
                         
 //                        if (agents.get(i).myTemplate.behavior.isJavaScriptActive == true) {
 //                            //myMainModel.javaEvaluationEngine.runScript(agents.get(i).myTemplate.behavior.javaScript.script);

@@ -12,7 +12,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class County extends Marker implements Serializable, Comparable<County>{
+public class County extends Scope implements Serializable, Comparable<County>{
 
     static final long serialVersionUID = softwareVersion;
     public String name;
@@ -20,7 +20,6 @@ public class County extends Marker implements Serializable, Comparable<County>{
     public transient boolean isLatLonCalculated = false;
     public ArrayList<City> cities;
     public ArrayList<ZipCode> zipcodes;
-    public ArrayList<CensusTract> censusTracts;
     
     public Country country;
     public State state;

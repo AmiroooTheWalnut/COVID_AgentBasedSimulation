@@ -85,7 +85,7 @@ public class MainModel extends Dataset {
 
     public void startScriptEngines() {
         javaEvaluationEngine = new JavaEvaluationEngine(this);
-        pythonEvaluationEngine = new PythonEvaluationEngine(this);
+        pythonEvaluationEngine = new PythonEvaluationEngine(this);//MAY NEED TO BE STOPPED BECAUSE OF LOCAL SERVER STRUGGLE WITH PROFILER
     }
 
     public void initData() {
@@ -245,7 +245,7 @@ public class MainModel extends Dataset {
         ABM.agentTemplates.add(rootAgentTemplate);
     }
 
-    public void initModelHardCoded(boolean isParallelLoadingData, boolean isParallelBehaviorEvaluation, int numCPUs) {
+    public void initModelHardCoded(boolean isParallelLoadingData, boolean isParallelBehaviorEvaluation, int numResidents, int numCPUs) {
         int month = ABM.startTime.getMonthValue();
         currentMonth = month;
         String monthString = String.valueOf(month);
@@ -265,13 +265,13 @@ public class MainModel extends Dataset {
         ABM.root=new Root(this);
 
         if (scenario.equals("CBG")) {
-            ABM.root.constructor(this, 8000, "CBG", -1);
+            ABM.root.constructor(this, numResidents, "CBG", -1);
         } else if (scenario.equals("VD")) {
-            ABM.root.constructor(this, 20, "VD", -1);
+            ABM.root.constructor(this, numResidents, "VD", -1);
         } else if (scenario.equals("CBGVD")) {
-            ABM.root.constructor(this, 20, "CBGVD", -1);
+            ABM.root.constructor(this, numResidents, "CBGVD", -1);
         } else if (scenario.equals("ABSVD")) {
-            ABM.root.constructor(this, 20, "ABSVD", -1);
+            ABM.root.constructor(this, numResidents, "ABSVD", -1);
         }
         
         

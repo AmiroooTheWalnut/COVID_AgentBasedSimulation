@@ -1,5 +1,6 @@
 package COVID_AgentBasedSimulation.Model.Structure;
 
+import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MyPolygon;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.SafegraphPlace;
 import static COVID_AgentBasedSimulation.Model.MainModel.softwareVersion;
 import java.io.Serializable;
@@ -21,6 +22,8 @@ public class CensusBlockGroup extends Marker implements Serializable, Comparable
     public State state;
     public County county;
     public CensusTract censusTract;
+    
+    public transient MyPolygon polygon;
     
     public transient ArrayList<ArrayList<SafegraphPlace>> vDsPlacesShops;
     public transient ArrayList<Double> proportionOfVDsShops;

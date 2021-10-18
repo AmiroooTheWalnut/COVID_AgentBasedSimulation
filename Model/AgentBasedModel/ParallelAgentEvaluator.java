@@ -50,7 +50,7 @@ public class ParallelAgentEvaluator extends ParallelProcessor {
 //                System.out.println(myEndIndex);
                         for (int i = myStartIndex; i < myEndIndex; i++) {
                             currentEvaluatingAgent[0] = data.get(i);
-                            currentEvaluatingAgent[0].behavior(parent);
+                            currentEvaluatingAgent[0].behavior();
                         }
                     } catch (Exception ex) {
                         System.out.println("ERROR ON AGENT TYPE:");

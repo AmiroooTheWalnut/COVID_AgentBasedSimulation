@@ -8,6 +8,7 @@ import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Person;
 import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilPersonManager.quarantine_days;
 import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilPersonManager.trace_days;
 import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilPersonManager.tracing_percentage;
+import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Root.statusEnum;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -17,41 +18,91 @@ import java.util.HashMap;
  */
 public class ShamilSimulatorController {
 
-    public static ArrayList<HashMap<Integer,ArrayList<Integer>>> daily_groups;
-    public static int n_infected_init=200;
-    
-    public static void runRawShamilSimulation(ArrayList<Person> people, int numDaysToSimulate){
+    public static ArrayList<HashMap<Integer, ArrayList<Integer>>> daily_groups;
+    public static int n_infected_init = 200;
+
+    public static void convertShamilToOur(ArrayList<Person> people) {
+//        int inf=0;
+        for (int i = 0; i < people.size(); i++) {
+            if (people.get(i).shamilPersonProperties.currentTask.name.equals("Stay Home")) {
+                people.get(i).properties.isAtHome = true;
+                people.get(i).properties.isAtWork = false;
+            }
+            if (people.get(i).shamilPersonProperties.currentTask.name.equals("Go to Work") || people.get(i).shamilPersonProperties.currentTask.name.equals("Work") || people.get(i).shamilPersonProperties.currentTask.name.equals("Returns Home") || people.get(i).shamilPersonProperties.currentTask.name.equals("Treat Patients")) {
+                people.get(i).properties.isAtHome = false;
+                people.get(i).properties.isAtWork = true;
+            }
+            if (people.get(i).shamilPersonProperties.state.equals("Not_infected")) {
+                people.get(i).properties.status = statusEnum.SUSCEPTIBLE.ordinal();
+            } else if (people.get(i).shamilPersonProperties.state.equals("Infected_notContagious")) {
+                people.get(i).properties.status = statusEnum.SUSCEPTIBLE.ordinal();
+            } else if (people.get(i).shamilPersonProperties.state.equals("contagious_symptomatic")) {
+                people.get(i).properties.status = statusEnum.INFECTED_SYM.ordinal();
+//                inf+=1;
+            } else if (people.get(i).shamilPersonProperties.state.equals("contagious_asymptomatic")) {
+                people.get(i).properties.status = statusEnum.INFECTED_ASYM.ordinal();
+//                inf+=1;
+            } else if (people.get(i).shamilPersonProperties.state.equals("Dead")) {
+                people.get(i).properties.status = statusEnum.DEAD.ordinal();
+            } else if (people.get(i).shamilPersonProperties.state.equals("recovered")) {
+                people.get(i).properties.status = statusEnum.RECOVERED.ordinal();
+            }
+        }
+//        System.out.println("convertOurToShamil INF: "+inf);
+    }
+
+    public static void convertOurToShamil(ArrayList<Person> people) {
+//        int inf=0;
+        for (int i = 0; i < people.size(); i++) {
+            if (people.get(i).properties.status == 0) {
+                people.get(i).shamilPersonProperties.state = "Not_infected";
+            } else if (people.get(i).properties.status == 1) {
+                people.get(i).shamilPersonProperties.state = "contagious_symptomatic";
+                people.get(i).shamilPersonProperties.isInfected=true;
+//                inf+=1;
+            } else if (people.get(i).properties.status == 2) {
+                people.get(i).shamilPersonProperties.state = "contagious_asymptomatic";
+                people.get(i).shamilPersonProperties.isInfected=true;
+//                inf+=1;
+            } else if (people.get(i).properties.status == 3) {
+                people.get(i).shamilPersonProperties.state = "recovered";
+            } else if (people.get(i).properties.status == 4) {
+                people.get(i).shamilPersonProperties.state = "Dead";
+            }
+        }
+//        System.out.println("convertOurToShamil INF: "+inf);
+    }
+
+    public static void runRawShamilSimulation(ArrayList<Person> people, int numDaysToSimulate) {
         shamilAgentGeneration(people);
-        for(int d=0;d<numDaysToSimulate;d++){
-            startDay(people,d);
-            for(int h=0;h<24;h++){
-                updateHour(people,h,d);
+        for (int d = 0; d < numDaysToSimulate; d++) {
+            startDay(people, d);
+            for (int h = 0; h < 24; h++) {
+                updateHour(people, h, d);
             }
-            endDay(people,d);
+            endDay(people, d);
         }
     }
-    
-    public static void runShamilSimulationOnly(ArrayList<Person> people, int numDaysToSimulate){
-        for(int d=0;d<numDaysToSimulate;d++){
-            startDay(people,d);
-            for(int h=0;h<24;h++){
-                updateHour(people,h,d);
+
+    public static void runShamilSimulationOnly(ArrayList<Person> people, int numDaysToSimulate) {
+        for (int d = 0; d < numDaysToSimulate; d++) {
+            startDay(people, d);
+            for (int h = 0; h < 24; h++) {
+                updateHour(people, h, d);
             }
-            endDay(people,d);
+            endDay(people, d);
         }
     }
-    
+
     public static void shamilAgentGeneration(ArrayList<Person> people) {
         //SHAMIL'S AGET GENERATION
         ShamilPersonManager.generatePersons(people);
         ShamilPersonManager.assignProfessionGroup(people);
     }
-    
-    public static void shamilInitialInfection(ArrayList<Person> people){
+
+    public static void shamilInitialInfection(ArrayList<Person> people) {
         ShamilPersonManager.initialInfection(people, n_infected_init);
     }
-    
-    
 
     public static void startDay(ArrayList<Person> people, int day) {
         for (int i = 0; i < people.size(); i++) {
@@ -61,7 +112,7 @@ public class ShamilSimulatorController {
             } else {
                 people.get(i).shamilPersonProperties.isTraceable = false;
             }
-            if(people.get(i).shamilPersonProperties.profession==null){
+            if (people.get(i).shamilPersonProperties.profession == null) {
                 System.out.println("!!!!!!!!!!!");
             }
         }
@@ -72,8 +123,8 @@ public class ShamilSimulatorController {
             lockdown_started = true;
         }
         ShamilDaySimulator.generateDailyTasks(people, lockdown_started);
-        
-        daily_groups=new ArrayList();
+
+        daily_groups = new ArrayList();
     }
 
     public static void updateHour(ArrayList<Person> people, int hour, int day) {
@@ -85,7 +136,7 @@ public class ShamilSimulatorController {
         Object output[] = ShamilGroupManager.assignGroups(people, tracing_percentage, day);
 
         ArrayList<ShamilGroup> groups = (ArrayList<ShamilGroup>) output[0];
-        HashMap<Integer,ArrayList<Integer>> person_group = (HashMap<Integer,ArrayList<Integer>>) output[1];
+        HashMap<Integer, ArrayList<Integer>> person_group = (HashMap<Integer, ArrayList<Integer>>) output[1];
 
         int event_cnt = 0;
         int event_going_person_cnt = 0;
@@ -95,21 +146,21 @@ public class ShamilSimulatorController {
                 event_going_person_cnt += groups.get(i).persons.size();
             }
         }
-        
+
         daily_groups.add(person_group);
-        
-        for(int i=0;i<groups.size();i++){
+
+        for (int i = 0; i < groups.size(); i++) {
             groups.get(i).updateActions();
         }
-        
-        for(int i=0;i<groups.size();i++){
+
+        for (int i = 0; i < groups.size(); i++) {
             ShamilGroupSimulator.groupInteraction(groups.get(i));
         }
-        
+
         //pickle.dump(daily_groups,open('group_info_day_' + str(day) + '.p','wb'))
     }
-    
-    public static void endDay(ArrayList<Person> people, int day){
+
+    public static void endDay(ArrayList<Person> people, int day) {
         ShamilDaySimulator.dayEnd(people, day, trace_days, quarantine_days, daily_groups);
     }
 }

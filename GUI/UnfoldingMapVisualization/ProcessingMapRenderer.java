@@ -277,4 +277,9 @@ public class ProcessingMapRenderer extends PApplet {
             z=passed_z;
         }
     }
+    
+    public void setCaseStudyPanZoom(float zoom, Location location){
+        this.map.zoomTo(zoom);
+        this.map.panTo(location);
+    }
 }

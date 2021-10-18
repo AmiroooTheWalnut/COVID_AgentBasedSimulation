@@ -160,7 +160,7 @@ public class CovidCsseJhu extends Dataset implements Serializable {
                 if(dailyConfirmedCasesList.get(i).county.name.equals("King County")){
                     System.out.println(dailyConfirmedCasesList.get(i).date.toString());
                     System.out.println(dailyConfirmedCasesList.get(i).numDailyCases);
-                    System.out.println("!!!");
+//                    System.out.println("!!!");
                 }
                 dailyConfirmedCasesList.get(i).numActiveCases=dailyConfirmedCasesList.get(i).numDailyCases;
             }

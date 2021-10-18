@@ -5,7 +5,9 @@
  */
 package COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization;
 
+import static COVID_AgentBasedSimulation.Model.MainModel.softwareVersion;
 import de.fhpotsdam.unfolding.geo.Location;
+import java.io.Serializable;
 import java.util.ArrayList;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -16,7 +18,8 @@ import org.locationtech.jts.geom.Polygon;
  *
  * @author user
  */
-public class MyPolygon {
+public class MyPolygon implements Serializable{
+    static final long serialVersionUID = softwareVersion;
 
     public ArrayList<Location> points = new ArrayList();
     public float severity;

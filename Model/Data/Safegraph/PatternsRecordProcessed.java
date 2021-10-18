@@ -1,5 +1,6 @@
 package COVID_AgentBasedSimulation.Model.Data.Safegraph;
 
+import COVID_AgentBasedSimulation.Model.HardcodedSimulator.POI;
 import static COVID_AgentBasedSimulation.Model.MainModel.softwareVersion;
 import COVID_AgentBasedSimulation.Model.Structure.CensusBlockGroup;
 import java.io.Serializable;
@@ -44,6 +45,13 @@ public class PatternsRecordProcessed implements Serializable, Comparable<Pattern
     public HashMap<Byte,Integer> popularity_by_day;//A mapping of day of week to the number of visits on each day (local time) in the course of the date range. (7 days with day of the week names)
 //    public String device_type;//The number of visitors to the POI that are using android vs. ios.
 //    public OpenHours[] openHours;//7 days starting from monday//NEED TO BE IN "PLACES"
+    
+    public transient int sumVisitsByDayOfMonth=0;//COULD BE PREPROCESSED I.E. REMOVING TRANSIENT
+    public transient int sumVisitsByDayOfWeek=0;//COULD BE PREPROCESSED I.E. REMOVING TRANSIENT
+    public transient int sumVisitsByHourofDay=0;//COULD BE PREPROCESSED I.E. REMOVING TRANSIENT
+    public transient int sumDwellTime=0;//COULD BE PREPROCESSED I.E. REMOVING TRANSIENT
+    public transient POI pOI;
+    
 
     @Override
     public int compareTo(PatternsRecordProcessed o) {
