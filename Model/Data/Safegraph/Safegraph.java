@@ -589,7 +589,7 @@ public class Safegraph extends Dataset implements Serializable {
                         output.patternRecords.add(patterns.patternRecords.get(i));
                     }
                 } else {
-                    System.out.println("!!!");
+                    System.out.println("pattern has no place!!!");
                 }
 
             }

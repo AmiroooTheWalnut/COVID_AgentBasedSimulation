@@ -6,11 +6,7 @@
 package COVID_AgentBasedSimulation.Model.AgentBasedModel;
 
 import COVID_AgentBasedSimulation.GUI.MainFrame;
-import COVID_AgentBasedSimulation.Model.HardcodedSimulator.CBG;
-import COVID_AgentBasedSimulation.Model.HardcodedSimulator.CBGVD;
-import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Person;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Root;
-import COVID_AgentBasedSimulation.Model.HardcodedSimulator.VD;
 import COVID_AgentBasedSimulation.Model.MainModel;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

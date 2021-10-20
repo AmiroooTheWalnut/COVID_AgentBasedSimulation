@@ -9,6 +9,7 @@ import COVID_AgentBasedSimulation.Model.AgentBasedModel.JavaScript;
 import COVID_AgentBasedSimulation.Model.AgentBasedModel.PythonScript;
 import COVID_AgentBasedSimulation.Model.Data.CovidCsseJhu.CovidCsseJhu;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.Safegraph;
+import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Region;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Root;
 import COVID_AgentBasedSimulation.Model.Structure.AllGISData;
 import COVID_AgentBasedSimulation.Model.Structure.CensusBlockGroup;
@@ -18,10 +19,13 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryo.util.DefaultInstantiatorStrategy;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -66,6 +70,8 @@ public class MainModel extends Dataset {
 
     public int currentMonth = -1;
 
+    public boolean isResultSavedAtTheEnd = false;
+
     public boolean isStartBySafegraph = false;
 
     public transient int numCPUs = 1;
@@ -76,8 +82,8 @@ public class MainModel extends Dataset {
     public int newSimulationDelayTime = -2;
 
     public String scenario = "CBG";
-    
-    public double sparsifyFraction=1;
+
+    public double sparsifyFraction = 1;
     public int lastMonthLoaded;//NOT USED
     public int lastYearLoaded;//NOT USED
 
@@ -246,6 +252,7 @@ public class MainModel extends Dataset {
     }
 
     public void initModelHardCoded(boolean isParallelLoadingData, boolean isParallelBehaviorEvaluation, int numResidents, int numCPUs) {
+        isResultSavedAtTheEnd = false;
         int month = ABM.startTime.getMonthValue();
         currentMonth = month;
         String monthString = String.valueOf(month);
@@ -261,8 +268,7 @@ public class MainModel extends Dataset {
         ABM.currentTime = ABM.startTime;
 
 //        ABM.rootAgent = ABM.makeRootAgentHardCoded();
-        
-        ABM.root=new Root(this);
+        ABM.root = new Root(this);
 
         if (scenario.equals("CBG")) {
             ABM.root.constructor(this, numResidents, "CBG", -1);
@@ -273,8 +279,7 @@ public class MainModel extends Dataset {
         } else if (scenario.equals("ABSVD")) {
             ABM.root.constructor(this, numResidents, "ABSVD", -1);
         }
-        
-        
+
 //        if (scenario.equals("CBG")) {
 //            ((Root) (ABM.rootAgent)).constructorCBG(this, sparsifyFraction);
 //        } else if (scenario.equals("VD")) {
@@ -284,11 +289,11 @@ public class MainModel extends Dataset {
 //        } else if (scenario.equals("ABSVD")) {
 //            ((Root) (ABM.rootAgent)).constructorABSVD(this);
 //        }
-
         resetTimerTask(isParallelBehaviorEvaluation, numCPUs, true);
     }
 
     public void initModel(boolean isParallelLoadingData, boolean isParallelBehaviorEvaluation, int numCPUs) {
+        isResultSavedAtTheEnd = false;
         //\/\/\/ THIS IS FOR ERROR CHECKING ONLY!
         javaEvaluationEngine.parseAllScripts(ABM.agentTemplates);
         //^^^ THIS IS FOR ERROR CHECKING ONLY!
@@ -338,20 +343,7 @@ public class MainModel extends Dataset {
         runTask = new TimerTask() {
             @Override
             public void run() {
-                int month = ABM.startTime.getMonthValue();
-                if (currentMonth != month) {
-                    String monthString = String.valueOf(month);
-                    if (monthString.length() < 2) {
-                        monthString = "0" + monthString;
-                    }
-                    String yearStr = String.valueOf(ABM.startTime.getYear());
-                    safegraph.clearPatternsPlaces();
-                    System.gc();
-                    safegraph.requestDataset(allGISData, ABM.studyScope, yearStr, monthString, true, numCPUs);
-                    currentMonth = month;
-                }
-                ABM.evaluateAllAgents(isParallel, numCPUs, isHardCoded);
-                ABM.currentTime = ABM.currentTime.plusMinutes(1);
+                iterate(isParallel, numCPUs, isHardCoded);
             }
         };
     }
@@ -361,20 +353,7 @@ public class MainModel extends Dataset {
             @Override
             public void run() {
                 while (isPause == false) {
-                    int month = ABM.startTime.getMonthValue();
-                    if (currentMonth != month) {
-                        String monthString = String.valueOf(month);
-                        if (monthString.length() < 2) {
-                            monthString = "0" + monthString;
-                        }
-                        String yearStr = String.valueOf(ABM.startTime.getYear());
-                        safegraph.clearPatternsPlaces();
-                        System.gc();
-                        safegraph.requestDataset(allGISData, ABM.studyScope, yearStr, monthString, true, numCPUs);
-                        currentMonth = month;
-                    }
-                    ABM.evaluateAllAgents(isParallel, numCPUs, isHardCoded);
-                    ABM.currentTime = ABM.currentTime.plusMinutes(1);
+                    iterate(isParallel, numCPUs, isHardCoded);
 //                    System.out.println(isPause);
                 }
                 isPause = false;
@@ -388,6 +367,32 @@ public class MainModel extends Dataset {
             }
         });
 
+    }
+
+    public void iterate(boolean isParallel, int numCPUs, boolean isHardCoded) {
+        if (isResultSavedAtTheEnd == false) {
+            if (ABM.currentTime.isEqual(ABM.endTime) || ABM.currentTime.isAfter(ABM.endTime)) {
+                isRunning = false;
+                pause();
+                saveResult(ABM.root.regions);
+                return;
+            }
+        }
+
+        int month = ABM.startTime.getMonthValue();
+        if (currentMonth != month) {
+            String monthString = String.valueOf(month);
+            if (monthString.length() < 2) {
+                monthString = "0" + monthString;
+            }
+            String yearStr = String.valueOf(ABM.startTime.getYear());
+            safegraph.clearPatternsPlaces();
+            System.gc();
+            safegraph.requestDataset(allGISData, ABM.studyScope, yearStr, monthString, true, numCPUs);
+            currentMonth = month;
+        }
+        ABM.evaluateAllAgents(isParallel, numCPUs, isHardCoded);
+        ABM.currentTime = ABM.currentTime.plusMinutes(1);
     }
 
     public void resume(boolean isParallel, int numCPUs, boolean isHardCoded) {
@@ -527,6 +532,28 @@ public class MainModel extends Dataset {
             Logger.getLogger(AllGISData.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
+    }
+
+    public void saveResult(ArrayList<Region> regions) {
+        String directoryPath = "projects\\" + ABM.filePath.substring(ABM.filePath.lastIndexOf("\\") + 1, ABM.filePath.length());
+        File directory = new File(directoryPath);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+        SimpleDateFormat formatter = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss");
+        Date date = new Date();
+        String testPath = "projects\\" + ABM.filePath.substring(ABM.filePath.lastIndexOf("\\") + 1, ABM.filePath.length()) + "\\" + formatter.format(date);
+        File testDirectory = new File(testPath);
+        if (!testDirectory.exists()) {
+            testDirectory.mkdirs();
+        }
+        HistoricalRun historicalRun = new HistoricalRun();
+        historicalRun.regions = regions;
+        historicalRun.startTime = ABM.startTime;
+        historicalRun.endTime = ABM.endTime;
+//        historicalRun.saveHistoricalRunJson("./projects/" + ABM.filePath + "/" + formatter.format(date)+"/data.json");
+        HistoricalRun.saveHistoricalRunKryo("projects\\" + ABM.filePath.substring(ABM.filePath.lastIndexOf("\\") + 1, ABM.filePath.length()) + "\\" + formatter.format(date) + "\\data", historicalRun);
+        isResultSavedAtTheEnd = true;
     }
 
     public void initSafegraph() {

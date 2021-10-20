@@ -32,20 +32,29 @@ public class ShamilSimulatorController {
                 people.get(i).properties.isAtHome = false;
                 people.get(i).properties.isAtWork = true;
             }
-            if (people.get(i).shamilPersonProperties.state.equals("Not_infected")) {
-                people.get(i).properties.status = statusEnum.SUSCEPTIBLE.ordinal();
-            } else if (people.get(i).shamilPersonProperties.state.equals("Infected_notContagious")) {
-                people.get(i).properties.status = statusEnum.SUSCEPTIBLE.ordinal();
-            } else if (people.get(i).shamilPersonProperties.state.equals("contagious_symptomatic")) {
-                people.get(i).properties.status = statusEnum.INFECTED_SYM.ordinal();
+            switch (people.get(i).shamilPersonProperties.state) {
+                case "Not_infected":
+                    people.get(i).properties.status = statusEnum.SUSCEPTIBLE.ordinal();
+                    break;
+                case "Infected_notContagious":
+                    people.get(i).properties.status = statusEnum.SUSCEPTIBLE.ordinal();
+                    break;
+                case "contagious_symptomatic":
+                    people.get(i).properties.status = statusEnum.INFECTED_SYM.ordinal();
 //                inf+=1;
-            } else if (people.get(i).shamilPersonProperties.state.equals("contagious_asymptomatic")) {
-                people.get(i).properties.status = statusEnum.INFECTED_ASYM.ordinal();
+                    break;
+                case "contagious_asymptomatic":
+                    people.get(i).properties.status = statusEnum.INFECTED_ASYM.ordinal();
 //                inf+=1;
-            } else if (people.get(i).shamilPersonProperties.state.equals("Dead")) {
-                people.get(i).properties.status = statusEnum.DEAD.ordinal();
-            } else if (people.get(i).shamilPersonProperties.state.equals("recovered")) {
-                people.get(i).properties.status = statusEnum.RECOVERED.ordinal();
+                    break;
+                case "Dead":
+                    people.get(i).properties.status = statusEnum.DEAD.ordinal();
+                    break;
+                case "recovered":
+                    people.get(i).properties.status = statusEnum.RECOVERED.ordinal();
+                    break;
+                default:
+                    break;
             }
         }
 //        System.out.println("convertOurToShamil INF: "+inf);
@@ -54,20 +63,28 @@ public class ShamilSimulatorController {
     public static void convertOurToShamil(ArrayList<Person> people) {
 //        int inf=0;
         for (int i = 0; i < people.size(); i++) {
-            if (people.get(i).properties.status == 0) {
-                people.get(i).shamilPersonProperties.state = "Not_infected";
-            } else if (people.get(i).properties.status == 1) {
-                people.get(i).shamilPersonProperties.state = "contagious_symptomatic";
-                people.get(i).shamilPersonProperties.isInfected=true;
+            switch (people.get(i).properties.status) {
+                case 0:
+                    people.get(i).shamilPersonProperties.state = "Not_infected";
+                    break;
+                case 1:
+                    people.get(i).shamilPersonProperties.state = "contagious_symptomatic";
+                    people.get(i).shamilPersonProperties.isInfected=true;
 //                inf+=1;
-            } else if (people.get(i).properties.status == 2) {
-                people.get(i).shamilPersonProperties.state = "contagious_asymptomatic";
-                people.get(i).shamilPersonProperties.isInfected=true;
+                    break;
+                case 2:
+                    people.get(i).shamilPersonProperties.state = "contagious_asymptomatic";
+                    people.get(i).shamilPersonProperties.isInfected=true;
 //                inf+=1;
-            } else if (people.get(i).properties.status == 3) {
-                people.get(i).shamilPersonProperties.state = "recovered";
-            } else if (people.get(i).properties.status == 4) {
-                people.get(i).shamilPersonProperties.state = "Dead";
+                    break;
+                case 3:
+                    people.get(i).shamilPersonProperties.state = "recovered";
+                    break;
+                case 4:
+                    people.get(i).shamilPersonProperties.state = "Dead";
+                    break;
+                default:
+                    break;
             }
         }
 //        System.out.println("convertOurToShamil INF: "+inf);

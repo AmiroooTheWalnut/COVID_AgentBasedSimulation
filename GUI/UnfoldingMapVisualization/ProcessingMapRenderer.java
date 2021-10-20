@@ -53,6 +53,8 @@ public class ProcessingMapRenderer extends PApplet {
     //FOR INDIVIDUAL AGENT
     Location drawingIndividualAgent;
     //FOR INDIVIDUAL AGENT
+    
+    public ArrayList<MyPolygon> polygons = new ArrayList();
 
     boolean isPan = false;
     boolean isReadyPan = false;
@@ -132,6 +134,8 @@ public class ProcessingMapRenderer extends PApplet {
             drawIndividualMarker();
             drawAgentTemplatesMarker();
         }
+        
+        drawPolygons();
 
 //        if (isPan == true) {
 //            isPan = false;
@@ -281,5 +285,22 @@ public class ProcessingMapRenderer extends PApplet {
     public void setCaseStudyPanZoom(float zoom, Location location){
         this.map.zoomTo(zoom);
         this.map.panTo(location);
+    }
+    
+    public void drawPolygons() {
+        for (int i = 0; i < polygons.size(); i++) {
+            fill(polygons.get(i).severity, 0, 255-polygons.get(i).severity, 50);
+            beginShape();
+            for (int j = 0; j < polygons.get(i).points.size(); j++) {
+
+                SimplePointMarker startMarker = new SimplePointMarker(polygons.get(i).points.get(j));
+
+                ScreenPosition scStartPos = startMarker.getScreenPosition(map);
+
+                vertex(scStartPos.x, scStartPos.y);
+            }
+            endShape(CLOSE);
+        }
+
     }
 }

@@ -22,7 +22,7 @@ public class MyPolygon implements Serializable{
     static final long serialVersionUID = softwareVersion;
 
     public ArrayList<Location> points = new ArrayList();
-    public float severity;
+    public transient float severity;
 
     public MyPolygon() {
 
@@ -30,7 +30,6 @@ public class MyPolygon implements Serializable{
 
     public MyPolygon(MyPolygon passed_polygon) {
         points = passed_polygon.points;
-        severity = passed_polygon.severity;
     }
 
     public boolean contains(Location point) {

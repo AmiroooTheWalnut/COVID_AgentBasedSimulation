@@ -8,13 +8,14 @@ package COVID_AgentBasedSimulation.Model.HardcodedSimulator;
 import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MyPolygon;
 import COVID_AgentBasedSimulation.Model.Structure.CensusBlockGroup;
 import COVID_AgentBasedSimulation.Model.Structure.Marker;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  *
  * @author user
  */
-public class Region extends Marker {
+public class Region extends Marker implements Serializable {
     public transient ScheduleList scheduleList=new ScheduleList();
     public transient double workPopulation;
     
@@ -27,9 +28,5 @@ public class Region extends Marker {
     
     public MyPolygon polygon;
     
-    public int N;
-    public int S;
-    public int IS;
-    public int IAS;
-    public int R;
+    public ArrayList<RegionSnapshot> hourlyRegionSnapshot=new ArrayList();
 }

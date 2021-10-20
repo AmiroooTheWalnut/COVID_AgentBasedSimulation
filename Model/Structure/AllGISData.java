@@ -646,8 +646,8 @@ public class AllGISData extends Dataset implements Serializable {
                         foundCBG.polygon=new MyPolygon();
                         JSONArray coords = root.getJSONObject("geometry").getJSONArray("coordinates").getJSONArray(0);
                         for(int i=0;i<coords.length();i++){
-                            double lat = coords.getJSONArray(i).getDouble(0);
-                            double lon = coords.getJSONArray(i).getDouble(1);
+                            double lon = coords.getJSONArray(i).getDouble(0);
+                            double lat = coords.getJSONArray(i).getDouble(1);
                             foundCBG.polygon.points.add(new Location(lat,lon));
                         }
                     }

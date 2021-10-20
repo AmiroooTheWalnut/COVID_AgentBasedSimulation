@@ -6,12 +6,29 @@
 package COVID_AgentBasedSimulation.GUI;
 
 import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.COVIDGeoVisualization;
+import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MyPolygon;
 import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.ProcessingMapRenderer;
+import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Region;
+import COVID_AgentBasedSimulation.Model.HardcodedSimulator.RegionSnapshot;
+import COVID_AgentBasedSimulation.Model.HistoricalRun;
 import COVID_AgentBasedSimulation.Model.Structure.Marker;
 import de.fhpotsdam.unfolding.geo.Location;
 import java.awt.Component;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.lang.reflect.Field;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 
 /**
  *
@@ -23,6 +40,12 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
 
     Timer zoomTimer;
 
+    HistoricalRun currentHistoricalRun;
+
+    ProcessingMapRenderer sketch;
+    
+    LegendRange legendRange=new LegendRange();
+
     /**
      * Creates new form PreviousRunsDialog
      */
@@ -31,7 +54,7 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
         initComponents();
         myParent = (MainFrame) parent;
 
-        ProcessingMapRenderer sketch = new ProcessingMapRenderer(myParent, jPanel2);
+        sketch = new ProcessingMapRenderer(myParent, jPanel2);
         sketch.startRendering();
 
         zoomTimer = new Timer();
@@ -40,7 +63,7 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
             public void run() {
                 if (sketch.map != null) {
                     Component[] components = jPanel2.getComponents();
-                    for(int i=0;i<components.length;i++){
+                    for (int i = 0; i < components.length; i++) {
                         System.out.println(components[i]);
                     }
                     if (components.length > 0) {
@@ -51,7 +74,49 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
             }
         };
         zoomTimer.schedule(runTask, 0, 500);
+        updateProjects();
+        jSlider1.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                setRendererShades();
+                ZonedDateTime temp = currentHistoricalRun.startTime.plusHours((int)(jSlider1.getValue()));
+                jLabel2.setText("Current: " + temp.toString());
+//                System.out.println("Slider1: " + jSlider1.getValue());
+            }
+        });
+        legendRange.setBounds(0, 0, jPanel6.getWidth(), jPanel6.getHeight());
+        jPanel6.add(legendRange);
+        jPanel6.repaint();
+    }
 
+    public void updateProjects() {
+        String filePath = myParent.mainModel.ABM.filePath;
+        String directoryPath = "projects\\" + filePath.substring(filePath.lastIndexOf("\\") + 1, filePath.length());
+        File directory = new File(directoryPath);
+        if (!directory.exists()) {
+            directory.mkdirs();
+            return;
+        }
+        DefaultTreeModel model = (DefaultTreeModel) jTree1.getModel();
+        DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
+        root.removeAllChildren();
+        model.reload();
+
+        root = new DefaultMutableTreeNode(filePath.substring(filePath.lastIndexOf("\\") + 1, filePath.length()));
+        model.setRoot(root);
+
+        String[] directories = directory.list(new FilenameFilter() {
+            @Override
+            public boolean accept(File current, String name) {
+                return new File(current, name).isDirectory();
+            }
+        });
+
+        for (int i = 0; i < directories.length; i++) {
+            DefaultMutableTreeNode safegraphNode = new DefaultMutableTreeNode(directories[i]);
+            root.add(safegraphNode);
+        }
+
+        model.reload();
     }
 
     /**
@@ -64,52 +129,83 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList<>();
-        jPanel2 = new javax.swing.JPanel();
+        jButton1 = new javax.swing.JButton();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jTree1 = new javax.swing.JTree();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jList2 = new javax.swing.JList<>();
+        jPanel5 = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
         jSlider1 = new javax.swing.JSlider();
         jPanel4 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
+        jPanel6 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Previous runs"));
 
-        jList1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        jScrollPane1.setViewportView(jList1);
+        jButton1.setText("Delete");
+
+        javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("root");
+        jTree1.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
+        jTree1.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
+            public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
+                jTree1ValueChanged(evt);
+            }
+        });
+        jScrollPane3.setViewportView(jTree1);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 139, Short.MAX_VALUE)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(jButton1)
+                .addGap(0, 76, Short.MAX_VALUE))
+            .addComponent(jScrollPane3)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 678, Short.MAX_VALUE)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 670, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton1)
+                .addContainerGap())
         );
-
-        jPanel2.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Feature"));
 
+        jList2.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { "Number of residents (N)", "Number of susceptibles (S)", "Number of infections symptomatic (IS)", "Number of infections asymptomatic (IAS)", "Number of recovered (R)", "Number of deaths (D)" };
+            public int getSize() { return strings.length; }
+            public String getElementAt(int i) { return strings[i]; }
+        });
+        jList2.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jList2.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                jList2ValueChanged(evt);
+            }
+        });
         jScrollPane2.setViewportView(jList2);
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 210, Short.MAX_VALUE)
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jScrollPane2)
         );
+
+        jPanel5.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        jPanel2.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
         jPanel4.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jPanel4.setLayout(new java.awt.GridLayout(1, 3));
@@ -123,6 +219,35 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
         jLabel3.setText("End:");
         jPanel4.add(jLabel3);
 
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jSlider1, javax.swing.GroupLayout.DEFAULT_SIZE, 831, Short.MAX_VALUE)
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jSlider1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+
+        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
+        jPanel6.setLayout(jPanel6Layout);
+        jPanel6Layout.setHorizontalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 72, Short.MAX_VALUE)
+        );
+        jPanel6Layout.setVerticalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -130,40 +255,122 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(2, 2, 2)
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jSlider1, javax.swing.GroupLayout.DEFAULT_SIZE, 799, Short.MAX_VALUE)
-                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSlider1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_jTree1ValueChanged
+        loadHistoricalRun(evt);
+
+        setRendererPolygons();
+    }//GEN-LAST:event_jTree1ValueChanged
+
+    private void jList2ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList2ValueChanged
+        setRendererShades();
+    }//GEN-LAST:event_jList2ValueChanged
+
+    public void setRendererShades() {
+        if (jList2.getSelectedIndex() > -1) {
+            DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) jTree1.getLastSelectedPathComponent();
+            if (selectedNode != null) {
+                String splitted[] = jList2.getSelectedValue().split("\\(");
+                try {
+                    Field field = RegionSnapshot.class.getDeclaredField(splitted[1].substring(0, splitted[1].length() - 1));
+                    ArrayList<Double> allValues = new ArrayList();
+                    for (int i = 0; i < currentHistoricalRun.regions.size(); i++) {
+                        double val = Double.valueOf(String.valueOf(field.get(currentHistoricalRun.regions.get(i).hourlyRegionSnapshot.get(jSlider1.getValue()))));
+                        allValues.add(val);
+                    }
+                    ArrayList<Double> allValuesScaled = scaleData(allValues);
+                    for (int i = 0; i < currentHistoricalRun.regions.size(); i++) {
+                        currentHistoricalRun.regions.get(i).polygon.severity = allValuesScaled.get(i).floatValue();
+                    }
+                } catch (NoSuchFieldException ex) {
+                    Logger.getLogger(PreviousRunsDialog.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (SecurityException ex) {
+                    Logger.getLogger(PreviousRunsDialog.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IllegalArgumentException ex) {
+                    Logger.getLogger(PreviousRunsDialog.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(PreviousRunsDialog.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+    }
+
+    public ArrayList<Double> scaleData(ArrayList<Double> input) {
+        ArrayList<Double> output = new ArrayList();
+        double min = Collections.min(input);
+        double max = Collections.max(input);
+        for (int i = 0; i < input.size(); i++) {
+            output.add(((input.get(i) - min) / max) * 255);
+        }
+        
+        legendRange.max=max;
+        legendRange.min=min;
+        jPanel6.invalidate();
+        jPanel6.repaint();
+        
+        return output;
+    }
+
+    public void loadHistoricalRun(javax.swing.event.TreeSelectionEvent evt) {
+//        DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) jTree1.getLastSelectedPathComponent();
+        TreePath treepath = evt.getPath();
+        String path = "projects\\";
+        Object elements[] = treepath.getPath();
+        for (int i = 0, n = elements.length; i < n; i++) {
+            path = path + elements[i] + "\\";
+        }
+        currentHistoricalRun = HistoricalRun.loadHistoricalRunKryo(path + "data.bin");
+
+        jSlider1.setMinimum(0);
+        jSlider1.setMaximum(currentHistoricalRun.regions.get(0).hourlyRegionSnapshot.size() - 1);
+        jSlider1.setValue(0);
+
+        jLabel1.setText("Start: " + currentHistoricalRun.startTimeString);
+        jLabel2.setText("Current: " + currentHistoricalRun.startTimeString);
+        jLabel3.setText("End: " + currentHistoricalRun.endTimeString);
+
+//        System.out.println("!!!!");
+    }
+
+    public void setRendererPolygons() {
+        ArrayList<MyPolygon> polygons = new ArrayList();
+        for (int i = 0; i < currentHistoricalRun.regions.size(); i++) {
+            polygons.add(currentHistoricalRun.regions.get(i).polygon);
+        }
+        sketch.polygons = polygons;
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JList<String> jList1;
     private javax.swing.JList<String> jList2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JSlider jSlider1;
+    private javax.swing.JTree jTree1;
     // End of variables declaration//GEN-END:variables
 }
