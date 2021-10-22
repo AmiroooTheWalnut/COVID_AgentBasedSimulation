@@ -18,7 +18,7 @@ public class ShamilGroup {
 
     public String group_name;
     public ArrayList<Person> persons;
-    public HashMap<Integer,Integer> person_mapper;
+    public HashMap<Integer, Integer> person_mapper;
     public ArrayList<ShamilAction> actions;
     public double[][] proximity = null;
 
@@ -47,6 +47,8 @@ public class ShamilGroup {
 
         double max_proximity = 1;
         double min_proximity = 0.5;
+        
+        //System.out.println(persons.size());
 
         if (full_random_proximity == true) {
             proximity = new double[persons.size()][persons.size()];
@@ -72,61 +74,60 @@ public class ShamilGroup {
         }
 
         proximity = new double[persons.size()][persons.size()];
-            for (int i = 0; i < persons.size(); i++) {
-                for (int j = 0; j < persons.size(); j++) {
-                    proximity[i][j] = 0;
-                }
+        /*
+        for (int i = 0; i < persons.size(); i++) {
+            for (int j = 0; j < persons.size(); j++) {
+                proximity[i][j] = 0;
             }
+        }
+        */
 //        self.proximity = np.zeros((len(self.persons), len(self.persons)))
 
         ArrayList<int[]> locs = new ArrayList();
 
         for (int i = 0; i < persons.size(); i++) {
-                for (int j = i+1; j < persons.size(); j++) {
-                    int[] temp=new int[2];
-                    temp[0]=i;
-                    temp[1]=j;
-                    locs.add(temp);
-                }
+            for (int j = i + 1; j < persons.size(); j++) {
+                int[] temp = new int[2];
+                temp[0] = i;
+                temp[1] = j;
+                locs.add(temp);
+            }
         }
-        
+
 //        for i in range(len(self.persons)):
 //
 //            for j in range(i+1,len(self.persons)):
 //                
 //                locs.append([i,j])
-
         // #max_proximity = dfToFloat(preferences_df,"max_proximity")
         // #min_proximity = dfToFloat(preferences_df,"min_proximity")
-        
         int tot_locs = locs.size();
-        int reduction_step = (int)Math.round(tot_locs*0.1);
+        int reduction_step = (int) Math.round(tot_locs * 0.1);
         int next_reduction = reduction_step;
 //        tot_locs = len(locs)
 //        reduction_step = int(tot_locs*0.1)
 //        next_reduction = reduction_step
 
         ArrayList<Integer> random_locs = new ArrayList();
-        for(int i=0;i<tot_locs;i++){
+        for (int i = 0; i < tot_locs; i++) {
             random_locs.add(i);
         }
         Collections.shuffle(random_locs);
-        
+
 //        random_locs = list(range(tot_locs))
 //        np.random.shuffle(random_locs)
-
-        double proximity_range = max_proximity-min_proximity;
-        double reduction_amount = proximity_range*0.1;
+        double proximity_range = max_proximity - min_proximity;
+        double reduction_amount = proximity_range * 0.1;
 //        proximity_range = (max_proximity-min_proximity)
 //        reduction_amount = proximity_range*0.1
 
-        for(int i=0;i<tot_locs;i++){
-            if(i==next_reduction){
+        for (int i = 0; i < tot_locs; i++) {
+            if (i == next_reduction) {
                 // #max_proximity -= 0.1
                 max_proximity -= reduction_amount;
                 next_reduction += reduction_step;
             }
-            
+
             double rand_proximity = Math.random() * reduction_amount;
 
             double var1 = Math.max(max_proximity - rand_proximity, 0);
@@ -135,45 +136,41 @@ public class ShamilGroup {
             // #print("var1 - " + str(var1) + " var2 - " + str(var2))
             // #var1 = 1
             // #var2 = 1
-            
-            
             proximity[locs.get(random_locs.get(i))[0]][locs.get(random_locs.get(i))[1]] = var1;
             proximity[locs.get(random_locs.get(i))[1]][locs.get(random_locs.get(i))[0]] = var2;
-            
-            
+
 //            self.proximity[locs[random_locs[i]][0]][locs[random_locs[i]][1]] = var1
 //            self.proximity[locs[random_locs[i]][1]][locs[random_locs[i]][0]] = var2
         }
     }
-    
-    
-    public void updateActions(){
+
+    public void updateActions() {
 
         clearActions();
 
-        for(int i=0;i<persons.size();i++){// prsn in self.persons:
-    
+        for (int i = 0; i < persons.size(); i++) {// prsn in self.persons:
+
             addActions(persons.get(i).shamilPersonProperties.actions);
         }
 
         refineActions();
-                }
-    
-    public void clearActions(){
+    }
+
+    public void clearActions() {
         actions.clear();
     }
-    
-    public void addActions(ArrayList<ShamilAction> actns){
+
+    public void addActions(ArrayList<ShamilAction> actns) {
         actions.addAll(actns);
     }
-    
-    public void refineActions(){
+
+    public void refineActions() {
         actions = ShamilActionManager.refineActionList(actions);
     }
-    
-    public double getProximity(int p1,int p2){
-        
+
+    public double getProximity(int p1, int p2) {
+
         return proximity[person_mapper.get(p1)][person_mapper.get(p2)];
     }
-    
+
 }

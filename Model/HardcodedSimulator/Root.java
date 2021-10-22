@@ -352,7 +352,7 @@ public class Root extends Agent {
             region.cBGsInvolved.add(cBGsListRaw.get(i));
             region.cBGsPercentageInvolved = new ArrayList();
             region.cBGsPercentageInvolved.add(1d);
-            region.polygon=cBGsListRaw.get(i).polygon;
+            region.polygons.add(cBGsListRaw.get(i).polygon);
             regionsList.add(region);
         }
         return regionsList;
@@ -761,6 +761,9 @@ public class Root extends Agent {
         if(myModelRoot.ABM.currentTime.getMinute() == 0){
         for(int i=0;i<regions.size();i++){
             RegionSnapshot snapshot=new RegionSnapshot();
+            if(regions.get(i).hourlyRegionSnapshot.size()>0){
+                snapshot.rate=regions.get(i).hourlyRegionSnapshot.get(regions.get(i).hourlyRegionSnapshot.size()-1).rate;
+            }
             for(int j=0;j<regions.get(i).residents.size();j++){
                 switch (regions.get(i).residents.get(j).properties.status) {
                 case 0:
@@ -770,10 +773,12 @@ public class Root extends Agent {
                 case 1:
                     snapshot.N+=1;
                     snapshot.IS+=1;
+                    snapshot.rate+=1;
                     break;
                 case 2:
                     snapshot.N+=1;
                     snapshot.IAS+=1;
+                    snapshot.rate+=1;
                     break;
                 case 3:
                     snapshot.N+=1;

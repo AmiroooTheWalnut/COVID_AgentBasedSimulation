@@ -25,6 +25,8 @@ public class POI {
     public double contaminatedTime = 0;
 //    public int numInfectedPeopleInPOI=0;
     public ArrayList<Person> peopleInPOI = new ArrayList();
+    
+    double numInfected = 0;
 
     public void contact(ZonedDateTime currentTime, Person person) {
         double probability = getProbabilityOfInfection(currentTime);
@@ -54,15 +56,15 @@ public class POI {
     }
 
     public void infectByContact(double probability, Person person) {
-        double numInfected = 0;
-        for (int i = 0; i < peopleInPOI.size(); i++) {
-            if (peopleInPOI.get(i).properties.status == statusEnum.INFECTED_ASYM.ordinal() || peopleInPOI.get(i).properties.status == statusEnum.INFECTED_SYM.ordinal()) {
-                if (Math.random() < CHANCE_OF_ENV_CONTAMINATION) {
-                    contaminatedTime = 1440;
-                }
-                numInfected += 1;
-            }
-        }
+//        double numInfected = 0;
+//        for (int i = 0; i < peopleInPOI.size(); i++) {
+//            if (peopleInPOI.get(i).properties.status == statusEnum.INFECTED_ASYM.ordinal() || peopleInPOI.get(i).properties.status == statusEnum.INFECTED_SYM.ordinal()) {
+//                if (Math.random() < CHANCE_OF_ENV_CONTAMINATION) {
+//                    contaminatedTime = 1440;
+//                }
+//                numInfected += 1;
+//            }
+//        }
         if (Math.random() < CONTACT_RATE * (numInfected / (double) (peopleInPOI.size())) * probability) {
             if (person.properties.status == statusEnum.SUSCEPTIBLE.ordinal()) {
 //                System.out.println("CONTACT INFECTION");

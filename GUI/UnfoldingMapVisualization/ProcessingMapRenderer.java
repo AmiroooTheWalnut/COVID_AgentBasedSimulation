@@ -289,7 +289,7 @@ public class ProcessingMapRenderer extends PApplet {
     
     public void drawPolygons() {
         for (int i = 0; i < polygons.size(); i++) {
-            fill(polygons.get(i).severity, 0, 255-polygons.get(i).severity, 50);
+            fill(polygons.get(i).severity, 0, 255-polygons.get(i).severity, 120);
             beginShape();
             for (int j = 0; j < polygons.get(i).points.size(); j++) {
 

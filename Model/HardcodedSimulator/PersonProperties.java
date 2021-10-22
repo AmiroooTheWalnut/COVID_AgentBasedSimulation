@@ -42,4 +42,6 @@ public class PersonProperties {
     public int minutesTravelToWorkFrom7;
     public int minutesTravelFromWorkFrom16;
     
+    public boolean isInitiallyInfectedEnteringPOI=false;
+    
 }

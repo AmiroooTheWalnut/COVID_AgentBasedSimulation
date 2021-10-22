@@ -171,7 +171,7 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 670, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 897, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton1)
                 .addContainerGap())
@@ -180,7 +180,7 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Feature"));
 
         jList2.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Number of residents (N)", "Number of susceptibles (S)", "Number of infections symptomatic (IS)", "Number of infections asymptomatic (IAS)", "Number of recovered (R)", "Number of deaths (D)" };
+            String[] strings = { "Number of residents (N)", "Number of susceptibles (S)", "Number of infections symptomatic (IS)", "Number of infections asymptomatic (IAS)", "Number of recovered (R)", "Number of deaths (D)", "Cumulative infections (rate)" };
             public int getSize() { return strings.length; }
             public String getElementAt(int i) { return strings[i]; }
         });
@@ -296,7 +296,9 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
                     }
                     ArrayList<Double> allValuesScaled = scaleData(allValues);
                     for (int i = 0; i < currentHistoricalRun.regions.size(); i++) {
-                        currentHistoricalRun.regions.get(i).polygon.severity = allValuesScaled.get(i).floatValue();
+                        for(int j=0;j<currentHistoricalRun.regions.get(i).polygons.size();j++){
+                            currentHistoricalRun.regions.get(i).polygons.get(j).severity = allValuesScaled.get(i).floatValue();
+                        }
                     }
                 } catch (NoSuchFieldException ex) {
                     Logger.getLogger(PreviousRunsDialog.class.getName()).log(Level.SEVERE, null, ex);
@@ -351,7 +353,9 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
     public void setRendererPolygons() {
         ArrayList<MyPolygon> polygons = new ArrayList();
         for (int i = 0; i < currentHistoricalRun.regions.size(); i++) {
-            polygons.add(currentHistoricalRun.regions.get(i).polygon);
+            for(int j=0;j<currentHistoricalRun.regions.get(i).polygons.size();j++){
+                polygons.add(currentHistoricalRun.regions.get(i).polygons.get(j));
+            }
         }
         sketch.polygons = polygons;
     }

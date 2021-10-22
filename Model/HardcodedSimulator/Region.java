@@ -26,7 +26,7 @@ public class Region extends Marker implements Serializable {
     public transient ArrayList<Person> residents=new ArrayList();
     public transient ArrayList<Person> workers=new ArrayList();
     
-    public MyPolygon polygon;
+    public ArrayList<MyPolygon> polygons=new ArrayList();
     
     public ArrayList<RegionSnapshot> hourlyRegionSnapshot=new ArrayList();
 }

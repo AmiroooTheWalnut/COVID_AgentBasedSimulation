@@ -8,6 +8,7 @@ package COVID_AgentBasedSimulation.Model.HardcodedSimulator;
 import COVID_AgentBasedSimulation.Model.AgentBasedModel.Agent;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.DwellTime;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.PatternsRecordProcessed;
+import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.POI.CHANCE_OF_ENV_CONTAMINATION;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilPersonProperties;
 import COVID_AgentBasedSimulation.Model.MainModel;
 import java.time.ZonedDateTime;
@@ -19,7 +20,7 @@ import java.time.ZonedDateTime;
 public class Person extends Agent {
 
     Person currentAgent = this;
-    
+
     MainModel myModelRoot;
 
     public PersonProperties properties = new PersonProperties();
@@ -33,7 +34,7 @@ public class Person extends Agent {
 
     @Override
     public void constructor(MainModel modelRoot) {
-        myModelRoot=modelRoot;
+        myModelRoot = modelRoot;
     }
 
     @Override
@@ -61,7 +62,7 @@ public class Person extends Agent {
         }
     }
 
-    public void returnAction( ) {
+    public void returnAction() {
         if (properties.didTravelFromHome == true) {
             lat = properties.homeRegion.lat;
             lon = properties.homeRegion.lon;
@@ -77,10 +78,17 @@ public class Person extends Agent {
         properties.minutesStayed = 0;
         properties.didTravelFromHome = false;
         properties.didTravelFromWork = false;
-        myModelRoot.ABM.root.pOIs.get(properties.currentPattern.placeKey).peopleInPOI.remove(this);
+        POI pOI = myModelRoot.ABM.root.pOIs.get(properties.currentPattern.placeKey);
+        pOI.peopleInPOI.remove(this);
+
+        if (properties.isInitiallyInfectedEnteringPOI == true) {
+            pOI.numInfected -= 1;
+            properties.isInitiallyInfectedEnteringPOI = false;
+        }
+
         properties.currentPattern = null;
     }
-    
+
     public void travelFromWork(ZonedDateTime currentTime) {
         PatternsRecordProcessed dest = chooseDestination(properties.workRegion);
         boolean decision = decideToTravel(dest, currentTime);
@@ -94,7 +102,17 @@ public class Person extends Agent {
             properties.didTravelFromHome = false;
             properties.didTravelFromWork = true;
             properties.currentPattern = dest;
-            myModelRoot.ABM.root.pOIs.get(properties.currentPattern.placeKey).peopleInPOI.add(this);
+            POI pOI = myModelRoot.ABM.root.pOIs.get(properties.currentPattern.placeKey);
+            pOI.peopleInPOI.add(this);
+
+            if (properties.status == Root.statusEnum.INFECTED_ASYM.ordinal() || properties.status == Root.statusEnum.INFECTED_SYM.ordinal()) {
+                if (Math.random() < CHANCE_OF_ENV_CONTAMINATION) {
+                    pOI.contaminatedTime = 1440;
+                }
+                pOI.numInfected += 1;
+                properties.isInitiallyInfectedEnteringPOI = true;
+            }
+
         }
     }
 
@@ -111,7 +129,17 @@ public class Person extends Agent {
             properties.didTravelFromHome = true;
             properties.didTravelFromWork = false;
             properties.currentPattern = dest;
-            myModelRoot.ABM.root.pOIs.get(properties.currentPattern.placeKey).peopleInPOI.add(this);
+            POI pOI = myModelRoot.ABM.root.pOIs.get(properties.currentPattern.placeKey);
+            pOI.peopleInPOI.add(this);
+
+            if (properties.status == Root.statusEnum.INFECTED_ASYM.ordinal() || properties.status == Root.statusEnum.INFECTED_SYM.ordinal()) {
+                if (Math.random() < CHANCE_OF_ENV_CONTAMINATION) {
+                    pOI.contaminatedTime = 1440;
+                }
+                pOI.numInfected += 1;
+                properties.isInitiallyInfectedEnteringPOI = true;
+            }
+
         }
     }
 
