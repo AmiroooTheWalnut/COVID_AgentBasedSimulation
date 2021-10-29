@@ -336,8 +336,9 @@ public class Root extends Agent {
     }
 
     ArrayList<Region> makeByCBGs(MainModel modelRoot) {
-        ArrayList<CensusBlockGroup> cBGsListRaw = modelRoot.getSafegraph().getCBGsFromCaseStudy(modelRoot.getABM().getStudyScopeGeography());
+        ArrayList<CensusBlockGroup> cBGsListRaw = modelRoot.safegraph.getCBGsFromCaseStudy(modelRoot.ABM.studyScopeGeography);
         ArrayList regionsList = new ArrayList();
+        Scope scope=(Scope)(modelRoot.ABM.studyScopeGeography);
         for (int i = 0; i < cBGsListRaw.size(); i++) {
             Region region = new Region();
             region.lat = cBGsListRaw.get(i).getLat();
@@ -352,7 +353,7 @@ public class Root extends Agent {
             region.cBGsInvolved.add(cBGsListRaw.get(i));
             region.cBGsPercentageInvolved = new ArrayList();
             region.cBGsPercentageInvolved.add(1d);
-            region.polygons.add(cBGsListRaw.get(i).polygon);
+            region.polygons.add(scope.cBGPolygons.get(cBGsListRaw.get(i).id));
             regionsList.add(region);
         }
         return regionsList;
@@ -363,6 +364,7 @@ public class Root extends Agent {
     ArrayList makeByVDs(MainModel modelRoot) {
         ArrayList<VDCell> vDsListRaw = modelRoot.getSafegraph().getVDsFromCaseStudy(modelRoot.getABM().getStudyScopeGeography());
         ArrayList regionsList = new ArrayList();
+        Scope scope=(Scope)(modelRoot.ABM.studyScopeGeography);
         for (int i = 0; i < vDsListRaw.size(); i++) {
             Region region = new Region();
             region.lat = vDsListRaw.get(i).getLat();
@@ -373,6 +375,8 @@ public class Root extends Agent {
             region.cBGsIDsInvolved = vDsListRaw.get(i).cBGsIDsInvolved;
             region.cBGsInvolved = vDsListRaw.get(i).cBGsInvolved;
             region.cBGsPercentageInvolved = vDsListRaw.get(i).cBGsPercentageInvolved;
+            
+            region.polygons.add(scope.vDPolygons.get(vDsListRaw.get(i).myIndex));
             regionsList.add(region);
         }
         return regionsList;

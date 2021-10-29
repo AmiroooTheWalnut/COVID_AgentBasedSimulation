@@ -8,6 +8,7 @@ package COVID_AgentBasedSimulation.GUI.VoronoiGIS;
 import COVID_AgentBasedSimulation.GUI.MainFrame;
 import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MyPolygon;
 import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.COVIDGeoVisualization;
+import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MyPolygons;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.LocationNodeSafegraph;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.PatternsRecordProcessed;
 import COVID_AgentBasedSimulation.Model.MainModel;
@@ -46,22 +47,20 @@ import de.fhpotsdam.unfolding.geo.Location;
 import de.siegmar.fastcsv.reader.CsvContainer;
 import de.siegmar.fastcsv.reader.CsvReader;
 import de.siegmar.fastcsv.writer.CsvWriter;
+import esmaieeli.gisFastLocationOptimization.GIS3D.NumericLayer;
+import esmaieeli.gisFastLocationOptimization.Simulation.SimplePolygons;
+import esmaieeli.gisFastLocationOptimization.Simulation.VectorToPolygon;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Reader;
-import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.locationtech.jts.algorithm.ConvexHull;
 import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.LinearRing;
 import org.locationtech.jts.geom.Polygon;
 
 /**
@@ -613,7 +612,6 @@ public class GISLocationDialog extends javax.swing.JDialog {
 //        months[0][1] = "10";
 //        months[0][2] = "11";
 
-
 //        months[0][0] = "03";
 //        months[0][1] = "04";
         months[0][0] = "05";
@@ -842,7 +840,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton9ActionPerformed
 
     private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
-        myParent.mainModel.allGISData.readCensusBlockGrioupPolygon("./datasets");
+        myParent.mainModel.allGISData.readCensusBlockGroupPolygon("./datasets");
 
         System.out.println("num nodes: " + mainFParent.allData.all_Nodes.length);
 
@@ -991,7 +989,6 @@ public class GISLocationDialog extends javax.swing.JDialog {
             }
         }
 
-        
         int counter[] = new int[shopMergedLocations.size()];
 
         int numProcessors = myParent.mainModel.numCPUs;
@@ -1178,10 +1175,10 @@ public class GISLocationDialog extends javax.swing.JDialog {
                 System.out.println("TRAVEL NUMBERS FAILED TO READ");
             }
         }
-        
+
         int numVisitsToNearestOrder[] = new int[shopMergedLocations.size()];
         double distanceByNearestOrder[] = new double[shopMergedLocations.size()];
-        
+
         int numVisitsToNearestOrderByCBGShop[][] = new int[cbgs.size()][shopMergedLocations.size()];
         double distanceByNearestOrderByCBGShop[][] = new double[cbgs.size()][shopMergedLocations.size()];
 
@@ -1200,20 +1197,20 @@ public class GISLocationDialog extends javax.swing.JDialog {
             });
 
             for (int j = 0; j < shopMergedLocations.size(); j++) {
-                numVisitsToNearestOrder[j] = numVisitsToNearestOrder[j] + (int) (CBGToShopNumbers[i][idx[j]]*cbgs.get(i).population);
+                numVisitsToNearestOrder[j] = numVisitsToNearestOrder[j] + (int) (CBGToShopNumbers[i][idx[j]] * cbgs.get(i).population);
                 distanceByNearestOrder[j] = distanceByNearestOrder[j] + CBGToShopDistances[i][idx[j]];
-                numVisitsToNearestOrderByCBGShop[i][j]=(int) (CBGToShopNumbers[i][idx[j]]*cbgs.get(i).population);
-                distanceByNearestOrderByCBGShop[i][j]=CBGToShopDistances[i][idx[j]];
+                numVisitsToNearestOrderByCBGShop[i][j] = (int) (CBGToShopNumbers[i][idx[j]] * cbgs.get(i).population);
+                distanceByNearestOrderByCBGShop[i][j] = CBGToShopDistances[i][idx[j]];
             }
         }
-        
+
         for (int j = 0; j < shopMergedLocations.size(); j++) {
-            numVisitsToNearestOrder[j]=numVisitsToNearestOrder[j]/shopMergedLocations.size();
-            distanceByNearestOrder[j]=distanceByNearestOrder[j]/shopMergedLocations.size();
+            numVisitsToNearestOrder[j] = numVisitsToNearestOrder[j] / shopMergedLocations.size();
+            distanceByNearestOrder[j] = distanceByNearestOrder[j] / shopMergedLocations.size();
         }
-        
-        writeLoadAggregatedOrderData(numVisitsToNearestOrder,distanceByNearestOrder);
-        writeLoadDetailedOrderData(numVisitsToNearestOrderByCBGShop,distanceByNearestOrderByCBGShop);
+
+        writeLoadAggregatedOrderData(numVisitsToNearestOrder, distanceByNearestOrder);
+        writeLoadDetailedOrderData(numVisitsToNearestOrderByCBGShop, distanceByNearestOrderByCBGShop);
 
     }//GEN-LAST:event_jButton11ActionPerformed
 
@@ -1645,7 +1642,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
         ArrayList<LocationNodeSafegraph> shops = mergeFacilitiesWithIndices(shopLocations, indicesList, indicesUniqueList);
 
         ArrayList<LocationNodeSafegraph> schoolLocations = initSchoolLocations();
-        indices = labelMergedFacilities(schoolLocations, shopMergeThreshold);
+        indices = labelMergedFacilities(schoolLocations, schoolMergeThreshold);
         indicesRawList = Arrays.asList(indices);
         indicesList = new ArrayList(indicesRawList);
         indicesUniqueSetHS = new LinkedHashSet(indicesList);
@@ -1823,7 +1820,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
 
     private void jButton16ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton16ActionPerformed
         int cBGIndex = mainFParent.findLayer("censusBlockGroups");
-        ArrayList<MyPolygon> polygons = new ArrayList();
+        ArrayList<MyPolygons> polygons = new ArrayList();
         ConvexHull convHull;
 //        for (int i = 1; i < 3; i++) {
         for (int i = 1; i < ((LayerDefinition) (mainFParent.allData.all_Layers.get(cBGIndex))).categories.length; i++) {
@@ -1840,16 +1837,17 @@ public class GISLocationDialog extends javax.swing.JDialog {
             }
             convHull = new ConvexHull(coords, geomFactory);
             Coordinate coordsConvex[] = convHull.getConvexHull().getCoordinates();
-            MyPolygon myPoly = new MyPolygon();
-            myPoly.points = new ArrayList();
-            myPoly.severity = 1;
+            MyPolygons myPolies = new MyPolygons();
+            myPolies.polygons.add(new MyPolygon());
+            myPolies.polygons.get(0).points = new ArrayList();
+            myPolies.severity = 1;
             for (int h = 0; h < coordsConvex.length; h++) {
-                myPoly.points.add(new Location(coordsConvex[h].x, coordsConvex[h].y));
+                myPolies.polygons.get(0).points.add(new Location(coordsConvex[h].x, coordsConvex[h].y));
             }
 
 //            LinearRing linearRing = geomFactory.createLinearRing(coordsConvex);
 //            Polygon poly = geomFactory.createPolygon(linearRing);
-            polygons.add(myPoly);
+            polygons.add(myPolies);
         }
         sketch.polygons = polygons;
     }//GEN-LAST:event_jButton16ActionPerformed
@@ -1865,7 +1863,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
 
     private void jButton18ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton18ActionPerformed
         int vDsIndex = mainFParent.findLayer("VDs_CBGs");
-        ArrayList<MyPolygon> polygons = new ArrayList();
+        ArrayList<MyPolygons> polygons = new ArrayList();
         ConvexHull convHull;
 //        for (int i = 1; i < 3; i++) {
         for (int i = 1; i < ((LayerDefinition) (mainFParent.allData.all_Layers.get(vDsIndex))).categories.length; i++) {
@@ -1882,23 +1880,24 @@ public class GISLocationDialog extends javax.swing.JDialog {
             }
             convHull = new ConvexHull(coords, geomFactory);
             Coordinate coordsConvex[] = convHull.getConvexHull().getCoordinates();
-            MyPolygon myPoly = new MyPolygon();
-            myPoly.points = new ArrayList();
-            myPoly.severity = 1;
+            MyPolygons myPolies = new MyPolygons();
+            myPolies.polygons.add(new MyPolygon());
+            myPolies.polygons.get(0).points = new ArrayList();
+            myPolies.severity = 1;
             for (int h = 0; h < coordsConvex.length; h++) {
-                myPoly.points.add(new Location(coordsConvex[h].x, coordsConvex[h].y));
+                myPolies.polygons.get(0).points.add(new Location(coordsConvex[h].x, coordsConvex[h].y));
             }
 
 //            LinearRing linearRing = geomFactory.createLinearRing(coordsConvex);
 //            Polygon poly = geomFactory.createPolygon(linearRing);
-            polygons.add(myPoly);
+            polygons.add(myPolies);
         }
         sketch.polygons = polygons;
     }//GEN-LAST:event_jButton18ActionPerformed
 
     private void jButton17ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton17ActionPerformed
         int vDsIndex = mainFParent.findLayer("voronoi_combination_v");
-        ArrayList<MyPolygon> polygons = new ArrayList();
+        ArrayList<MyPolygons> polygons = new ArrayList();
         ConvexHull convHull;
 //        for (int i = 1; i < 3; i++) {
         for (int i = 1; i < ((LayerDefinition) (mainFParent.allData.all_Layers.get(vDsIndex))).categories.length; i++) {
@@ -1915,16 +1914,17 @@ public class GISLocationDialog extends javax.swing.JDialog {
             }
             convHull = new ConvexHull(coords, geomFactory);
             Coordinate coordsConvex[] = convHull.getConvexHull().getCoordinates();
-            MyPolygon myPoly = new MyPolygon();
-            myPoly.points = new ArrayList();
-            myPoly.severity = 1;
+            MyPolygons myPolies = new MyPolygons();
+            myPolies.polygons.add(new MyPolygon());
+            myPolies.polygons.get(0).points = new ArrayList();
+            myPolies.severity = 1;
             for (int h = 0; h < coordsConvex.length; h++) {
-                myPoly.points.add(new Location(coordsConvex[h].x, coordsConvex[h].y));
+                myPolies.polygons.get(0).points.add(new Location(coordsConvex[h].x, coordsConvex[h].y));
             }
 
 //            LinearRing linearRing = geomFactory.createLinearRing(coordsConvex);
 //            Polygon poly = geomFactory.createPolygon(linearRing);
-            polygons.add(myPoly);
+            polygons.add(myPolies);
         }
         sketch.polygons = polygons;
     }//GEN-LAST:event_jButton17ActionPerformed
@@ -2011,7 +2011,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
 
     private void jButton22ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton22ActionPerformed
         int vDsIndex = mainFParent.findLayer("voronoi_combination_v");
-        ArrayList<MyPolygon> polygons = new ArrayList();
+        ArrayList<MyPolygons> polygons = new ArrayList();
         ConvexHull convHull;
 //        for (int i = 1; i < 3; i++) {
         for (int i = 1; i < ((LayerDefinition) (mainFParent.allData.all_Layers.get(vDsIndex))).categories.length; i++) {
@@ -2028,16 +2028,17 @@ public class GISLocationDialog extends javax.swing.JDialog {
             }
             convHull = new ConvexHull(coords, geomFactory);
             Coordinate coordsConvex[] = convHull.getConvexHull().getCoordinates();
-            MyPolygon myPoly = new MyPolygon();
-            myPoly.points = new ArrayList();
-            myPoly.severity = 1;
+            MyPolygons myPolies = new MyPolygons();
+            myPolies.polygons.add(new MyPolygon());
+            myPolies.polygons.get(0).points = new ArrayList();
+            myPolies.severity = 1;
             for (int h = 0; h < coordsConvex.length; h++) {
-                myPoly.points.add(new Location(coordsConvex[h].x, coordsConvex[h].y));
+                myPolies.polygons.get(0).points.add(new Location(coordsConvex[h].x, coordsConvex[h].y));
             }
 
 //            LinearRing linearRing = geomFactory.createLinearRing(coordsConvex);
 //            Polygon poly = geomFactory.createPolygon(linearRing);
-            polygons.add(myPoly);
+            polygons.add(myPolies);
         }
 
         String GISDataFileName = "./output_CBGs.csv";
@@ -2068,7 +2069,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
 
                 CensusBlockGroup cBGGeo = myParent.mainModel.allGISData.findCensusBlockGroup(Long.parseLong(data.getRow(j).getField("CBG")));
                 for (int l = 0; l < polygons.size(); l++) {
-                    Polygon polyConverted = MyPolygon.myPolygonToJTSPolygon(polygons.get(l));
+                    Polygon polyConverted = MyPolygon.myPolygonToJTSPolygon(polygons.get(l).polygons.get(0));
                     if (polyConverted != null) {
                         if (isInside(cBGGeo.lon, cBGGeo.lat, polyConverted) == true) {
                             vDN.set(l, vDN.get(l) + Integer.parseInt(data.getRow(j).getField("N")));
@@ -2144,7 +2145,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
 
     private void jButton23ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton23ActionPerformed
         int vDsCBGsIndex = mainFParent.findLayer("VDs_CBGs");
-        ArrayList<MyPolygon> polygons = new ArrayList();
+        ArrayList<MyPolygons> polygons = new ArrayList();
         ConvexHull convHull;
 //        for (int i = 1; i < 3; i++) {
         for (int i = 1; i < ((LayerDefinition) (mainFParent.allData.all_Layers.get(vDsCBGsIndex))).categories.length; i++) {
@@ -2161,16 +2162,17 @@ public class GISLocationDialog extends javax.swing.JDialog {
             }
             convHull = new ConvexHull(coords, geomFactory);
             Coordinate coordsConvex[] = convHull.getConvexHull().getCoordinates();
-            MyPolygon myPoly = new MyPolygon();
-            myPoly.points = new ArrayList();
-            myPoly.severity = 1;
+            MyPolygons myPolies = new MyPolygons();
+            myPolies.polygons.add(new MyPolygon());
+            myPolies.polygons.get(0).points = new ArrayList();
+            myPolies.severity = 1;
             for (int h = 0; h < coordsConvex.length; h++) {
-                myPoly.points.add(new Location(coordsConvex[h].x, coordsConvex[h].y));
+                myPolies.polygons.get(0).points.add(new Location(coordsConvex[h].x, coordsConvex[h].y));
             }
 
 //            LinearRing linearRing = geomFactory.createLinearRing(coordsConvex);
 //            Polygon poly = geomFactory.createPolygon(linearRing);
-            polygons.add(myPoly);
+            polygons.add(myPolies);
         }
 
         String GISDataFileName = "./output_CBGs.csv";
@@ -2201,7 +2203,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
 
                 CensusBlockGroup cBGGeo = myParent.mainModel.allGISData.findCensusBlockGroup(Long.parseLong(data.getRow(j).getField("CBG")));
                 for (int l = 0; l < polygons.size(); l++) {
-                    Polygon polyConverted = MyPolygon.myPolygonToJTSPolygon(polygons.get(l));
+                    Polygon polyConverted = MyPolygon.myPolygonToJTSPolygon(polygons.get(l).polygons.get(0));
                     if (polyConverted != null) {
                         if (isInside(cBGGeo.lon, cBGGeo.lat, polyConverted) == true) {
                             vDCBGN.set(l, vDCBGN.get(l) + Integer.parseInt(data.getRow(j).getField("N")));
@@ -2278,11 +2280,15 @@ public class GISLocationDialog extends javax.swing.JDialog {
             city.vDCells = new ArrayList();
             int vDLayerIndex = mainFParent.findLayer("voronoi_combination_v");
             int cBGLayerIndex = mainFParent.findLayer("censusBlockGroups");
+
+            System.out.println("num VDs: " + ((LayerDefinition) (mainFParent.allData.all_Layers.get(vDLayerIndex))).categories.length);
+
             for (int vdIndex = 1; vdIndex < ((LayerDefinition) (mainFParent.allData.all_Layers.get(vDLayerIndex))).categories.length; vdIndex++) {
                 city.vDCells.add(new VDCell());
                 city.vDCells.get(vdIndex - 1).cBGsInvolved = new ArrayList();
                 city.vDCells.get(vdIndex - 1).cBGsIDsInvolved = new ArrayList();
                 city.vDCells.get(vdIndex - 1).cBGsPercentageInvolved = new ArrayList();
+                city.vDCells.get(vdIndex - 1).myIndex=vdIndex;
 
                 HashMap<CensusBlockGroup, Integer> cBGNumNodesHashMap = null;
 
@@ -2341,6 +2347,9 @@ public class GISLocationDialog extends javax.swing.JDialog {
                 city.cBGVDCells.get(cBGVDIndex - 1).cBGsInvolved = new ArrayList();
                 city.cBGVDCells.get(cBGVDIndex - 1).cBGsIDsInvolved = new ArrayList();
                 city.cBGVDCells.get(cBGVDIndex - 1).cBGsPercentageInvolved = new ArrayList();
+                city.cBGVDCells.get(cBGVDIndex - 1).myIndex=cBGVDIndex;
+                
+                
                 HashMap<CensusBlockGroup, Integer> cBGNumNodesHashMap = new HashMap();
                 for (int i = 0; i < mainFParent.allData.all_Nodes.length; i++) {
                     if (((short[]) (mainFParent.allData.all_Nodes[i].layers.get(cBGVDLayerIndex)))[0] == cBGVDIndex) {
@@ -2403,7 +2412,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
 //                if (i == 5) {
 //                    System.out.println("!!!!!!!!!!!");
 //                }
-                if (city.vDCells.get(i).shopPlacesKeys.size() > 0 && city.vDCells.get(i).schoolPlacesKeys.size() > 0) {
+//                if (city.vDCells.get(i).shopPlacesKeys.size() > 0 && city.vDCells.get(i).schoolPlacesKeys.size() > 0) {//THIS IS CAUSED BY A BUG POTENTIALLY! BUT REMOVED FOR NOW
                     VDCell vDCell = new VDCell();
                     vDCell.cBGsIDsInvolved = new ArrayList();
                     vDCell.cBGsPercentageInvolved = new ArrayList();
@@ -2411,6 +2420,9 @@ public class GISLocationDialog extends javax.swing.JDialog {
                     vDCell.schoolPlacesKeys = new ArrayList();
                     vDCell.templePlacesKeys = new ArrayList();
                     vDCell.remainingFreqs = new ArrayList();
+                    
+                    vDCell.myIndex=city.vDCells.get(i).myIndex;
+                    
                     for (int j = 0; j < city.vDCells.get(i).cBGsInvolved.size(); j++) {
                         if (city.vDCells.get(i).cBGsInvolved.get(j) != null) {
                             vDCell.cBGsIDsInvolved.add(city.vDCells.get(i).cBGsInvolved.get(j).id);
@@ -2425,7 +2437,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
                         vDCell.schoolPlacesKeys.add(city.vDCells.get(i).schoolPlacesKeys.get(j));
                     }
                     scsd.vDCells.add(vDCell);
-                }
+//                }
             }
 
             scsd.cBGVDCells = new ArrayList(city.cBGVDCells.size());
@@ -2438,6 +2450,9 @@ public class GISLocationDialog extends javax.swing.JDialog {
                     cBGVDCell.schoolPlacesKeys = new ArrayList();
                     cBGVDCell.templePlacesKeys = new ArrayList();
                     cBGVDCell.remainingFreqs = new ArrayList();
+                    
+                    cBGVDCell.myIndex=city.cBGVDCells.get(i).myIndex;
+                    
                     for (int j = 0; j < city.cBGVDCells.get(i).cBGsInvolved.size(); j++) {
                         if (city.cBGVDCells.get(i).cBGsInvolved.get(j) != null) {
                             cBGVDCell.cBGsIDsInvolved.add(city.cBGVDCells.get(i).cBGsInvolved.get(j).id);
@@ -2454,6 +2469,53 @@ public class GISLocationDialog extends javax.swing.JDialog {
                 }
             }
 
+//            int layer=layersList.getSelectedIndex();
+            if (!(mainFParent.allData.all_Layers.get(vDLayerIndex) instanceof NumericLayer)) {
+
+                System.out.println("city.vDCells.size(): " + city.vDCells.size());
+
+                VectorToPolygon vp = new VectorToPolygon();
+                int[][] indexedImage = vp.layerToIndexedImage(mainFParent.allData, vDLayerIndex, true);
+                HashMap<Integer, SimplePolygons> polies = vp.imageToPolygons(indexedImage, mainFParent.allData, vDLayerIndex, false, true);
+
+                polies.forEach((key, val) -> {
+//                    System.out.println(key);
+//                    if(key==238){
+//                        System.out.println("!!!!!!!!!!!");
+//                    }
+//                    if (city.vDCells.get(key-1).shopPlacesKeys.size() > 0 && city.vDCells.get(key-1).schoolPlacesKeys.size() > 0) {//THIS IS CAUSED BY A BUG POTENTIALLY! BUT REMOVED FOR NOW
+                        MyPolygons myPolygons = new MyPolygons();
+                        for (int y = 0; y < val.polygons.size(); y++) {
+                            MyPolygon myPolygon = new MyPolygon();
+                            for (int z = 0; z < val.polygons.get(y).points.size(); z++) {
+                                myPolygon.points.add(new Location(val.polygons.get(y).points.get(z).xM, val.polygons.get(y).points.get(z).yM));
+                            }
+                            myPolygons.polygons.add(myPolygon);
+                        }
+                        city.vDPolygons.put(key, myPolygons);
+//                    }
+                });
+
+//                for(int k=0;k<polies.size();k++){
+//                    MyPolygons myPolygons=new MyPolygons();
+//                    for(int y=0;y<polies.get(k).polygons.size();y++){
+//                        MyPolygon myPolygon=new MyPolygon();
+//                        for(int z=0;z<polies.get(k).polygons.get(y).points.size();z++){
+//                            myPolygon.points.add(new Location(polies.get(k).polygons.get(y).points.get(z).xM,polies.get(k).polygons.get(y).points.get(z).yM));
+//                        }
+//                        myPolygons.polygons.add(myPolygon);
+//                    }
+//                    city.vDPolygons.put(k, myPolygons);
+//                }
+            } else {
+                System.out.println("ONLY CATEGORICAL LAYERS!");
+            }
+
+            myParent.mainModel.allGISData.loadScopeCBGPolygons(city);
+
+            scsd.cBGPolygons = city.cBGPolygons;
+            scsd.vDPolygons = city.vDPolygons;
+
             myParent.mainModel.supplementaryCaseStudyData = scsd;
 
             String directoryPath = "./datasets/Safegraph/" + myParent.mainModel.ABM.studyScope;
@@ -2463,6 +2525,8 @@ public class GISLocationDialog extends javax.swing.JDialog {
             }
 
             MainModel.saveSupplementaryCaseStudyDataKryo(directoryPath + "/supplementaryGIS", scsd);
+
+//            myParent.mainModel.loadAndConnectSupplementaryCaseStudyDataKryo("./datasets/safegraph/" + myParent.mainModel.ABM.studyScope + "/supplementaryGIS.bin");//TESTING!
 
         } else {
             jLabel1.setText("HALT! ONLY CITY SCOPE IS IMPLEMENTED!");
@@ -3508,7 +3572,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
                             }
                         }
                         if (isCBGFound == false) {
-                            System.out.println("SEVERE PROBLEM! LOCATION NODE HAS NOT CBG!");
+                            System.out.println("SEVERE PROBLEM! LOCATION NODE HAS NO CBG!");
                         }
 //                        System.out.println(counter);
 //                        counter = counter + 1;
@@ -3566,8 +3630,8 @@ public class GISLocationDialog extends javax.swing.JDialog {
         }
         return cBGNumNodesHashMap;
     }
-    
-    private void writeLoadAggregatedOrderData(int numVisitsToNearestOrder[],double distanceByNearestOrder[]){
+
+    private void writeLoadAggregatedOrderData(int numVisitsToNearestOrder[], double distanceByNearestOrder[]) {
         File file = new File(myParent.mainModel.ABM.studyScope + "_ShopNumVisitsByOrder.csv");
         if (file.exists() == false) {
             ArrayList<String[]> data = new ArrayList();
@@ -3642,8 +3706,8 @@ public class GISLocationDialog extends javax.swing.JDialog {
             }
         }
     }
-    
-    private void writeLoadDetailedOrderData(int numVisitsToNearestOrderByCBGShop[][],double distanceByNearestOrderByCBGShop[][]){
+
+    private void writeLoadDetailedOrderData(int numVisitsToNearestOrderByCBGShop[][], double distanceByNearestOrderByCBGShop[][]) {
         File file = new File(myParent.mainModel.ABM.studyScope + "_ShopNumVisitsByOrderCBG.csv");
         if (file.exists() == false) {
             ArrayList<String[]> data = new ArrayList();
@@ -3722,8 +3786,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
             }
         }
     }
-    
-    
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;

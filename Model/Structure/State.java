@@ -11,7 +11,7 @@ import lombok.Setter;
  * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 @Getter @Setter
-public class State extends Marker implements Serializable, Comparable<State>{
+public class State extends Scope implements Serializable, Comparable<State>{
     static final long serialVersionUID = softwareVersion;
     public String name;
     public byte id;

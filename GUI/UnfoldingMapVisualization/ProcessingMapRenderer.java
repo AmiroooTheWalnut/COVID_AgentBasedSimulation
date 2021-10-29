@@ -53,8 +53,9 @@ public class ProcessingMapRenderer extends PApplet {
     //FOR INDIVIDUAL AGENT
     Location drawingIndividualAgent;
     //FOR INDIVIDUAL AGENT
-    
-    public ArrayList<MyPolygon> polygons = new ArrayList();
+
+    public ArrayList<MyPolygons> polygons = new ArrayList();
+//    public RegionImageLayer regionImageLayer;
 
     boolean isPan = false;
     boolean isReadyPan = false;
@@ -134,8 +135,12 @@ public class ProcessingMapRenderer extends PApplet {
             drawIndividualMarker();
             drawAgentTemplatesMarker();
         }
+
+//        drawPolygons();
+
         
-        drawPolygons();
+
+
 
 //        if (isPan == true) {
 //            isPan = false;
@@ -216,16 +221,16 @@ public class ProcessingMapRenderer extends PApplet {
             for (int i = 0; i < drawingAgentTemplateLocations.size(); i++) {
                 SimplePointMarker locSM = new SimplePointMarker(drawingAgentTemplateLocations.get(i));
                 ScreenPosition scLocPos = locSM.getScreenPosition(map);
-                if(colors!=null){
-                    if(colors.size()>0){
+                if (colors != null) {
+                    if (colors.size() > 0) {
                         noStroke();
-                        fill(colors.get(i).x,colors.get(i).y,colors.get(i).z,255f);
+                        fill(colors.get(i).x, colors.get(i).y, colors.get(i).z, 255f);
                         ellipse(scLocPos.x, scLocPos.y, 10, 10);
-                    }else{
+                    } else {
                         fill(0.0F, 200.0F, 0.0F, 100.0F);
                         ellipse(scLocPos.x, scLocPos.y, 30, 30);
                     }
-                }else{
+                } else {
                     fill(0.0F, 200.0F, 0.0F, 100.0F);
                     ellipse(scLocPos.x, scLocPos.y, 30, 30);
                 }
@@ -272,35 +277,46 @@ public class ProcessingMapRenderer extends PApplet {
     }
 
     public static class Vector3f {
+
         float x;
         float y;
         float z;
-        public Vector3f(float passed_x, float passed_y, float passed_z){
-            x=passed_x;
-            y=passed_y;
-            z=passed_z;
+
+        public Vector3f(float passed_x, float passed_y, float passed_z) {
+            x = passed_x;
+            y = passed_y;
+            z = passed_z;
         }
     }
-    
-    public void setCaseStudyPanZoom(float zoom, Location location){
+
+    public void setCaseStudyPanZoom(float zoom, Location location) {
         this.map.zoomTo(zoom);
         this.map.panTo(location);
     }
-    
+
     public void drawPolygons() {
         for (int i = 0; i < polygons.size(); i++) {
-            fill(polygons.get(i).severity, 0, 255-polygons.get(i).severity, 120);
-            beginShape();
-            for (int j = 0; j < polygons.get(i).points.size(); j++) {
+            if (polygons.get(i) != null) {
+                fill(polygons.get(i).severity, 0, 255 - polygons.get(i).severity, 120);
+                for (int k = 0; k < polygons.get(i).polygons.size(); k++) {
+                    beginShape();
+                    for (int j = 0; j < polygons.get(i).polygons.get(k).points.size(); j++) {
 
-                SimplePointMarker startMarker = new SimplePointMarker(polygons.get(i).points.get(j));
+                        SimplePointMarker startMarker = new SimplePointMarker(polygons.get(i).polygons.get(k).points.get(j));
 
-                ScreenPosition scStartPos = startMarker.getScreenPosition(map);
+                        ScreenPosition scStartPos = startMarker.getScreenPosition(map);
 
-                vertex(scStartPos.x, scStartPos.y);
+                        vertex(scStartPos.x, scStartPos.y);
+                    }
+                    endShape(CLOSE);
+                }
             }
-            endShape(CLOSE);
         }
 
     }
+    
+    public void drawIndexedImageBoundaries(){
+        
+    }
+    
 }

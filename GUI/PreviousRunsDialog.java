@@ -7,6 +7,7 @@ package COVID_AgentBasedSimulation.GUI;
 
 import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.COVIDGeoVisualization;
 import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MyPolygon;
+import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MyPolygons;
 import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.ProcessingMapRenderer;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Region;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.RegionSnapshot;
@@ -351,8 +352,13 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
     }
 
     public void setRendererPolygons() {
-        ArrayList<MyPolygon> polygons = new ArrayList();
+        ArrayList<MyPolygons> polygons = new ArrayList();
+//        polygons.add(currentHistoricalRun.regions.get(1).polygons.get(0));
         for (int i = 0; i < currentHistoricalRun.regions.size(); i++) {
+//            if(i==80){
+//                System.out.println("!!!!");
+//                continue;
+//            }
             for(int j=0;j<currentHistoricalRun.regions.get(i).polygons.size();j++){
                 polygons.add(currentHistoricalRun.regions.get(i).polygons.get(j));
             }

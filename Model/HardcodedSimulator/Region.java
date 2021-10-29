@@ -6,6 +6,7 @@
 package COVID_AgentBasedSimulation.Model.HardcodedSimulator;
 
 import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MyPolygon;
+import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MyPolygons;
 import COVID_AgentBasedSimulation.Model.Structure.CensusBlockGroup;
 import COVID_AgentBasedSimulation.Model.Structure.Marker;
 import java.io.Serializable;
@@ -26,7 +27,7 @@ public class Region extends Marker implements Serializable {
     public transient ArrayList<Person> residents=new ArrayList();
     public transient ArrayList<Person> workers=new ArrayList();
     
-    public ArrayList<MyPolygon> polygons=new ArrayList();
+    public ArrayList<MyPolygons> polygons=new ArrayList();
     
     public ArrayList<RegionSnapshot> hourlyRegionSnapshot=new ArrayList();
 }

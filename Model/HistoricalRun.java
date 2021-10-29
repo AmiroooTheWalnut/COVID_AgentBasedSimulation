@@ -108,6 +108,7 @@ public class HistoricalRun implements Serializable {
         kryo.register(COVID_AgentBasedSimulation.Model.HardcodedSimulator.RegionSnapshot.class);
         kryo.register(COVID_AgentBasedSimulation.Model.HistoricalRun.class);
         kryo.register(COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MyPolygon.class);
+        kryo.register(COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MyPolygons.class);
         kryo.register(de.fhpotsdam.unfolding.geo.Location.class);
         kryo.register(java.util.ArrayList.class);
         kryo.register(java.lang.String.class);
@@ -129,6 +130,7 @@ public class HistoricalRun implements Serializable {
         kryo.register(COVID_AgentBasedSimulation.Model.HardcodedSimulator.RegionSnapshot.class);
         kryo.register(COVID_AgentBasedSimulation.Model.HistoricalRun.class);
         kryo.register(COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MyPolygon.class);
+        kryo.register(COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MyPolygons.class);
         kryo.register(de.fhpotsdam.unfolding.geo.Location.class);
         kryo.register(java.util.ArrayList.class);
         kryo.register(java.lang.String.class);

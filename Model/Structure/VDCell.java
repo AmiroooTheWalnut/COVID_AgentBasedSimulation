@@ -17,6 +17,8 @@ import java.util.ArrayList;
 public class VDCell extends Marker implements Serializable {
 
     static final long serialVersionUID = softwareVersion;
+    
+    public int myIndex;
 
     public ArrayList<Long> cBGsIDsInvolved = new ArrayList();
     public transient ArrayList<CensusBlockGroup> cBGsInvolved = new ArrayList();

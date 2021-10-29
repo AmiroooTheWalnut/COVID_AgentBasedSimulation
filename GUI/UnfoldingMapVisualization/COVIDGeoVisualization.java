@@ -23,7 +23,7 @@ public class COVIDGeoVisualization extends PApplet {
 
     GISLocationDialog parent;
     
-    public ArrayList<MyPolygon> polygons = new ArrayList();
+    public ArrayList<MyPolygons> polygons = new ArrayList();
     
     UnfoldingMap map;
     MapSources mapSources;
@@ -89,15 +89,18 @@ public class COVIDGeoVisualization extends PApplet {
         fill(220, 0, 0, 20);
         for (int i = 0; i < polygons.size(); i++) {
             beginShape();
-            for (int j = 0; j < polygons.get(i).points.size(); j++) {
+            for (int k = 0; k < polygons.get(i).polygons.size(); k++) {
+                beginShape();
+                for (int j = 0; j < polygons.get(i).polygons.get(k).points.size(); j++) {
 
-                SimplePointMarker startMarker = new SimplePointMarker(polygons.get(i).points.get(j));
+                    SimplePointMarker startMarker = new SimplePointMarker(polygons.get(i).polygons.get(k).points.get(j));
 
-                ScreenPosition scStartPos = startMarker.getScreenPosition(map);
+                    ScreenPosition scStartPos = startMarker.getScreenPosition(map);
 
-                vertex(scStartPos.x, scStartPos.y);
+                    vertex(scStartPos.x, scStartPos.y);
+                }
+                endShape(CLOSE);
             }
-            endShape(CLOSE);
         }
 
     }

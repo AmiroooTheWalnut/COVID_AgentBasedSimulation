@@ -6,6 +6,7 @@
 package COVID_AgentBasedSimulation.Model.Structure;
 
 import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MyPolygon;
+import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MyPolygons;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.Patterns;
 import COVID_AgentBasedSimulation.Model.Dataset;
 import COVID_AgentBasedSimulation.Model.DatasetTemplate;
@@ -109,7 +110,7 @@ public class AllGISData extends Dataset implements Serializable {
     public void processUSData(String geographyDirectory) {
         System.out.println("READING STATES");
         File statesFile = new File(geographyDirectory + "/US_States.json");
-        try (BufferedReader br = new BufferedReader(new FileReader(statesFile))) {
+        try ( BufferedReader br = new BufferedReader(new FileReader(statesFile))) {
 //            if (countries == null) {
 //                countries = new ArrayList();
 //            }
@@ -147,7 +148,7 @@ public class AllGISData extends Dataset implements Serializable {
 
         System.out.println("READING COUNTIES");
         File countiesFile = new File(geographyDirectory + "/US_Counties.json");
-        try (BufferedReader br = new BufferedReader(new FileReader(countiesFile))) {
+        try ( BufferedReader br = new BufferedReader(new FileReader(countiesFile))) {
             String line;
             int counter = 0;
             int largerCounter = 0;
@@ -156,12 +157,12 @@ public class AllGISData extends Dataset implements Serializable {
                 if (line.contains("{ \"type\": \"Feature\", \"properties\":")) {
                     JSONObject root = new JSONObject(line);
                     JSONObject properties = root.getJSONObject("properties");
-                    String stateIdString=properties.getString("STATEFP");
+                    String stateIdString = properties.getString("STATEFP");
                     byte stateId = Byte.parseByte(stateIdString);
                     State state = countries.get(countries.size() - 1).findAndInsertState(stateId);
 
-                    String countyIdString=properties.getString("COUNTYFP");
-                    String countyIdRevised=stateIdString+countyIdString;
+                    String countyIdString = properties.getString("COUNTYFP");
+                    String countyIdRevised = stateIdString + countyIdString;
                     int countyId = Integer.parseInt(countyIdRevised);
                     County county = state.findAndInsertCounty(countyId);
                     if (!properties.isNull("NAMELSAD")) {
@@ -185,7 +186,7 @@ public class AllGISData extends Dataset implements Serializable {
 
         System.out.println("READING CENSUS BLOCK GROUPS");
         File censusBlockGroupFile = new File(geographyDirectory + "/US_CensusBlockGroup.json");
-        try (BufferedReader br = new BufferedReader(new FileReader(censusBlockGroupFile))) {
+        try ( BufferedReader br = new BufferedReader(new FileReader(censusBlockGroupFile))) {
             String line;
             int deguggingCounter = 0;
             int counter = 0;
@@ -195,18 +196,18 @@ public class AllGISData extends Dataset implements Serializable {
                 if (line.contains("{ \"type\": \"Feature\", \"properties\":")) {
                     JSONObject root = new JSONObject(line);
                     JSONObject properties = root.getJSONObject("properties");
-                    String stateIdString=properties.getString("STATEFP");
+                    String stateIdString = properties.getString("STATEFP");
                     byte stateId = Byte.parseByte(properties.getString("STATEFP"));
                     State state = countries.get(countries.size() - 1).findAndInsertState(stateId);
 
-                    String countyIdString=properties.getString("COUNTYFP");
-                    String countyIdRevised=stateIdString+countyIdString;
-                    int countyId=Integer.parseInt(countyIdRevised);
+                    String countyIdString = properties.getString("COUNTYFP");
+                    String countyIdRevised = stateIdString + countyIdString;
+                    int countyId = Integer.parseInt(countyIdRevised);
                     County county = state.findAndInsertCounty(countyId);
 
-                    String censusTractIdString=properties.getString("TRACTCE");
-                    String censusTractIdRevised=stateIdString+countyIdString+censusTractIdString;
-                    long censusTractId=Long.parseLong(censusTractIdRevised);
+                    String censusTractIdString = properties.getString("TRACTCE");
+                    String censusTractIdRevised = stateIdString + countyIdString + censusTractIdString;
+                    long censusTractId = Long.parseLong(censusTractIdRevised);
                     CensusTract censusTract = county.findAndInsertCensusTract(censusTractId);
                     censusTract.country = countries.get(countries.size() - 1);
                     censusTract.state = state;
@@ -326,21 +327,21 @@ public class AllGISData extends Dataset implements Serializable {
         } catch (IOException ex) {
             Logger.getLogger(Patterns.class.getName()).log(Level.SEVERE, (String) null, ex);
         }
-        
+
         for (int i = 0; i < countries.size(); i++) {
             for (int j = 0; j < countries.get(i).states.size(); j++) {
                 for (int k = 0; k < countries.get(i).states.get(j).counties.size(); k++) {
                     if (countries.get(i).states.get(j).counties.get(k).cities != null) {
                         for (int m = 0; m < countries.get(i).states.get(j).counties.get(k).cities.size(); m++) {
-                            
-                            City targetCity=countries.get(i).states.get(j).counties.get(k).cities.get(m);
-                            
+
+                            City targetCity = countries.get(i).states.get(j).counties.get(k).cities.get(m);
+
                             for (int n = 0; n < countries.get(i).states.get(j).counties.size(); n++) {
                                 if (countries.get(i).states.get(j).counties.get(n).cities != null) {
                                     for (int d = 0; d < countries.get(i).states.get(j).counties.get(n).cities.size(); d++) {
-                                        if(targetCity.name.equals(countries.get(i).states.get(j).counties.get(n).cities.get(d).name)){
-                                            if(targetCity.censusTracts.get(0).id!=countries.get(i).states.get(j).counties.get(n).cities.get(d).censusTracts.get(0).id){
-                                                for(int f=0;f<countries.get(i).states.get(j).counties.get(n).cities.get(d).censusTracts.size();f++){
+                                        if (targetCity.name.equals(countries.get(i).states.get(j).counties.get(n).cities.get(d).name)) {
+                                            if (targetCity.censusTracts.get(0).id != countries.get(i).states.get(j).counties.get(n).cities.get(d).censusTracts.get(0).id) {
+                                                for (int f = 0; f < countries.get(i).states.get(j).counties.get(n).cities.get(d).censusTracts.size(); f++) {
                                                     targetCity.censusTracts.add(countries.get(i).states.get(j).counties.get(n).cities.get(d).censusTracts.get(f));
                                                 }
                                             }
@@ -348,8 +349,7 @@ public class AllGISData extends Dataset implements Serializable {
                                     }
                                 }
                             }
-                            
-                            
+
                         }
                     }
                 }
@@ -371,9 +371,9 @@ public class AllGISData extends Dataset implements Serializable {
         AllGISData.saveAllGISDataKryo("./datasets/ProcessedGeoData", this);
     }
 
-    public void readCensusBlockGrioupPolygon(String geographyDirectory) {
+    public void readCensusBlockGroupPolygon(String geographyDirectory) {
         File censusBlockGroupFile = new File(geographyDirectory + "/US_CensusBlockGroup.json");
-        try (BufferedReader br = new BufferedReader(new FileReader(censusBlockGroupFile))) {
+        try ( BufferedReader br = new BufferedReader(new FileReader(censusBlockGroupFile))) {
             String line;
             int deguggingCounter = 0;
             int counter = 0;
@@ -384,14 +384,19 @@ public class AllGISData extends Dataset implements Serializable {
                 if (line.contains("{ \"type\": \"Feature\", \"properties\":")) {
                     JSONObject root = new JSONObject(line);
                     JSONObject properties = root.getJSONObject("properties");
+                    String stateIdString = properties.getString("STATEFP");
                     byte stateId = Byte.parseByte(properties.getString("STATEFP"));
                     State state = countries.get(countries.size() - 1).findAndInsertState(stateId);
 
-                    int countyId = Integer.parseInt(properties.getString("COUNTYFP"));
+                    String countyIdString = properties.getString("COUNTYFP");
+                    String countyIdRevised = stateIdString + countyIdString;
+                    int countyId = Integer.parseInt(countyIdRevised);
                     County county = state.findAndInsertCounty(countyId);
 
-                    int censusTractInt = properties.getInt("TRACTCE");
-                    CensusTract censusTract = county.findAndInsertCensusTract(censusTractInt);
+                    String censusTractIdString = properties.getString("TRACTCE");
+                    String censusTractIdRevised = stateIdString + countyIdString + censusTractIdString;
+                    long censusTractId = Long.parseLong(censusTractIdRevised);
+                    CensusTract censusTract = county.findAndInsertCensusTract(censusTractId);
 //                    censusTract.country = countries.get(countries.size() - 1);
 //                    censusTract.state = state;
 //                    censusTract.county = county;
@@ -408,36 +413,64 @@ public class AllGISData extends Dataset implements Serializable {
                     JSONObject geometry = root.getJSONObject("geometry");
                     JSONArray coordsT = geometry.getJSONArray("coordinates");
                     String geomType = (String) (geometry.get("type"));
-                    JSONArray coords = coordsT.getJSONArray(0);
-                    ArrayList<Coordinate> coordsArrayList = new ArrayList();
-                    for (int i = 0; i < coords.length(); i++) {
-                        if (geomType.equals("Polygon")) {
+                    if (geomType.equals("Polygon")) {
+                        JSONArray coords = coordsT.getJSONArray(0);
+                        ArrayList<Coordinate> coordsArrayList = new ArrayList();
+                        for (int i = 0; i < coords.length(); i++) {
                             coordsArrayList.add(new Coordinate(coords.getJSONArray(i).getDouble(0), coords.getJSONArray(i).getDouble(1)));
-                        } else if (geomType.equals("MultiPolygon")) {
+                        }
+                        Coordinate coordsArray[] = new Coordinate[coordsArrayList.size()];
+                        for (int m = 0; m < coordsArrayList.size(); m++) {
+                            coordsArray[m] = coordsArrayList.get(m);
+                        }
+                        GeometryFactory geomFactory = new GeometryFactory();
+                        try {
+                            LinearRing linearRing = geomFactory.createLinearRing(coordsArray);
+                            Polygon poly = geomFactory.createPolygon(linearRing);
+
+                            censusBlock.shape.add(poly);
+                        } catch (Exception ex) {
 
                         }
-//                        System.out.println(coords.get(i));
-//                        System.out.println(debugCounter);
+                    } else if (geomType.equals("MultiPolygon")) {
+                        for (int m = 0; m < coordsT.length(); m++) {
+                            JSONArray coords = coordsT.getJSONArray(m);
+                            ArrayList<Coordinate> coordsArrayList = new ArrayList();
 
+                            for (int i = 0; i < coords.getJSONArray(0).length(); i++) {
+                                coordsArrayList.add(new Coordinate(coords.getJSONArray(0).getJSONArray(i).getDouble(0), coords.getJSONArray(0).getJSONArray(i).getDouble(1)));
+                            }
+                            Coordinate coordsArray[] = new Coordinate[coordsArrayList.size()];
+                            for (int h = 0; h < coordsArrayList.size(); h++) {
+                                coordsArray[h] = coordsArrayList.get(h);
+                            }
+                            GeometryFactory geomFactory = new GeometryFactory();
+                            try {
+                                LinearRing linearRing = geomFactory.createLinearRing(coordsArray);
+                                Polygon poly = geomFactory.createPolygon(linearRing);
+
+                                censusBlock.shape.add(poly);
+                            } catch (Exception ex) {
+
+                            }
+
+                        }
                     }
 
+//                    JSONArray coords = coordsT.getJSONArray(0);
+//                    ArrayList<Coordinate> coordsArrayList = new ArrayList();
+//                    for (int i = 0; i < coords.length(); i++) {
+//                        if (geomType.equals("Polygon")) {
+//                            coordsArrayList.add(new Coordinate(coords.getJSONArray(i).getDouble(0), coords.getJSONArray(i).getDouble(1)));
+//                        } else if (geomType.equals("MultiPolygon")) {
+//                            System.out.println("MultiPolygon!!!");
+//                        }
+////                        System.out.println(coords.get(i));
+////                        System.out.println(debugCounter);
+//
+//                    }
                     debugCounter = debugCounter + 1;
 
-                    Coordinate coordsArray[] = new Coordinate[coordsArrayList.size()];
-                    for (int m = 0; m < coordsArrayList.size(); m++) {
-                        coordsArray[m] = coordsArrayList.get(m);
-                    }
-
-                    GeometryFactory geomFactory = new GeometryFactory();
-
-                    try {
-                        LinearRing linearRing = geomFactory.createLinearRing(coordsArray);
-                        Polygon poly = geomFactory.createPolygon(linearRing);
-
-                        censusBlock.shape.add(poly);
-                    } catch (Exception ex) {
-
-                    }
                 }
                 deguggingCounter = deguggingCounter + 1;
                 counter = counter + 1;
@@ -624,12 +657,12 @@ public class AllGISData extends Dataset implements Serializable {
             return false;
         }
     }
-    
-    public void loadScopeCBGPolygons(Scope scope){
+
+    public void loadScopeCBGPolygons(Scope scope) {
         System.out.println("READING CENSUS BLOCK GROUPS");
-        String geographyDirectory="./datasets";
+        String geographyDirectory = "./datasets";
         File censusBlockGroupFile = new File(geographyDirectory + "/US_CensusBlockGroup.json");
-        try (BufferedReader br = new BufferedReader(new FileReader(censusBlockGroupFile))) {
+        try ( BufferedReader br = new BufferedReader(new FileReader(censusBlockGroupFile))) {
             String line;
             int deguggingCounter = 0;
             int counter = 0;
@@ -642,15 +675,83 @@ public class AllGISData extends Dataset implements Serializable {
 
                     long censusBlockLong = Long.parseLong(properties.getString("GEOID"));
                     CensusBlockGroup foundCBG = scope.findCBG(censusBlockLong);
-                    if(foundCBG!=null){
-                        foundCBG.polygon=new MyPolygon();
-                        JSONArray coords = root.getJSONObject("geometry").getJSONArray("coordinates").getJSONArray(0);
-                        for(int i=0;i<coords.length();i++){
-                            double lon = coords.getJSONArray(i).getDouble(0);
-                            double lat = coords.getJSONArray(i).getDouble(1);
-                            foundCBG.polygon.points.add(new Location(lat,lon));
+                    
+                    
+                    
+                    if (foundCBG != null) {
+                    JSONObject geometry = root.getJSONObject("geometry");
+                    JSONArray coordsT = geometry.getJSONArray("coordinates");
+                    String geomType = (String) (geometry.get("type"));
+                    MyPolygons polys=new MyPolygons();
+                    if (geomType.equals("Polygon")) {
+                        JSONArray coords = coordsT.getJSONArray(0);
+                        MyPolygon poly=new MyPolygon();
+//                        ArrayList<Coordinate> coordsArrayList = new ArrayList();
+                        for (int i = 0; i < coords.length(); i++) {
+                            poly.points.add(new Location(coords.getJSONArray(i).getDouble(1),coords.getJSONArray(i).getDouble(0)));
+//                            coordsArrayList.add(new Coordinate(coords.getJSONArray(i).getDouble(0), coords.getJSONArray(i).getDouble(1)));
+                        }
+                        polys.polygons.add(poly);
+//                        Coordinate coordsArray[] = new Coordinate[coordsArrayList.size()];
+//                        for (int m = 0; m < coordsArrayList.size(); m++) {
+//                            coordsArray[m] = coordsArrayList.get(m);
+//                        }
+//                        GeometryFactory geomFactory = new GeometryFactory();
+//                        try {
+//                            LinearRing linearRing = geomFactory.createLinearRing(coordsArray);
+//                            Polygon poly = geomFactory.createPolygon(linearRing);
+//
+//                            foundCBG.shape.add(poly);
+//                        } catch (Exception ex) {
+//                            
+//                        }
+                        scope.cBGPolygons.put(censusBlockLong, polys);
+                    } else if (geomType.equals("MultiPolygon")) {
+                        for (int m = 0; m < coordsT.length(); m++) {
+                            JSONArray coords = coordsT.getJSONArray(m);
+                            
+                            MyPolygon poly=new MyPolygon();
+                            
+//                            ArrayList<Coordinate> coordsArrayList = new ArrayList();
+
+                            for (int i = 0; i < coords.getJSONArray(0).length(); i++) {
+                                poly.points.add(new Location(coords.getJSONArray(i).getDouble(0),coords.getJSONArray(i).getDouble(1)));
+//                                coordsArrayList.add(new Coordinate(coords.getJSONArray(0).getJSONArray(i).getDouble(0), coords.getJSONArray(0).getJSONArray(i).getDouble(1)));
+                            }
+                            
+                            polys.polygons.add(poly);
+                            
+                            scope.cBGPolygons.put(censusBlockLong, polys);
+                            
+//                            Coordinate coordsArray[] = new Coordinate[coordsArrayList.size()];
+//                            for (int h = 0; h < coordsArrayList.size(); h++) {
+//                                coordsArray[h] = coordsArrayList.get(h);
+//                            }
+//                            GeometryFactory geomFactory = new GeometryFactory();
+//                            try {
+//                                LinearRing linearRing = geomFactory.createLinearRing(coordsArray);
+//                                Polygon poly = geomFactory.createPolygon(linearRing);
+//
+//                                foundCBG.shape.add(poly);
+//                            } catch (Exception ex) {
+//
+//                            }
+
                         }
                     }
+                    }
+                    
+                    
+//                    if (foundCBG != null) {
+//                        foundCBG.polygon = new MyPolygon();
+//                        JSONArray coords = root.getJSONObject("geometry").getJSONArray("coordinates").getJSONArray(0);
+//                        for (int i = 0; i < coords.length(); i++) {
+//                            double lon = coords.getJSONArray(i).getDouble(0);
+//                            double lat = coords.getJSONArray(i).getDouble(1);
+//                            foundCBG.polygon.points.add(new Location(lat, lon));
+//                        }
+//                        scope.cBGPolygons.put(foundCBG.id,foundCBG.polygon);
+//                    }
                 }
                 deguggingCounter = deguggingCounter + 1;
                 counter = counter + 1;

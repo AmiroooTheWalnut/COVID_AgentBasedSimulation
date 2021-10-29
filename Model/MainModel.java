@@ -149,6 +149,9 @@ public class MainModel extends Dataset {
                 }
                 city.vDCells = scsd.vDCells;
                 city.cBGVDCells = scsd.cBGVDCells;
+                city.cBGPolygons = scsd.cBGPolygons;
+                city.vDPolygons = scsd.vDPolygons;
+                city.cBGVDPolygons = scsd.cBGVDPolygons;
             }
         } else {
             System.out.println("HALT! ONLY CITY SCOPE IS IMPLEMENTED!");
@@ -160,6 +163,10 @@ public class MainModel extends Dataset {
         kryo.register(COVID_AgentBasedSimulation.Model.Structure.SupplementaryCaseStudyData.class);
         kryo.register(COVID_AgentBasedSimulation.Model.Structure.CBGVDCell.class);
         kryo.register(COVID_AgentBasedSimulation.Model.Structure.VDCell.class);
+        kryo.register(COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MyPolygon.class);
+        kryo.register(de.fhpotsdam.unfolding.geo.Location.class);
+        kryo.register(COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MyPolygons.class);
+        kryo.register(java.util.HashMap.class);
         kryo.register(java.util.ArrayList.class);
         kryo.register(java.lang.String.class);
         kryo.register(java.lang.Long.class);
@@ -182,6 +189,10 @@ public class MainModel extends Dataset {
         kryo.register(COVID_AgentBasedSimulation.Model.Structure.SupplementaryCaseStudyData.class);
         kryo.register(COVID_AgentBasedSimulation.Model.Structure.CBGVDCell.class);
         kryo.register(COVID_AgentBasedSimulation.Model.Structure.VDCell.class);
+        kryo.register(COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MyPolygon.class);
+        kryo.register(de.fhpotsdam.unfolding.geo.Location.class);
+        kryo.register(COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MyPolygons.class);
+        kryo.register(java.util.HashMap.class);
         kryo.register(java.util.ArrayList.class);
         kryo.register(java.lang.String.class);
         kryo.register(java.lang.Long.class);

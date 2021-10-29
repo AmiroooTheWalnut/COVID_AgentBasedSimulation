@@ -1382,7 +1382,7 @@ public class SimulatorDialog extends javax.swing.JDialog {
         myParent.mainModel.javaEvaluationEngine.connectToConsole(jTextArea1);
         myParent.mainModel.pythonEvaluationEngine.connectToConsole(jTextArea2);
         myParent.mainModel.loadAndConnectSupplementaryCaseStudyDataKryo("./datasets/safegraph/"+myParent.mainModel.ABM.studyScope + "/supplementaryGIS.bin");
-        myParent.mainModel.allGISData.loadScopeCBGPolygons((Scope)(myParent.mainModel.ABM.studyScopeGeography));
+//        myParent.mainModel.allGISData.loadScopeCBGPolygons((Scope)(myParent.mainModel.ABM.studyScopeGeography));//THIS IS NOW IN SUPPLAMENTARY DATA
         myParent.mainModel.initModelHardCoded(true, jCheckBox1.isSelected(), (int)(jSpinner1.getValue()), myParent.numProcessors);
         jLabel2.setText(myParent.mainModel.ABM.startTime.toString());
         

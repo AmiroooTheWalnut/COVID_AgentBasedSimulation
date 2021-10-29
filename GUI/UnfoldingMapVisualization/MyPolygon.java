@@ -22,7 +22,7 @@ public class MyPolygon implements Serializable{
     static final long serialVersionUID = softwareVersion;
 
     public ArrayList<Location> points = new ArrayList();
-    public transient float severity;
+    
 
     public MyPolygon() {
 
