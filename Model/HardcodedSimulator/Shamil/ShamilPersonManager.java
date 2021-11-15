@@ -64,7 +64,7 @@ public class ShamilPersonManager {
             put("ACTION_OCCURRING_PROBABILITY", 0.35);
             put("ACTION_AFFECTING_PROBABILITY", 0.75);
             //put("ACTION_INFECT_THRESHOLD", 0.45);//ORIGINAL
-            put("ACTION_INFECT_THRESHOLD", 0.45);
+            put("ACTION_INFECT_THRESHOLD", 0.85);
             //put("INFECTION_PROBABILITY", 0.55);//ORIGINAL
             put("INFECTION_PROBABILITY", 0.6);
             put("PROTECTION_LEVEL_THRESH", 0.4);
@@ -327,7 +327,7 @@ public class ShamilPersonManager {
 
     public static void die(Person person) {
         if (person.shamilPersonProperties.infectedDays > 15) {
-            if (Math.random() > 0.5) {
+            if (Math.random() > 0.97) {
                 person.shamilPersonProperties.isAlive = false;
                 //print('Person {} has died'.format(self.id));
             }

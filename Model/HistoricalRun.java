@@ -6,6 +6,7 @@
 package COVID_AgentBasedSimulation.Model;
 
 import COVID_AgentBasedSimulation.GUI.MainFrame;
+import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.RegionImageLayer;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Region;
 import static COVID_AgentBasedSimulation.Model.MainModel.softwareVersion;
 import com.esotericsoftware.kryo.Kryo;
@@ -39,6 +40,7 @@ public class HistoricalRun implements Serializable {
     static final long serialVersionUID = softwareVersion;
 
     public ArrayList<Region> regions;
+    public RegionImageLayer regionsLayer;
     public transient ZonedDateTime startTime;
     public transient ZonedDateTime endTime;
     public String startTimeString;
@@ -109,6 +111,12 @@ public class HistoricalRun implements Serializable {
         kryo.register(COVID_AgentBasedSimulation.Model.HistoricalRun.class);
         kryo.register(COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MyPolygon.class);
         kryo.register(COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MyPolygons.class);
+        kryo.register(COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.RegionImageLayer.class);
+        kryo.register(double[].class);
+        kryo.register(int[].class);
+        kryo.register(int[][].class);
+        kryo.register(boolean[][].class);
+        kryo.register(boolean[].class);
         kryo.register(de.fhpotsdam.unfolding.geo.Location.class);
         kryo.register(java.util.ArrayList.class);
         kryo.register(java.lang.String.class);
@@ -131,6 +139,12 @@ public class HistoricalRun implements Serializable {
         kryo.register(COVID_AgentBasedSimulation.Model.HistoricalRun.class);
         kryo.register(COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MyPolygon.class);
         kryo.register(COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MyPolygons.class);
+        kryo.register(COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.RegionImageLayer.class);
+        kryo.register(double[].class);
+        kryo.register(int[].class);
+        kryo.register(int[][].class);
+        kryo.register(boolean[][].class);
+        kryo.register(boolean[].class);
         kryo.register(de.fhpotsdam.unfolding.geo.Location.class);
         kryo.register(java.util.ArrayList.class);
         kryo.register(java.lang.String.class);

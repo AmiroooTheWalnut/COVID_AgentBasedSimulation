@@ -4,13 +4,9 @@
  */
 package COVID_AgentBasedSimulation.Model.HardcodedSimulator;
 
-import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilTemplateAction;
-import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilTask;
-import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilProfession;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.DwellTime;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.PatternsRecordProcessed;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilPersonProperties;
-import java.util.ArrayList;
 
 /**
  *
@@ -43,5 +39,7 @@ public class PersonProperties {
     public int minutesTravelFromWorkFrom16;
     
     public boolean isInitiallyInfectedEnteringPOI=false;
+    
+    public POI currentPOI;
     
 }

@@ -24,6 +24,7 @@ import javax.swing.JPanel;
 import processing.awt.PSurfaceAWT;
 import processing.awt.PSurfaceAWT.SmoothCanvas;
 import processing.core.PApplet;
+import processing.core.PImage;
 import processing.core.PSurface;
 
 /**
@@ -55,7 +56,7 @@ public class ProcessingMapRenderer extends PApplet {
     //FOR INDIVIDUAL AGENT
 
     public ArrayList<MyPolygons> polygons = new ArrayList();
-//    public RegionImageLayer regionImageLayer;
+    public RegionImageLayer regionImageLayer;
 
     boolean isPan = false;
     boolean isReadyPan = false;
@@ -137,10 +138,8 @@ public class ProcessingMapRenderer extends PApplet {
         }
 
 //        drawPolygons();
-
-        
-
-
+        drawIndexImageShades();
+        drawIndexedImageBoundaries();
 
 //        if (isPan == true) {
 //            isPan = false;
@@ -314,9 +313,63 @@ public class ProcessingMapRenderer extends PApplet {
         }
 
     }
-    
-    public void drawIndexedImageBoundaries(){
-        
+
+    public void drawIndexImageShades() {
+        if (regionImageLayer != null) {
+            if (regionImageLayer.indexedImage != null) {
+                if (regionImageLayer.severities != null) {
+                    int width = regionImageLayer.indexedImage.length;
+                    int height = regionImageLayer.indexedImage[0].length;
+                    PImage img = createImage(width, height, ARGB);
+                    loadPixels();
+                    for (int x = 0; x < width; x++) {
+                        for (int y = 0; y < height; y++) {
+                            int loc = x + y * width;
+                            int index = regionImageLayer.indexedImage[x][height - y - 1] - 1;
+                            if (index >= 0) {
+                                img.pixels[loc] = color((int) (regionImageLayer.severities[index]), 0, 255 - (int) (regionImageLayer.severities[index]), 120);
+                            } else {
+                                img.pixels[loc] = color(0, 0, 0, 0);
+                            }
+                        }
+                    }
+                    updatePixels();
+                    SimplePointMarker startMarker = new SimplePointMarker(new Location(regionImageLayer.startLon, regionImageLayer.startLat));
+                    ScreenPosition scStartXY = startMarker.getScreenPosition(map);
+                    SimplePointMarker endMarker = new SimplePointMarker(new Location(regionImageLayer.endLon, regionImageLayer.endLat));
+                    ScreenPosition scEndXY = endMarker.getScreenPosition(map);
+                    image(img, scStartXY.x, scStartXY.y, scEndXY.x - scStartXY.x, scEndXY.y - scStartXY.y);
+                }
+            }
+        }
     }
-    
+
+    public void drawIndexedImageBoundaries() {
+        if (regionImageLayer != null) {
+            if (regionImageLayer.imageBoundaries != null) {
+
+                int width = regionImageLayer.imageBoundaries.length;
+                int height = regionImageLayer.imageBoundaries[0].length;
+                PImage img = createImage(width, height, ARGB);
+                loadPixels();
+                for (int x = 0; x < width; x++) {
+                    for (int y = 0; y < height; y++) {
+                        int loc = x + y * width;
+                        if (regionImageLayer.imageBoundaries[x][height - y - 1] == true) {
+                            img.pixels[loc] = color(0, 0, 0, 200);
+                        } else {
+                            img.pixels[loc] = color(0, 0, 0, 0);
+                        }
+                    }
+                }
+                updatePixels();
+                SimplePointMarker startMarker = new SimplePointMarker(new Location(regionImageLayer.startLon, regionImageLayer.startLat));
+                ScreenPosition scStartXY = startMarker.getScreenPosition(map);
+                SimplePointMarker endMarker = new SimplePointMarker(new Location(regionImageLayer.endLon, regionImageLayer.endLat));
+                ScreenPosition scEndXY = endMarker.getScreenPosition(map);
+                image(img, scStartXY.x, scStartXY.y, scEndXY.x - scStartXY.x, scEndXY.y - scStartXY.y);
+            }
+        }
+    }
+
 }

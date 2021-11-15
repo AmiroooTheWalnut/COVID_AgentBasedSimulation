@@ -9,6 +9,7 @@ import COVID_AgentBasedSimulation.GUI.MainFrame;
 import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MyPolygon;
 import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.COVIDGeoVisualization;
 import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MyPolygons;
+import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.RegionImageLayer;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.LocationNodeSafegraph;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.PatternsRecordProcessed;
 import COVID_AgentBasedSimulation.Model.MainModel;
@@ -2280,6 +2281,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
             city.vDCells = new ArrayList();
             int vDLayerIndex = mainFParent.findLayer("voronoi_combination_v");
             int cBGLayerIndex = mainFParent.findLayer("censusBlockGroups");
+            int cBGVDLayerIndex = mainFParent.findLayer("VDs_CBGs");
 
             System.out.println("num VDs: " + ((LayerDefinition) (mainFParent.allData.all_Layers.get(vDLayerIndex))).categories.length);
 
@@ -2288,7 +2290,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
                 city.vDCells.get(vdIndex - 1).cBGsInvolved = new ArrayList();
                 city.vDCells.get(vdIndex - 1).cBGsIDsInvolved = new ArrayList();
                 city.vDCells.get(vdIndex - 1).cBGsPercentageInvolved = new ArrayList();
-                city.vDCells.get(vdIndex - 1).myIndex=vdIndex;
+                city.vDCells.get(vdIndex - 1).myIndex = vdIndex;
 
                 HashMap<CensusBlockGroup, Integer> cBGNumNodesHashMap = null;
 
@@ -2340,16 +2342,15 @@ public class GISLocationDialog extends javax.swing.JDialog {
             }
 
             city.cBGVDCells = new ArrayList();
-            int cBGVDLayerIndex = mainFParent.findLayer("VDs_CBGs");
+
 //            int cBGLayerIndex=mainFParent.findLayer("censusBlockGroups");
             for (int cBGVDIndex = 1; cBGVDIndex < ((LayerDefinition) (mainFParent.allData.all_Layers.get(cBGVDLayerIndex))).categories.length; cBGVDIndex++) {
                 city.cBGVDCells.add(new CBGVDCell());
                 city.cBGVDCells.get(cBGVDIndex - 1).cBGsInvolved = new ArrayList();
                 city.cBGVDCells.get(cBGVDIndex - 1).cBGsIDsInvolved = new ArrayList();
                 city.cBGVDCells.get(cBGVDIndex - 1).cBGsPercentageInvolved = new ArrayList();
-                city.cBGVDCells.get(cBGVDIndex - 1).myIndex=cBGVDIndex;
-                
-                
+                city.cBGVDCells.get(cBGVDIndex - 1).myIndex = cBGVDIndex;
+
                 HashMap<CensusBlockGroup, Integer> cBGNumNodesHashMap = new HashMap();
                 for (int i = 0; i < mainFParent.allData.all_Nodes.length; i++) {
                     if (((short[]) (mainFParent.allData.all_Nodes[i].layers.get(cBGVDLayerIndex)))[0] == cBGVDIndex) {
@@ -2413,30 +2414,30 @@ public class GISLocationDialog extends javax.swing.JDialog {
 //                    System.out.println("!!!!!!!!!!!");
 //                }
 //                if (city.vDCells.get(i).shopPlacesKeys.size() > 0 && city.vDCells.get(i).schoolPlacesKeys.size() > 0) {//THIS IS CAUSED BY A BUG POTENTIALLY! BUT REMOVED FOR NOW
-                    VDCell vDCell = new VDCell();
-                    vDCell.cBGsIDsInvolved = new ArrayList();
-                    vDCell.cBGsPercentageInvolved = new ArrayList();
-                    vDCell.shopPlacesKeys = new ArrayList();
-                    vDCell.schoolPlacesKeys = new ArrayList();
-                    vDCell.templePlacesKeys = new ArrayList();
-                    vDCell.remainingFreqs = new ArrayList();
-                    
-                    vDCell.myIndex=city.vDCells.get(i).myIndex;
-                    
-                    for (int j = 0; j < city.vDCells.get(i).cBGsInvolved.size(); j++) {
-                        if (city.vDCells.get(i).cBGsInvolved.get(j) != null) {
-                            vDCell.cBGsIDsInvolved.add(city.vDCells.get(i).cBGsInvolved.get(j).id);
-                            vDCell.cBGsPercentageInvolved.add(city.vDCells.get(i).cBGsPercentageInvolved.get(j));
-                        }
+                VDCell vDCell = new VDCell();
+                vDCell.cBGsIDsInvolved = new ArrayList();
+                vDCell.cBGsPercentageInvolved = new ArrayList();
+                vDCell.shopPlacesKeys = new ArrayList();
+                vDCell.schoolPlacesKeys = new ArrayList();
+                vDCell.templePlacesKeys = new ArrayList();
+                vDCell.remainingFreqs = new ArrayList();
+
+                vDCell.myIndex = city.vDCells.get(i).myIndex;
+
+                for (int j = 0; j < city.vDCells.get(i).cBGsInvolved.size(); j++) {
+                    if (city.vDCells.get(i).cBGsInvolved.get(j) != null) {
+                        vDCell.cBGsIDsInvolved.add(city.vDCells.get(i).cBGsInvolved.get(j).id);
+                        vDCell.cBGsPercentageInvolved.add(city.vDCells.get(i).cBGsPercentageInvolved.get(j));
                     }
+                }
 //                    System.out.println(city.vDCells.get(i).shopPlaces.size());
-                    for (int j = 0; j < city.vDCells.get(i).shopPlacesKeys.size(); j++) {
-                        vDCell.shopPlacesKeys.add(city.vDCells.get(i).shopPlacesKeys.get(j));
-                    }
-                    for (int j = 0; j < city.vDCells.get(i).schoolPlacesKeys.size(); j++) {
-                        vDCell.schoolPlacesKeys.add(city.vDCells.get(i).schoolPlacesKeys.get(j));
-                    }
-                    scsd.vDCells.add(vDCell);
+                for (int j = 0; j < city.vDCells.get(i).shopPlacesKeys.size(); j++) {
+                    vDCell.shopPlacesKeys.add(city.vDCells.get(i).shopPlacesKeys.get(j));
+                }
+                for (int j = 0; j < city.vDCells.get(i).schoolPlacesKeys.size(); j++) {
+                    vDCell.schoolPlacesKeys.add(city.vDCells.get(i).schoolPlacesKeys.get(j));
+                }
+                scsd.vDCells.add(vDCell);
 //                }
             }
 
@@ -2450,9 +2451,9 @@ public class GISLocationDialog extends javax.swing.JDialog {
                     cBGVDCell.schoolPlacesKeys = new ArrayList();
                     cBGVDCell.templePlacesKeys = new ArrayList();
                     cBGVDCell.remainingFreqs = new ArrayList();
-                    
-                    cBGVDCell.myIndex=city.cBGVDCells.get(i).myIndex;
-                    
+
+                    cBGVDCell.myIndex = city.cBGVDCells.get(i).myIndex;
+
                     for (int j = 0; j < city.cBGVDCells.get(i).cBGsInvolved.size(); j++) {
                         if (city.cBGVDCells.get(i).cBGsInvolved.get(j) != null) {
                             cBGVDCell.cBGsIDsInvolved.add(city.cBGVDCells.get(i).cBGsInvolved.get(j).id);
@@ -2470,32 +2471,64 @@ public class GISLocationDialog extends javax.swing.JDialog {
             }
 
 //            int layer=layersList.getSelectedIndex();
+            if (!(mainFParent.allData.all_Layers.get(cBGLayerIndex) instanceof NumericLayer)) {
+                RegionImageLayer cBGLayer = new RegionImageLayer();
+
+                VectorToPolygon vp = new VectorToPolygon();
+                int[][] indexedImage = vp.layerToIndexedImage(mainFParent.allData, cBGLayerIndex, true);
+
+                cBGLayer.indexedImage = indexedImage;
+                cBGLayer.startLat = vp.scaleOffsetX;
+                cBGLayer.startLon = vp.scaleOffsetY;
+                cBGLayer.endLat = vp.scaleOffsetX + vp.scaleWidth;
+                cBGLayer.endLon = vp.scaleOffsetY + vp.scaleHeight;
+
+                int numCBGs = ((LayerDefinition) (mainFParent.allData.all_Layers.get(cBGLayerIndex))).categories.length - 1;
+
+                cBGLayer.severities = new double[numCBGs];
+                cBGLayer.imageBoundaries = RegionImageLayer.getImageBoundaries(indexedImage);
+                city.cBGRegionLayer = cBGLayer;
+            } else {
+                System.out.println("ONLY CATEGORICAL LAYERS!");
+            }
+
             if (!(mainFParent.allData.all_Layers.get(vDLayerIndex) instanceof NumericLayer)) {
 
                 System.out.println("city.vDCells.size(): " + city.vDCells.size());
+                RegionImageLayer vDLayer = new RegionImageLayer();
 
                 VectorToPolygon vp = new VectorToPolygon();
                 int[][] indexedImage = vp.layerToIndexedImage(mainFParent.allData, vDLayerIndex, true);
-                HashMap<Integer, SimplePolygons> polies = vp.imageToPolygons(indexedImage, mainFParent.allData, vDLayerIndex, false, true);
 
-                polies.forEach((key, val) -> {
-//                    System.out.println(key);
-//                    if(key==238){
-//                        System.out.println("!!!!!!!!!!!");
-//                    }
-//                    if (city.vDCells.get(key-1).shopPlacesKeys.size() > 0 && city.vDCells.get(key-1).schoolPlacesKeys.size() > 0) {//THIS IS CAUSED BY A BUG POTENTIALLY! BUT REMOVED FOR NOW
-                        MyPolygons myPolygons = new MyPolygons();
-                        for (int y = 0; y < val.polygons.size(); y++) {
-                            MyPolygon myPolygon = new MyPolygon();
-                            for (int z = 0; z < val.polygons.get(y).points.size(); z++) {
-                                myPolygon.points.add(new Location(val.polygons.get(y).points.get(z).xM, val.polygons.get(y).points.get(z).yM));
-                            }
-                            myPolygons.polygons.add(myPolygon);
-                        }
-                        city.vDPolygons.put(key, myPolygons);
-//                    }
-                });
+                vDLayer.indexedImage = indexedImage;
+                vDLayer.startLat = vp.scaleOffsetX;
+                vDLayer.startLon = vp.scaleOffsetY;
+                vDLayer.endLat = vp.scaleOffsetX + vp.scaleWidth;
+                vDLayer.endLon = vp.scaleOffsetY + vp.scaleHeight;
 
+                vDLayer.severities = new double[city.vDCells.size()];
+                vDLayer.imageBoundaries = RegionImageLayer.getImageBoundaries(indexedImage);
+                city.vDRegionLayer = vDLayer;
+
+                //                HashMap<Integer, SimplePolygons> polies = vp.imageToPolygons(indexedImage, mainFParent.allData, vDLayerIndex, false, true);
+//
+//                polies.forEach((key, val) -> {
+////                    System.out.println(key);
+////                    if(key==238){
+////                        System.out.println("!!!!!!!!!!!");
+////                    }
+////                    if (city.vDCells.get(key-1).shopPlacesKeys.size() > 0 && city.vDCells.get(key-1).schoolPlacesKeys.size() > 0) {//THIS IS CAUSED BY A BUG POTENTIALLY! BUT REMOVED FOR NOW
+//                        MyPolygons myPolygons = new MyPolygons();
+//                        for (int y = 0; y < val.polygons.size(); y++) {
+//                            MyPolygon myPolygon = new MyPolygon();
+//                            for (int z = 0; z < val.polygons.get(y).points.size(); z++) {
+//                                myPolygon.points.add(new Location(val.polygons.get(y).points.get(z).xM, val.polygons.get(y).points.get(z).yM));
+//                            }
+//                            myPolygons.polygons.add(myPolygon);
+//                        }
+//                        city.vDPolygons.put(key, myPolygons);
+////                    }
+//                });
 //                for(int k=0;k<polies.size();k++){
 //                    MyPolygons myPolygons=new MyPolygons();
 //                    for(int y=0;y<polies.get(k).polygons.size();y++){
@@ -2511,10 +2544,34 @@ public class GISLocationDialog extends javax.swing.JDialog {
                 System.out.println("ONLY CATEGORICAL LAYERS!");
             }
 
+            if (!(mainFParent.allData.all_Layers.get(cBGVDLayerIndex) instanceof NumericLayer)) {
+                RegionImageLayer cBGVDLayer = new RegionImageLayer();
+
+                VectorToPolygon vp = new VectorToPolygon();
+                int[][] indexedImage = vp.layerToIndexedImage(mainFParent.allData, cBGVDLayerIndex, true);
+
+                cBGVDLayer.indexedImage = indexedImage;
+                cBGVDLayer.startLat = vp.scaleOffsetX;
+                cBGVDLayer.startLon = vp.scaleOffsetY;
+                cBGVDLayer.endLat = vp.scaleOffsetX + vp.scaleWidth;
+                cBGVDLayer.endLon = vp.scaleOffsetY + vp.scaleHeight;
+
+                cBGVDLayer.severities = new double[city.cBGVDCells.size()];
+                cBGVDLayer.imageBoundaries = RegionImageLayer.getImageBoundaries(indexedImage);
+                city.cBGVDRegionLayer = cBGVDLayer;
+
+            } else {
+                System.out.println("ONLY CATEGORICAL LAYERS!");
+            }
+
             myParent.mainModel.allGISData.loadScopeCBGPolygons(city);
 
             scsd.cBGPolygons = city.cBGPolygons;
             scsd.vDPolygons = city.vDPolygons;
+
+            scsd.cBGRegionImageLayer = city.cBGRegionLayer;
+            scsd.vDRegionImageLayer = city.vDRegionLayer;
+            scsd.cBGVDRegionImageLayer = city.cBGVDRegionLayer;
 
             myParent.mainModel.supplementaryCaseStudyData = scsd;
 
@@ -2527,7 +2584,6 @@ public class GISLocationDialog extends javax.swing.JDialog {
             MainModel.saveSupplementaryCaseStudyDataKryo(directoryPath + "/supplementaryGIS", scsd);
 
 //            myParent.mainModel.loadAndConnectSupplementaryCaseStudyDataKryo("./datasets/safegraph/" + myParent.mainModel.ABM.studyScope + "/supplementaryGIS.bin");//TESTING!
-
         } else {
             jLabel1.setText("HALT! ONLY CITY SCOPE IS IMPLEMENTED!");
         }

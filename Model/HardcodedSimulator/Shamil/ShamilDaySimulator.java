@@ -138,10 +138,14 @@ public class ShamilDaySimulator {
                 } else {
                     if (prsn.shamilPersonProperties.isAlive == false) {
                         prsn.shamilPersonProperties.state = "Dead";
-                    } else if (prsn.shamilPersonProperties.infectedDays == 4) {
-                        prsn.shamilPersonProperties.state = "contagious_asymptomatic";
-                    } else if (prsn.shamilPersonProperties.infectedDays == 6) {
-                        if (Math.random() > 0.7) {//ADDED BY AMIROOO
+                    } else if (prsn.shamilPersonProperties.infectedDays >= Math.round(Math.max(55, 55+10*Math.random())) && prsn.shamilPersonProperties.state.equals("recovered")) {//ADDED BY AMIROOO WAS 60
+                        prsn.shamilPersonProperties.state = "Not_infected";
+                        prsn.shamilPersonProperties.isInfected = false;
+                        prsn.shamilPersonProperties.quarantinedDay = -1;
+                    } else if (prsn.shamilPersonProperties.infectedDays >= Math.round(Math.max(14, 14+10*Math.random())) && (prsn.shamilPersonProperties.state.equals("contagious_symptomatic") || prsn.shamilPersonProperties.state.equals("contagious_asymptomatic"))) {//ADDED BY AMIROOO WAS 18
+                        prsn.shamilPersonProperties.state = "recovered";//ADDED BY AMIROOO
+                    } else if (prsn.shamilPersonProperties.infectedDays >= Math.round(Math.max(5, 5+2*Math.random())) && prsn.shamilPersonProperties.state.equals("contagious_asymptomatic")) {//EDITTED BY AMIROOO IT WAS 6
+                        if (Math.random() > 0.5) {//ADDED BY AMIROOO
                             prsn.shamilPersonProperties.state = "contagious_symptomatic";
 
                             // # elif(prsn.infected_days==1):
@@ -186,12 +190,8 @@ public class ShamilDaySimulator {
                                 }
                             }
                         }
-                    } else if (prsn.shamilPersonProperties.infectedDays == 18) {//ADDED BY AMIROOO
-                        prsn.shamilPersonProperties.state = "recovered";//ADDED BY AMIROOO
-                    } else if (prsn.shamilPersonProperties.infectedDays == 60) {//ADDED BY AMIROOO
-                        prsn.shamilPersonProperties.state = "Not_infected";
-                        prsn.shamilPersonProperties.isInfected = false;
-                        prsn.shamilPersonProperties.quarantinedDay = -1;
+                    } else if (prsn.shamilPersonProperties.infectedDays >= Math.round(Math.max(3, 3+2*Math.random()))) {//EDITTED BY AMIROOO IT WAS 4
+                        prsn.shamilPersonProperties.state = "contagious_asymptomatic";
                     }
                 }
             }

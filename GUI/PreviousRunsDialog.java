@@ -9,6 +9,7 @@ import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.COVIDGeoVisualiz
 import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MyPolygon;
 import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MyPolygons;
 import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.ProcessingMapRenderer;
+import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.RegionImageLayer;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Region;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.RegionSnapshot;
 import COVID_AgentBasedSimulation.Model.HistoricalRun;
@@ -78,7 +79,8 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
         updateProjects();
         jSlider1.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
-                setRendererShades();
+//                setRendererPolygonShades();//DEPRECIATED!!!
+                setRendererRegionLayerShades();
                 ZonedDateTime temp = currentHistoricalRun.startTime.plusHours((int)(jSlider1.getValue()));
                 jLabel2.setText("Current: " + temp.toString());
 //                System.out.println("Slider1: " + jSlider1.getValue());
@@ -276,14 +278,46 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
     private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_jTree1ValueChanged
         loadHistoricalRun(evt);
 
-        setRendererPolygons();
+//        setRendererPolygons();
+        setRegionImageLayer();
+
     }//GEN-LAST:event_jTree1ValueChanged
 
     private void jList2ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList2ValueChanged
-        setRendererShades();
+//        setRendererPolygonShades();
+        setRendererRegionLayerShades();
     }//GEN-LAST:event_jList2ValueChanged
 
-    public void setRendererShades() {
+    public void setRendererRegionLayerShades() {
+        if (jList2.getSelectedIndex() > -1) {
+            DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) jTree1.getLastSelectedPathComponent();
+            if (selectedNode != null) {
+                String splitted[] = jList2.getSelectedValue().split("\\(");
+                try {
+                    Field field = RegionSnapshot.class.getDeclaredField(splitted[1].substring(0, splitted[1].length() - 1));
+                    ArrayList<Double> allValues = new ArrayList();
+                    for (int i = 0; i < currentHistoricalRun.regions.size(); i++) {
+                        double val = Double.valueOf(String.valueOf(field.get(currentHistoricalRun.regions.get(i).hourlyRegionSnapshot.get(jSlider1.getValue()))));
+                        allValues.add(val);
+                    }
+                    ArrayList<Double> allValuesScaled = scaleData(allValues);
+                    for (int i = 0; i < currentHistoricalRun.regions.size(); i++) {
+                        currentHistoricalRun.regionsLayer.severities[i]=allValuesScaled.get(i);
+                    }
+                } catch (NoSuchFieldException ex) {
+                    Logger.getLogger(PreviousRunsDialog.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (SecurityException ex) {
+                    Logger.getLogger(PreviousRunsDialog.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IllegalArgumentException ex) {
+                    Logger.getLogger(PreviousRunsDialog.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(PreviousRunsDialog.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+    }
+    
+    public void setRendererPolygonShades() {
         if (jList2.getSelectedIndex() > -1) {
             DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) jTree1.getLastSelectedPathComponent();
             if (selectedNode != null) {
@@ -364,6 +398,10 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
             }
         }
         sketch.polygons = polygons;
+    }
+    
+    public void setRegionImageLayer(){
+        sketch.regionImageLayer = currentHistoricalRun.regionsLayer;
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

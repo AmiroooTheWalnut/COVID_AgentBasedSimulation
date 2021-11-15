@@ -7,6 +7,7 @@ package COVID_AgentBasedSimulation.Model.Structure;
 
 import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MyPolygon;
 import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MyPolygons;
+import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.RegionImageLayer;
 import static COVID_AgentBasedSimulation.Model.MainModel.softwareVersion;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -26,7 +27,16 @@ public class SupplementaryCaseStudyData implements Serializable {
     public double schoolMergePrecision;
     public double templeMergePrecision;
 
-    public HashMap<Long, MyPolygons> cBGPolygons = new HashMap();
-    public HashMap<Integer, MyPolygons> vDPolygons = new HashMap();
-    public HashMap<Integer, MyPolygons> cBGVDPolygons = new HashMap();
+    public HashMap<Long, MyPolygons> cBGPolygons = new HashMap();//DEPRECIATED!
+    public HashMap<Integer, MyPolygons> vDPolygons = new HashMap();//DEPRECIATED!
+    public HashMap<Integer, MyPolygons> cBGVDPolygons = new HashMap();//DEPRECIATED!
+    
+//    public RegionImageLayer vDRegionLayer;
+//    public RegionImageLayer cBGVDGRegionLayer;
+//    public RegionImageLayer cBGRegionLayer;
+    
+    
+    public RegionImageLayer cBGRegionImageLayer;
+    public RegionImageLayer vDRegionImageLayer;
+    public RegionImageLayer cBGVDRegionImageLayer;
 }

@@ -12,6 +12,10 @@ import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.POI.CHANCE_OF_
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilPersonProperties;
 import COVID_AgentBasedSimulation.Model.MainModel;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -21,15 +25,16 @@ public class Person extends Agent {
 
     Person currentAgent = this;
 
-    MainModel myModelRoot;
+    public boolean isPolled = false;
 
     public PersonProperties properties = new PersonProperties();
     public ShamilPersonProperties shamilPersonProperties = new ShamilPersonProperties();
 
     public boolean isActive = false;//IF OUR ABM IS ACTIVE, THEN THIS CLASS'S BEHAVIOR WILL RUN
 
-    public Person() {
+    public Person(int index) {
         myType = "Person";
+        myIndex = index;
     }
 
     @Override
@@ -40,16 +45,21 @@ public class Person extends Agent {
     @Override
     public void behavior() {
         if (isActive == true) {
-            if (properties.isAtHome == true) {
-                travelFromHome(myModelRoot.ABM.currentTime);
-            }
-            if (properties.isAtWork == true) {
-                travelFromWork(myModelRoot.ABM.currentTime);
-            }
-            if (properties.isInTravel == true) {
-                properties.minutesStayed += 1;
-                myModelRoot.ABM.root.pOIs.get(properties.currentPattern.placeKey).contact(myModelRoot.ABM.currentTime, this);
-                returnFromTravel();
+            if (properties.status != Root.statusEnum.DEAD.ordinal()) {
+                isPolled = false;
+                if (properties.isAtHome == true) {
+                    travelFromHome(myModelRoot.ABM.currentTime);
+                }
+                if (properties.isAtWork == true) {
+                    travelFromWork(myModelRoot.ABM.currentTime);
+                }
+                if (properties.isInTravel == true) {
+                    properties.minutesStayed += 1;
+//                    myModelRoot.ABM.root.pOIs.get(properties.currentPattern.placeKey).contact(myModelRoot.ABM.currentTime, this);
+                    properties.currentPOI.contact(myModelRoot.ABM.currentTime, this);
+                    returnFromTravel();
+                }
+//                pollContact();
             }
         }
     }
@@ -78,14 +88,20 @@ public class Person extends Agent {
         properties.minutesStayed = 0;
         properties.didTravelFromHome = false;
         properties.didTravelFromWork = false;
-        POI pOI = myModelRoot.ABM.root.pOIs.get(properties.currentPattern.placeKey);
-        pOI.peopleInPOI.remove(this);
 
+//        System.out.println("RETURN");
+//        System.out.println("mtIndex: "+myIndex);
+//        System.out.println("properties.currentPOI.peopleInPOI.size(): before:"+properties.currentPOI.peopleInPOI.size());
+//        POI pOI = myModelRoot.ABM.root.pOIs.get(properties.currentPattern.placeKey);
+//        pOI.peopleInPOI.remove(this);
+        properties.currentPOI.peopleInPOI.remove(this);
+
+//        System.out.println("properties.currentPOI.peopleInPOI.size(): after:"+properties.currentPOI.peopleInPOI.size());
         if (properties.isInitiallyInfectedEnteringPOI == true) {
-            pOI.numInfected -= 1;
+            properties.currentPOI.numInfected -= 1;
             properties.isInitiallyInfectedEnteringPOI = false;
         }
-
+        properties.currentPOI = null;
         properties.currentPattern = null;
     }
 
@@ -103,8 +119,15 @@ public class Person extends Agent {
             properties.didTravelFromWork = true;
             properties.currentPattern = dest;
             POI pOI = myModelRoot.ABM.root.pOIs.get(properties.currentPattern.placeKey);
+
+//            System.out.println("TRAVELFROMWORK");
+//            System.out.println("mtIndex: "+myIndex);
+//        System.out.println("properties.currentPOI.peopleInPOI.size(): before:"+pOI.peopleInPOI.size());
             pOI.peopleInPOI.add(this);
 
+            properties.currentPOI = pOI;
+
+//        System.out.println("properties.currentPOI.peopleInPOI.size(): after:"+properties.currentPOI.peopleInPOI.size());
             if (properties.status == Root.statusEnum.INFECTED_ASYM.ordinal() || properties.status == Root.statusEnum.INFECTED_SYM.ordinal()) {
                 if (Math.random() < CHANCE_OF_ENV_CONTAMINATION) {
                     pOI.contaminatedTime = 1440;
@@ -130,8 +153,14 @@ public class Person extends Agent {
             properties.didTravelFromWork = false;
             properties.currentPattern = dest;
             POI pOI = myModelRoot.ABM.root.pOIs.get(properties.currentPattern.placeKey);
-            pOI.peopleInPOI.add(this);
 
+//            System.out.println("TRAVELFROMHOME");
+//            System.out.println("mtIndex: "+myIndex);
+//        System.out.println("properties.currentPOI.peopleInPOI.size(): before:"+pOI.peopleInPOI.size());
+            pOI.peopleInPOI.add(this);
+            properties.currentPOI = pOI;
+
+//            System.out.println("properties.currentPOI.peopleInPOI.size(): after:"+properties.currentPOI.peopleInPOI.size());
             if (properties.status == Root.statusEnum.INFECTED_ASYM.ordinal() || properties.status == Root.statusEnum.INFECTED_SYM.ordinal()) {
                 if (Math.random() < CHANCE_OF_ENV_CONTAMINATION) {
                     pOI.contaminatedTime = 1440;
@@ -200,5 +229,39 @@ public class Person extends Agent {
             }
         }
         return null;
+    }
+
+    public void pollContact() {
+        if (properties.isInTravel == true) {
+            if (isPolled == false) {
+//            if(myModelRoot.ABM.currentTime.getMinute()==0){
+//            System.out.println("properties.currentPOI.peopleInPOI.size() "+properties.currentPOI.peopleInPOI.size());
+//            }
+                for (int i = 0; i < properties.currentPOI.peopleInPOI.size(); i++) {
+//                if(properties.currentPOI.peopleInPOI==null){
+//                    System.out.println("STRANGE!!!");
+//                }
+//                if(i>=properties.currentPOI.peopleInPOI.size()){
+//                    System.out.println("STRANGE2!!!");
+//                }
+                    myModelRoot.ABM.root.agentPairContact[myIndex][i] = myModelRoot.ABM.root.agentPairContact[myIndex][i] + properties.currentPOI.peopleInPOI.size();
+                    myModelRoot.ABM.root.agentPairContact[i][myIndex] = myModelRoot.ABM.root.agentPairContact[i][myIndex] + properties.currentPOI.peopleInPOI.size();
+                    try {
+                        properties.currentPOI.peopleInPOI.get(i).isPolled = true;
+                    } catch (Exception ex) {
+                        System.out.println("STRANGE!!!");
+                    }
+                }
+            }
+//            for (int i = 0; i < myModelRoot.ABM.root.people.size(); i++) {
+//                if (myIndex != myModelRoot.ABM.root.people.get(i).myIndex) {
+//                    if (myModelRoot.ABM.root.people.get(i).properties.isInTravel == true) {
+//                        if (properties.currentPattern.placeKey.equals(myModelRoot.ABM.root.people.get(i).properties.currentPattern.placeKey)) {
+//                            myModelRoot.ABM.root.agentPairContact[myIndex][i] = myModelRoot.ABM.root.agentPairContact[myIndex][i] + 1;
+//                        }
+//                    }
+//                }
+//            }
+        }
     }
 }

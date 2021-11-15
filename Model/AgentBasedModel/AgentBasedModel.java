@@ -20,6 +20,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -45,12 +46,12 @@ public class AgentBasedModel {
 
     public String studyScope = "FullData";
     public transient Object studyScopeGeography;
-    
-    public boolean isReportContactRate=true;
-    
-    public boolean isOurABMActive=false;
-    public boolean isShamilABMActive=false;
-    public boolean isAirQualityActive=false;
+
+    public boolean isReportContactRate = true;
+
+    public boolean isOurABMActive = false;
+    public boolean isShamilABMActive = false;
+    public boolean isAirQualityActive = false;
 
     private transient MainModel myMainModel;
 
@@ -68,7 +69,7 @@ public class AgentBasedModel {
 //        FileWriter fileWritter = new FileWriter("",true);
     }
 
-    public void evaluateAllAgents(boolean isParallel, int numCPU, boolean isHardCoded) {
+    public void evaluateAllAgents(int numCPU, boolean isHardCoded) {
         if (isHardCoded == false) {
             Agent currentEvaluatingAgent[] = new Agent[1];
             try {
@@ -81,47 +82,49 @@ public class AgentBasedModel {
                 } else {
                     myMainModel.pythonEvaluationEngine.runScript(rootAgent.myTemplate.behavior.pythonScript);
                 }
-                if (isParallel == false) {
-                    for (int i = 0; i < agents.size(); i++) {
-                        currentEvaluatingAgent[0] = agents.get(i);
-                        if (agents.get(i).myTemplate.behavior.isJavaScriptActive == true) {
-                            //myMainModel.javaEvaluationEngine.runScript(agents.get(i).myTemplate.behavior.javaScript.script);
+//                    for (int i = 0; i < agents.size(); i++) {
+//                        currentEvaluatingAgent[0] = agents.get(i);
+//                        if (agents.get(i).myTemplate.behavior.isJavaScriptActive == true) {
+//                            //myMainModel.javaEvaluationEngine.runScript(agents.get(i).myTemplate.behavior.javaScript.script);
+//
+//                            myMainModel.javaEvaluationEngine.runParsedScript(agents.get(i), agents.get(i).myTemplate.behavior.javaScript.parsedScript);
+//                        } else {
+//                            myMainModel.pythonEvaluationEngine.runScript(agents.get(i).myTemplate.behavior.pythonScript);
+//                        }
+//                    }
 
-                            myMainModel.javaEvaluationEngine.runParsedScript(agents.get(i), agents.get(i).myTemplate.behavior.javaScript.parsedScript);
-                        } else {
-                            myMainModel.pythonEvaluationEngine.runScript(agents.get(i).myTemplate.behavior.pythonScript);
-                        }
-                    }
-                } else {
-//                for (int i = 0; i < agents.size(); i++) {
-//                    
-//                }
-                    int numProcessors = numCPU;
+                int numProcessors = numCPU;
 //                    if (numProcessors > Runtime.getRuntime().availableProcessors()) {
 //                        numProcessors = Runtime.getRuntime().availableProcessors();
 //                    }
-                    ParallelAgentEvaluator parallelAgentEval[] = new ParallelAgentEvaluator[numProcessors];
+                AdvancedParallelAgentEvaluator parallelAgentEval[] = new AdvancedParallelAgentEvaluator[numProcessors];
 
-                    for (int i = 0; i < numProcessors - 1; i++) {
-                        parallelAgentEval[i] = new ParallelAgentEvaluator(myMainModel, agents, (int) Math.floor(i * ((agents.size()) / numProcessors)), (int) Math.floor((i + 1) * ((agents.size()) / numProcessors)), isHardCoded);
-                    }
-                    parallelAgentEval[numProcessors - 1] = new ParallelAgentEvaluator(myMainModel, agents, (int) Math.floor((numProcessors - 1) * ((agents.size()) / numProcessors)), agents.size(), isHardCoded);
-
-                    for (int i = 0; i < numProcessors; i++) {
-                        parallelAgentEval[i].myThread.start();
-                    }
-                    for (int i = 0; i < numProcessors; i++) {
-                        try {
-                            parallelAgentEval[i].myThread.join();
-//                        System.out.println("thread " + i + "finished for records: " + parallelAgentEval[i].myStartIndex + " | " + parallelAgentEval[i].myEndIndex);
-                        } catch (InterruptedException ie) {
-                            System.out.println(ie.toString());
-                        }
-                    }
-//                for (int i = 0; i < numProcessors; i++) {
-//                    recordsLocal.addAll(parallelPatternParsers[i].records);
-//                }
+                for (int i = 0; i < numProcessors - 1; i++) {
+                    parallelAgentEval[i] = new AdvancedParallelAgentEvaluator(myMainModel, agents, (int) Math.floor(i * ((agents.size()) / numProcessors)), (int) Math.floor((i + 1) * ((agents.size()) / numProcessors)), isHardCoded);
                 }
+                parallelAgentEval[numProcessors - 1] = new AdvancedParallelAgentEvaluator(myMainModel, agents, (int) Math.floor((numProcessors - 1) * ((agents.size()) / numProcessors)), agents.size(), isHardCoded);
+
+                ArrayList<Callable<Object>> calls = new ArrayList<Callable<Object>>();
+                
+                for (int i = 0; i < numProcessors; i++) {
+                    parallelAgentEval[i].addRunnableToQueue(calls);
+                }
+                
+                myMainModel.agentEvalPool.invokeAny(calls);
+                
+            //\/\/\/ OLD DESIGN WITH THREADS
+//                for (int i = 0; i < numProcessors; i++) {
+//                    parallelAgentEval[i].myThread.start();
+//                }
+//                for (int i = 0; i < numProcessors; i++) {
+//                    try {
+//                        parallelAgentEval[i].myThread.join();
+////                        System.out.println("thread " + i + "finished for records: " + parallelAgentEval[i].myStartIndex + " | " + parallelAgentEval[i].myEndIndex);
+//                    } catch (InterruptedException ie) {
+//                        System.out.println(ie.toString());
+//                    }
+//                }
+            //^^^ OLD DESIGN WITH THREADS
 
             } catch (Exception ex) {
                 System.out.println("ERROR ON AGENT TYPE:");
@@ -134,9 +137,9 @@ public class AgentBasedModel {
             Agent currentEvaluatingAgent[] = new Agent[1];
             try {
                 currentEvaluatingAgent[0] = root;
-                
+
                 currentEvaluatingAgent[0].behavior();
-                
+
 //                if (rootAgent.myTemplate.behavior.isJavaScriptActive == true) {
 //                    //myMainModel.javaEvaluationEngine.runScript(rootAgent.myTemplate.behavior.javaScript.script);
 //
@@ -145,49 +148,53 @@ public class AgentBasedModel {
 //                } else {
 //                    myMainModel.pythonEvaluationEngine.runScript(rootAgent.myTemplate.behavior.pythonScript);
 //                }
-                if (isParallel == false) {
-                    for (int i = 0; i < agents.size(); i++) {
-                        currentEvaluatingAgent[0] = agents.get(i);
-                        currentEvaluatingAgent[0].behavior();
-                        
-//                        if (agents.get(i).myTemplate.behavior.isJavaScriptActive == true) {
-//                            //myMainModel.javaEvaluationEngine.runScript(agents.get(i).myTemplate.behavior.javaScript.script);
-//
-//                            myMainModel.javaEvaluationEngine.runParsedScript(agents.get(i), agents.get(i).myTemplate.behavior.javaScript.parsedScript);
-//                        } else {
-//                            myMainModel.pythonEvaluationEngine.runScript(agents.get(i).myTemplate.behavior.pythonScript);
-//                        }
-                    }
-                } else {
+//                    for (int i = 0; i < agents.size(); i++) {
+//                        currentEvaluatingAgent[0] = agents.get(i);
+//                        currentEvaluatingAgent[0].behavior();
+//                        
+////                        if (agents.get(i).myTemplate.behavior.isJavaScriptActive == true) {
+////                            //myMainModel.javaEvaluationEngine.runScript(agents.get(i).myTemplate.behavior.javaScript.script);
+////
+////                            myMainModel.javaEvaluationEngine.runParsedScript(agents.get(i), agents.get(i).myTemplate.behavior.javaScript.parsedScript);
+////                        } else {
+////                            myMainModel.pythonEvaluationEngine.runScript(agents.get(i).myTemplate.behavior.pythonScript);
+////                        }
+//                    }
 //                for (int i = 0; i < agents.size(); i++) {
 //                    
 //                }
-                    int numProcessors = numCPU;
+                int numProcessors = numCPU;
 //                    if (numProcessors > Runtime.getRuntime().availableProcessors()) {
 //                        numProcessors = Runtime.getRuntime().availableProcessors();
 //                    }
-                    ParallelAgentEvaluator parallelAgentEval[] = new ParallelAgentEvaluator[numProcessors];
+                AdvancedParallelAgentEvaluator parallelAgentEval[] = new AdvancedParallelAgentEvaluator[numProcessors];
 
-                    for (int i = 0; i < numProcessors - 1; i++) {
-                        parallelAgentEval[i] = new ParallelAgentEvaluator(myMainModel, agents, (int) Math.floor(i * ((agents.size()) / numProcessors)), (int) Math.floor((i + 1) * ((agents.size()) / numProcessors)), isHardCoded);
-                    }
-                    parallelAgentEval[numProcessors - 1] = new ParallelAgentEvaluator(myMainModel, agents, (int) Math.floor((numProcessors - 1) * ((agents.size()) / numProcessors)), agents.size(), isHardCoded);
-
-                    for (int i = 0; i < numProcessors; i++) {
-                        parallelAgentEval[i].myThread.start();
-                    }
-                    for (int i = 0; i < numProcessors; i++) {
-                        try {
-                            parallelAgentEval[i].myThread.join();
-//                        System.out.println("thread " + i + "finished for records: " + parallelAgentEval[i].myStartIndex + " | " + parallelAgentEval[i].myEndIndex);
-                        } catch (InterruptedException ie) {
-                            System.out.println(ie.toString());
-                        }
-                    }
-//                for (int i = 0; i < numProcessors; i++) {
-//                    recordsLocal.addAll(parallelPatternParsers[i].records);
-//                }
+                for (int i = 0; i < numProcessors - 1; i++) {
+                    parallelAgentEval[i] = new AdvancedParallelAgentEvaluator(myMainModel, agents, (int) Math.floor(i * ((agents.size()) / numProcessors)), (int) Math.floor((i + 1) * ((agents.size()) / numProcessors)), isHardCoded);
                 }
+                parallelAgentEval[numProcessors - 1] = new AdvancedParallelAgentEvaluator(myMainModel, agents, (int) Math.floor((numProcessors - 1) * ((agents.size()) / numProcessors)), agents.size(), isHardCoded);
+
+                ArrayList<Callable<Object>> calls = new ArrayList<Callable<Object>>();
+                
+                for (int i = 0; i < numProcessors; i++) {
+                    parallelAgentEval[i].addRunnableToQueue(calls);
+                }
+                
+                myMainModel.agentEvalPool.invokeAny(calls);
+                
+            //\/\/\/ OLD DESIGN WITH THREADS
+//                for (int i = 0; i < numProcessors; i++) {
+//                    parallelAgentEval[i].myThread.start();
+//                }
+//                for (int i = 0; i < numProcessors; i++) {
+//                    try {
+//                        parallelAgentEval[i].myThread.join();
+////                        System.out.println("thread " + i + "finished for records: " + parallelAgentEval[i].myStartIndex + " | " + parallelAgentEval[i].myEndIndex);
+//                    } catch (InterruptedException ie) {
+//                        System.out.println(ie.toString());
+//                    }
+//                }
+            //^^^ OLD DESIGN WITH THREADS
 
             } catch (Exception ex) {
                 System.out.println("ERROR ON AGENT TYPE:");
@@ -265,10 +272,6 @@ public class AgentBasedModel {
 //                output_default.constructor(myMainModel);
 //                return output_default;
 //        }
-
-
-
-
 
         return null;
     }

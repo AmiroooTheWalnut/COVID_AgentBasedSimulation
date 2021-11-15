@@ -25,12 +25,22 @@ public class ShamilSimulatorController {
 //        int inf=0;
         for (int i = 0; i < people.size(); i++) {
             if (people.get(i).shamilPersonProperties.currentTask.name.equals("Stay Home")) {
-                people.get(i).properties.isAtHome = true;
-                people.get(i).properties.isAtWork = false;
+                if (people.get(i).properties.isInTravel == false) {
+                    people.get(i).properties.isAtHome = true;
+                    people.get(i).properties.isAtWork = false;
+                } else {
+                    people.get(i).properties.didTravelFromHome = true;
+                    people.get(i).properties.didTravelFromWork = false;
+                }
             }
             if (people.get(i).shamilPersonProperties.currentTask.name.equals("Go to Work") || people.get(i).shamilPersonProperties.currentTask.name.equals("Work") || people.get(i).shamilPersonProperties.currentTask.name.equals("Returns Home") || people.get(i).shamilPersonProperties.currentTask.name.equals("Treat Patients")) {
-                people.get(i).properties.isAtHome = false;
-                people.get(i).properties.isAtWork = true;
+                if (people.get(i).properties.isInTravel == false) {
+                    people.get(i).properties.isAtHome = false;
+                    people.get(i).properties.isAtWork = true;
+                } else {
+                    people.get(i).properties.didTravelFromHome = false;
+                    people.get(i).properties.didTravelFromWork = true;
+                }
             }
             switch (people.get(i).shamilPersonProperties.state) {
                 case "Not_infected":
@@ -69,12 +79,12 @@ public class ShamilSimulatorController {
                     break;
                 case 1:
                     people.get(i).shamilPersonProperties.state = "contagious_symptomatic";
-                    people.get(i).shamilPersonProperties.isInfected=true;
+                    people.get(i).shamilPersonProperties.isInfected = true;
 //                inf+=1;
                     break;
                 case 2:
                     people.get(i).shamilPersonProperties.state = "contagious_asymptomatic";
-                    people.get(i).shamilPersonProperties.isInfected=true;
+                    people.get(i).shamilPersonProperties.isInfected = true;
 //                inf+=1;
                     break;
                 case 3:

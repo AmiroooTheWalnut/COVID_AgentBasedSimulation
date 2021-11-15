@@ -11,6 +11,7 @@ import COVID_AgentBasedSimulation.Model.Structure.CensusBlockGroup;
 import COVID_AgentBasedSimulation.Model.Structure.Marker;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  *
@@ -26,6 +27,8 @@ public class Region extends Marker implements Serializable {
     
     public transient ArrayList<Person> residents=new ArrayList();
     public transient ArrayList<Person> workers=new ArrayList();
+    
+    public transient HashMap<Integer, Region> neighbors=new HashMap();
     
     public ArrayList<MyPolygons> polygons=new ArrayList();
     

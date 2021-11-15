@@ -29,6 +29,8 @@ import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
@@ -87,7 +89,10 @@ public class MainModel extends Dataset {
     public int lastMonthLoaded;//NOT USED
     public int lastYearLoaded;//NOT USED
 
-    private Thread thread;
+//    private Thread fastForwardthread;
+    public ExecutorService fastForwardPool = Executors.newSingleThreadExecutor();
+
+    public ExecutorService agentEvalPool;
 
     public void startScriptEngines() {
         javaEvaluationEngine = new JavaEvaluationEngine(this);
@@ -152,6 +157,9 @@ public class MainModel extends Dataset {
                 city.cBGPolygons = scsd.cBGPolygons;
                 city.vDPolygons = scsd.vDPolygons;
                 city.cBGVDPolygons = scsd.cBGVDPolygons;
+                city.cBGRegionLayer = scsd.cBGRegionImageLayer;
+                city.vDRegionLayer = scsd.vDRegionImageLayer;
+                city.cBGVDRegionLayer = scsd.cBGVDRegionImageLayer;
             }
         } else {
             System.out.println("HALT! ONLY CITY SCOPE IS IMPLEMENTED!");
@@ -166,6 +174,12 @@ public class MainModel extends Dataset {
         kryo.register(COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MyPolygon.class);
         kryo.register(de.fhpotsdam.unfolding.geo.Location.class);
         kryo.register(COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MyPolygons.class);
+        kryo.register(COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.RegionImageLayer.class);
+        kryo.register(double[].class);
+        kryo.register(int[].class);
+        kryo.register(int[][].class);
+        kryo.register(boolean[][].class);
+        kryo.register(boolean[].class);
         kryo.register(java.util.HashMap.class);
         kryo.register(java.util.ArrayList.class);
         kryo.register(java.lang.String.class);
@@ -192,6 +206,12 @@ public class MainModel extends Dataset {
         kryo.register(COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MyPolygon.class);
         kryo.register(de.fhpotsdam.unfolding.geo.Location.class);
         kryo.register(COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MyPolygons.class);
+        kryo.register(COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.RegionImageLayer.class);
+        kryo.register(double[].class);
+        kryo.register(int[].class);
+        kryo.register(int[][].class);
+        kryo.register(boolean[][].class);
+        kryo.register(boolean[].class);
         kryo.register(java.util.HashMap.class);
         kryo.register(java.util.ArrayList.class);
         kryo.register(java.lang.String.class);
@@ -262,7 +282,7 @@ public class MainModel extends Dataset {
         ABM.agentTemplates.add(rootAgentTemplate);
     }
 
-    public void initModelHardCoded(boolean isParallelLoadingData, boolean isParallelBehaviorEvaluation, int numResidents, int numCPUs) {
+    public void initModelHardCoded(boolean isParallelLoadingData, boolean isParallelBehaviorEvaluation, int numResidents, int numRegions, int numCPUs) {
         isResultSavedAtTheEnd = false;
         int month = ABM.startTime.getMonthValue();
         currentMonth = month;
@@ -289,6 +309,8 @@ public class MainModel extends Dataset {
             ABM.root.constructor(this, numResidents, "CBGVD", -1);
         } else if (scenario.equals("ABSVD")) {
             ABM.root.constructor(this, numResidents, "ABSVD", -1);
+        } else if (scenario.equals("RANDOM")) {
+            ABM.root.constructor(this, numResidents, "RANDOM", numRegions);
         }
 
 //        if (scenario.equals("CBG")) {
@@ -300,7 +322,14 @@ public class MainModel extends Dataset {
 //        } else if (scenario.equals("ABSVD")) {
 //            ((Root) (ABM.rootAgent)).constructorABSVD(this);
 //        }
-        resetTimerTask(isParallelBehaviorEvaluation, numCPUs, true);
+        int passingNumCPU;
+        if (isParallelBehaviorEvaluation == true) {
+            passingNumCPU = numCPUs;
+        } else {
+            passingNumCPU = 1;
+        }
+//        pollBarrier = new CyclicBarrier(passingNumCPU);
+        resetTimerTask(passingNumCPU, true);
     }
 
     public void initModel(boolean isParallelLoadingData, boolean isParallelBehaviorEvaluation, int numCPUs) {
@@ -332,14 +361,22 @@ public class MainModel extends Dataset {
         } else {
             pythonEvaluationEngine.runScript(ABM.rootAgent.myTemplate.constructor.pythonScript);
         }
-//                currentEvaluatingAgent[0] = oldCurrentEvaluatingAgent[0];
 
+        int passingNumCPU;
+        if (isParallelBehaviorEvaluation == true) {
+            passingNumCPU = numCPUs;
+        } else {
+            passingNumCPU = 1;
+        }
+//        pollBarrier = new CyclicBarrier(passingNumCPU);
+
+//                currentEvaluatingAgent[0] = oldCurrentEvaluatingAgent[0];
 //        if (ABM.rootAgent.myTemplate.agentTypeName.equals("Person")) {
 //            System.out.println(ABM.rootAgent.myIndex);
 //            System.out.println("!!!!");
 //        }
 //        ABM.rootAgent = new Agent(ABM.agentTemplates.get(0));
-        resetTimerTask(isParallelBehaviorEvaluation, numCPUs, false);
+        resetTimerTask(passingNumCPU, false);
 
 //        if (ABM.rootAgent.myTemplate.constructor.isJavaScriptActive == true) {
 //
@@ -350,37 +387,51 @@ public class MainModel extends Dataset {
 //        }
     }
 
-    public void resetTimerTask(boolean isParallel, int numCPUs, boolean isHardCoded) {
+    public void resetTimerTask(int numCPUs, boolean isHardCoded) {
         runTask = new TimerTask() {
             @Override
             public void run() {
-                iterate(isParallel, numCPUs, isHardCoded);
+                iterate(numCPUs, isHardCoded);
             }
         };
     }
 
     public void fastForward(boolean isParallel, int numCPUs, boolean isHardCoded) {
-        thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (isPause == false) {
-                    iterate(isParallel, numCPUs, isHardCoded);
-//                    System.out.println(isPause);
-                }
-                isPause = false;
-                isRunning = false;
-            }
-        });
+
+//        fastForwardthread = new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                while (isPause == false) {
+//                    iterate(numCPUs, isHardCoded);
+////                    System.out.println(isPause);
+//                }
+//                isPause = false;
+//                isRunning = false;
+//            }
+//        });
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                thread.start();
+                fastForwardPool.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        while (isPause == false) {
+                            iterate(numCPUs, isHardCoded);
+//                    System.out.println(isPause);
+                        }
+                        isPause = false;
+                        isRunning = false;
+                    }
+                });
+                //\/\/\/ OLD DESIGN WITH THREADS
+//                fastForwardthread.start();
+                //^^^ OLD DESIGN WITH THREADS
             }
         });
 
     }
 
-    public void iterate(boolean isParallel, int numCPUs, boolean isHardCoded) {
+    public void iterate(int numCPUs, boolean isHardCoded) {
         if (isResultSavedAtTheEnd == false) {
             if (ABM.currentTime.isEqual(ABM.endTime) || ABM.currentTime.isAfter(ABM.endTime)) {
                 isRunning = false;
@@ -389,8 +440,8 @@ public class MainModel extends Dataset {
                 return;
             }
         }
-
-        int month = ABM.startTime.getMonthValue();
+        //\/\/\/ DYNAMICALLY ADD NEW PATTERNS OF THE NEW MONTH AND GENERATE SCHEDULES
+        int month = ABM.currentTime.getMonthValue();
         if (currentMonth != month) {
             String monthString = String.valueOf(month);
             if (monthString.length() < 2) {
@@ -401,16 +452,22 @@ public class MainModel extends Dataset {
             System.gc();
             safegraph.requestDataset(allGISData, ABM.studyScope, yearStr, monthString, true, numCPUs);
             currentMonth = month;
+            
+            ABM.root.generateSchedules(this, ABM.root.regionType, ABM.root.regions);
         }
-        ABM.evaluateAllAgents(isParallel, numCPUs, isHardCoded);
+        //^^^ DYNAMICALLY ADD NEW PATTERNS OF THE NEW MONTH AND GENERATE SCHEDULES
+        ABM.evaluateAllAgents(numCPUs, isHardCoded);
         ABM.currentTime = ABM.currentTime.plusMinutes(1);
     }
 
     public void resume(boolean isParallel, int numCPUs, boolean isHardCoded) {
+        if(agentEvalPool==null){
+            agentEvalPool = Executors.newFixedThreadPool(numCPUs);
+        }
         if (isHardCoded == true) {
             if (simulationDelayTime > -1) {
                 simulationTimer = new Timer();
-                resetTimerTask(isParallel, numCPUs, isHardCoded);
+                resetTimerTask(numCPUs, isHardCoded);
                 simulationTimer.schedule(runTask, 0, simulationDelayTime);
             } else {
                 fastForward(isParallel, numCPUs, isHardCoded);
@@ -419,7 +476,7 @@ public class MainModel extends Dataset {
         } else {
             if (simulationDelayTime > -1) {
                 simulationTimer = new Timer();
-                resetTimerTask(isParallel, numCPUs, isHardCoded);
+                resetTimerTask(numCPUs, isHardCoded);
                 simulationTimer.schedule(runTask, 0, simulationDelayTime);
             } else {
                 fastForward(isParallel, numCPUs, isHardCoded);
@@ -553,7 +610,7 @@ public class MainModel extends Dataset {
         }
         SimpleDateFormat formatter = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss");
         Date date = new Date();
-        String testPath = "projects\\" + ABM.filePath.substring(ABM.filePath.lastIndexOf("\\") + 1, ABM.filePath.length()) + "\\" + formatter.format(date);
+        String testPath = "projects\\" + ABM.filePath.substring(ABM.filePath.lastIndexOf("\\") + 1, ABM.filePath.length()) + "\\" + formatter.format(date) + "_NumPeople_" + ABM.root.people.size() + "_" + scenario;
         File testDirectory = new File(testPath);
         if (!testDirectory.exists()) {
             testDirectory.mkdirs();
@@ -562,8 +619,16 @@ public class MainModel extends Dataset {
         historicalRun.regions = regions;
         historicalRun.startTime = ABM.startTime;
         historicalRun.endTime = ABM.endTime;
+        historicalRun.regionsLayer = ABM.root.regionsLayer;
 //        historicalRun.saveHistoricalRunJson("./projects/" + ABM.filePath + "/" + formatter.format(date)+"/data.json");
-        HistoricalRun.saveHistoricalRunKryo("projects\\" + ABM.filePath.substring(ABM.filePath.lastIndexOf("\\") + 1, ABM.filePath.length()) + "\\" + formatter.format(date) + "\\data", historicalRun);
+        HistoricalRun.saveHistoricalRunKryo(testPath + "\\data", historicalRun);
+
+        ABM.root.writeDailyInfection(testPath + "\\infectionReport");
+
+        ABM.root.writeTotalContacts(testPath + "\\rawContactData");
+
+        ABM.root.writeSimulationSummary(testPath + "\\simulationSummary");
+
         isResultSavedAtTheEnd = true;
     }
 

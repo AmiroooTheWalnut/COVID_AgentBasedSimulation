@@ -11,6 +11,8 @@ import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.PersonProperti
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Root.statusEnum;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  *
@@ -19,13 +21,13 @@ import java.util.ArrayList;
 public class POI {
 
     public static double CONTACT_RATE = 0.1;//CONTACT PER MINUTE
-    public static double CHANCE_OF_ENV_CONTAMINATION = 0.0001;
+    public static double CHANCE_OF_ENV_CONTAMINATION = 0.0015;
 
     public PatternsRecordProcessed patternsRecord;
     public double contaminatedTime = 0;
 //    public int numInfectedPeopleInPOI=0;
-    public ArrayList<Person> peopleInPOI = new ArrayList();
-    
+    public List<Person> peopleInPOI = Collections.synchronizedList(new ArrayList());
+
     double numInfected = 0;
 
     public void contact(ZonedDateTime currentTime, Person person) {
@@ -40,7 +42,10 @@ public class POI {
         int dayInMonth = currentTime.getDayOfMonth() - 1;
         byte dayInWeek = (byte) ((currentTime.getDayOfWeek().getValue()) - 1);
         int hourInDay = currentTime.getHour();
-        double percentDayInMonth = (double) (patternsRecord.visits_by_day[dayInMonth]) / (double) (patternsRecord.sumVisitsByDayOfMonth);
+        double percentDayInMonth = 1;
+        if (dayInMonth < patternsRecord.visits_by_day.length) {
+            percentDayInMonth = (double) (patternsRecord.visits_by_day[dayInMonth]) / (double) (patternsRecord.sumVisitsByDayOfMonth);
+        }
         double percentDayInWeek = (double) (patternsRecord.popularity_by_day.get(dayInWeek)) / (double) (patternsRecord.sumVisitsByDayOfWeek);
         double percentHourInDay = (double) (patternsRecord.popularity_by_hour[hourInDay]) / (double) (patternsRecord.sumVisitsByHourofDay);
         int numPeopleInPOI = (int) Math.ceil(patternsRecord.raw_visit_counts * percentDayInMonth * percentDayInWeek * percentHourInDay);
