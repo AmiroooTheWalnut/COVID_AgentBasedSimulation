@@ -54,7 +54,7 @@
               <Component id="jPanel8" min="-2" max="-2" attributes="0"/>
           </Group>
           <Component id="jPanel7" alignment="0" max="32767" attributes="0"/>
-          <Component id="jPanel11" alignment="0" pref="0" max="32767" attributes="0"/>
+          <Component id="jPanel11" alignment="0" max="32767" attributes="0"/>
           <Group type="102" alignment="0" attributes="0">
               <Component id="jPanel17" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -325,8 +325,15 @@
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="jSpinner1" max="32767" attributes="0"/>
                           </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="jRadioButton18" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="jSpinner2" pref="59" max="32767" attributes="0"/>
+                          </Group>
                           <Group type="102" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="jCheckBox5" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jCheckBox4" min="-2" max="-2" attributes="0"/>
                                   <Component id="jRadioButton10" min="-2" max="-2" attributes="0"/>
                                   <Component id="jButton3" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Group type="102" alignment="0" attributes="0">
@@ -334,18 +341,13 @@
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="jCheckBox2" min="-2" max="-2" attributes="0"/>
                                   </Group>
-                                  <Component id="jCheckBox3" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="jRadioButton9" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="jRadioButton11" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="jButton4" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="jRadioButton12" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jCheckBox3" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                          </Group>
-                          <Group type="102" alignment="0" attributes="0">
-                              <Component id="jRadioButton18" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="jSpinner2" pref="59" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -361,9 +363,13 @@
                           <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="jSpinner1" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace min="-2" pref="14" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Component id="jCheckBox3" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="jCheckBox4" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="jCheckBox5" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
                       <Component id="jRadioButton9" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jRadioButton10" min="-2" max="-2" attributes="0"/>
@@ -374,7 +380,7 @@
                           <Component id="jRadioButton18" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="jSpinner2" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Component id="jRadioButton12" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jButton4" min="-2" max="-2" attributes="0"/>
@@ -383,7 +389,6 @@
                           <Component id="jToggleButton4" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="jCheckBox2" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -495,6 +500,16 @@
                 <Property name="model" type="javax.swing.SpinnerModel" editor="org.netbeans.modules.form.editors2.SpinnerModelEditor">
                   <SpinnerModel initial="20" minimum="1" numberType="java.lang.Integer" stepSize="1" type="number"/>
                 </Property>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JCheckBox" name="jCheckBox4">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Fill SafeGraph missing values"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JCheckBox" name="jCheckBox5">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Only affect local trips"/>
               </Properties>
             </Component>
           </SubComponents>
@@ -724,7 +739,7 @@
                 </DimensionLayout>
                 <DimensionLayout dim="1">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jScrollPane11" alignment="0" pref="200" max="32767" attributes="0"/>
+                      <Component id="jScrollPane11" alignment="0" pref="229" max="32767" attributes="0"/>
                   </Group>
                 </DimensionLayout>
               </Layout>
@@ -769,7 +784,7 @@
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jScrollPane9" alignment="0" pref="657" max="32767" attributes="0"/>
+                  <Component id="jScrollPane9" alignment="0" pref="686" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
           </Layout>
@@ -844,7 +859,7 @@
                     </DimensionLayout>
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="jScrollPane1" alignment="0" pref="591" max="32767" attributes="0"/>
+                          <Component id="jScrollPane1" alignment="0" pref="620" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                   </Layout>
@@ -898,7 +913,7 @@
                     </DimensionLayout>
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="jScrollPane2" alignment="0" pref="591" max="32767" attributes="0"/>
+                          <Component id="jScrollPane2" alignment="0" pref="620" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                   </Layout>
@@ -952,7 +967,7 @@
                     </DimensionLayout>
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="jScrollPane3" alignment="0" pref="591" max="32767" attributes="0"/>
+                          <Component id="jScrollPane3" alignment="0" pref="620" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                   </Layout>
@@ -1006,7 +1021,7 @@
                     </DimensionLayout>
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="jScrollPane10" alignment="0" pref="591" max="32767" attributes="0"/>
+                          <Component id="jScrollPane10" alignment="0" pref="620" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                   </Layout>
@@ -1060,7 +1075,7 @@
                     </DimensionLayout>
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="jScrollPane4" alignment="0" pref="591" max="32767" attributes="0"/>
+                          <Component id="jScrollPane4" alignment="0" pref="620" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                   </Layout>
@@ -1114,7 +1129,7 @@
                     </DimensionLayout>
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="jScrollPane5" alignment="0" pref="591" max="32767" attributes="0"/>
+                          <Component id="jScrollPane5" alignment="0" pref="620" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                   </Layout>
@@ -1187,7 +1202,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jScrollPane6" pref="340" max="32767" attributes="0"/>
+                      <Component id="jScrollPane6" pref="354" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -1234,7 +1249,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jScrollPane7" pref="340" max="32767" attributes="0"/>
+                      <Component id="jScrollPane7" pref="354" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
