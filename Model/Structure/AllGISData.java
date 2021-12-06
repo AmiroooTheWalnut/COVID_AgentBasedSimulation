@@ -93,11 +93,15 @@ public class AllGISData extends Dataset implements Serializable {
         long censusTractID = (long) getMidDigits(id, 2, 12);
 //        byte censusBlockGroupID=(byte)getMidDigits(id,1,1);
         for (int i = 0; i < countries.size(); i++) {
+            try{
             State state = countries.get(i).findState(stateID);
             County county = state.findCounty(countyID);
             CensusTract censusTract = county.findCensusTract(censusTractID);
             CensusBlockGroup censusBlockGroup = censusTract.findCensusBlock(id);
             return censusBlockGroup;
+            }catch(Exception ex){
+                System.out.println("^^^^^^^^^^");
+            }
         }
         return null;
     }

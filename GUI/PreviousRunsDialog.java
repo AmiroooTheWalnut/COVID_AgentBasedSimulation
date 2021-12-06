@@ -45,8 +45,8 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
     HistoricalRun currentHistoricalRun;
 
     ProcessingMapRenderer sketch;
-    
-    LegendRange legendRange=new LegendRange();
+
+    LegendRange legendRange = new LegendRange();
 
     /**
      * Creates new form PreviousRunsDialog
@@ -81,7 +81,7 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
             public void stateChanged(ChangeEvent e) {
 //                setRendererPolygonShades();//DEPRECIATED!!!
                 setRendererRegionLayerShades();
-                ZonedDateTime temp = currentHistoricalRun.startTime.plusHours((int)(jSlider1.getValue()));
+                ZonedDateTime temp = currentHistoricalRun.startTime.plusHours((int) (jSlider1.getValue()));
                 jLabel2.setText("Current: " + temp.toString());
 //                System.out.println("Slider1: " + jSlider1.getValue());
             }
@@ -146,6 +146,7 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jPanel6 = new javax.swing.JPanel();
+        jCheckBox1 = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -183,7 +184,7 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Feature"));
 
         jList2.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Number of residents (N)", "Number of susceptibles (S)", "Number of infections symptomatic (IS)", "Number of infections asymptomatic (IAS)", "Number of recovered (R)", "Number of deaths (D)", "Cumulative infections (rate)" };
+            String[] strings = { "Number of residents (N)", "Number of susceptibles (S)", "Number of infections symptomatic (IS)", "Number of infections asymptomatic (IAS)", "Number of recovered (R)", "Number of deaths (D)", "Cumulative infections (rate)", "Number of sick (sick)" };
             public int getSize() { return strings.length; }
             public String getElementAt(int i) { return strings[i]; }
         });
@@ -199,7 +200,7 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 210, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 207, Short.MAX_VALUE)
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -251,6 +252,14 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
             .addGap(0, 0, Short.MAX_VALUE)
         );
 
+        jCheckBox1.setSelected(true);
+        jCheckBox1.setText("Show text");
+        jCheckBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCheckBox1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -262,14 +271,19 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jCheckBox1)))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jCheckBox1))
         );
 
         pack();
@@ -280,13 +294,18 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
 
 //        setRendererPolygons();
         setRegionImageLayer();
-
+        setRegionIndicesNames();
+        setRegionCentralLocations();
     }//GEN-LAST:event_jTree1ValueChanged
 
     private void jList2ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList2ValueChanged
 //        setRendererPolygonShades();
         setRendererRegionLayerShades();
     }//GEN-LAST:event_jList2ValueChanged
+
+    private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
+        sketch.isShowRegionIndexText = jCheckBox1.isSelected();
+    }//GEN-LAST:event_jCheckBox1ActionPerformed
 
     public void setRendererRegionLayerShades() {
         if (jList2.getSelectedIndex() > -1) {
@@ -299,10 +318,13 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
                     for (int i = 0; i < currentHistoricalRun.regions.size(); i++) {
                         double val = Double.valueOf(String.valueOf(field.get(currentHistoricalRun.regions.get(i).hourlyRegionSnapshot.get(jSlider1.getValue()))));
                         allValues.add(val);
+//                        if(val>0){
+//                            System.out.println("Region: "+i);
+//                        }
                     }
                     ArrayList<Double> allValuesScaled = scaleData(allValues);
                     for (int i = 0; i < currentHistoricalRun.regions.size(); i++) {
-                        currentHistoricalRun.regionsLayer.severities[i]=allValuesScaled.get(i);
+                        currentHistoricalRun.regionsLayer.severities[i] = allValuesScaled.get(i);
                     }
                 } catch (NoSuchFieldException ex) {
                     Logger.getLogger(PreviousRunsDialog.class.getName()).log(Level.SEVERE, null, ex);
@@ -316,7 +338,7 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
             }
         }
     }
-    
+
     public void setRendererPolygonShades() {
         if (jList2.getSelectedIndex() > -1) {
             DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) jTree1.getLastSelectedPathComponent();
@@ -331,7 +353,7 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
                     }
                     ArrayList<Double> allValuesScaled = scaleData(allValues);
                     for (int i = 0; i < currentHistoricalRun.regions.size(); i++) {
-                        for(int j=0;j<currentHistoricalRun.regions.get(i).polygons.size();j++){
+                        for (int j = 0; j < currentHistoricalRun.regions.get(i).polygons.size(); j++) {
                             currentHistoricalRun.regions.get(i).polygons.get(j).severity = allValuesScaled.get(i).floatValue();
                         }
                     }
@@ -355,12 +377,12 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
         for (int i = 0; i < input.size(); i++) {
             output.add(((input.get(i) - min) / max) * 255);
         }
-        
-        legendRange.max=max;
-        legendRange.min=min;
+
+        legendRange.max = max;
+        legendRange.min = min;
         jPanel6.invalidate();
         jPanel6.repaint();
-        
+
         return output;
     }
 
@@ -393,19 +415,36 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
 //                System.out.println("!!!!");
 //                continue;
 //            }
-            for(int j=0;j<currentHistoricalRun.regions.get(i).polygons.size();j++){
+            for (int j = 0; j < currentHistoricalRun.regions.get(i).polygons.size(); j++) {
                 polygons.add(currentHistoricalRun.regions.get(i).polygons.get(j));
             }
         }
         sketch.polygons = polygons;
     }
-    
-    public void setRegionImageLayer(){
+
+    public void setRegionImageLayer() {
         sketch.regionImageLayer = currentHistoricalRun.regionsLayer;
+    }
+
+    public void setRegionIndicesNames() {
+        ArrayList<String> output = new ArrayList();
+        for (int i = 0; i < currentHistoricalRun.regions.size(); i++) {
+            output.add(String.valueOf(i));
+        }
+        sketch.regionNames = output;
+    }
+
+    public void setRegionCentralLocations() {
+        ArrayList<Location> output = new ArrayList();
+        for (int i = 0; i < currentHistoricalRun.regions.size(); i++) {
+            output.add(new Location(currentHistoricalRun.regions.get(i).lon, currentHistoricalRun.regions.get(i).lat));
+        }
+        sketch.regionCenters = output;
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
+    private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

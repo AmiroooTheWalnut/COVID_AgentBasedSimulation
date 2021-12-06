@@ -21,6 +21,8 @@ public class SupplementaryCaseStudyData implements Serializable {
 
     static final long serialVersionUID = softwareVersion;
 
+    public ArrayList<Tessellation> tessellations;
+    
     public ArrayList<VDCell> vDCells;
     public ArrayList<CBGVDCell> cBGVDCells;
     public double shopMergePrecision;

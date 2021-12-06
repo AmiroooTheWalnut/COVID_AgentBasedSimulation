@@ -22,6 +22,8 @@ public class Scope extends Marker implements Serializable {
     
     public ArrayList<CensusTract> censusTracts;
 
+    public transient ArrayList<Tessellation> tessellations;
+    
     public transient ArrayList<VDCell> vDCells;
     public transient ArrayList<CBGVDCell> cBGVDCells;
     

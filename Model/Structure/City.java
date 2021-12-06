@@ -20,6 +20,32 @@ public class City extends Scope implements Serializable, Comparable<City> {
     
     
     public transient boolean isLatLonCalculated = false;
+    
+    public Object[] getVDTessellationFromCBG(int tessellationIndex, CensusBlockGroup input, boolean noNull) {
+        if (tessellations.get(tessellationIndex).cells != null) {
+            double dist = Double.MAX_VALUE;
+            Object[] closest = new Object[2];
+            for (int i = 0; i < tessellations.get(tessellationIndex).cells.size(); i++) {
+                for (int j = 0; j < tessellations.get(tessellationIndex).cells.get(i).cBGsIDsInvolved.size(); j++) {
+                    if (tessellations.get(tessellationIndex).cells.get(i).cBGsIDsInvolved.get(j) == input.id) {
+                        Object[] output = new Object[2];
+                        output[0] = tessellations.get(tessellationIndex).cells.get(i);
+                        output[1] = tessellations.get(tessellationIndex).cells.get(i).cBGsPercentageInvolved.get(j);
+                        return output;
+                    }
+                }
+                if (noNull == true) {
+                    if (Math.pow(tessellations.get(tessellationIndex).cells.get(i).lat - input.lat, 2) + Math.pow(tessellations.get(tessellationIndex).cells.get(i).lon - input.lon, 2) < dist) {
+                        dist = Math.pow(tessellations.get(tessellationIndex).cells.get(i).lat - input.lat, 2) + Math.pow(tessellations.get(tessellationIndex).cells.get(i).lon - input.lon, 2);
+                        closest[0] = tessellations.get(tessellationIndex).cells.get(i);
+                        closest[1] = tessellations.get(tessellationIndex).cells.get(i).cBGsPercentageInvolved.get((int) (Math.random() * tessellations.get(tessellationIndex).cells.get(i).cBGsPercentageInvolved.size() - 1));
+                    }
+                }
+            }
+            return closest;
+        }
+        return null;
+    }
 
     public Object[] getVDFromCBG(CensusBlockGroup input, boolean noNull) {
         if (vDCells != null) {

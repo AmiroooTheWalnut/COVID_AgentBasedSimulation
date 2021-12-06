@@ -5,6 +5,7 @@
 package COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil;
 
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Person;
+import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Region;
 import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilSimulatorController.n_infected_init;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,16 +36,18 @@ public class ShamilPersonManager {
             put("min_family_size", 1d);
             put("max_family_size", 6d);
             put("n_workgroup", 600d);
-            put("n_transport", 2500d);
-            put("transport_seat_limit", 60d);
+//            put("n_transport", 2500d);//ORIGINAL
+            put("n_transport", 15000d);
+//            put("transport_seat_limit", 60d);//ORIGINAL
+            put("transport_seat_limit", 30d);
             put("n_events", 100d);
 //        put("n_persons",10000d);
 //        put("n_infected_init",252d);
 //            put("awareness_start", 7d);//ORIGINAL
             put("awareness_start", 0d);
-            put("quarantine_start", 27d);
+            put("quarantine_start", 0d);
 //            put("quarantined_person_ratio", 0.5d);//ORIGINAL
-            put("quarantined_person_ratio", 0.01d);
+            put("quarantined_person_ratio", 0.1d);
         }
     };
 
@@ -61,13 +64,13 @@ public class ShamilPersonManager {
         {
 //            put("ACTION_OCCURRING_PROBABILITY", 0.55);//ORIGINAL
 //            put("ACTION_AFFECTING_PROBABILITY", 0.55);//ORIGINAL
-            put("ACTION_OCCURRING_PROBABILITY", 0.35);
-            put("ACTION_AFFECTING_PROBABILITY", 0.75);
+            put("ACTION_OCCURRING_PROBABILITY", 0.45);
+            put("ACTION_AFFECTING_PROBABILITY", 0.45);
             //put("ACTION_INFECT_THRESHOLD", 0.45);//ORIGINAL
-            put("ACTION_INFECT_THRESHOLD", 0.85);
+            put("ACTION_INFECT_THRESHOLD", 0.35);
             //put("INFECTION_PROBABILITY", 0.55);//ORIGINAL
-            put("INFECTION_PROBABILITY", 0.6);
-            put("PROTECTION_LEVEL_THRESH", 0.4);
+            put("INFECTION_PROBABILITY", 0.55);
+            put("PROTECTION_LEVEL_THRESH", 0.2);
         }
     };
 
@@ -194,10 +197,10 @@ public class ShamilPersonManager {
                 selectedProfession = 3;
             }
 //            persons.get(i).shamilPersonProperties.profession = profession_df.get(selectedProfession);
-            
+
             persons.get(i).shamilPersonProperties.profession = new ShamilProfession(profession_df.get(selectedProfession));//ADDED "NEW" TO MAKE SURE A DEEP COPY IS TAKEN
-            persons.get(i).shamilPersonProperties.initialProfession=new ShamilProfession(persons.get(i).shamilPersonProperties.profession);
-            
+            persons.get(i).shamilPersonProperties.initialProfession = new ShamilProfession(persons.get(i).shamilPersonProperties.profession);
+
             age = (int) (profession_df.get(selectedProfession).min_age + Math.random() * (profession_df.get(selectedProfession).max_age - profession_df.get(selectedProfession).min_age));
             if (family_size_counter == 0) {
                 family_id = family_id + 1;
@@ -214,6 +217,85 @@ public class ShamilPersonManager {
                 family_size_counter = family_size_counter - 1;
             }
         }
+
+    }
+
+    /*
+    *   Added by Amirooo
+     */
+    public static void generatePersonsSpatial(ArrayList<Region> regions) {
+        int family_id = 0;
+        int family_size_orig = 0;
+        int family_size_counter = 0;
+        int age = 0;
+        int selectedProfession = -1;
+        int uniqurCounter = 0;//ADDED BY AMIROOO
+        for (int r = 0; r < regions.size(); r++) {
+            for (int i = 0; i < regions.get(r).residents.size(); i++) {
+                double professionRand = Math.random();
+                if (professionRand < 0.22) {
+                    selectedProfession = 0;
+                } else if (professionRand < 0.22 + 0.741) {
+                    selectedProfession = 1;
+                } else if (professionRand < 0.22 + 0.741 + 0.019) {
+                    selectedProfession = 2;
+                } else {
+                    selectedProfession = 3;
+                }
+//            persons.get(i).shamilPersonProperties.profession = profession_df.get(selectedProfession);
+
+                regions.get(r).residents.get(i).shamilPersonProperties.profession = new ShamilProfession(profession_df.get(selectedProfession));//ADDED "NEW" TO MAKE SURE A DEEP COPY IS TAKEN
+                regions.get(r).residents.get(i).shamilPersonProperties.initialProfession = new ShamilProfession(regions.get(r).residents.get(i).shamilPersonProperties.profession);
+
+                age = (int) (profession_df.get(selectedProfession).min_age + Math.random() * (profession_df.get(selectedProfession).max_age - profession_df.get(selectedProfession).min_age));
+                if (family_size_counter == 0) {
+                    family_id = family_id + 1;
+                    family_size_orig = (int) Math.round(preference_def.get("min_family_size") + Math.random() * (preference_def.get("max_family_size") - preference_def.get("min_family_size")));
+                    family_size_counter = family_size_orig;
+                }
+                regions.get(r).residents.get(i).shamilPersonProperties.familyId = family_id;
+                regions.get(r).residents.get(i).shamilPersonProperties.familySize = family_size_orig;
+
+                regions.get(r).residents.get(i).shamilPersonProperties.id = uniqurCounter;
+                uniqurCounter += 1;
+                regions.get(r).residents.get(i).shamilPersonProperties.name = rands();
+                regions.get(r).residents.get(i).shamilPersonProperties.age = age;
+                if (family_size_counter > 0) {
+                    family_size_counter = family_size_counter - 1;
+                }
+            }
+        }
+    }
+
+    public static void assignProfessionGroupSpatial(ArrayList<Region> regions, ArrayList<Person> persons) {
+        ArrayList<Integer> worker_ids = new ArrayList();
+        for (int r = 0; r < regions.size(); r++) {
+            for (int i = 0; i < regions.get(r).residents.size(); i++) {
+                if (regions.get(r).residents.get(i).shamilPersonProperties.profession.name.equals("Service")) {
+                    worker_ids.add(regions.get(r).residents.get(i).shamilPersonProperties.id);
+                }
+            }
+        }
+        Collections.shuffle(worker_ids);
+//        int n_workgroup = (preference_def.get("n_workgroup")).intValue();
+//        int n_workgroup = (int) (worker_ids.size() * (preference_def.get("n_workgroup") / 7410d));//ORIGINAL
+        int n_workgroup = (int) (worker_ids.size() * (preference_def.get("n_workgroup") / 5000d));//ORIGINAL
+        if (n_workgroup == 0) {
+            n_workgroup = 1;
+        }
+
+        int worker_per_workgroup = (int) (Math.floorDiv(worker_ids.size(), n_workgroup));
+        if (worker_per_workgroup == 0) {
+            worker_per_workgroup = 1;
+        }
+        for (int i = 0; i < worker_ids.size(); i++) {
+            persons.get(worker_ids.get(i)).shamilPersonProperties.professionGroupId = Math.min(Math.floorDiv(i, worker_per_workgroup), n_workgroup);
+        }
+//        for (int i = 0; i < persons.size(); i++) {
+//            System.out.println(persons.get(i).shamilPersonProperties.professionGroupId);
+//        }
+
+//        System.out.println("n_workgroup: " + n_workgroup);
     }
 
     public static void assignProfessionGroup(ArrayList<Person> persons) {
@@ -237,20 +319,20 @@ public class ShamilPersonManager {
             persons.get(worker_ids.get(i)).shamilPersonProperties.professionGroupId = Math.min(Math.floorDiv(i, worker_per_workgroup), n_workgroup);
         }
     }
-    
-    public static void initialInfection(ArrayList<Person> people, int n_infected_init){
-        while(n_infected_init > 0){
 
-            int person_id = (int)(Math.random()*people.size()); //np.random.randint(0,len(persons))
+    public static void initialInfection(ArrayList<Person> people, int n_infected_init) {
+        while (n_infected_init > 0) {
 
-            while(people.get(person_id).shamilPersonProperties.isInfected == true){
+            int person_id = (int) (Math.random() * people.size()); //np.random.randint(0,len(persons))
 
-                person_id = (int)(Math.random()*people.size());
-                
+            while (people.get(person_id).shamilPersonProperties.isInfected == true) {
+
+                person_id = (int) (Math.random() * people.size());
+
             }
 
             people.get(person_id).shamilPersonProperties.isInfected = true;
-            people.get(person_id).shamilPersonProperties.state="Infected_notContagious";
+            people.get(person_id).shamilPersonProperties.state = "Infected_notContagious";
             //print('Person {} is initially infected'.format(person_id))
             n_infected_init -= 1;
         }
@@ -270,13 +352,13 @@ public class ShamilPersonManager {
     }
 
     public static void raiseAwareness(Person person) {
-        if (randn(0,1) > 0.5) {
-            person.shamilPersonProperties.awarenessLevel = Math.min(person.shamilPersonProperties.awarenessLevel + randn(0,1), 1.0);
+        if (randn(0, 1) > 0.5) {
+            person.shamilPersonProperties.awarenessLevel = Math.min(person.shamilPersonProperties.awarenessLevel + randn(0, 1), 1.0);
         }
     }
 
     public static void becomeProtected(Person person, int numInfection) {//numInfection IS ADDED BY AMIROOO FOR DEBUG
-        double randnum = randn(0,1);
+        double randnum = randn(0, 1);
         double extra_protection = 0.0;
 //        if(numInfection==0){//ADDED BY AMIROOO
 //            System.out.println("!!!!!!!!!");//ADDED BY AMIROOO
@@ -300,7 +382,7 @@ public class ShamilPersonManager {
             }
         } else {
             if (randnum > 0.7) {
-                person.shamilPersonProperties.protectionLevel = Math.min(randn(0,person.shamilPersonProperties.awarenessLevel) , 0.25 + extra_protection);
+                person.shamilPersonProperties.protectionLevel = Math.min(randn(0, person.shamilPersonProperties.awarenessLevel), 0.25 + extra_protection);
             }
         }
     }
@@ -333,12 +415,12 @@ public class ShamilPersonManager {
             }
         }
     }
-    
-    public static double randn(double lo,double hi){
-    //# fline = open("seed.txt").readline().rstrip()
-    //# ranseed = int(fline)
-    //# np.random.seed(ranseed)
-    return Math.random()*(hi-lo) + lo;
+
+    public static double randn(double lo, double hi) {
+        //# fline = open("seed.txt").readline().rstrip()
+        //# ranseed = int(fline)
+        //# np.random.seed(ranseed)
+        return Math.random() * (hi - lo) + lo;
     }
 
 }

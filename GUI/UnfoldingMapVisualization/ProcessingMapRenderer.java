@@ -61,9 +61,13 @@ public class ProcessingMapRenderer extends PApplet {
     boolean isPan = false;
     boolean isReadyPan = false;
     boolean isShowText = false;
+    public boolean isShowRegionIndexText = true;
 
     public boolean isShowGISMarkers = true;
     public boolean isShowAgentMarkers = true;
+
+    public ArrayList<String> regionNames = new ArrayList();
+    public ArrayList<Location> regionCenters = new ArrayList();
 
     ProcessingMapRenderer thisRenderer;
 
@@ -140,6 +144,7 @@ public class ProcessingMapRenderer extends PApplet {
 //        drawPolygons();
         drawIndexImageShades();
         drawIndexedImageBoundaries();
+        drawRegionTexts();
 
 //        if (isPan == true) {
 //            isPan = false;
@@ -368,6 +373,18 @@ public class ProcessingMapRenderer extends PApplet {
                 SimplePointMarker endMarker = new SimplePointMarker(new Location(regionImageLayer.endLon, regionImageLayer.endLat));
                 ScreenPosition scEndXY = endMarker.getScreenPosition(map);
                 image(img, scStartXY.x, scStartXY.y, scEndXY.x - scStartXY.x, scEndXY.y - scStartXY.y);
+            }
+        }
+    }
+
+    public void drawRegionTexts() {
+        if (isShowRegionIndexText == true) {
+            if (regionNames != null && regionCenters != null) {
+                for (int i = 0; i < regionNames.size(); i++) {
+                    SimplePointMarker locSM = new SimplePointMarker(regionCenters.get(i));
+                    ScreenPosition scLocPos = locSM.getScreenPosition(this.map);
+                    text(regionNames.get(i), scLocPos.x - textWidth(regionNames.get(i)) / 2.0F, scLocPos.y);
+                }
             }
         }
     }

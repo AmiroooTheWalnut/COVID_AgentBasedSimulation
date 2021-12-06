@@ -5,6 +5,7 @@
 package COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil;
 
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Person;
+import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Region;
 import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilPersonManager.quarantine_days;
 import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilPersonManager.trace_days;
 import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilPersonManager.tracing_percentage;
@@ -105,7 +106,7 @@ public class ShamilSimulatorController {
         for (int d = 0; d < numDaysToSimulate; d++) {
             startDay(people, d);
             for (int h = 0; h < 24; h++) {
-                updateHour(people, h, d);
+                updateHour(people, null, h, d, false, false);
             }
             endDay(people, d);
         }
@@ -115,7 +116,7 @@ public class ShamilSimulatorController {
         for (int d = 0; d < numDaysToSimulate; d++) {
             startDay(people, d);
             for (int h = 0; h < 24; h++) {
-                updateHour(people, h, d);
+                updateHour(people, null, h, d, false, false);
             }
             endDay(people, d);
         }
@@ -125,6 +126,15 @@ public class ShamilSimulatorController {
         //SHAMIL'S AGET GENERATION
         ShamilPersonManager.generatePersons(people);
         ShamilPersonManager.assignProfessionGroup(people);
+    }
+
+    /*
+    *   Added by Amirooo
+     */
+    public static void shamilAgentGenerationSpatial(ArrayList<Region> regions, ArrayList<Person> people) {
+        //SHAMIL'S AGET GENERATION
+        ShamilPersonManager.generatePersonsSpatial(regions);
+        ShamilPersonManager.assignProfessionGroupSpatial(regions, people);
     }
 
     public static void shamilInitialInfection(ArrayList<Person> people) {
@@ -154,13 +164,17 @@ public class ShamilSimulatorController {
         daily_groups = new ArrayList();
     }
 
-    public static void updateHour(ArrayList<Person> people, int hour, int day) {
+    public static void updateHour(ArrayList<Person> people, ArrayList<Region> regions, int hour, int day, boolean isSpatial, boolean debug) {
         for (int i = 0; i < people.size(); i++) {
             ShamilPersonManager.updateCurrentTask(people.get(i), hour);
         }
         ShamilHourSimulator.generateHourlyActions(people, hour);
-
-        Object output[] = ShamilGroupManager.assignGroups(people, tracing_percentage, day);
+        Object output[];
+        if (isSpatial == true) {
+            output = ShamilGroupManager.assignGroupsSpatial(regions, tracing_percentage, day, debug);
+        } else {
+            output = ShamilGroupManager.assignGroups(people, tracing_percentage, day);
+        }
 
         ArrayList<ShamilGroup> groups = (ArrayList<ShamilGroup>) output[0];
         HashMap<Integer, ArrayList<Integer>> person_group = (HashMap<Integer, ArrayList<Integer>>) output[1];
@@ -182,6 +196,17 @@ public class ShamilSimulatorController {
 
         for (int i = 0; i < groups.size(); i++) {
             ShamilGroupSimulator.groupInteraction(groups.get(i));
+            
+            if (debug == true) {
+                if (groups.get(i).persons.size() > 50 && groups.get(i).group_name.contains("T")) {
+                    System.out.println("GROUP NAME: " + groups.get(i).group_name);
+                    System.out.println("GROUP SIZE: " + groups.get(i).persons.size());
+
+                    System.out.println("@@@@@@@@@@@");
+                }
+            }
+            
+            
         }
 
         //pickle.dump(daily_groups,open('group_info_day_' + str(day) + '.p','wb'))

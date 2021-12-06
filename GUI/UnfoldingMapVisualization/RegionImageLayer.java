@@ -17,6 +17,7 @@ public class RegionImageLayer implements Serializable {
     static final long serialVersionUID = softwareVersion;
 
     public int[][] indexedImage;
+    public long[] cBGIndexs;
     public boolean[][] imageBoundaries;
     public double severities[];
 

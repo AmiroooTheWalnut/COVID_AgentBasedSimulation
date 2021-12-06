@@ -21,6 +21,8 @@ import COVID_AgentBasedSimulation.Model.Structure.County;
 import COVID_AgentBasedSimulation.Model.Structure.Marker;
 import COVID_AgentBasedSimulation.Model.Structure.State;
 import COVID_AgentBasedSimulation.Model.Structure.SupplementaryCaseStudyData;
+import COVID_AgentBasedSimulation.Model.Structure.Tessellation;
+import COVID_AgentBasedSimulation.Model.Structure.TessellationCell;
 import COVID_AgentBasedSimulation.Model.Structure.VDCell;
 import esmaieeli.gisFastLocationOptimization.GIS3D.Grid;
 import esmaieeli.gisFastLocationOptimization.GIS3D.LayerDefinition;
@@ -49,6 +51,7 @@ import de.siegmar.fastcsv.reader.CsvContainer;
 import de.siegmar.fastcsv.reader.CsvReader;
 import de.siegmar.fastcsv.writer.CsvWriter;
 import esmaieeli.gisFastLocationOptimization.GIS3D.NumericLayer;
+import esmaieeli.gisFastLocationOptimization.GIS3D.StoreProcessedData;
 import esmaieeli.gisFastLocationOptimization.Simulation.SimplePolygons;
 import esmaieeli.gisFastLocationOptimization.Simulation.VectorToPolygon;
 import java.io.File;
@@ -129,16 +132,14 @@ public class GISLocationDialog extends javax.swing.JDialog {
         jButton13 = new javax.swing.JButton();
         jButton14 = new javax.swing.JButton();
         jButton15 = new javax.swing.JButton();
-        jPanel3 = new javax.swing.JPanel();
-        jButton20 = new javax.swing.JButton();
-        jButton16 = new javax.swing.JButton();
-        jButton19 = new javax.swing.JButton();
-        jButton18 = new javax.swing.JButton();
-        jButton17 = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jButton21 = new javax.swing.JButton();
         jButton22 = new javax.swing.JButton();
         jButton23 = new javax.swing.JButton();
+        jButton29 = new javax.swing.JButton();
+        jSpinner1 = new javax.swing.JSpinner();
+        jButton30 = new javax.swing.JButton();
+        jButton31 = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
         jButton24 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
@@ -146,6 +147,12 @@ public class GISLocationDialog extends javax.swing.JDialog {
         jButton26 = new javax.swing.JButton();
         jButton27 = new javax.swing.JButton();
         jButton28 = new javax.swing.JButton();
+        jPanel3 = new javax.swing.JPanel();
+        jButton20 = new javax.swing.JButton();
+        jButton16 = new javax.swing.JButton();
+        jButton19 = new javax.swing.JButton();
+        jButton18 = new javax.swing.JButton();
+        jButton17 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -182,7 +189,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
             }
         });
 
-        jButton5.setText("Generate voronoi combinations");
+        jButton5.setText("Generate VDFMTH");
         jButton5.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton5ActionPerformed(evt);
@@ -217,7 +224,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
             }
         });
 
-        jButton10.setText("Generate CBG layer");
+        jButton10.setText("Generate CBG");
         jButton10.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton10ActionPerformed(evt);
@@ -252,10 +259,197 @@ public class GISLocationDialog extends javax.swing.JDialog {
             }
         });
 
-        jButton15.setText("Generate VDs CBGs");
+        jButton15.setText("Generate CBGVDFMTH");
         jButton15.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton15ActionPerformed(evt);
+            }
+        });
+
+        jPanel4.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+
+        jButton21.setText("CBGs infections");
+        jButton21.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton21ActionPerformed(evt);
+            }
+        });
+
+        jButton22.setText("VDs infections");
+        jButton22.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton22ActionPerformed(evt);
+            }
+        });
+
+        jButton23.setText("CBGs VDs infections");
+        jButton23.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton23ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButton21)
+                    .addComponent(jButton22)
+                    .addComponent(jButton23))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jButton21)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton22)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton23)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jButton29.setText("Generate VDFNC");
+        jButton29.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton29ActionPerformed(evt);
+            }
+        });
+
+        jSpinner1.setModel(new javax.swing.SpinnerNumberModel(20, 1, null, 1));
+
+        jButton30.setText("VDFNC temp 100");
+        jButton30.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton30ActionPerformed(evt);
+            }
+        });
+
+        jButton31.setText("VDFNC temp 70");
+        jButton31.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton31ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButton1)
+                    .addComponent(jButton2)
+                    .addComponent(jButton4)
+                    .addComponent(jButton3)
+                    .addComponent(jButton6)
+                    .addComponent(jButton7)
+                    .addComponent(jButton5)
+                    .addComponent(jButton8)
+                    .addComponent(jButton9)
+                    .addComponent(jButton10)
+                    .addComponent(jButton12)
+                    .addComponent(jButton13)
+                    .addComponent(jButton14)
+                    .addComponent(jButton15)
+                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
+                            .addComponent(jButton29)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jButton11, javax.swing.GroupLayout.Alignment.LEADING))
+                    .addComponent(jButton30)
+                    .addComponent(jButton31))
+                .addContainerGap(20, Short.MAX_VALUE))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jButton4)
+                .addGap(18, 18, 18)
+                .addComponent(jButton7)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton2)
+                .addGap(18, 18, 18)
+                .addComponent(jButton8)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton6)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton3)
+                .addGap(18, 18, 18)
+                .addComponent(jButton5)
+                .addGap(18, 18, 18)
+                .addComponent(jButton9)
+                .addGap(18, 18, 18)
+                .addComponent(jButton10)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton15)
+                .addGap(18, 18, 18)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton29)
+                    .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addComponent(jButton30)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton31)
+                .addGap(78, 78, 78)
+                .addComponent(jButton11)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton12)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton13)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton14)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanel5.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+
+        jButton24.setText("Update city sup by app");
+        jButton24.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton24ActionPerformed(evt);
+            }
+        });
+
+        jLabel1.setText("STATUS");
+
+        jButton25.setText("Update city sup by data");
+        jButton25.setToolTipText("");
+        jButton25.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton25ActionPerformed(evt);
+            }
+        });
+
+        jButton26.setText("Save VD travels");
+        jButton26.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton26ActionPerformed(evt);
+            }
+        });
+
+        jButton27.setText("Read Rent locs");
+        jButton27.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton27ActionPerformed(evt);
+            }
+        });
+
+        jButton28.setText("Write Rent proximities");
+        jButton28.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton28ActionPerformed(evt);
             }
         });
 
@@ -327,158 +521,6 @@ public class GISLocationDialog extends javax.swing.JDialog {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jPanel4.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-
-        jButton21.setText("CBGs infections");
-        jButton21.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton21ActionPerformed(evt);
-            }
-        });
-
-        jButton22.setText("VDs infections");
-        jButton22.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton22ActionPerformed(evt);
-            }
-        });
-
-        jButton23.setText("CBGs VDs infections");
-        jButton23.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton23ActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButton21)
-                    .addComponent(jButton22)
-                    .addComponent(jButton23))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jButton21)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton22)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton23)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButton1)
-                    .addComponent(jButton2)
-                    .addComponent(jButton4)
-                    .addComponent(jButton3)
-                    .addComponent(jButton6)
-                    .addComponent(jButton7)
-                    .addComponent(jButton5)
-                    .addComponent(jButton8)
-                    .addComponent(jButton9)
-                    .addComponent(jButton10)
-                    .addComponent(jButton11)
-                    .addComponent(jButton12)
-                    .addComponent(jButton13)
-                    .addComponent(jButton14)
-                    .addComponent(jButton15))
-                .addContainerGap(20, Short.MAX_VALUE))
-            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jButton4)
-                .addGap(18, 18, 18)
-                .addComponent(jButton7)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton2)
-                .addGap(18, 18, 18)
-                .addComponent(jButton8)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton6)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton3)
-                .addGap(18, 18, 18)
-                .addComponent(jButton5)
-                .addGap(18, 18, 18)
-                .addComponent(jButton9)
-                .addGap(18, 18, 18)
-                .addComponent(jButton10)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton15)
-                .addGap(18, 18, 18)
-                .addComponent(jButton11)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton12)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton13)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton14)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
-        jPanel5.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-
-        jButton24.setText("Update city sup by app");
-        jButton24.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton24ActionPerformed(evt);
-            }
-        });
-
-        jLabel1.setText("STATUS");
-
-        jButton25.setText("Update city sup by data");
-        jButton25.setToolTipText("");
-        jButton25.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton25ActionPerformed(evt);
-            }
-        });
-
-        jButton26.setText("Save VD travels");
-        jButton26.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton26ActionPerformed(evt);
-            }
-        });
-
-        jButton27.setText("Read Rent locs");
-        jButton27.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton27ActionPerformed(evt);
-            }
-        });
-
-        jButton28.setText("Write Rent proximities");
-        jButton28.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton28ActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
@@ -493,6 +535,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
                     .addComponent(jButton27)
                     .addComponent(jButton28))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -509,6 +552,8 @@ public class GISLocationDialog extends javax.swing.JDialog {
                 .addComponent(jButton27)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton28)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -520,8 +565,8 @@ public class GISLocationDialog extends javax.swing.JDialog {
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 1078, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 1071, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -535,73 +580,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        //shopFacilities = initShopFacilities();
-//        parentApp.enqueue(new Callable() {
-//            public Object call() throws Exception {
-//                myParent.preProcessor.setWaysColorLayerBased(myParent.allData, resetLayerList.getSelectedIndex());
-//                myParent.preProcessor.shadeColors(myParent.allData);
-//                parentApp.isRefreshing = true;
-//                return null;
-//            }
-//        });
-
-//        if (resetLayerList.getSelectedIndex() == 0) {
-        mainFParent.flowControl.simulateOneLayerCompetingFacilityBased(shopFacilities, mainFParent.findLayer("traffic"), myParent.numProcessors, -1, false);
-//        } else {
-//            myParent.flowControl.simulateOneLayerCompetingFacilityBased(testFacilities, myParent.findLayer("traffic"), (int) numCPUSpinner.getValue(), resetLayerList.getSelectedIndex() - 1, isIterative.isSelected());
-//        }
-//        isLavaBased = false;
-//        isFacilityBased = true;
-//        isZoneActive = false;
-
-        mainFParent.flowControl.correctFacilityLava(mainFParent.findLayer("traffic"), myParent.numProcessors);
-
-        ArrayList<Integer> observedFacilities = new ArrayList();
-
-        for (int i = 0; i < mainFParent.allData.all_Nodes.length; i++) {
-            short[] val = new short[1];
-            if (mainFParent.allData.all_Nodes[i].isBurned == true) {
-                for (int k = 0; k < mainFParent.allData.all_Nodes[i].burntBy.length; k++) {
-                    for (int j = 0; j < shopFacilities.length; j++) {
-                        if (mainFParent.allData.all_Nodes[i].burntBy[k] == shopFacilities[j]) {
-                            observedFacilities.add(j);
-                            val[0] = (short) (j + 1 + 1);
-                        }
-                    }
-                }
-                mainFParent.allData.all_Nodes[i].layers.add(val);
-            } else {
-                val[0] = 1;
-                mainFParent.allData.all_Nodes[i].layers.add(val);
-            }
-        }
-
-        LinkedHashSet<Integer> uniqueObservedFacilities = new LinkedHashSet(observedFacilities);
-
-        LayerDefinition tempLayer = new LayerDefinition("category", "shops_v");
-        int numShops = uniqueObservedFacilities.size();
-        tempLayer.categories = new String[numShops + 1];
-        tempLayer.colors = new Color[numShops + 1];
-        tempLayer.values = new double[numShops + 1];
-
-        tempLayer.categories[0] = "NOT ASSIGNED";
-        tempLayer.colors[0] = new Color(2, 2, 2);
-        tempLayer.values[0] = Double.valueOf(0);
-        for (int i = 1; i < numShops + 1; i++) {
-            tempLayer.categories[i] = "Shop " + String.valueOf(i);
-            tempLayer.colors[i] = new Color(Color.HSBtoRGB((float) i / (float) numShops + 1 - 1, 1, 1));
-            tempLayer.values[i] = Double.valueOf(i);
-        }
-
-        for (int i = 0; i < mainFParent.allData.all_Nodes.length; i++) {
-            if (((short[]) mainFParent.allData.all_Nodes[i].layers.get(mainFParent.allData.all_Nodes[i].layers.size() - 1))[0] < 1) {
-                ((short[]) mainFParent.allData.all_Nodes[i].layers.get(mainFParent.allData.all_Nodes[i].layers.size() - 1))[0] = 1;
-            }
-        }
-
-        mainFParent.allData.all_Layers.add(tempLayer);
-        mainFParent.refreshLayersList();
-
+        makeVDs(shopFacilities, "shops_v_VDFMTH");
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
@@ -649,57 +628,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
-        //schoolFacilities = initSchoolFacilities();
-
-        mainFParent.flowControl.simulateOneLayerCompetingFacilityBased(schoolFacilities, mainFParent.findLayer("traffic"), myParent.numProcessors, -1, false);
-
-        mainFParent.flowControl.correctFacilityLava(mainFParent.findLayer("traffic"), myParent.numProcessors);
-
-        ArrayList<Integer> observedFacilities = new ArrayList();
-
-        for (int i = 0; i < mainFParent.allData.all_Nodes.length; i++) {
-            short[] val = new short[1];
-            if (mainFParent.allData.all_Nodes[i].isBurned == true) {
-                for (int k = 0; k < mainFParent.allData.all_Nodes[i].burntBy.length; k++) {
-                    for (int j = 0; j < schoolFacilities.length; j++) {
-                        if (mainFParent.allData.all_Nodes[i].burntBy[k] == schoolFacilities[j]) {
-                            observedFacilities.add(j);
-                            val[0] = (short) (j + 1 + 1);
-                        }
-                    }
-                }
-                mainFParent.allData.all_Nodes[i].layers.add(val);
-            } else {
-                val[0] = 1;
-                mainFParent.allData.all_Nodes[i].layers.add(val);
-            }
-        }
-
-        LinkedHashSet<Integer> uniqueObservedFacilities = new LinkedHashSet(observedFacilities);
-
-        LayerDefinition tempLayer = new LayerDefinition("category", "schools_v");
-        int numShops = uniqueObservedFacilities.size();
-        tempLayer.categories = new String[numShops + 1];
-        tempLayer.colors = new Color[numShops + 1];
-        tempLayer.values = new double[numShops + 1];
-
-        tempLayer.categories[0] = "NOT ASSIGNED";
-        tempLayer.colors[0] = new Color(2, 2, 2);
-        tempLayer.values[0] = Double.valueOf(0);
-        for (int i = 1; i < numShops + 1; i++) {
-            tempLayer.categories[i] = "School " + String.valueOf(i);
-            tempLayer.colors[i] = new Color(Color.HSBtoRGB((float) i / (float) numShops + 1 - 1, 1, 1));
-            tempLayer.values[i] = Double.valueOf(i);
-        }
-
-        for (int i = 0; i < mainFParent.allData.all_Nodes.length; i++) {
-            if (((short[]) mainFParent.allData.all_Nodes[i].layers.get(mainFParent.allData.all_Nodes[i].layers.size() - 1))[0] < 1) {
-                ((short[]) mainFParent.allData.all_Nodes[i].layers.get(mainFParent.allData.all_Nodes[i].layers.size() - 1))[0] = 1;
-            }
-        }
-
-        mainFParent.allData.all_Layers.add(tempLayer);
-        mainFParent.refreshLayersList();
+        makeVDs(schoolFacilities, "schools_v_VDFMTH");
     }//GEN-LAST:event_jButton6ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
@@ -717,106 +646,15 @@ public class GISLocationDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-        int shopLayer = mainFParent.findLayer("shops_v");
-        int schoolLayer = mainFParent.findLayer("schools_v");
-        HashMap<String, String> perms = new HashMap();
-        HashMap<String, Integer> usedPerms = new HashMap();
-        HashMap<String, Integer> refinedPermsById = new HashMap();
-        HashMap<String, Integer> refinedPermsbyUse = new HashMap();
-        ArrayList<String> refinedPermsKeys = new ArrayList();
-        int counter = 0;
-        for (int i = 1; i < ((LayerDefinition) mainFParent.allData.all_Layers.get(shopLayer)).categories.length; i++) {
-            for (int j = 1; j < ((LayerDefinition) mainFParent.allData.all_Layers.get(schoolLayer)).categories.length; j++) {
-                perms.put(i + "_" + j, String.valueOf(counter));
-                usedPerms.put(i + "_" + j, 0);
-                counter = counter + 1;
-            }
-        }
-        usedPerms.put("0", 0);
-
-        for (int i = 0; i < mainFParent.allData.all_Nodes.length; i++) {
-            short shopIndex = (short) (((short[]) mainFParent.allData.all_Nodes[i].layers.get(shopLayer))[0] - 1);
-            short schoolIndex = (short) (((short[]) mainFParent.allData.all_Nodes[i].layers.get(schoolLayer))[0] - 1);
-            int currentCounter = -1;
-            if (shopIndex == 0 || schoolIndex == 0) {//NOT ASSIGNED SCENARIOS
-                currentCounter = usedPerms.get("0");
-            } else {
-                currentCounter = usedPerms.get(shopIndex + "_" + schoolIndex);
-            }
-
-            usedPerms.put(shopIndex + "_" + schoolIndex, currentCounter + 1);
-        }
-
-        counter = 1;
-        int refinedCounter = 0;
-        for (Map.Entry<String, Integer> entry : usedPerms.entrySet()) {
-            String key = entry.getKey();
-            Integer value = entry.getValue();
-            if (value > 0) {
-                refinedPermsbyUse.put(key, value);
-                refinedPermsById.put(key, refinedCounter + 1);
-                refinedCounter = refinedCounter + 1;
-            }
-            counter = counter + 1;
-        }
-
-        LayerDefinition tempLayer = new LayerDefinition("category", "voronoi_combination_v");
-        tempLayer.categories = new String[refinedCounter + 1];
-        tempLayer.colors = new Color[refinedCounter + 1];
-        tempLayer.values = new double[refinedCounter + 1];
-
-        tempLayer.categories[0] = "NOT ASSIGNED";
-        tempLayer.colors[0] = new Color(2, 2, 2);
-        tempLayer.values[0] = Double.valueOf(1);
-//        for (int i = 1; i < counter + 1; i++) {
-//            tempLayer.categories[i] = "combination " + String.valueOf(i);
-//            tempLayer.colors[i] = new Color(Color.HSBtoRGB((float) i / (float) counter + 1 - 1, 1, 1));
-//            tempLayer.values[i] = Double.valueOf(i + 1);
-//        }
-
-        int combinationCounter = 1;
-        for (Map.Entry<String, Integer> entry : refinedPermsById.entrySet()) {
-            String key = entry.getKey();
-            Integer value = entry.getValue();
-            tempLayer.categories[combinationCounter] = "combination " + key;
-            tempLayer.colors[combinationCounter] = new Color(Color.HSBtoRGB((float) combinationCounter / (float) refinedCounter + 1 - 1, 1, 1));
-            tempLayer.values[combinationCounter] = Double.valueOf(value);
-            combinationCounter = combinationCounter + 1;
-        }
-
-        for (int i = 0; i < mainFParent.allData.all_Nodes.length; i++) {
-            short shopIndex = (short) (((short[]) mainFParent.allData.all_Nodes[i].layers.get(shopLayer))[0] - 1);
-            short schoolIndex = (short) (((short[]) mainFParent.allData.all_Nodes[i].layers.get(schoolLayer))[0] - 1);
-            String combinationIndex;
-            if (shopIndex == 0 || schoolIndex == 0) {//NOT ASSIGNED SCENARIOS
-                combinationIndex = "0";
-            } else {
-                combinationIndex = String.valueOf(refinedPermsById.get(shopIndex + "_" + schoolIndex));
-            }
-            short[] val = new short[1];
-//            if(combinationIndex==null){
-//                System.out.println("combinationIndex: "+combinationIndex);
-//            }
-            val[0] = (short) (Short.valueOf(combinationIndex) + 1);
-//            if (val[0] == 0) {
-//                System.out.println("!!!");
-//            }
-//            if (val[0] > 64) {
-//                System.out.println("!!!");
-//            }
-            mainFParent.allData.all_Nodes[i].layers.add(val);
-        }
-
-        mainFParent.allData.all_Layers.add(tempLayer);
-        mainFParent.refreshLayersList();
+        makeVDCombination("shops_v_VDFMTH", "schools_v_VDFMTH", "VDFMTH");
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
-        shopFacilities = initShopFacilities();
+        shopFacilities = initShopFacilities(shopMergeThreshold);
     }//GEN-LAST:event_jButton7ActionPerformed
 
     private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
-        schoolFacilities = initSchoolFacilities();
+        schoolFacilities = initSchoolFacilities(schoolMergeThreshold);
     }//GEN-LAST:event_jButton8ActionPerformed
 
     private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
@@ -955,7 +793,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
             }
         }
 
-        LayerDefinition tempLayer = new LayerDefinition("category", "censusBlockGroups");
+        LayerDefinition tempLayer = new LayerDefinition("category", "CBG");
 
         tempLayer.categories = new String[numCBGs];
         tempLayer.colors = new Color[numCBGs];
@@ -1043,7 +881,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
                         System.out.println(ie.toString());
                     }
                 }
-                System.out.println(i);
+//                System.out.println(i);
             }
 
             ArrayList<String[]> data = new ArrayList();
@@ -1627,11 +1465,11 @@ public class GISLocationDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton14ActionPerformed
 
     private void jButton15ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton15ActionPerformed
-        int comLayer = mainFParent.findLayer("voronoi_combination_v");
-        int cBGLayer = mainFParent.findLayer("censusBlockGroups");
+        int comLayer = mainFParent.findLayerExactNotCaseSensitive("VDFMTH");
+        int cBGLayer = mainFParent.findLayerExactNotCaseSensitive("CBG");
 
-        int shopLayer = mainFParent.findLayer("shops_v");
-        int schoolLayer = mainFParent.findLayer("schools_v");
+        int shopLayer = mainFParent.findLayerExactNotCaseSensitive("shops_v_VDFMTH");
+        int schoolLayer = mainFParent.findLayerExactNotCaseSensitive("schools_v_VDFMTH");
 
         ArrayList<LocationNodeSafegraph> shopLocations = initShopLocations();
         Integer indices[] = labelMergedFacilities(shopLocations, shopMergeThreshold);
@@ -1768,7 +1606,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
             counter = counter + 1;
         }
 
-        LayerDefinition tempLayer = new LayerDefinition("category", "VDs_CBGs");
+        LayerDefinition tempLayer = new LayerDefinition("category", "CBGVDFMTH");
         tempLayer.categories = new String[refinedCounter + 1];
         tempLayer.colors = new Color[refinedCounter + 1];
         tempLayer.values = new double[refinedCounter + 1];
@@ -1820,7 +1658,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton15ActionPerformed
 
     private void jButton16ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton16ActionPerformed
-        int cBGIndex = mainFParent.findLayer("censusBlockGroups");
+        int cBGIndex = mainFParent.findLayerExactNotCaseSensitive("CBG");
         ArrayList<MyPolygons> polygons = new ArrayList();
         ConvexHull convHull;
 //        for (int i = 1; i < 3; i++) {
@@ -1863,7 +1701,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton20ActionPerformed
 
     private void jButton18ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton18ActionPerformed
-        int vDsIndex = mainFParent.findLayer("VDs_CBGs");
+        int vDsIndex = mainFParent.findLayerExactNotCaseSensitive("VDs_CBGs");
         ArrayList<MyPolygons> polygons = new ArrayList();
         ConvexHull convHull;
 //        for (int i = 1; i < 3; i++) {
@@ -1897,7 +1735,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton18ActionPerformed
 
     private void jButton17ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton17ActionPerformed
-        int vDsIndex = mainFParent.findLayer("voronoi_combination_v");
+        int vDsIndex = mainFParent.findLayerExactNotCaseSensitive("voronoi_combination_v");
         ArrayList<MyPolygons> polygons = new ArrayList();
         ConvexHull convHull;
 //        for (int i = 1; i < 3; i++) {
@@ -1951,7 +1789,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
                     .getName()).log(Level.SEVERE, (String) null, ex);
         }
 
-        int cBGIndex = mainFParent.findLayer("censusBlockGroups");
+        int cBGIndex = mainFParent.findLayerExactNotCaseSensitive("CBG");
 
         int numCBGs = ((LayerDefinition) (mainFParent.allData.all_Layers.get(cBGIndex))).categories.length;
 
@@ -2011,7 +1849,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton21ActionPerformed
 
     private void jButton22ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton22ActionPerformed
-        int vDsIndex = mainFParent.findLayer("voronoi_combination_v");
+        int vDsIndex = mainFParent.findLayerExactNotCaseSensitive("voronoi_combination_v");
         ArrayList<MyPolygons> polygons = new ArrayList();
         ConvexHull convHull;
 //        for (int i = 1; i < 3; i++) {
@@ -2145,7 +1983,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton22ActionPerformed
 
     private void jButton23ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton23ActionPerformed
-        int vDsCBGsIndex = mainFParent.findLayer("VDs_CBGs");
+        int vDsCBGsIndex = mainFParent.findLayerExactNotCaseSensitive("VDs_CBGs");
         ArrayList<MyPolygons> polygons = new ArrayList();
         ConvexHull convHull;
 //        for (int i = 1; i < 3; i++) {
@@ -2275,13 +2113,18 @@ public class GISLocationDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton23ActionPerformed
 
     private void jButton24ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton24ActionPerformed
+        saveTessellations();
+    }//GEN-LAST:event_jButton24ActionPerformed
+
+    @Deprecated
+    public void writeSupplementaryData() {
         if (myParent.mainModel.ABM.studyScopeGeography instanceof City) {
             City city = (City) (myParent.mainModel.ABM.studyScopeGeography);
 
             city.vDCells = new ArrayList();
-            int vDLayerIndex = mainFParent.findLayer("voronoi_combination_v");
-            int cBGLayerIndex = mainFParent.findLayer("censusBlockGroups");
-            int cBGVDLayerIndex = mainFParent.findLayer("VDs_CBGs");
+            int vDLayerIndex = mainFParent.findLayerExactNotCaseSensitive("VDFMTH");
+            int cBGLayerIndex = mainFParent.findLayerExactNotCaseSensitive("CBG");
+            int cBGVDLayerIndex = mainFParent.findLayerExactNotCaseSensitive("CBGVDFMTH");
 
             System.out.println("num VDs: " + ((LayerDefinition) (mainFParent.allData.all_Layers.get(vDLayerIndex))).categories.length);
 
@@ -2478,6 +2321,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
                 int[][] indexedImage = vp.layerToIndexedImage(mainFParent.allData, cBGLayerIndex, true);
 
                 cBGLayer.indexedImage = indexedImage;
+                cBGLayer.cBGIndexs = vp.cBGlayerToIndexedIDImage(mainFParent.allData, cBGLayerIndex, indexedImage);
                 cBGLayer.startLat = vp.scaleOffsetX;
                 cBGLayer.startLon = vp.scaleOffsetY;
                 cBGLayer.endLat = vp.scaleOffsetX + vp.scaleWidth;
@@ -2587,7 +2431,109 @@ public class GISLocationDialog extends javax.swing.JDialog {
         } else {
             jLabel1.setText("HALT! ONLY CITY SCOPE IS IMPLEMENTED!");
         }
-    }//GEN-LAST:event_jButton24ActionPerformed
+    }
+
+    public void saveTessellations() {
+        if (myParent.mainModel.ABM.studyScopeGeography instanceof City) {
+            City city = (City) (myParent.mainModel.ABM.studyScopeGeography);
+            SupplementaryCaseStudyData scsd = new SupplementaryCaseStudyData();
+            scsd.tessellations = new ArrayList();
+            int cBGLayerIndex = mainFParent.findLayerExactNotCaseSensitive("CBG");
+            for (int i = 0; i < mainFParent.allData.all_Layers.size(); i++) {
+                if (!((LayerDefinition) (mainFParent.allData.all_Layers.get(i))).layerName.toLowerCase().contains("Base".toLowerCase())) {
+                    if (!((LayerDefinition) (mainFParent.allData.all_Layers.get(i))).layerName.toLowerCase().contains("traffic".toLowerCase())) {
+                        if (!(mainFParent.allData.all_Layers.get(i) instanceof NumericLayer)) {
+                            Tessellation tessellation = new Tessellation();
+                            tessellation.scenarioName = ((LayerDefinition) (mainFParent.allData.all_Layers.get(i))).layerName;
+                            for (int vdIndex = 1; vdIndex < ((LayerDefinition) (mainFParent.allData.all_Layers.get(i))).categories.length; vdIndex++) {
+                                tessellation.cells.add(new TessellationCell());
+                                tessellation.cells.get(vdIndex - 1).cBGsInvolved = new ArrayList();
+                                tessellation.cells.get(vdIndex - 1).cBGsIDsInvolved = new ArrayList();
+                                tessellation.cells.get(vdIndex - 1).cBGsPercentageInvolved = new ArrayList();
+                                tessellation.cells.get(vdIndex - 1).myIndex = vdIndex;
+
+                                HashMap<CensusBlockGroup, Integer> cBGNumNodesHashMap = null;
+
+//                                if(((LayerDefinition)(mainFParent.allData.all_Layers.get(i))).layerName.equals("CBG")){
+//                                    System.out.println("DEBUG123");
+//                                }
+                                
+                                cBGNumNodesHashMap = getHashNumNodeForCBG(vdIndex, i, cBGLayerIndex);
+
+                                double sumNodes = 0;
+                                for (Map.Entry<CensusBlockGroup, Integer> set : cBGNumNodesHashMap.entrySet()) {
+                                    sumNodes += set.getValue();
+                                }
+                                for (Map.Entry<CensusBlockGroup, Integer> set : cBGNumNodesHashMap.entrySet()) {
+                                    tessellation.cells.get(vdIndex - 1).cBGsInvolved.add(set.getKey());
+                                    if (set.getKey() != null) {
+                                        tessellation.cells.get(vdIndex - 1).cBGsIDsInvolved.add(set.getKey().id);
+                                    } else {
+                                        tessellation.cells.get(vdIndex - 1).cBGsIDsInvolved.add(-1l);
+                                    }
+                                    tessellation.cells.get(vdIndex - 1).cBGsPercentageInvolved.add((double) (set.getValue()) / sumNodes);
+                                }
+//                            if (vdIndex >= 1) {
+//                                String[] shopSchoolTemp = ((LayerDefinition) (mainFParent.allData.all_Layers.get(vDLayerIndex))).categories[vdIndex].split(" ");
+//                                String[] shopSchool = shopSchoolTemp[1].split("_");
+//                                int shopIndex = Integer.valueOf(shopSchool[0]);
+//                                int schoolIndex = Integer.valueOf(shopSchool[1]);
+////                    System.out.println(shopIndex);
+////                    System.out.println(schoolIndex);
+////                    System.out.println("!!!!!!!!!!!!!!!!!!!!!!");
+//                                if (shopIndex > 0 && schoolIndex > 0) {
+//                                    city.vDCells.get(vdIndex - 1).shopPlaces = shopLocationNodes.get(shopIndex - 1).places;
+//                                    city.vDCells.get(vdIndex - 1).shopPlacesKeys = shopLocationNodes.get(shopIndex - 1).placeKeys;
+//
+//                                    System.out.println("vdIndex: " + vdIndex);
+//                                    System.out.println("city.vDCells.size(): " + city.vDCells.size());
+//                                    System.out.println("schoolIndex: " + schoolIndex);
+//                                    System.out.println("shopLocationNodes.size(): " + shopLocationNodes.size());
+//                                    city.vDCells.get(vdIndex - 1).schoolPlaces = schoolLocationNodes.get(schoolIndex - 1).places;
+//                                    city.vDCells.get(vdIndex - 1).schoolPlacesKeys = schoolLocationNodes.get(schoolIndex - 1).placeKeys;
+//                                }
+//                            }
+                            }
+
+                            RegionImageLayer vDLayer = new RegionImageLayer();
+
+                            VectorToPolygon vp = new VectorToPolygon();
+                            int[][] indexedImage = vp.layerToIndexedImage(mainFParent.allData, i, false);
+
+                            vDLayer.indexedImage = indexedImage;
+                            if(((LayerDefinition) (mainFParent.allData.all_Layers.get(i))).layerName.toLowerCase().equals("cbg")){
+                                vDLayer.cBGIndexs = vp.cBGlayerToIndexedIDImage(mainFParent.allData, cBGLayerIndex, indexedImage);
+                            }
+                            vDLayer.startLat = vp.scaleOffsetX;
+                            vDLayer.startLon = vp.scaleOffsetY;
+                            vDLayer.endLat = vp.scaleOffsetX + vp.scaleWidth;
+                            vDLayer.endLon = vp.scaleOffsetY + vp.scaleHeight;
+
+                            vDLayer.severities = new double[tessellation.cells.size()];
+                            vDLayer.imageBoundaries = RegionImageLayer.getImageBoundaries(indexedImage);
+                            tessellation.regionImageLayer = vDLayer;
+
+                            scsd.tessellations.add(tessellation);
+                        }
+                    }
+                }
+            }
+
+            myParent.mainModel.supplementaryCaseStudyData = scsd;
+
+            String directoryPath = "./datasets/Safegraph/" + myParent.mainModel.ABM.studyScope;
+            File directory = new File(directoryPath);
+            if (!directory.exists()) {
+                directory.mkdir();
+            }
+
+            MainModel.saveSupplementaryCaseStudyDataKryo(directoryPath + "/supplementaryGIS", scsd);
+        }
+    }
+
+//    public String getScenarioName(String input){
+//        if(input.contains(input))
+//    }
 
     private void jButton25ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton25ActionPerformed
         myParent.mainModel.loadAndConnectSupplementaryCaseStudyDataKryo("./datasets/safegraph/" + myParent.mainModel.ABM.studyScope + "/supplementaryGIS.bin");
@@ -2818,7 +2764,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
 
             //int shopLayer = mainFParent.findLayer("shops_v");
             //int schoolLayer = mainFParent.findLayer("schools_v");
-            int trafficLayer = mainFParent.findLayer("traffic");
+            int trafficLayer = mainFParent.findLayerContains("traffic");
 
             int numProcessors = myParent.mainModel.numCPUs;
             mainFParent.allData.setParallelLayers(numProcessors, -1);
@@ -2992,6 +2938,292 @@ public class GISLocationDialog extends javax.swing.JDialog {
 
     }//GEN-LAST:event_jButton28ActionPerformed
 
+    private void jButton29ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton29ActionPerformed
+        float currentShopMergeThreshold = shopMergeThreshold;
+        float currentSchoolMergeThreshold = schoolMergeThreshold;
+        int targetNumCells = (int) (jSpinner1.getValue());
+        float stepSize = 0.2f;
+        int maxIterations = 20;
+
+        for (int iter = 0; iter < maxIterations; iter++) {
+            shopFacilities = initShopFacilities(currentShopMergeThreshold);
+            schoolFacilities = initSchoolFacilities(currentSchoolMergeThreshold);
+            makeVDs(shopFacilities, "shops_v_VDFNC_" + targetNumCells);
+            makeVDs(schoolFacilities, "schools_v_VDFNC_" + targetNumCells);
+
+            makeVDCombination("shops_v_VDFNC_" + targetNumCells, "schools_v_VDFNC_" + targetNumCells, "VDFNC_" + targetNumCells);
+            int generatedLayer = mainFParent.findLayerExactNotCaseSensitive("VDFNC_" + targetNumCells);
+            int currentNumCells = ((LayerDefinition) (mainFParent.allData.all_Layers.get(generatedLayer))).categories.length - 1;
+            System.out.println("shopFacilities.length: " + shopFacilities.length);
+            System.out.println("schoolFacilities.length: " + schoolFacilities.length);
+            System.out.println("currentNumCells: " + currentNumCells);
+            System.out.println("currentShopMergeThreshold: " + currentShopMergeThreshold);
+            System.out.println("currentSchoolMergeThreshold: " + currentSchoolMergeThreshold);
+
+            ((LayerDefinition) mainFParent.allData.all_Layers.get(generatedLayer)).layerName = "VDFNC_" + currentNumCells;
+
+            int shop_ind = mainFParent.findLayerExactNotCaseSensitive("shops_v_VDFNC_" + targetNumCells);
+            ((LayerDefinition) mainFParent.allData.all_Layers.get(shop_ind)).layerName = "shops_v_VDFNC_" + currentNumCells;
+
+            int school_ind = mainFParent.findLayerExactNotCaseSensitive("schools_v_VDFNC_" + targetNumCells);
+            ((LayerDefinition) mainFParent.allData.all_Layers.get(school_ind)).layerName = "schools_v_VDFNC_" + currentNumCells;
+
+            if (currentNumCells < targetNumCells) {
+                currentShopMergeThreshold = currentShopMergeThreshold * (1 - stepSize);
+                currentSchoolMergeThreshold = currentSchoolMergeThreshold * (1 - stepSize);
+                stepSize = stepSize * 0.95f;
+
+            } else if (currentNumCells > targetNumCells) {
+                currentShopMergeThreshold = currentShopMergeThreshold * (1 + stepSize);
+                currentSchoolMergeThreshold = currentSchoolMergeThreshold * (1 + stepSize);
+                stepSize = stepSize * 0.95f;
+            } else {
+                break;
+            }
+//            if (iter < maxIterations - 1) {
+//                deleteLayer("shops_v_VDFNC_"+ targetNumCells);
+//                deleteLayer("schools_v_VDFNC_"+ targetNumCells);
+//                deleteLayer("VDFNC_"+ targetNumCells);
+//            }
+            StoreProcessedData saving = new StoreProcessedData();
+            saving.save_allData_kryo("C:\\Users\\user\\Documents\\Seattle_temp_" + iter, mainFParent.allData);
+        }
+
+    }//GEN-LAST:event_jButton29ActionPerformed
+
+    private void jButton30ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton30ActionPerformed
+        temp_VDFNC_100();
+    }//GEN-LAST:event_jButton30ActionPerformed
+
+    private void jButton31ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton31ActionPerformed
+        temp_VDFNC_70();
+    }//GEN-LAST:event_jButton31ActionPerformed
+
+    public void temp_VDFNC_70() {
+        float currentShopMergeThreshold = 0.01072975f;
+        float currentSchoolMergeThreshold = 0.009574889f;
+
+        shopFacilities = initShopFacilities(currentShopMergeThreshold);
+        schoolFacilities = initSchoolFacilities(currentSchoolMergeThreshold);
+        makeVDs(shopFacilities, "shops_v_VDFNC_" + 70);
+        makeVDs(schoolFacilities, "schools_v_VDFNC_" + 70);
+
+        makeVDCombination("shops_v_VDFNC_" + 70, "schools_v_VDFNC_" + 70, "VDFNC_" + 70);
+
+        int generatedLayer = mainFParent.findLayerExactNotCaseSensitive("VDFNC_" + 70);
+        int currentNumCells = ((LayerDefinition) (mainFParent.allData.all_Layers.get(generatedLayer))).categories.length - 1;
+        System.out.println("shopFacilities.length: " + shopFacilities.length);
+        System.out.println("schoolFacilities.length: " + schoolFacilities.length);
+        System.out.println("currentNumCells: " + currentNumCells);
+        System.out.println("currentShopMergeThreshold: " + currentShopMergeThreshold);
+        System.out.println("currentSchoolMergeThreshold: " + currentSchoolMergeThreshold);
+    }
+
+    public void temp_VDFNC_100() {
+        float currentShopMergeThreshold = shopMergeThreshold;
+        float currentSchoolMergeThreshold = schoolMergeThreshold;
+
+        float stepSize = 0.2f;
+
+        currentShopMergeThreshold = currentShopMergeThreshold * (1 + stepSize);
+        currentSchoolMergeThreshold = currentSchoolMergeThreshold * (1 + stepSize);
+        stepSize = stepSize * 0.95f;
+
+        currentShopMergeThreshold = currentShopMergeThreshold * (1 + stepSize);
+        currentSchoolMergeThreshold = currentSchoolMergeThreshold * (1 + stepSize);
+        stepSize = stepSize * 0.95f;
+
+        currentShopMergeThreshold = currentShopMergeThreshold * (1 - stepSize);
+        currentSchoolMergeThreshold = currentSchoolMergeThreshold * (1 - stepSize);
+        stepSize = stepSize * 0.95f;
+
+        currentShopMergeThreshold = currentShopMergeThreshold * (1 + stepSize);
+        currentSchoolMergeThreshold = currentSchoolMergeThreshold * (1 + stepSize);
+        stepSize = stepSize * 0.95f;
+
+        currentShopMergeThreshold = currentShopMergeThreshold * (1 - stepSize);
+        currentSchoolMergeThreshold = currentSchoolMergeThreshold * (1 - stepSize);
+        stepSize = stepSize * 0.95f;
+
+        shopFacilities = initShopFacilities(currentShopMergeThreshold);
+        schoolFacilities = initSchoolFacilities(currentSchoolMergeThreshold);
+        makeVDs(shopFacilities, "shops_v_VDFNC_" + 100);
+        makeVDs(schoolFacilities, "schools_v_VDFNC_" + 100);
+
+        makeVDCombination("shops_v_VDFNC_" + 100, "schools_v_VDFNC_" + 100, "VDFNC_" + 100);
+
+        int generatedLayer = mainFParent.findLayerExactNotCaseSensitive("VDFNC_" + 100);
+        int currentNumCells = ((LayerDefinition) (mainFParent.allData.all_Layers.get(generatedLayer))).categories.length - 1;
+        System.out.println("shopFacilities.length: " + shopFacilities.length);
+        System.out.println("schoolFacilities.length: " + schoolFacilities.length);
+        System.out.println("currentNumCells: " + currentNumCells);
+        System.out.println("currentShopMergeThreshold: " + currentShopMergeThreshold);
+        System.out.println("currentSchoolMergeThreshold: " + currentSchoolMergeThreshold);
+    }
+
+    public void deleteLayer(String name) {
+        int index = mainFParent.findLayerExactNotCaseSensitive(name);
+        mainFParent.allData.all_Layers.remove(index);
+        for (int i = 0; i < mainFParent.allData.all_Nodes.length; i++) {
+            mainFParent.allData.all_Nodes[i].layers.remove(index);
+        }
+        mainFParent.refreshLayersList();
+    }
+
+    public void makeVDs(FacilityLocation[] facilities, String outputLayerName) {
+        mainFParent.flowControl.tollOff = 5;
+//        System.out.println("VD CONSTRUCTION START!");
+        mainFParent.flowControl.simulateOneLayerCompetingFacilityBased(facilities, mainFParent.findLayerContains("traffic"), myParent.numProcessors, -1, false);
+//        System.out.println("SIMULATION DONE!");
+        mainFParent.flowControl.correctFacilityLava(mainFParent.findLayerContains("traffic"), myParent.numProcessors);
+//        System.out.println("SIMULATION CORRECTION DONE!");
+
+        ArrayList<Integer> observedFacilities = new ArrayList();
+
+        for (int i = 0; i < mainFParent.allData.all_Nodes.length; i++) {
+            short[] val = new short[1];
+            if (mainFParent.allData.all_Nodes[i].isBurned == true) {
+                for (int k = 0; k < mainFParent.allData.all_Nodes[i].burntBy.length; k++) {
+                    for (int j = 0; j < facilities.length; j++) {
+                        if (mainFParent.allData.all_Nodes[i].burntBy[k] == facilities[j]) {
+                            observedFacilities.add(j);
+                            val[0] = (short) (j + 1 + 1);
+                        }
+                    }
+                }
+                mainFParent.allData.all_Nodes[i].layers.add(val);
+            } else {
+                val[0] = 1;
+                mainFParent.allData.all_Nodes[i].layers.add(val);
+            }
+        }
+
+        LinkedHashSet<Integer> uniqueObservedFacilities = new LinkedHashSet(observedFacilities);
+
+        LayerDefinition tempLayer = new LayerDefinition("category", outputLayerName);
+        int numShops = uniqueObservedFacilities.size();
+        tempLayer.categories = new String[numShops + 1];
+        tempLayer.colors = new Color[numShops + 1];
+        tempLayer.values = new double[numShops + 1];
+
+        tempLayer.categories[0] = "NOT ASSIGNED";
+        tempLayer.colors[0] = new Color(2, 2, 2);
+        tempLayer.values[0] = Double.valueOf(0);
+        for (int i = 1; i < numShops + 1; i++) {
+            tempLayer.categories[i] = outputLayerName + " " + String.valueOf(i);
+            tempLayer.colors[i] = new Color(Color.HSBtoRGB((float) i / (float) numShops + 1 - 1, 1, 1));
+            tempLayer.values[i] = Double.valueOf(i);
+        }
+
+        for (int i = 0; i < mainFParent.allData.all_Nodes.length; i++) {
+            if (((short[]) mainFParent.allData.all_Nodes[i].layers.get(mainFParent.allData.all_Nodes[i].layers.size() - 1))[0] < 1) {
+                ((short[]) mainFParent.allData.all_Nodes[i].layers.get(mainFParent.allData.all_Nodes[i].layers.size() - 1))[0] = 1;
+            }
+        }
+
+        mainFParent.allData.all_Layers.add(tempLayer);
+        mainFParent.refreshLayersList();
+    }
+
+    public void makeVDCombination(String firstVDLayerName, String secondVDLayerName, String outputLayerName) {
+        int firstLayer = mainFParent.findLayerExactNotCaseSensitive(firstVDLayerName);
+        int secondLayer = mainFParent.findLayerExactNotCaseSensitive(secondVDLayerName);
+        HashMap<String, String> perms = new HashMap();
+        HashMap<String, Integer> usedPerms = new HashMap();
+        HashMap<String, Integer> refinedPermsById = new HashMap();
+        HashMap<String, Integer> refinedPermsbyUse = new HashMap();
+        ArrayList<String> refinedPermsKeys = new ArrayList();
+        int counter = 0;
+        for (int i = 1; i < ((LayerDefinition) mainFParent.allData.all_Layers.get(firstLayer)).categories.length; i++) {
+            for (int j = 1; j < ((LayerDefinition) mainFParent.allData.all_Layers.get(secondLayer)).categories.length; j++) {
+                perms.put(i + "_" + j, String.valueOf(counter));
+                usedPerms.put(i + "_" + j, 0);
+                counter = counter + 1;
+            }
+        }
+        usedPerms.put("0", 0);
+
+        for (int i = 0; i < mainFParent.allData.all_Nodes.length; i++) {
+            short shopIndex = (short) (((short[]) mainFParent.allData.all_Nodes[i].layers.get(firstLayer))[0] - 1);
+            short schoolIndex = (short) (((short[]) mainFParent.allData.all_Nodes[i].layers.get(secondLayer))[0] - 1);
+            int currentCounter = -1;
+            if (shopIndex == 0 || schoolIndex == 0) {//NOT ASSIGNED SCENARIOS
+                currentCounter = usedPerms.get("0");
+            } else {
+                currentCounter = usedPerms.get(shopIndex + "_" + schoolIndex);
+            }
+
+            usedPerms.put(shopIndex + "_" + schoolIndex, currentCounter + 1);
+        }
+
+        counter = 1;
+        int refinedCounter = 0;
+        for (Map.Entry<String, Integer> entry : usedPerms.entrySet()) {
+            String key = entry.getKey();
+            Integer value = entry.getValue();
+            if (value > 0) {
+                refinedPermsbyUse.put(key, value);
+                refinedPermsById.put(key, refinedCounter + 1);
+                refinedCounter = refinedCounter + 1;
+            }
+            counter = counter + 1;
+        }
+
+        LayerDefinition tempLayer = new LayerDefinition("category", outputLayerName);
+        tempLayer.categories = new String[refinedCounter + 1];
+        tempLayer.colors = new Color[refinedCounter + 1];
+        tempLayer.values = new double[refinedCounter + 1];
+
+        tempLayer.categories[0] = "NOT ASSIGNED";
+        tempLayer.colors[0] = new Color(2, 2, 2);
+        tempLayer.values[0] = Double.valueOf(1);
+//        for (int i = 1; i < counter + 1; i++) {
+//            tempLayer.categories[i] = "combination " + String.valueOf(i);
+//            tempLayer.colors[i] = new Color(Color.HSBtoRGB((float) i / (float) counter + 1 - 1, 1, 1));
+//            tempLayer.values[i] = Double.valueOf(i + 1);
+//        }
+
+        int combinationCounter = 1;
+        for (Map.Entry<String, Integer> entry : refinedPermsById.entrySet()) {
+            String key = entry.getKey();
+            Integer value = entry.getValue();
+            tempLayer.categories[combinationCounter] = "combination " + key;
+            tempLayer.colors[combinationCounter] = new Color(Color.HSBtoRGB((float) combinationCounter / (float) refinedCounter + 1 - 1, 1, 1));
+            tempLayer.values[combinationCounter] = Double.valueOf(value);
+            combinationCounter = combinationCounter + 1;
+        }
+
+        for (int i = 0; i < mainFParent.allData.all_Nodes.length; i++) {
+            short shopIndex = (short) (((short[]) mainFParent.allData.all_Nodes[i].layers.get(firstLayer))[0] - 1);
+            short schoolIndex = (short) (((short[]) mainFParent.allData.all_Nodes[i].layers.get(secondLayer))[0] - 1);
+            String combinationIndex;
+            if (shopIndex == 0 || schoolIndex == 0) {//NOT ASSIGNED SCENARIOS
+                combinationIndex = "0";
+            } else {
+                combinationIndex = String.valueOf(refinedPermsById.get(shopIndex + "_" + schoolIndex));
+            }
+            short[] val = new short[1];
+//            if(combinationIndex==null){
+//                System.out.println("combinationIndex: "+combinationIndex);
+//            }
+            val[0] = (short) (Short.valueOf(combinationIndex) + 1);
+//            if (val[0] == 0) {
+//                System.out.println("!!!");
+//            }
+//            if (val[0] > 64) {
+//                System.out.println("!!!");
+//            }
+            mainFParent.allData.all_Nodes[i].layers.add(val);
+        }
+
+        mainFParent.allData.all_Layers.add(tempLayer);
+        mainFParent.refreshLayersList();
+    }
+
+    public void makeTempVDCombinations() {
+
+    }
+
     public double getCBGPercentageInvolvedForVD(City city, VDCell cell, CensusBlockGroup input) {
         if (cell != null && input != null) {
             for (int j = 0; j < cell.cBGsIDsInvolved.size(); j++) {
@@ -3105,9 +3337,9 @@ public class GISLocationDialog extends javax.swing.JDialog {
         return temples;
     }
 
-    public FacilityLocation[] initShopFacilities() {
+    public FacilityLocation[] initShopFacilities(float threshold) {
         ArrayList<LocationNodeSafegraph> shopLocations = initShopLocations();
-        Integer indices[] = labelMergedFacilities(shopLocations, shopMergeThreshold);
+        Integer indices[] = labelMergedFacilities(shopLocations, threshold);
         List<Integer> indicesRawList = Arrays.asList(indices);
         ArrayList<Integer> indicesList = new ArrayList(indicesRawList);
         LinkedHashSet<Integer> indicesUniqueSetHS = new LinkedHashSet(indicesList);
@@ -3247,9 +3479,9 @@ public class GISLocationDialog extends javax.swing.JDialog {
         return output;
     }
 
-    public FacilityLocation[] initSchoolFacilities() {
+    public FacilityLocation[] initSchoolFacilities(float threshold) {
         ArrayList<LocationNodeSafegraph> schoolLocations = initSchoolLocations();
-        Integer indices[] = labelMergedFacilities(schoolLocations, schoolMergeThreshold);
+        Integer indices[] = labelMergedFacilities(schoolLocations, threshold);
         List<Integer> indicesRawList = Arrays.asList(indices);
         ArrayList<Integer> indicesList = new ArrayList(indicesRawList);
         LinkedHashSet<Integer> indicesUniqueSetHS = new LinkedHashSet(indicesList);
@@ -3674,13 +3906,15 @@ public class GISLocationDialog extends javax.swing.JDialog {
     private HashMap<CensusBlockGroup, Integer> getHashNumNodeForCBG(int vdIndex, int vDLayerIndex, int cBGLayerIndex) {
         HashMap<CensusBlockGroup, Integer> cBGNumNodesHashMap = new HashMap();
         for (int i = 0; i < mainFParent.allData.all_Nodes.length; i++) {
-            if (((short[]) (mainFParent.allData.all_Nodes[i].layers.get(vDLayerIndex)))[0] == vdIndex) {
+            if (((short[]) (mainFParent.allData.all_Nodes[i].layers.get(vDLayerIndex)))[0]-1 == vdIndex) {
                 Double value = Double.valueOf(Math.round(((LayerDefinition) (mainFParent.allData.all_Layers.get(cBGLayerIndex))).values[((short[]) (mainFParent.allData.all_Nodes[i].layers.get(cBGLayerIndex)))[0] - 1]));
                 CensusBlockGroup cBG = myParent.mainModel.allGISData.findCensusBlockGroup(value.longValue());
-                if (cBGNumNodesHashMap.containsKey(cBG)) {
-                    cBGNumNodesHashMap.put(cBG, cBGNumNodesHashMap.get(cBG) + 1);
-                } else {
-                    cBGNumNodesHashMap.put(cBG, 1);
+                if (cBG != null) {
+                    if (cBGNumNodesHashMap.containsKey(cBG)) {
+                        cBGNumNodesHashMap.put(cBG, cBGNumNodesHashMap.get(cBG) + 1);
+                    } else {
+                        cBGNumNodesHashMap.put(cBG, 1);
+                    }
                 }
             }
         }
@@ -3866,7 +4100,10 @@ public class GISLocationDialog extends javax.swing.JDialog {
     private javax.swing.JButton jButton26;
     private javax.swing.JButton jButton27;
     private javax.swing.JButton jButton28;
+    private javax.swing.JButton jButton29;
     private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton30;
+    private javax.swing.JButton jButton31;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
@@ -3879,5 +4116,6 @@ public class GISLocationDialog extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
+    private javax.swing.JSpinner jSpinner1;
     // End of variables declaration//GEN-END:variables
 }

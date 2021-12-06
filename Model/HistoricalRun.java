@@ -114,6 +114,7 @@ public class HistoricalRun implements Serializable {
         kryo.register(COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.RegionImageLayer.class);
         kryo.register(double[].class);
         kryo.register(int[].class);
+        kryo.register(long[].class);
         kryo.register(int[][].class);
         kryo.register(boolean[][].class);
         kryo.register(boolean[].class);
@@ -142,6 +143,7 @@ public class HistoricalRun implements Serializable {
         kryo.register(COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.RegionImageLayer.class);
         kryo.register(double[].class);
         kryo.register(int[].class);
+        kryo.register(long[].class);
         kryo.register(int[][].class);
         kryo.register(boolean[][].class);
         kryo.register(boolean[].class);

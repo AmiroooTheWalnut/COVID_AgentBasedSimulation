@@ -38,6 +38,11 @@ public class ShamilGroup {
     }
 
     public void updateProximity() {
+//        System.out.println("GROUP SIZE: "+persons.size());
+//        System.out.println("GROUP NAME: "+group_name);
+//        if(persons.size()>100){
+//            System.out.println("@@@@@@@@@@@");
+//        }
         boolean full_random_proximity = false;
         // # fline = open("seed.txt").readline().rstrip()
         // # ranseed = int(fline)
@@ -47,9 +52,8 @@ public class ShamilGroup {
 
         double max_proximity = 1;
         double min_proximity = 0.5;
-        
-        //System.out.println(persons.size());
 
+        //System.out.println(persons.size());
         if (full_random_proximity == true) {
             proximity = new double[persons.size()][persons.size()];
             for (int i = 0; i < persons.size(); i++) {
@@ -80,8 +84,15 @@ public class ShamilGroup {
                 proximity[i][j] = 0;
             }
         }
-        */
+         */
 //        self.proximity = np.zeros((len(self.persons), len(self.persons)))
+
+        int tot_locs = (persons.size() * (persons.size() - 1)) / 2;
+        int reduction_step = (int) Math.round(tot_locs * 0.1);
+        int next_reduction = reduction_step;
+
+        ArrayList<Integer> random_locs = new ArrayList();
+        int counter = 0;
 
         ArrayList<int[]> locs = new ArrayList();
 
@@ -91,6 +102,7 @@ public class ShamilGroup {
                 temp[0] = i;
                 temp[1] = j;
                 locs.add(temp);
+                random_locs.add(counter);
             }
         }
 
@@ -101,17 +113,16 @@ public class ShamilGroup {
 //                locs.append([i,j])
         // #max_proximity = dfToFloat(preferences_df,"max_proximity")
         // #min_proximity = dfToFloat(preferences_df,"min_proximity")
-        int tot_locs = locs.size();
-        int reduction_step = (int) Math.round(tot_locs * 0.1);
-        int next_reduction = reduction_step;
+//        int tot_locs = locs.size();
+//        int reduction_step = (int) Math.round(tot_locs * 0.1);
+//        int next_reduction = reduction_step;
 //        tot_locs = len(locs)
 //        reduction_step = int(tot_locs*0.1)
 //        next_reduction = reduction_step
-
-        ArrayList<Integer> random_locs = new ArrayList();
-        for (int i = 0; i < tot_locs; i++) {
-            random_locs.add(i);
-        }
+//        ArrayList<Integer> random_locs = new ArrayList();
+//        for (int i = 0; i < tot_locs; i++) {
+//            random_locs.add(i);
+//        }
         Collections.shuffle(random_locs);
 
 //        random_locs = list(range(tot_locs))

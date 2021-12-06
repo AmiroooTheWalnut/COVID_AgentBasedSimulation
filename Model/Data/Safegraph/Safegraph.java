@@ -13,6 +13,7 @@ import COVID_AgentBasedSimulation.Model.Structure.City;
 import COVID_AgentBasedSimulation.Model.Structure.Country;
 import COVID_AgentBasedSimulation.Model.Structure.County;
 import COVID_AgentBasedSimulation.Model.Structure.State;
+import COVID_AgentBasedSimulation.Model.Structure.TessellationCell;
 import COVID_AgentBasedSimulation.Model.Structure.VDCell;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
@@ -673,6 +674,17 @@ public class Safegraph extends Dataset implements Serializable {
         return output;
     }
 
+    public ArrayList<TessellationCell> getVDTessellationFromCaseStudy(Object restriction, int tessellationIndex) {
+        ArrayList<TessellationCell> output = new ArrayList();
+        if (restriction instanceof City) {//SO FAR ONLY CITY IS SUPPORT
+            City temp = ((City) restriction);
+            for (int k = 0; k < temp.tessellations.get(tessellationIndex).cells.size(); k++) {
+                output.add(temp.tessellations.get(tessellationIndex).cells.get(k));
+            }
+        }
+        return output;
+    }
+    
     public ArrayList<VDCell> getVDsFromCaseStudy(Object restriction) {
         ArrayList<VDCell> output = new ArrayList();
         if (restriction instanceof City) {//SO FAR ONLY CITY IS SUPPORT
