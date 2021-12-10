@@ -602,7 +602,7 @@ public class Root extends Agent {
 
     public ArrayList<ArrayList<Integer>> getCBGMergingIndices(ArrayList<CensusBlockGroup> cBGsListRaw, ArrayList<Region> tempRegionsList, int numRegions) {
 //        rnd.setSeed(System.currentTimeMillis());
-        rnd.setSeed(123);//FOR DEBUGGING
+//        rnd.setSeed(123);//FOR DEBUGGING
         ArrayList<ArrayList<Integer>> groups = new ArrayList();
         for (int m = 0; m < cBGsListRaw.size(); m++) {
             ArrayList<Integer> group = new ArrayList();
