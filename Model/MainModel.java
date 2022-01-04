@@ -509,7 +509,7 @@ public class MainModel extends Dataset {
         ABM.currentTime = ABM.currentTime.plusMinutes(1);
     }
 
-    public void resume(boolean isParallel, int numCPUs, boolean isHardCoded) {
+    public void resume(boolean isParallel, int numCPUs, boolean isHardCoded, boolean isInfectCBGOnly) {
         if (agentEvalPool == null) {
             agentEvalPool = Executors.newFixedThreadPool(numCPUs);
         }
@@ -519,7 +519,7 @@ public class MainModel extends Dataset {
                 resetTimerTask(numCPUs, isHardCoded, isHardCoded);
                 simulationTimer.schedule(runTask, 0, simulationDelayTime);
             } else {
-                fastForward(isParallel, numCPUs, isHardCoded, isHardCoded);
+                fastForward(isParallel, numCPUs, isHardCoded, isInfectCBGOnly);
             }
             isRunning = true;
         } else {
@@ -528,7 +528,7 @@ public class MainModel extends Dataset {
                 resetTimerTask(numCPUs, isHardCoded, isHardCoded);
                 simulationTimer.schedule(runTask, 0, simulationDelayTime);
             } else {
-                fastForward(isParallel, numCPUs, isHardCoded, isHardCoded);
+                fastForward(isParallel, numCPUs, isHardCoded, isInfectCBGOnly);
             }
             isRunning = true;
         }

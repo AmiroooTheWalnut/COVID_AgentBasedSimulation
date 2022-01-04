@@ -63,6 +63,8 @@ public class ProcessingMapRenderer extends PApplet {
     boolean isShowText = false;
     public boolean isShowRegionIndexText = true;
 
+    public boolean isSave = false;
+
     public boolean isShowGISMarkers = true;
     public boolean isShowAgentMarkers = true;
 
@@ -153,6 +155,10 @@ public class ProcessingMapRenderer extends PApplet {
 //        if (isReadyPan != true) {
 //
 //        }
+        if (isSave == true) {
+            saveFrame("output.jpg");
+            isSave = false;
+        }
     }
 
     public void panZoomTo(Location loc, float size) {
@@ -387,6 +393,10 @@ public class ProcessingMapRenderer extends PApplet {
                 }
             }
         }
+    }
+
+    public void saveFile() {
+        isSave = true;
     }
 
 }
