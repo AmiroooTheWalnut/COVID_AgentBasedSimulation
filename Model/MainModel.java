@@ -20,7 +20,7 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryo.util.DefaultInstantiatorStrategy;
-import esmaieeli.gisFastLocationOptimization.Simulation.VectorToPolygon;
+//import esmaieeli.gisFastLocationOptimization.Simulation.VectorToPolygon;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -651,26 +651,26 @@ public class MainModel extends Dataset {
         return null;
     }
     
-    public void debugSaveBoundaries(boolean[][] input) {
-        int width = input.length;
-        int height = input[0].length;
-        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                if(input[x][y]==true){
-                    image.setRGB(x, y, Color.black.getRGB());
-                }else{
-                    image.setRGB(x, y, Color.white.getRGB());
-                }
-            }
-        }
-        File outputFile = new File("DEBUGING" + ".png");
-        try {
-            ImageIO.write(image, "png", outputFile);
-        } catch (IOException ex) {
-            Logger.getLogger(VectorToPolygon.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
+//    public void debugSaveBoundaries(boolean[][] input) {
+//        int width = input.length;
+//        int height = input[0].length;
+//        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+//        for (int y = 0; y < height; y++) {
+//            for (int x = 0; x < width; x++) {
+//                if(input[x][y]==true){
+//                    image.setRGB(x, y, Color.black.getRGB());
+//                }else{
+//                    image.setRGB(x, y, Color.white.getRGB());
+//                }
+//            }
+//        }
+//        File outputFile = new File("DEBUGING" + ".png");
+//        try {
+//            ImageIO.write(image, "png", outputFile);
+//        } catch (IOException ex) {
+//            Logger.getLogger(VectorToPolygon.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//    }
 
     public void saveResult(ArrayList<Region> regions, boolean isInfectCBGOnly) {
 //        debugSaveBoundaries(ABM.root.regionsLayer.imageBoundaries);

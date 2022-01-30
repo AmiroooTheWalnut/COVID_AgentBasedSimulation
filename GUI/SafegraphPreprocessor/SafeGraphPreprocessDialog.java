@@ -420,7 +420,7 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
 
         jLabel4.setText("Empty");
 
-        jButton5.setText("Generate matrix");
+        jButton5.setText("Generate travel matrix");
         jButton5.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton5ActionPerformed(evt);

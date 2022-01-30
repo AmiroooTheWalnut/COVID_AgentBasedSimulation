@@ -22,6 +22,7 @@ public class DailyConfirmedCases implements Serializable {
     static final long serialVersionUID = softwareVersion;
     
     public ZonedDateTime date;
+    public int cumulativeCases;
     public int numDailyCases;
     public int numActiveCases;
     public County county;
@@ -32,7 +33,7 @@ public class DailyConfirmedCases implements Serializable {
     
     public DailyConfirmedCases(ZonedDateTime passed_date, int passed_numDailyCases, County passed_county){
         date=passed_date;
-        numDailyCases=passed_numDailyCases;
+        cumulativeCases=passed_numDailyCases;
         county=passed_county;
     }
     

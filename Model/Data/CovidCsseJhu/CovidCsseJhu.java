@@ -46,7 +46,7 @@ public class CovidCsseJhu extends Dataset implements Serializable {
 
     static final long serialVersionUID = softwareVersion;
 
-    public ArrayList<DailyConfirmedCases> dailyConfirmedCasesList = new ArrayList();
+    public ArrayList<DailyConfirmedCases> casesList = new ArrayList();
 
     @Override
     public void requestDataset(AllGISData allGISData, String project, String year, String month, boolean isParallel, int numCPU) {
@@ -77,7 +77,7 @@ public class CovidCsseJhu extends Dataset implements Serializable {
     }
 
     public void preprocessDailyCountyInfections(String fileName, AllGISData gisData) {
-        dailyConfirmedCasesList = new ArrayList();
+        casesList = new ArrayList();
         File patternFile = new File(fileName);
         try {
             CsvReader cSVReader = new CsvReader();
@@ -122,7 +122,7 @@ public class CovidCsseJhu extends Dataset implements Serializable {
 //                                            System.out.println("!!!");
 //                                        }
                                         DailyConfirmedCases dailyConfirmedCases = new DailyConfirmedCases(date, confirmedCased, county);
-                                        dailyConfirmedCasesList.add(dailyConfirmedCases);
+                                        casesList.add(dailyConfirmedCases);
                                     }
                                 }
                             }
@@ -133,39 +133,25 @@ public class CovidCsseJhu extends Dataset implements Serializable {
                 }
             }
 
-//            //ACTIVE CASES
-//            for (int i = 0; i < dailyConfirmedCasesList.size(); i++) {
-//                int activeCases = 0;
-//                for (int j = 13; j >=0; j--) {
-//                    if (i - j > -1) {
-//                        dailyConfirmedCasesList.get(i).numActiveCases=dailyConfirmedCasesList.get(i).numDailyCases-dailyConfirmedCasesList.get(i - j).numDailyCases;
-//                        break;
-//                    }
-//                }
-//            }
-//            //ACTIVE CASES
-//            //SUM ACTIVE CASES
-//            for (int i = 0; i < dailyConfirmedCasesList.size(); i++) {
-//                int sumInfected = 0;
-//                for (int j = 0; j < 14; j++) {
-//                    if (i - j > -1) {
-//                        sumInfected = sumInfected + dailyConfirmedCasesList.get(i - j).numDailyCases;
-//                    }
-//                }
-//                dailyConfirmedCasesList.get(i).numActiveCases = sumInfected;
-//            }
-//            //SUM ACTIVE CASES
-            //TOTAL CASES
-            for (int i = 0; i < dailyConfirmedCasesList.size(); i++) {
-                if(dailyConfirmedCasesList.get(i).county.name.equals("King County")){
-                    System.out.println(dailyConfirmedCasesList.get(i).date.toString());
-                    System.out.println(dailyConfirmedCasesList.get(i).numDailyCases);
-//                    System.out.println("!!!");
+            for (int i = 0; i < casesList.size(); i++) {
+                if (i - 1 > -1) {
+                    casesList.get(i).numDailyCases = casesList.get(i).cumulativeCases - casesList.get(i - 1).cumulativeCases;
+                    if(casesList.get(i).numDailyCases<0){
+                        casesList.get(i).numDailyCases=0;
+                    }
                 }
-                dailyConfirmedCasesList.get(i).numActiveCases=dailyConfirmedCasesList.get(i).numDailyCases;
             }
-            //TOTAL CASES
             
+            for (int i = 0; i < casesList.size(); i++) {
+                int activeCases = 0;
+                for (int j = 15; j >= 0; j--) {
+                    if (i - j > -1) {
+                        activeCases=activeCases + casesList.get(i - j).numDailyCases;
+                    }
+                }
+                casesList.get(i).numActiveCases = activeCases;
+            }
+
             CovidCsseJhu.saveDailyConfirmedCasesListKryo("./datasets/ProcessedCasesData", this);
 
         } catch (IOException ex) {
@@ -261,9 +247,9 @@ public class CovidCsseJhu extends Dataset implements Serializable {
 
     public ArrayList getCountyCases(County input) {
         ArrayList output = new ArrayList();
-        for (int i = 0; i < dailyConfirmedCasesList.size(); i++) {
-            if (dailyConfirmedCasesList.get(i).county.id == input.id) {
-                output.add(dailyConfirmedCasesList.get(i));
+        for (int i = 0; i < casesList.size(); i++) {
+            if (casesList.get(i).county.id == input.id) {
+                output.add(casesList.get(i));
             }
         }
         return output;
@@ -271,10 +257,10 @@ public class CovidCsseJhu extends Dataset implements Serializable {
 
     public DailyConfirmedCases getCountyDailyCases(County input, ZonedDateTime day) {
         DailyConfirmedCases output = null;
-        for (int i = 0; i < dailyConfirmedCasesList.size(); i++) {
-            if (dailyConfirmedCasesList.get(i).date.equals(day)) {
-                if (dailyConfirmedCasesList.get(i).county.id == input.id) {
-                    output = dailyConfirmedCasesList.get(i);
+        for (int i = 0; i < casesList.size(); i++) {
+            if (casesList.get(i).date.equals(day)) {
+                if (casesList.get(i).county.id == input.id) {
+                    output = casesList.get(i);
                 }
             }
         }

@@ -20,8 +20,8 @@ import java.util.List;
  */
 public class POI {
 
-    public static double CONTACT_RATE = 0.2;//CONTACT PER MINUTE
-    public static double CHANCE_OF_ENV_CONTAMINATION = 0.002;
+    public static double CONTACT_RATE = 0.39;//CONTACT PER MINUTE
+    public static double CHANCE_OF_ENV_CONTAMINATION = 0.00014;
 
     public PatternsRecordProcessed patternsRecord;
     public double contaminatedTime = 0;
@@ -84,7 +84,7 @@ public class POI {
 
     public void infectedByEnvironment(Person person) {
         if (contaminatedTime > 0) {
-            if (Math.random() < CHANCE_OF_ENV_CONTAMINATION * CONTACT_RATE) {
+            if (Math.random() < CHANCE_OF_ENV_CONTAMINATION * CONTACT_RATE / (numInfected / (double) (peopleInPOI.size()))) {
                 if (person.properties.status == statusEnum.SUSCEPTIBLE.ordinal()) {
 //                    System.out.println("ENV INFECTION");
                     if (Math.random() > 0.7) {

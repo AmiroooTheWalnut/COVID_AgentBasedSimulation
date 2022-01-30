@@ -104,15 +104,17 @@ public class Root extends Agent {
         myModelRoot = modelRoot;
         regionType = passed_regionType;
 
-        String[] header = new String[8];
+        String[] header = new String[10];
         header[0] = "Date";
         header[1] = "SUSCEPTIBLE";
         header[2] = "INFECTED_SYM";
         header[3] = "INFECTED_ASYM";
         header[4] = "RECOVERED";
         header[5] = "DEAD";
-        header[6] = "IPRJHU";
-        header[7] = "IPRSIM";
+        header[6] = "IPR_JHU_S_SA";
+        header[7] = "IPR_JHU_S";
+        header[8] = "IPR_S_AS_SIM";
+        header[9] = "IPR_S_SIM";
 
         infectionPoll.add(header);
 
@@ -747,11 +749,12 @@ public class Root extends Agent {
                 for (int i = 0; i < relevantDailyConfirmedCases.size(); i++) {
                     if ((myModelRoot.ABM.currentTime).equals(relevantDailyConfirmedCases.get(i).date) == true) {
                         sumRelevantCountiesPopulation += relevantDailyConfirmedCases.get(i).county.population;
-                        sumRelevantCountiesInfection += relevantDailyConfirmedCases.get(i).numActiveCases;
+                        sumRelevantCountiesInfection += relevantDailyConfirmedCases.get(i).numActiveCases*(10f/3f);
                     }
                 }
                 int expectedInfectionInScope = (int) (((double) sumRelevantCountiesInfection / (double) sumRelevantCountiesPopulation) * (double) (scope.population));
                 double expectedInfectionPercentage = (double) (expectedInfectionInScope) / (double) (scope.population);
+                initialRecovered(expectedInfectionPercentage);
                 double currentInfections = 0;
                 double currentInfectionPercentage = 0;
                 while (currentInfectionPercentage < expectedInfectionPercentage) {
@@ -766,12 +769,12 @@ public class Root extends Agent {
                                 if (rnd.nextDouble() > 0.7) {
                                     regions.get(j).residents.get(selectedResident).properties.status = statusEnum.INFECTED_SYM.ordinal();
                                     regions.get(j).residents.get(selectedResident).shamilPersonProperties.infectedDays = 4 + (int) (Math.random() * 10);
+                                    currentInfections = currentInfections + 1;
+                                    currentInfectionPercentage = currentInfections / people.size();
                                 } else {
                                     regions.get(j).residents.get(selectedResident).properties.status = statusEnum.INFECTED_ASYM.ordinal();
                                     regions.get(j).residents.get(selectedResident).shamilPersonProperties.infectedDays = 3 + (int) (Math.random() * 3);
                                 }
-                                currentInfections = currentInfections + 1;
-                                currentInfectionPercentage = currentInfections / people.size();
                                 break;
                             }
                         }
@@ -794,11 +797,12 @@ public class Root extends Agent {
                 for (int i = 0; i < relevantDailyConfirmedCases.size(); i++) {
                     if ((myModelRoot.ABM.currentTime).equals(relevantDailyConfirmedCases.get(i).date) == true) {
                         sumRelevantCountiesPopulation += relevantDailyConfirmedCases.get(i).county.population;
-                        sumRelevantCountiesInfection += relevantDailyConfirmedCases.get(i).numActiveCases;
+                        sumRelevantCountiesInfection += relevantDailyConfirmedCases.get(i).numActiveCases*(10f/3f);
                     }
                 }
                 int expectedInfectionInScope = (int) (((double) sumRelevantCountiesInfection / (double) sumRelevantCountiesPopulation) * (double) (scope.population));
                 double expectedInfectionPercentage = ((double) (expectedInfectionInScope) / (double) (scope.population)) * ((double) (regionPopulation) / (double) (scope.population));
+                initialRecovered(expectedInfectionPercentage);
                 double currentInfections = 0;
                 double currentInfectionPercentage = 0;
                 int maxRetry = 100;
@@ -900,6 +904,35 @@ public class Root extends Agent {
                     break;
                 }
             }
+            int sumRelevantCountiesPopulation = 0;
+                for (int i = 0; i < relevantDailyConfirmedCases.size(); i++) {
+                    if ((myModelRoot.ABM.currentTime).equals(relevantDailyConfirmedCases.get(i).date) == true) {
+                        sumRelevantCountiesPopulation += relevantDailyConfirmedCases.get(i).county.population;
+                    }
+                }
+            initialRecovered((double)numInfected/(double)sumRelevantCountiesPopulation);
+        }
+        
+    }
+    
+    private void initialRecovered(double percentage){
+        int numRecovered=(int)Math.round(people.size()*percentage);
+        int currentRecovered=0;
+        int counter=0;
+        int maxCounter=50;
+        while(currentRecovered<numRecovered){
+            int selectedResident = (int) ((rnd.nextDouble() * (people.size() - 1)));
+            if(people.get(selectedResident).properties.status==statusEnum.SUSCEPTIBLE.ordinal()){
+                people.get(selectedResident).properties.status=statusEnum.RECOVERED.ordinal();
+                people.get(selectedResident).shamilPersonProperties.infectedDays = 28 + (int) (Math.random() * 32);
+                currentRecovered=currentRecovered+1;
+                counter=0;
+            }else{
+                counter=counter+1;
+            }
+            if(counter>maxCounter){
+                break;
+            }
         }
     }
 
@@ -918,7 +951,7 @@ public class Root extends Agent {
             }
         }
 
-        ArrayList<DailyConfirmedCases> dailyConfirmedCases = myModelRoot.covidCsseJhu.dailyConfirmedCasesList;
+        ArrayList<DailyConfirmedCases> dailyConfirmedCases = myModelRoot.covidCsseJhu.casesList;
         relevantDailyConfirmedCases = new ArrayList();
 
         for (int d = 0; d < dailyConfirmedCases.size(); d++) {
@@ -1127,18 +1160,18 @@ public class Root extends Agent {
         }
     }
 
-    public void calcContactRate(MainModel modelRoot) {
-        if (modelRoot.ABM.isReportContactRate == true) {
-            for (int i = 0; i < modelRoot.ABM.agents.size(); i++) {
-                if (modelRoot.ABM.agents.get(i).myType.equals("Person")) {
-
-                }
-            }
-        }
-    }
+//    public void calcContactRate(MainModel modelRoot) {
+//        if (modelRoot.ABM.isReportContactRate == true) {
+//            for (int i = 0; i < modelRoot.ABM.agents.size(); i++) {
+//                if (modelRoot.ABM.agents.get(i).myType.equals("Person")) {
+//
+//                }
+//            }
+//        }
+//    }
 
     public void pollDailyInfection() {
-        String[] row = new String[8];
+        String[] row = new String[10];
         row[0] = myModelRoot.ABM.currentTime.format(DateTimeFormatter.ISO_DATE);
         int numSUSCEPTIBLE = 0;
         int numINFECTED_SYM = 0;
@@ -1173,14 +1206,16 @@ public class Root extends Agent {
         for (int i = 0; i < relevantDailyConfirmedCases.size(); i++) {
             if ((myModelRoot.ABM.currentTime.truncatedTo(ChronoUnit.DAYS)).equals(relevantDailyConfirmedCases.get(i).date) == true) {
                 sumRelevantCountiesPopulation += relevantDailyConfirmedCases.get(i).county.population;
-                sumRelevantCountiesInfection += relevantDailyConfirmedCases.get(i).numActiveCases;
+                sumRelevantCountiesInfection += relevantDailyConfirmedCases.get(i).numActiveCases*(10f/3f);
             }
         }
         int expectedInfectionInScope = (int) (((double) sumRelevantCountiesInfection / (double) sumRelevantCountiesPopulation) * (double) (scope.population));
         float iPRJHU = (float) expectedInfectionInScope / (float) (scope.population);
 
-        row[6] = String.valueOf(iPRJHU);
-        row[7] = String.valueOf((float) (numINFECTED_SYM + numINFECTED_ASYM) / (float) pop);
+        row[6] = String.valueOf(iPRJHU*(3f/10f));
+        row[7] = String.valueOf(iPRJHU);
+        row[8] = String.valueOf((float) (numINFECTED_SYM + numINFECTED_ASYM) / (float) pop);
+        row[9] = String.valueOf((float) (numINFECTED_SYM) / (float) pop);
 
         infectionPoll.add(row);
     }
