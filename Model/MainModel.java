@@ -293,9 +293,11 @@ public class MainModel extends Dataset {
         }
     }
 
-    public void initAgentBasedModel() {
+    public void initAgentBasedModel(boolean isStartScriptingEngine) {
         ABM = new AgentBasedModel(this);
-        startScriptEngines();
+        if (isStartScriptingEngine == true) {
+            startScriptEngines();
+        }
 //        agentBasedModel.agents=new ArrayList();
         ABM.agentTemplates = new ArrayList();
         AgentTemplate rootAgentTemplate = new AgentTemplate();
@@ -650,7 +652,7 @@ public class MainModel extends Dataset {
         }
         return null;
     }
-    
+
 //    public void debugSaveBoundaries(boolean[][] input) {
 //        int width = input.length;
 //        int height = input[0].length;
@@ -671,7 +673,6 @@ public class MainModel extends Dataset {
 //            Logger.getLogger(VectorToPolygon.class.getName()).log(Level.SEVERE, null, ex);
 //        }
 //    }
-
     public void saveResult(ArrayList<Region> regions, boolean isInfectCBGOnly) {
 //        debugSaveBoundaries(ABM.root.regionsLayer.imageBoundaries);
         String directoryPath = "projects\\" + ABM.filePath.substring(ABM.filePath.lastIndexOf("\\") + 1, ABM.filePath.length());
@@ -710,10 +711,9 @@ public class MainModel extends Dataset {
 //                }
 //            }
 //        }
-
         ABM.root.writeDailyInfection(testPath + "\\infectionReport");
         ABM.root.writeSimulationSummary(testPath + "\\simulationSummary");
-        if(isInfectCBGOnly==true){
+        if (isInfectCBGOnly == true) {
             ABM.root.writeConvertedToCBGInfection(testPath + "\\CBGInf");
         }
         ABM.root.writeTotalContacts(testPath + "\\rawContactData");

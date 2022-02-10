@@ -167,6 +167,9 @@ public class ShamilSimulatorController {
     public static void updateHour(ArrayList<Person> people, ArrayList<Region> regions, int hour, int day, boolean isSpatial, boolean debug) {
         for (int i = 0; i < people.size(); i++) {
             ShamilPersonManager.updateCurrentTask(people.get(i), hour);
+//            if(people.get(i).shamilPersonProperties.currentTask==null){
+//                System.out.println("NULL TASK!");
+//            }
         }
         ShamilHourSimulator.generateHourlyActions(people, hour);
         Object output[];

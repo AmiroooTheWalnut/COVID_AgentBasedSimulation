@@ -17,8 +17,8 @@ public class ShamilPersonProperties {
     public ShamilProfession profession;
     public int familyId;
     public int professionGroupId;
-    public ArrayList<ShamilTask> tasks;
-    public ArrayList<ShamilAction> actions;
+    public ArrayList<ShamilTask> tasks=new ArrayList();
+    public ArrayList<ShamilAction> actions=new ArrayList();
     
     public ShamilTask currentTask;
     public boolean isAlive=true;

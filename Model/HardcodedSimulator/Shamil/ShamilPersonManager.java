@@ -57,6 +57,7 @@ public class ShamilPersonManager {
             add(new ShamilProfession("Service", 18, 62, 0.741));
             add(new ShamilProfession("Doctor", 25, 70, 0.019));
             add(new ShamilProfession("Unemployed", 10, 81, 0.02));
+            add(new ShamilProfession("Hospitalized", 4, 81, 0));
         }
     };
 

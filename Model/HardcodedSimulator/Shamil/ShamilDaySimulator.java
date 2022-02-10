@@ -83,7 +83,9 @@ public class ShamilDaySimulator {
             } else if (prof_pers.name.equals("Service")) {
                 people.get(i).shamilPersonProperties.tasks = ShamilTaskManager.generateTasks(ShamilPersonManager.profession_df.get(1));
 //                prsn.setTasks(TaskManager.generateTasks(tasks_df[tasks_df["profession"]=="Service"]))
-            } else {
+            } else if (prof_pers.name.equals("Hospitalized")) {//ADDED BY AMIROOO
+                people.get(i).shamilPersonProperties.tasks = ShamilTaskManager.generateTasks(ShamilPersonManager.profession_df.get(4));
+            }else{
                 // isolated- no task - empty list
                 people.get(i).shamilPersonProperties.tasks.clear();
             }

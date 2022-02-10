@@ -199,28 +199,29 @@ public class ShamilGroupManager {
                 }
                 String group_id = "";
 
-                if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Stay Home")) {
+//                if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask != null) {
+                    if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Stay Home")) {
 //            if(prsn.current_task.name=="Stay Home"):
-                    group_id = "F-" + regions.get(r).residents.get(i).shamilPersonProperties.familyId;
+                        group_id = "F-" + regions.get(r).residents.get(i).shamilPersonProperties.familyId;
 //                group_id = "F-{}".format(prsn.family_id)
-                } else if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Go to Work") || regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Returns Home")) {
-                    int selected_transport_index = (int) (Math.random() * transport_free_seats.size());
-                    int selected_transport = transport_free_seats.get(selected_transport_index);
+                    } else if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Go to Work") || regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Returns Home")) {
+                        int selected_transport_index = (int) (Math.random() * transport_free_seats.size());
+                        int selected_transport = transport_free_seats.get(selected_transport_index);
 //                selected_transport = random.choice(transport_free_seats)
 
-                    transport_free_seats.remove(selected_transport);
+                        transport_free_seats.remove(selected_transport);
 //                transport_free_seats.remove(selected_transport)
 
-                    group_id = "T-" + selected_transport;
+                        group_id = "T-" + selected_transport;
 //                group_id = "T-{}".format(selected_transport);
-                } else if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Work")) {
-                    group_id = "W-" + regions.get(r).residents.get(i).shamilPersonProperties.professionGroupId;
+                    } else if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Work")) {
+                        group_id = "W-" + regions.get(r).residents.get(i).shamilPersonProperties.professionGroupId;
 //                group_id = "W-{}".format(prsn.profession_group_id)                
 
-                } else if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Attend Event")) {
-                    group_id = "E-" + (int) (Math.round(Math.random() * n_events));
+                    } else if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Attend Event")) {
+                        group_id = "E-" + (int) (Math.round(Math.random() * n_events));
 //                group_id = "E-{}".format(np.random.randint(0,n_events))
-                    /*
+                        /*
                 effort = 0
                 while True:
                     group_id = "E-{}".format(np.random.randint(0,n_events))
@@ -236,20 +237,21 @@ public class ShamilGroupManager {
                     effort +=1
                     if(effort==3):
                         break
-                     */
+                         */
 
-                } else if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Stay Hospital")) {
-                    group_id = "H";
-                } else if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Treat Patients")) {
-                    group_id = "H";
-                }
+                    } else if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Stay Hospital")) {
+                        group_id = "H";
+                    } else if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Treat Patients")) {
+                        group_id = "H";
+                    }
 
-                if (!groupDict.containsKey(group_id) && group_id.length() > 0) {//group_id not in groupDict):
-                    groupDict.put(group_id, new ShamilGroup(group_id));
+                    if (!groupDict.containsKey(group_id) && group_id.length() > 0) {//group_id not in groupDict):
+                        groupDict.put(group_id, new ShamilGroup(group_id));
 //                groupDict[group_id] = Group(group_id);
-                }
-                groupDict.get(group_id).persons.add(regions.get(r).residents.get(i));
+                    }
+                    groupDict.get(group_id).persons.add(regions.get(r).residents.get(i));
 //            groupDict[group_id].addPerson(prsn)
+//                }
             }
         }
 

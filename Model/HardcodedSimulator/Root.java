@@ -111,7 +111,7 @@ public class Root extends Agent {
         header[3] = "INFECTED_ASYM";
         header[4] = "RECOVERED";
         header[5] = "DEAD";
-        header[6] = "IPR_JHU_S_SA";
+        header[6] = "IPR_JHU_S_AS";
         header[7] = "IPR_JHU_S";
         header[8] = "IPR_S_AS_SIM";
         header[9] = "IPR_S_SIM";
@@ -1212,7 +1212,7 @@ public class Root extends Agent {
         int expectedInfectionInScope = (int) (((double) sumRelevantCountiesInfection / (double) sumRelevantCountiesPopulation) * (double) (scope.population));
         float iPRJHU = (float) expectedInfectionInScope / (float) (scope.population);
 
-        row[6] = String.valueOf(iPRJHU*(3f/10f));
+        row[6] = String.valueOf(iPRJHU*(10f/3f));
         row[7] = String.valueOf(iPRJHU);
         row[8] = String.valueOf((float) (numINFECTED_SYM + numINFECTED_ASYM) / (float) pop);
         row[9] = String.valueOf((float) (numINFECTED_SYM) / (float) pop);
