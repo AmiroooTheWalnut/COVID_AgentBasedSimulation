@@ -352,6 +352,11 @@ public class SimulatorDialog extends javax.swing.JDialog {
         jPanel21.setBorder(javax.swing.BorderFactory.createTitledBorder("Hardcoded"));
 
         jCheckBox2.setText("IsParallel?");
+        jCheckBox2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCheckBox2ActionPerformed(evt);
+            }
+        });
 
         jToggleButton4.setText("Run");
         jToggleButton4.addActionListener(new java.awt.event.ActionListener() {
@@ -1557,9 +1562,9 @@ public class SimulatorDialog extends javax.swing.JDialog {
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         myParent.mainModel.ABM.isReportContactRate = jCheckBox3.isSelected();
-        myParent.mainModel.javaEvaluationEngine.connectToConsole(jTextArea1);
-        myParent.mainModel.pythonEvaluationEngine.connectToConsole(jTextArea2);
-        myParent.mainModel.loadAndConnectSupplementaryCaseStudyDataKryo("./datasets/safegraph/" + myParent.mainModel.ABM.studyScope + "/supplementaryGIS.bin");
+//        myParent.mainModel.javaEvaluationEngine.connectToConsole(jTextArea1);
+//        myParent.mainModel.pythonEvaluationEngine.connectToConsole(jTextArea2);
+        myParent.mainModel.loadAndConnectSupplementaryCaseStudyDataKryo("./datasets/Safegraph/" + myParent.mainModel.ABM.studyScope + "/supplementaryGIS.bin");
 //        myParent.mainModel.allGISData.loadScopeCBGPolygons((Scope)(myParent.mainModel.ABM.studyScopeGeography));//THIS IS NOW IN SUPPLAMENTARY DATA
         ArrayList<Integer> infectionIndices = new ArrayList();
         if (isSpecialScenarioActive == false) {
@@ -1767,6 +1772,10 @@ public class SimulatorDialog extends javax.swing.JDialog {
     private void jCheckBox6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox6ActionPerformed
         isSpecialScenarioActive = jCheckBox6.isSelected();
     }//GEN-LAST:event_jCheckBox6ActionPerformed
+
+    private void jCheckBox2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jCheckBox2ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

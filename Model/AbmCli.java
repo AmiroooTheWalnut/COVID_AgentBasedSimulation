@@ -94,7 +94,7 @@ public class AbmCli {
         mainModel.ABM.isReportContactRate = runConfig.isReportContactRate;
         //mainModel.javaEvaluationEngine.connectToConsole(jTextArea1);
         //mainModel.pythonEvaluationEngine.connectToConsole(jTextArea2);
-        mainModel.loadAndConnectSupplementaryCaseStudyDataKryo("./datasets/safegraph/" + mainModel.ABM.studyScope + "/supplementaryGIS.bin");
+        mainModel.loadAndConnectSupplementaryCaseStudyDataKryo("./datasets/Safegraph/" + mainModel.ABM.studyScope + "/supplementaryGIS.bin");
 //          myParent.mainModel.allGISData.loadScopeCBGPolygons((Scope)(myParent.mainModel.ABM.studyScopeGeography));//THIS IS NOW IN SUPPLAMENTARY DATA
         ArrayList<Integer> infectionIndices = new ArrayList();
         if (runConfig.isSpecialScenarioActive == false) {

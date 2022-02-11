@@ -7,8 +7,13 @@ package COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Person;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Region;
 import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilPersonManager.rnd;
+import COVID_AgentBasedSimulation.Model.MainModel;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -157,7 +162,7 @@ public class ShamilGroupManager {
 
     }
 
-    public static Object[] assignGroupsSpatial(ArrayList<Region> regions, double tracing_percentage, int num_of_day, boolean debug) {
+    public static Object[] assignGroupsSpatial(ArrayList<Region> regions, double tracing_percentage, int num_of_day, boolean debug, MainModel myMainModel) {
         HashMap<Integer, ArrayList<Integer>> person_group = new HashMap();
 //        person_group = {}
         //# fline = open("seed.txt").readline().rstrip()
@@ -200,28 +205,28 @@ public class ShamilGroupManager {
                 String group_id = "";
 
 //                if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask != null) {
-                    if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Stay Home")) {
+                if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Stay Home")) {
 //            if(prsn.current_task.name=="Stay Home"):
-                        group_id = "F-" + regions.get(r).residents.get(i).shamilPersonProperties.familyId;
+                    group_id = "F-" + regions.get(r).residents.get(i).shamilPersonProperties.familyId;
 //                group_id = "F-{}".format(prsn.family_id)
-                    } else if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Go to Work") || regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Returns Home")) {
-                        int selected_transport_index = (int) (Math.random() * transport_free_seats.size());
-                        int selected_transport = transport_free_seats.get(selected_transport_index);
+                } else if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Go to Work") || regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Returns Home")) {
+                    int selected_transport_index = (int) (Math.random() * transport_free_seats.size());
+                    int selected_transport = transport_free_seats.get(selected_transport_index);
 //                selected_transport = random.choice(transport_free_seats)
 
-                        transport_free_seats.remove(selected_transport);
+                    transport_free_seats.remove(selected_transport);
 //                transport_free_seats.remove(selected_transport)
 
-                        group_id = "T-" + selected_transport;
+                    group_id = "T-" + selected_transport;
 //                group_id = "T-{}".format(selected_transport);
-                    } else if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Work")) {
-                        group_id = "W-" + regions.get(r).residents.get(i).shamilPersonProperties.professionGroupId;
+                } else if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Work")) {
+                    group_id = "W-" + regions.get(r).residents.get(i).shamilPersonProperties.professionGroupId;
 //                group_id = "W-{}".format(prsn.profession_group_id)                
 
-                    } else if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Attend Event")) {
-                        group_id = "E-" + (int) (Math.round(Math.random() * n_events));
+                } else if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Attend Event")) {
+                    group_id = "E-" + (int) (Math.round(Math.random() * n_events));
 //                group_id = "E-{}".format(np.random.randint(0,n_events))
-                        /*
+                    /*
                 effort = 0
                 while True:
                     group_id = "E-{}".format(np.random.randint(0,n_events))
@@ -237,19 +242,19 @@ public class ShamilGroupManager {
                     effort +=1
                     if(effort==3):
                         break
-                         */
+                     */
 
-                    } else if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Stay Hospital")) {
-                        group_id = "H";
-                    } else if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Treat Patients")) {
-                        group_id = "H";
-                    }
+                } else if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Stay Hospital")) {
+                    group_id = "H";
+                } else if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Treat Patients")) {
+                    group_id = "H";
+                }
 
-                    if (!groupDict.containsKey(group_id) && group_id.length() > 0) {//group_id not in groupDict):
-                        groupDict.put(group_id, new ShamilGroup(group_id));
+                if (!groupDict.containsKey(group_id) && group_id.length() > 0) {//group_id not in groupDict):
+                    groupDict.put(group_id, new ShamilGroup(group_id));
 //                groupDict[group_id] = Group(group_id);
-                    }
-                    groupDict.get(group_id).persons.add(regions.get(r).residents.get(i));
+                }
+                groupDict.get(group_id).persons.add(regions.get(r).residents.get(i));
 //            groupDict[group_id].addPerson(prsn)
 //                }
             }
@@ -286,24 +291,48 @@ public class ShamilGroupManager {
             groups.add(groupDict.get(groupDictKeySet.get(i)));
         }
 
-        groupDict = new HashMap();
+//        groupDict = new HashMap();// groupDict = {}
+        try {
+            int numProcessors = myMainModel.numCPUs;
 
-        for (int i = 0; i < groups.size(); i++) {// grp in groups:
+            AdvancedParallelGroupUpdateEvaluator parallelGroupEval[] = new AdvancedParallelGroupUpdateEvaluator[numProcessors];
 
-            if (debug == true) {
-                if (groups.get(i).persons.size() > 50 && groups.get(i).group_name.contains("T")) {
-                    System.out.println("GROUP NAME: " + groups.get(i).group_name);
-                    System.out.println("GROUP SIZE: " + groups.get(i).persons.size());
+            for (int i = 0; i < numProcessors - 1; i++) {
+                parallelGroupEval[i] = new AdvancedParallelGroupUpdateEvaluator(myMainModel, groups, (int) Math.floor(i * ((groups.size()) / numProcessors)), (int) Math.floor((i + 1) * ((groups.size()) / numProcessors)));
+            }
+            parallelGroupEval[numProcessors - 1] = new AdvancedParallelGroupUpdateEvaluator(myMainModel, groups, (int) Math.floor((numProcessors - 1) * ((groups.size()) / numProcessors)), groups.size());
 
-                    System.out.println("@@@@@@@@@@@");
-                }
+            ArrayList<Callable<Object>> calls = new ArrayList<Callable<Object>>();
+
+            for (int i = 0; i < numProcessors; i++) {
+                parallelGroupEval[i].addRunnableToQueue(calls);
             }
 
-            groups.get(i).updatePersonMapper();
-
-            groups.get(i).updateProximity();
-
+            myMainModel.agentEvalPool.invokeAny(calls);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(ShamilSimulatorController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ExecutionException ex) {
+            Logger.getLogger(ShamilSimulatorController.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        //SERIAL EVAULATION OF GROUP UPDATE
+//        for (int i = 0; i < groups.size(); i++) {// grp in groups:
+//
+//            if (debug == true) {
+//                if (groups.get(i).persons.size() > 50 && groups.get(i).group_name.contains("T")) {
+//                    System.out.println("GROUP NAME: " + groups.get(i).group_name);
+//                    System.out.println("GROUP SIZE: " + groups.get(i).persons.size());
+//
+//                    System.out.println("@@@@@@@@@@@");
+//                }
+//            }
+//
+//            groups.get(i).updatePersonMapper();
+//
+//            groups.get(i).updateProximity();
+//
+//        }
+        //SERIAL EVAULATION OF GROUP UPDATE
 
         Object output[] = new Object[2];
         output[0] = groups;

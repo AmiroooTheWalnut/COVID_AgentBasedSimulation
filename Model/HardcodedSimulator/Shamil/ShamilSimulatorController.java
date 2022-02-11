@@ -4,14 +4,20 @@
  */
 package COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil;
 
+import COVID_AgentBasedSimulation.Model.AgentBasedModel.AdvancedParallelAgentEvaluator;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Person;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Region;
 import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilPersonManager.quarantine_days;
 import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilPersonManager.trace_days;
 import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilPersonManager.tracing_percentage;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Root.statusEnum;
+import COVID_AgentBasedSimulation.Model.MainModel;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -101,22 +107,22 @@ public class ShamilSimulatorController {
 //        System.out.println("convertOurToShamil INF: "+inf);
     }
 
-    public static void runRawShamilSimulation(ArrayList<Person> people, int numDaysToSimulate) {
+    public static void runRawShamilSimulation(ArrayList<Person> people, int numDaysToSimulate, MainModel mainModel) {
         shamilAgentGeneration(people);
         for (int d = 0; d < numDaysToSimulate; d++) {
             startDay(people, d);
             for (int h = 0; h < 24; h++) {
-                updateHour(people, null, h, d, false, false);
+                updateHour(people, null, h, d, false, false, mainModel);
             }
             endDay(people, d);
         }
     }
 
-    public static void runShamilSimulationOnly(ArrayList<Person> people, int numDaysToSimulate) {
+    public static void runShamilSimulationOnly(ArrayList<Person> people, int numDaysToSimulate, MainModel mainModel) {
         for (int d = 0; d < numDaysToSimulate; d++) {
             startDay(people, d);
             for (int h = 0; h < 24; h++) {
-                updateHour(people, null, h, d, false, false);
+                updateHour(people, null, h, d, false, false, mainModel);
             }
             endDay(people, d);
         }
@@ -164,7 +170,7 @@ public class ShamilSimulatorController {
         daily_groups = new ArrayList();
     }
 
-    public static void updateHour(ArrayList<Person> people, ArrayList<Region> regions, int hour, int day, boolean isSpatial, boolean debug) {
+    public static void updateHour(ArrayList<Person> people, ArrayList<Region> regions, int hour, int day, boolean isSpatial, boolean debug, MainModel myMainModel) {
         for (int i = 0; i < people.size(); i++) {
             ShamilPersonManager.updateCurrentTask(people.get(i), hour);
 //            if(people.get(i).shamilPersonProperties.currentTask==null){
@@ -174,7 +180,7 @@ public class ShamilSimulatorController {
         ShamilHourSimulator.generateHourlyActions(people, hour);
         Object output[];
         if (isSpatial == true) {
-            output = ShamilGroupManager.assignGroupsSpatial(regions, tracing_percentage, day, debug);
+            output = ShamilGroupManager.assignGroupsSpatial(regions, tracing_percentage, day, debug, myMainModel);
         } else {
             output = ShamilGroupManager.assignGroups(people, tracing_percentage, day);
         }
@@ -182,14 +188,20 @@ public class ShamilSimulatorController {
         ArrayList<ShamilGroup> groups = (ArrayList<ShamilGroup>) output[0];
         HashMap<Integer, ArrayList<Integer>> person_group = (HashMap<Integer, ArrayList<Integer>>) output[1];
 
-        int event_cnt = 0;
-        int event_going_person_cnt = 0;
-        for (int i = 0; i < groups.size(); i++) {// grp in groups:
-            if ((groups.get(i).group_name).startsWith("E")) {
-                event_cnt += 1;
-                event_going_person_cnt += groups.get(i).persons.size();
-            }
-        }
+        //COMMENTED BECAUSE IT'S FOR REPORTING ONLY
+//        int event_cnt = 0;
+//        int event_going_person_cnt = 0;
+//        for (int i = 0; i < groups.size(); i++) {// grp in groups:
+//            if ((groups.get(i).group_name).startsWith("E")) {
+//                event_cnt += 1;
+//                event_going_person_cnt += groups.get(i).persons.size();
+//            }
+//        }
+//        
+//        if(event_going_person_cnt>400){
+//            System.out.println("Hour: "+hour+" - Events: "+event_cnt+" - Event going people: "+event_going_person_cnt);
+//        }
+        //COMMENTED BECAUSE IT'S FOR REPORTING ONLY
 
         daily_groups.add(person_group);
 
@@ -197,20 +209,45 @@ public class ShamilSimulatorController {
             groups.get(i).updateActions();
         }
 
-        for (int i = 0; i < groups.size(); i++) {
-            ShamilGroupSimulator.groupInteraction(groups.get(i));
-            
-            if (debug == true) {
-                if (groups.get(i).persons.size() > 50 && groups.get(i).group_name.contains("T")) {
-                    System.out.println("GROUP NAME: " + groups.get(i).group_name);
-                    System.out.println("GROUP SIZE: " + groups.get(i).persons.size());
+        try {
+            int numProcessors = myMainModel.numCPUs;
 
-                    System.out.println("@@@@@@@@@@@");
-                }
+            AdvancedParallelGroupInteractionEvaluator parallelGroupEval[] = new AdvancedParallelGroupInteractionEvaluator[numProcessors];
+
+            for (int i = 0; i < numProcessors - 1; i++) {
+                parallelGroupEval[i] = new AdvancedParallelGroupInteractionEvaluator(myMainModel, groups, (int) Math.floor(i * ((groups.size()) / numProcessors)), (int) Math.floor((i + 1) * ((groups.size()) / numProcessors)));
             }
+            parallelGroupEval[numProcessors - 1] = new AdvancedParallelGroupInteractionEvaluator(myMainModel, groups, (int) Math.floor((numProcessors - 1) * ((groups.size()) / numProcessors)), groups.size());
+
+            ArrayList<Callable<Object>> calls = new ArrayList<Callable<Object>>();
+
+            for (int i = 0; i < numProcessors; i++) {
+                parallelGroupEval[i].addRunnableToQueue(calls);
+            }
+
+
             
-            
+            myMainModel.agentEvalPool.invokeAny(calls);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(ShamilSimulatorController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ExecutionException ex) {
+            Logger.getLogger(ShamilSimulatorController.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        //SERIAL EVAULATION OF GROUP INTERACTIONS
+//        for (int i = 0; i < groups.size(); i++) {
+//            ShamilGroupSimulator.groupInteraction(groups.get(i));
+//            
+//            if (debug == true) {
+//                if (groups.get(i).persons.size() > 50 && groups.get(i).group_name.contains("T")) {
+//                    System.out.println("GROUP NAME: " + groups.get(i).group_name);
+//                    System.out.println("GROUP SIZE: " + groups.get(i).persons.size());
+//
+//                    System.out.println("@@@@@@@@@@@");
+//                }
+//            }
+//        }
+        //SERIAL EVAULATION OF GROUP INTERACTIONS
 
         //pickle.dump(daily_groups,open('group_info_day_' + str(day) + '.p','wb'))
     }

@@ -2427,7 +2427,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
 
             MainModel.saveSupplementaryCaseStudyDataKryo(directoryPath + "/supplementaryGIS", scsd);
 
-//            myParent.mainModel.loadAndConnectSupplementaryCaseStudyDataKryo("./datasets/safegraph/" + myParent.mainModel.ABM.studyScope + "/supplementaryGIS.bin");//TESTING!
+//            myParent.mainModel.loadAndConnectSupplementaryCaseStudyDataKryo("./datasets/Safegraph/" + myParent.mainModel.ABM.studyScope + "/supplementaryGIS.bin");//TESTING!
         } else {
             jLabel1.setText("HALT! ONLY CITY SCOPE IS IMPLEMENTED!");
         }
@@ -2536,7 +2536,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
 //    }
 
     private void jButton25ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton25ActionPerformed
-        myParent.mainModel.loadAndConnectSupplementaryCaseStudyDataKryo("./datasets/safegraph/" + myParent.mainModel.ABM.studyScope + "/supplementaryGIS.bin");
+        myParent.mainModel.loadAndConnectSupplementaryCaseStudyDataKryo("./datasets/Safegraph/" + myParent.mainModel.ABM.studyScope + "/supplementaryGIS.bin");
     }//GEN-LAST:event_jButton25ActionPerformed
 
     private void jButton26ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton26ActionPerformed
