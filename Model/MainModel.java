@@ -91,6 +91,8 @@ public class MainModel extends Dataset {
 
     public Scenario scenario = new Scenario();
 
+    public transient long startTimeNanoSecond;
+
     public double sparsifyFraction = 1;
     public int lastMonthLoaded;//NOT USED
     public int lastYearLoaded;//NOT USED
@@ -486,6 +488,9 @@ public class MainModel extends Dataset {
         if (isResultSavedAtTheEnd == false) {
             if (ABM.currentTime.isEqual(ABM.endTime) || ABM.currentTime.isAfter(ABM.endTime)) {
                 isRunning = false;
+                long endTimeNanoSecond = System.nanoTime();
+                double elapsed = ((endTimeNanoSecond - startTimeNanoSecond) / 1000000000);
+                System.out.println("ABM runtime (seconds): " + elapsed);
                 pause();
                 saveResult(ABM.root.regions, isInfectCBGOnly);
                 return;
@@ -675,14 +680,14 @@ public class MainModel extends Dataset {
 //    }
     public void saveResult(ArrayList<Region> regions, boolean isInfectCBGOnly) {
 //        debugSaveBoundaries(ABM.root.regionsLayer.imageBoundaries);
-        String directoryPath = "projects\\" + ABM.filePath.substring(ABM.filePath.lastIndexOf("\\") + 1, ABM.filePath.length());
+        String directoryPath = "projects"+ File.separator + ABM.filePath.substring(ABM.filePath.lastIndexOf(File.separator) + 1, ABM.filePath.length());
         File directory = new File(directoryPath);
         if (!directory.exists()) {
             directory.mkdirs();
         }
         SimpleDateFormat formatter = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss");
         Date date = new Date();
-        String testPath = "projects\\" + ABM.filePath.substring(ABM.filePath.lastIndexOf("\\") + 1, ABM.filePath.length()) + "\\" + formatter.format(date) + "_NumPeople_" + ABM.root.people.size() + "_" + scenario.scenarioName;
+        String testPath = "projects" + File.separator + ABM.filePath.substring(ABM.filePath.lastIndexOf(File.separator) + 1, ABM.filePath.length()) + File.separator + formatter.format(date) + "_NumPeople_" + ABM.root.people.size() + "_" + scenario.scenarioName;
         File testDirectory = new File(testPath);
         if (!testDirectory.exists()) {
             testDirectory.mkdirs();
@@ -693,7 +698,7 @@ public class MainModel extends Dataset {
         historicalRun.endTime = ABM.endTime;
         historicalRun.regionsLayer = ABM.root.regionsLayer;
 //        historicalRun.saveHistoricalRunJson("./projects/" + ABM.filePath + "/" + formatter.format(date)+"/data.json");
-        HistoricalRun.saveHistoricalRunKryo(testPath + "\\data", historicalRun);
+        HistoricalRun.saveHistoricalRunKryo(testPath + File.separator+"data", historicalRun);
 
 //        for (int i = 0; i < historicalRun.regions.size(); i++) {
 //            for (int j = 0; j < historicalRun.regions.get(i).hourlyRegionSnapshot.size(); j++) {
@@ -711,12 +716,12 @@ public class MainModel extends Dataset {
 //                }
 //            }
 //        }
-        ABM.root.writeDailyInfection(testPath + "\\infectionReport");
-        ABM.root.writeSimulationSummary(testPath + "\\simulationSummary");
+        ABM.root.writeDailyInfection(testPath + File.separator+"infectionReport");
+        ABM.root.writeSimulationSummary(testPath + File.separator+"simulationSummary");
         if (isInfectCBGOnly == true) {
-            ABM.root.writeConvertedToCBGInfection(testPath + "\\CBGInf");
+            ABM.root.writeConvertedToCBGInfection(testPath + File.separator+"CBGInf");
         }
-        ABM.root.writeTotalContacts(testPath + "\\rawContactData");
+        ABM.root.writeTotalContacts(testPath + File.separator+"rawContactData");
         isResultSavedAtTheEnd = true;
     }
 

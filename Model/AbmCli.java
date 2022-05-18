@@ -115,6 +115,7 @@ public class AbmCli {
         }
         mainModel.simulationDelayTime = -1;
         mainModel.initModelHardCoded(true, runConfig.isParallelBehaviorEvaluation, runConfig.numResidents, numRegions, runConfig.numCPUs, !runConfig.isSpecificRegionInfected, runConfig.isSpecialScenarioActive, infectionIndices);
+        mainModel.startTimeNanoSecond=System.nanoTime();
         mainModel.resume(runConfig.isParallelBehaviorEvaluation, runConfig.numCPUs, true, runConfig.isSpecialScenarioActive);
     }
 }

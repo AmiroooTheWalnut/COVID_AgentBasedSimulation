@@ -110,7 +110,8 @@ public class AgentBasedModel {
                     parallelAgentEval[i].addRunnableToQueue(calls);
                 }
                 
-                myMainModel.agentEvalPool.invokeAny(calls);
+                //myMainModel.agentEvalPool.invokeAny(calls);
+                myMainModel.agentEvalPool.invokeAll(calls);
                 
             //\/\/\/ OLD DESIGN WITH THREADS
 //                for (int i = 0; i < numProcessors; i++) {
@@ -180,7 +181,8 @@ public class AgentBasedModel {
                     parallelAgentEval[i].addRunnableToQueue(calls);
                 }
                 
-                myMainModel.agentEvalPool.invokeAny(calls);
+//                myMainModel.agentEvalPool.invokeAny(calls);
+                myMainModel.agentEvalPool.invokeAll(calls);
                 
             //\/\/\/ OLD DESIGN WITH THREADS
 //                for (int i = 0; i < numProcessors; i++) {

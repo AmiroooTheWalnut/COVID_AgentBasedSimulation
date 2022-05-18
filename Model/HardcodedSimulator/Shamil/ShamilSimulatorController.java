@@ -227,10 +227,9 @@ public class ShamilSimulatorController {
 
 
             
-            myMainModel.agentEvalPool.invokeAny(calls);
+            //myMainModel.agentEvalPool.invokeAny(calls);
+            myMainModel.agentEvalPool.invokeAll(calls);
         } catch (InterruptedException ex) {
-            Logger.getLogger(ShamilSimulatorController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ExecutionException ex) {
             Logger.getLogger(ShamilSimulatorController.class.getName()).log(Level.SEVERE, null, ex);
         }
         

@@ -14,6 +14,7 @@ import COVID_AgentBasedSimulation.Model.AgentBasedModel.PythonScript;
 import COVID_AgentBasedSimulation.Model.DatasetTemplate;
 import COVID_AgentBasedSimulation.Model.MainModel;
 import java.awt.Color;
+import java.io.File;
 import java.util.ArrayList;
 import javax.swing.JTree;
 import javax.swing.event.DocumentEvent;
@@ -195,7 +196,7 @@ public class AgentTemplateDialog extends javax.swing.JDialog {
         DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
         String processedInput = input;
         if (input.contains("(")) {
-            String variableName[] = input.split("\\(");
+            String variableName[] = input.split(File.separator+"(");
             processedInput = variableName[0];
         }
         expandablePath = new TreePath(root);
@@ -210,7 +211,7 @@ public class AgentTemplateDialog extends javax.swing.JDialog {
             globalRowIndex = globalRowIndex + 1;
             if (root.getChildAt(i).isLeaf()) {
                 if (((String) ((DefaultMutableTreeNode) root.getChildAt(i)).getUserObject()).contains("(")) {
-                    String variableName[] = ((String) ((DefaultMutableTreeNode) root.getChildAt(i)).getUserObject()).split("\\(");
+                    String variableName[] = ((String) ((DefaultMutableTreeNode) root.getChildAt(i)).getUserObject()).split(File.separator+"(");
                     if (variableName.length > 0) {
                         if (variableName[0].equals(input)) {
                             hasReached = true;

@@ -126,7 +126,7 @@ public class Root extends Agent {
 
         generateSchedules(modelRoot, passed_regionType, regions);
         generateAgents(modelRoot, passed_numAgents);
-
+        
         agentPairContact = new int[people.size()][people.size()];
 
         if (modelRoot.ABM.isShamilABMActive == true) {
@@ -321,7 +321,7 @@ public class Root extends Agent {
         sumRegionsPopulation = cumulativePopulation;
         for (int i = 0; i < passed_numAgents; i++) {
             Person person = new Person(i);
-            selectHomeRegion(person, sumRegionsPopulation);
+            selectHomeRegion(person, sumRegionsPopulation,0);
             selectWorkRegion(person, person.properties.homeRegion);
 
             modelRoot.ABM.agents.add(person);
@@ -330,15 +330,25 @@ public class Root extends Agent {
         }
     }
 
-    private void selectHomeRegion(Person person, int cumulativePopulation) {
+    private void selectHomeRegion(Person person, int cumulativePopulation, int retry) {
         int indexCumulativePopulation = (int) ((rnd.nextDouble() * (cumulativePopulation - 1)));
         int cumulativePopulationRun = regions.get(0).population;
         for (int j = 0; j < regions.size(); j++) {
             cumulativePopulationRun = cumulativePopulationRun + regions.get(j).population;
             if (cumulativePopulationRun > indexCumulativePopulation) {
+                if(regions.get(j).scheduleList.originalDestinations.size()>0){
                 person.properties.homeRegion = regions.get(j);
                 regions.get(j).residents.add(person);
                 break;
+                }else{
+                    if(retry<20){
+                        retry=retry+1;
+                    selectHomeRegion(person,cumulativePopulation,retry);
+                    break;
+                    }else{
+                        System.out.println("Failed to assign a home region with a schedule!");
+                    }
+                }
             }
         }
     }
@@ -747,7 +757,7 @@ public class Root extends Agent {
                 int sumRelevantCountiesPopulation = 0;
                 int sumRelevantCountiesInfection = 0;
                 for (int i = 0; i < relevantDailyConfirmedCases.size(); i++) {
-                    if ((myModelRoot.ABM.currentTime).equals(relevantDailyConfirmedCases.get(i).date) == true) {
+                    if ((myModelRoot.ABM.currentTime).truncatedTo(ChronoUnit.DAYS).isEqual(relevantDailyConfirmedCases.get(i).date.truncatedTo(ChronoUnit.DAYS)) == true) {
                         sumRelevantCountiesPopulation += relevantDailyConfirmedCases.get(i).county.population;
                         sumRelevantCountiesInfection += relevantDailyConfirmedCases.get(i).numActiveCases*(10f/3f);
                     }
@@ -795,7 +805,7 @@ public class Root extends Agent {
                 int sumRelevantCountiesPopulation = 0;
                 int sumRelevantCountiesInfection = 0;
                 for (int i = 0; i < relevantDailyConfirmedCases.size(); i++) {
-                    if ((myModelRoot.ABM.currentTime).equals(relevantDailyConfirmedCases.get(i).date) == true) {
+                    if ((myModelRoot.ABM.currentTime).truncatedTo(ChronoUnit.DAYS).isEqual(relevantDailyConfirmedCases.get(i).date.truncatedTo(ChronoUnit.DAYS)) == true) {
                         sumRelevantCountiesPopulation += relevantDailyConfirmedCases.get(i).county.population;
                         sumRelevantCountiesInfection += relevantDailyConfirmedCases.get(i).numActiveCases*(10f/3f);
                     }
@@ -906,7 +916,7 @@ public class Root extends Agent {
             }
             int sumRelevantCountiesPopulation = 0;
                 for (int i = 0; i < relevantDailyConfirmedCases.size(); i++) {
-                    if ((myModelRoot.ABM.currentTime).equals(relevantDailyConfirmedCases.get(i).date) == true) {
+                    if ((myModelRoot.ABM.currentTime).truncatedTo(ChronoUnit.DAYS).isEqual(relevantDailyConfirmedCases.get(i).date.truncatedTo(ChronoUnit.DAYS)) == true) {
                         sumRelevantCountiesPopulation += relevantDailyConfirmedCases.get(i).county.population;
                     }
                 }
@@ -1204,7 +1214,7 @@ public class Root extends Agent {
         int sumRelevantCountiesPopulation = 0;
         int sumRelevantCountiesInfection = 0;
         for (int i = 0; i < relevantDailyConfirmedCases.size(); i++) {
-            if ((myModelRoot.ABM.currentTime.truncatedTo(ChronoUnit.DAYS)).equals(relevantDailyConfirmedCases.get(i).date) == true) {
+            if ((myModelRoot.ABM.currentTime.truncatedTo(ChronoUnit.DAYS)).isEqual(relevantDailyConfirmedCases.get(i).date.truncatedTo(ChronoUnit.DAYS)) == true) {
                 sumRelevantCountiesPopulation += relevantDailyConfirmedCases.get(i).county.population;
                 sumRelevantCountiesInfection += relevantDailyConfirmedCases.get(i).numActiveCases*(10f/3f);
             }

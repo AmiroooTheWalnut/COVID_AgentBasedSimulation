@@ -93,7 +93,7 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
 
     public void updateProjects() {
         String filePath = myParent.mainModel.ABM.filePath;
-        String directoryPath = "projects\\" + filePath.substring(filePath.lastIndexOf("\\") + 1, filePath.length());
+        String directoryPath = "projects"+ File.separator + filePath.substring(filePath.lastIndexOf(File.separator) + 1, filePath.length());
         File directory = new File(directoryPath);
         if (!directory.exists()) {
             directory.mkdirs();
@@ -104,7 +104,7 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
         root.removeAllChildren();
         model.reload();
 
-        root = new DefaultMutableTreeNode(filePath.substring(filePath.lastIndexOf("\\") + 1, filePath.length()));
+        root = new DefaultMutableTreeNode(filePath.substring(filePath.lastIndexOf(File.separator) + 1, filePath.length()));
         model.setRoot(root);
 
         String[] directories = directory.list(new FilenameFilter() {
@@ -326,7 +326,7 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
         if (jList2.getSelectedIndex() > -1) {
             DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) jTree1.getLastSelectedPathComponent();
             if (selectedNode != null) {
-                String splitted[] = jList2.getSelectedValue().split("\\(");
+                String splitted[] = jList2.getSelectedValue().split(File.separator+"(");
                 try {
                     Field field = RegionSnapshot.class.getDeclaredField(splitted[1].substring(0, splitted[1].length() - 1));
                     ArrayList<Double> allValues = new ArrayList();
@@ -358,7 +358,7 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
         if (jList2.getSelectedIndex() > -1) {
             DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) jTree1.getLastSelectedPathComponent();
             if (selectedNode != null) {
-                String splitted[] = jList2.getSelectedValue().split("\\(");
+                String splitted[] = jList2.getSelectedValue().split(File.separator+"(");
                 try {
                     Field field = RegionSnapshot.class.getDeclaredField(splitted[1].substring(0, splitted[1].length() - 1));
                     ArrayList<Double> allValues = new ArrayList();
@@ -404,10 +404,10 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
     public void loadHistoricalRun(javax.swing.event.TreeSelectionEvent evt) {
 //        DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) jTree1.getLastSelectedPathComponent();
         TreePath treepath = evt.getPath();
-        String path = "projects\\";
+        String path = "projects"+File.separator;
         Object elements[] = treepath.getPath();
         for (int i = 0, n = elements.length; i < n; i++) {
-            path = path + elements[i] + "\\";
+            path = path + elements[i] + File.separator;
         }
         currentHistoricalRun = HistoricalRun.loadHistoricalRunKryo(path + "data.bin");
 

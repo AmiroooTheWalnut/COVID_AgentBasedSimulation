@@ -2986,7 +2986,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
 //                deleteLayer("VDFNC_"+ targetNumCells);
 //            }
             StoreProcessedData saving = new StoreProcessedData();
-            saving.save_allData_kryo("C:\\Users\\user\\Documents\\Seattle_temp_" + iter, mainFParent.allData);
+            saving.save_allData_kryo("C:"+File.separator+"Users"+File.separator+"user"+File.separator+"Documents"+File.separator+"Seattle_temp_" + iter, mainFParent.allData);
         }
 
     }//GEN-LAST:event_jButton29ActionPerformed

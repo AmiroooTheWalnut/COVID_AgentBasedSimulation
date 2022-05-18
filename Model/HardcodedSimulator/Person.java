@@ -186,6 +186,7 @@ public class Person extends Agent {
 
     public boolean decideToTravel(PatternsRecordProcessed record, ZonedDateTime currentTime) {
         int dayInMonth = currentTime.getDayOfMonth() - 1;
+        try{
         int selectedDayInMonth = (int) (Math.floor(Math.random() * record.sumVisitsByDayOfMonth));
         int cumulativeDayInMonth = 0;
         for (int i = 0; i < record.visits_by_day.length; i++) {
@@ -216,6 +217,11 @@ public class Person extends Agent {
                 }
             }
         }
+        }catch(Exception ex){
+            //ex.printStackTrace(System.out);
+            //System.out.println(ex.getMessage());
+        }
+        
         return false;
     }
 
@@ -237,20 +243,24 @@ public class Person extends Agent {
 //            if(myModelRoot.ABM.currentTime.getMinute()==0){
 //            System.out.println("properties.currentPOI.peopleInPOI.size() "+properties.currentPOI.peopleInPOI.size());
 //            }
-                for (int i = 0; i < properties.currentPOI.peopleInPOI.size(); i++) {
+                try {
+                    if (properties.currentPOI != null) {
+                        for (int i = 0; i < properties.currentPOI.peopleInPOI.size(); i++) {
 //                if(properties.currentPOI.peopleInPOI==null){
 //                    System.out.println("STRANGE!!!");
 //                }
 //                if(i>=properties.currentPOI.peopleInPOI.size()){
 //                    System.out.println("STRANGE2!!!");
 //                }
-                    myModelRoot.ABM.root.agentPairContact[myIndex][i] = myModelRoot.ABM.root.agentPairContact[myIndex][i] + properties.currentPOI.peopleInPOI.size();
-                    myModelRoot.ABM.root.agentPairContact[i][myIndex] = myModelRoot.ABM.root.agentPairContact[i][myIndex] + properties.currentPOI.peopleInPOI.size();
-                    try {
+                        myModelRoot.ABM.root.agentPairContact[myIndex][i] = myModelRoot.ABM.root.agentPairContact[myIndex][i] + properties.currentPOI.peopleInPOI.size();
+                        myModelRoot.ABM.root.agentPairContact[i][myIndex] = myModelRoot.ABM.root.agentPairContact[i][myIndex] + properties.currentPOI.peopleInPOI.size();
+
                         properties.currentPOI.peopleInPOI.get(i).isPolled = true;
-                    } catch (Exception ex) {
-                        System.out.println("STRANGE!!!");
+
+                        }
                     }
+                } catch (Exception ex) {
+                    System.out.println("Unsafe thread access!!! Logical polling unsafe access.");
                 }
             }
 //            for (int i = 0; i < myModelRoot.ABM.root.people.size(); i++) {

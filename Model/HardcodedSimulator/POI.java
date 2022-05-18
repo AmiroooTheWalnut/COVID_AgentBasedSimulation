@@ -20,8 +20,8 @@ import java.util.List;
  */
 public class POI {
 
-    public static double CONTACT_RATE = 0.39;//CONTACT PER MINUTE
-    public static double CHANCE_OF_ENV_CONTAMINATION = 0.00014;
+    public static double CONTACT_RATE = 0.4;//CONTACT PER MINUTE
+    public static double CHANCE_OF_ENV_CONTAMINATION = 0.0002;
 
     public PatternsRecordProcessed patternsRecord;
     public double contaminatedTime = 0;
