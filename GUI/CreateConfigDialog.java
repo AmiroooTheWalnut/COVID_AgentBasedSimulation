@@ -35,7 +35,7 @@ public class CreateConfigDialog extends javax.swing.JDialog {
         currentRunConfig.scenarioName = jTextField1.getText();
         currentRunConfig.isParallelBehaviorEvaluation = jCheckBox4.isSelected();
         currentRunConfig.numResidents = (int) (jSpinner3.getValue());
-        currentRunConfig.numCPUs = (int) (jSpinner4.getValue());
+        currentRunConfig.numCPUsInModel = (int) (jSpinner4.getValue());
     }
 
     public void fillUIElements(RunConfig input) {
@@ -48,7 +48,7 @@ public class CreateConfigDialog extends javax.swing.JDialog {
         jTextField1.setText(currentRunConfig.scenarioName);
         jCheckBox4.setSelected(currentRunConfig.isParallelBehaviorEvaluation);
         jSpinner3.setValue(currentRunConfig.numResidents);
-        jSpinner4.setValue(currentRunConfig.numCPUs);
+        jSpinner4.setValue(currentRunConfig.numCPUsInModel);
     }
 
     /**

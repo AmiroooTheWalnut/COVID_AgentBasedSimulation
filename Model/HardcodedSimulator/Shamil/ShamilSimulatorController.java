@@ -225,11 +225,12 @@ public class ShamilSimulatorController {
                 parallelGroupEval[i].addRunnableToQueue(calls);
             }
 
-
-            
-            //myMainModel.agentEvalPool.invokeAny(calls);
-            myMainModel.agentEvalPool.invokeAll(calls);
+            myMainModel.agentEvalPool.invokeAny(calls);
+//            myMainModel.agentEvalPool.invokeAll(calls);
         } catch (InterruptedException ex) {
+            Logger.getLogger(ShamilSimulatorController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        catch (ExecutionException ex) {
             Logger.getLogger(ShamilSimulatorController.class.getName()).log(Level.SEVERE, null, ex);
         }
         

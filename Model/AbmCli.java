@@ -6,6 +6,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -14,7 +19,10 @@ import java.util.TimerTask;
 public class AbmCli {
 
     public MainModel mainModel;
-    public int numProcessors;
+    public int numProcessorsInModel;
+    public int numProcessorsInTests;
+
+    public ExecutorService testThreadPool;
 
     public int currentNumRun = 0;
 
@@ -29,35 +37,62 @@ public class AbmCli {
     }
 
     public void init(String projectLocation, RunConfig runConfig) {
-        if (runConfig.numCPUs > 0) {
-            numProcessors = runConfig.numCPUs;
+        if (runConfig.numCPUsInModel > 0) {
+            numProcessorsInModel = runConfig.numCPUsInModel;
         } else {
-            numProcessors = Runtime.getRuntime().availableProcessors() / 2;
+            numProcessorsInModel = Runtime.getRuntime().availableProcessors() / 2;
         }
-        Timer refreshSimulationDialogTimer = new Timer();
-        refreshSimulationDialogTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                if (mainModel != null) {
-                    if (mainModel.isRunning == false) {
+        if (runConfig.isParallelTests == false) {
+            Timer refreshSimulationDialogTimer = new Timer();
+            refreshSimulationDialogTimer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    if (mainModel != null) {
+                        if (mainModel.isRunning == false) {
+                            if (currentNumRun < runConfig.numRuns) {
+                                runARun(projectLocation, runConfig);
+                                currentNumRun = currentNumRun + 1;
+                            }
+                        }
+                    } else {
                         if (currentNumRun < runConfig.numRuns) {
                             runARun(projectLocation, runConfig);
                             currentNumRun = currentNumRun + 1;
                         }
                     }
-                } else {
-                    if (currentNumRun < runConfig.numRuns) {
-                        runARun(projectLocation, runConfig);
-                        currentNumRun = currentNumRun + 1;
-                    }
                 }
+            }, 0, 1000);
+        } else {
+            if (runConfig.numCPUsInTest > 0) {
+                numProcessorsInTests = runConfig.numCPUsInTest;
+            } else {
+                numProcessorsInTests = Runtime.getRuntime().availableProcessors() / 2;
             }
-        }, 0, 1000);
+            testThreadPool = Executors.newFixedThreadPool(numProcessorsInTests);
+            try {
+                AdvancedParallelTest[] parallelTest = new AdvancedParallelTest[runConfig.numRuns];
+
+                for (int i = 0; i < runConfig.numRuns - 1; i++) {
+                    parallelTest[i] = new AdvancedParallelTest(this, projectLocation, runConfig, numProcessorsInModel, -1, -1);
+                }
+                parallelTest[runConfig.numRuns - 1] = new AdvancedParallelTest(this, projectLocation, runConfig, numProcessorsInModel, -1, -1);
+
+                ArrayList<Callable<Object>> calls = new ArrayList<Callable<Object>>();
+
+                for (int i = 0; i < runConfig.numRuns; i++) {
+                    parallelTest[i].addRunnableToQueue(calls);
+                }
+
+                testThreadPool.invokeAll(calls);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(AbmCli.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 
     public void runARun(String projectLocation, RunConfig runConfig) {
         mainModel = new MainModel();
-        mainModel.numCPUs = numProcessors;
+        mainModel.numCPUs = numProcessorsInModel;
 
         mainModel.initAgentBasedModel(false);
         mainModel.initData();
@@ -114,8 +149,8 @@ public class AbmCli {
             numRegions = Integer.parseInt(values[1]);
         }
         mainModel.simulationDelayTime = -1;
-        mainModel.initModelHardCoded(true, runConfig.isParallelBehaviorEvaluation, runConfig.numResidents, numRegions, runConfig.numCPUs, !runConfig.isSpecificRegionInfected, runConfig.isSpecialScenarioActive, infectionIndices);
-        mainModel.startTimeNanoSecond=System.nanoTime();
-        mainModel.resume(runConfig.isParallelBehaviorEvaluation, runConfig.numCPUs, true, runConfig.isSpecialScenarioActive);
+        mainModel.initModelHardCoded(true, runConfig.isParallelBehaviorEvaluation, runConfig.numResidents, numRegions, runConfig.numCPUsInModel, !runConfig.isSpecificRegionInfected, runConfig.isSpecialScenarioActive, infectionIndices);
+        mainModel.startTimeNanoSecond = System.nanoTime();
+        mainModel.resume(runConfig.isParallelBehaviorEvaluation, runConfig.numCPUsInModel, true, runConfig.isSpecialScenarioActive);
     }
 }

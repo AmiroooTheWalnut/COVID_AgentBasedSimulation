@@ -981,9 +981,9 @@ public class Root extends Agent {
         }
         if (myModelRoot.ABM.currentTime.getMinute() == 0) {
             boolean debug = false;
-            if (myModelRoot.ABM.currentTime.getHour() == 9) {
-                debug = true;
-            }
+            //if (myModelRoot.ABM.currentTime.getHour() == 9) {
+            //    debug = true;
+            //}
             updateHour(people, regions, myModelRoot.ABM.currentTime.getHour(), day, isSpatial, debug, myModelRoot);
         }
         if (myModelRoot.ABM.currentTime.getHour() == 23 && myModelRoot.ABM.currentTime.getMinute() == 59) {

@@ -22,6 +22,9 @@ import java.util.logging.Logger;
  */
 public class RunConfig {
     public int numRuns=1;
+
+    public boolean isParallelTests=false;
+    public int numCPUsInTest;
     
     public boolean isReportContactRate;
     public boolean isSpecialScenarioActive;
@@ -31,7 +34,7 @@ public class RunConfig {
     public String scenarioName;
     public boolean isParallelBehaviorEvaluation;
     public int numResidents;
-    public int numCPUs;
+    public int numCPUsInModel;
     
     public static RunConfig loadModel(String path){
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
