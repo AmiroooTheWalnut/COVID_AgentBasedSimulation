@@ -102,6 +102,8 @@ public class MainModel extends Dataset {
 
     public ExecutorService agentEvalPool;
 
+    public String datasetDirectory = "./datasets";
+
     public void startScriptEngines() {
         javaEvaluationEngine = new JavaEvaluationEngine(this);
         pythonEvaluationEngine = new PythonEvaluationEngine(this);//MAY NEED TO BE STOPPED BECAUSE OF LOCAL SERVER STRUGGLE WITH PROFILER
@@ -338,13 +340,20 @@ public class MainModel extends Dataset {
         String dateName = ABM.startTime.getYear() + "_" + monthString;
         safegraph.clearPatternsPlaces();
         System.gc();
-        safegraph.loadPatternsPlacesSet(dateName, allGISData, ABM.studyScope, isParallelLoadingData, numCPUs);
+        safegraph.loadPatternsPlacesSet(datasetDirectory, dateName, allGISData, ABM.studyScope, isParallelLoadingData, numCPUs);
         ABM.agents = new CopyOnWriteArrayList();
 
         ABM.currentTime = ABM.startTime;
 
 //        ABM.rootAgent = ABM.makeRootAgentHardCoded();
         ABM.root = new Root(this);
+
+        //\/\/\/ get the total travels for the month from SafeGraph
+        for (int i = 0; i < safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.size(); i++) {
+            ABM.root.calcCumulativeMonthWeekHour(safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i));// COULD BE AVOIDED IF ALL DATA BE PREPROCESSED AND TRANSIENTS ARE REMOVED
+            ABM.root.numRealTravels = ABM.root.numRealTravels + safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).sumVisitsByDayOfMonth;
+        }
+        //^^^
 
         ABM.root.numAgents = numResidents;
 
@@ -399,13 +408,20 @@ public class MainModel extends Dataset {
         String dateName = ABM.startTime.getYear() + "_" + monthString;
         safegraph.clearPatternsPlaces();
         System.gc();
-        safegraph.loadPatternsPlacesSet(dateName, allGISData, ABM.studyScope, isParallelLoadingData, numCPUs);
+        safegraph.loadPatternsPlacesSet(datasetDirectory, dateName, allGISData, ABM.studyScope, isParallelLoadingData, numCPUs);
+
         ABM.agents = new CopyOnWriteArrayList();
 
         ABM.currentTime = ABM.startTime;
 
         ABM.rootAgent = ABM.makeRootAgent();
 
+        //\/\/\/ get the total travels for the month from SafeGraph
+//        for (int i = 0; i < safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.size(); i++) {
+//            ABM.rootAgent.calcCumulativeMonthWeekHour(safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i));// COULD BE AVOIDED IF ALL DATA BE PREPROCESSED AND TRANSIENTS ARE REMOVED
+//            ABM.rootAgent.numRealTravels = ABM.root.numRealTravels + safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).sumVisitsByDayOfMonth;
+//        }
+        //^^^
         pythonEvaluationEngine.saveAllPythonScripts(ABM.agentTemplates);
         if (ABM.rootAgent.myTemplate.constructor.isJavaScriptActive == true) {
             //myMainModel.javaEvaluationEngine.runScript(output.myTemplate.constructor.javaScript.script);
@@ -491,6 +507,14 @@ public class MainModel extends Dataset {
                 long endTimeNanoSecond = System.nanoTime();
                 double elapsed = ((endTimeNanoSecond - startTimeNanoSecond) / 1000000000);
                 System.out.println("ABM runtime (seconds): " + elapsed);
+                System.out.println("Num real travels: " + ABM.root.numRealTravels);
+                for(int i=0;i<ABM.root.people.size();i++){
+                    ABM.root.numTravels=ABM.root.numTravels+ABM.root.people.get(i).numTravels;
+                }
+                for(int i=0;i<ABM.root.people.size();i++){
+                    ABM.root.numContacts=ABM.root.numContacts+ABM.root.people.get(i).numContacts;
+                }
+                System.out.println("Num ABM travels: " + ABM.root.numTravels);
                 pause();
                 saveResult(ABM.root.regions, isInfectCBGOnly);
                 return;
@@ -503,10 +527,16 @@ public class MainModel extends Dataset {
             if (monthString.length() < 2) {
                 monthString = "0" + monthString;
             }
-            String yearStr = String.valueOf(ABM.startTime.getYear());
+            String yearStr = String.valueOf(ABM.currentTime.getYear());
             safegraph.clearPatternsPlaces();
             System.gc();
-            safegraph.requestDataset(allGISData, ABM.studyScope, yearStr, monthString, true, numCPUs);
+            safegraph.requestDataset(datasetDirectory, allGISData, ABM.studyScope, yearStr, monthString, true, numCPUs);
+            //\/\/\/ get the total travels for the month from SafeGraph
+            for (int i = 0; i < safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.size(); i++) {
+                ABM.root.calcCumulativeMonthWeekHour(safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i));// COULD BE AVOIDED IF ALL DATA BE PREPROCESSED AND TRANSIENTS ARE REMOVED
+                ABM.root.numRealTravels = ABM.root.numRealTravels + safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).sumVisitsByDayOfMonth;
+            }
+            //^^^
             currentMonth = month;
 
             ABM.root.generateSchedules(this, ABM.root.regionType, ABM.root.regions);
@@ -680,12 +710,12 @@ public class MainModel extends Dataset {
 //    }
     public void saveResult(ArrayList<Region> regions, boolean isInfectCBGOnly) {
 //        debugSaveBoundaries(ABM.root.regionsLayer.imageBoundaries);
-        String directoryPath = "projects"+ File.separator + ABM.filePath.substring(ABM.filePath.lastIndexOf(File.separator) + 1, ABM.filePath.length());
+        String directoryPath = "projects" + File.separator + ABM.filePath.substring(ABM.filePath.lastIndexOf(File.separator) + 1, ABM.filePath.length());
         File directory = new File(directoryPath);
         if (!directory.exists()) {
             directory.mkdirs();
         }
-        SimpleDateFormat formatter = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss");
+        SimpleDateFormat formatter = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss_SSS");
         Date date = new Date();
         String testPath = "projects" + File.separator + ABM.filePath.substring(ABM.filePath.lastIndexOf(File.separator) + 1, ABM.filePath.length()) + File.separator + formatter.format(date) + "_NumPeople_" + ABM.root.people.size() + "_" + scenario.scenarioName;
         File testDirectory = new File(testPath);
@@ -698,7 +728,7 @@ public class MainModel extends Dataset {
         historicalRun.endTime = ABM.endTime;
         historicalRun.regionsLayer = ABM.root.regionsLayer;
 //        historicalRun.saveHistoricalRunJson("./projects/" + ABM.filePath + "/" + formatter.format(date)+"/data.json");
-        HistoricalRun.saveHistoricalRunKryo(testPath + File.separator+"data", historicalRun);
+        HistoricalRun.saveHistoricalRunKryo(testPath + File.separator + "data", historicalRun);
 
 //        for (int i = 0; i < historicalRun.regions.size(); i++) {
 //            for (int j = 0; j < historicalRun.regions.get(i).hourlyRegionSnapshot.size(); j++) {
@@ -716,12 +746,12 @@ public class MainModel extends Dataset {
 //                }
 //            }
 //        }
-        ABM.root.writeDailyInfection(testPath + File.separator+"infectionReport");
-        ABM.root.writeSimulationSummary(testPath + File.separator+"simulationSummary");
+        ABM.root.writeDailyInfection(testPath + File.separator + "infectionReport");
+        ABM.root.writeSimulationSummary(testPath + File.separator + "simulationSummary");
         if (isInfectCBGOnly == true) {
-            ABM.root.writeConvertedToCBGInfection(testPath + File.separator+"CBGInf");
+            ABM.root.writeConvertedToCBGInfection(testPath + File.separator + "CBGInf");
         }
-        ABM.root.writeTotalContacts(testPath + File.separator+"rawContactData");
+        ABM.root.writeTotalContacts(testPath + File.separator + "rawContactData");
         isResultSavedAtTheEnd = true;
     }
 

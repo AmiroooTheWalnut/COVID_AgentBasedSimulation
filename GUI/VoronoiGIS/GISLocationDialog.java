@@ -610,7 +610,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
         months[1][4] = "05";
         months[1][5] = "06";
         months[1][6] = "07";
-        myParent.mainModel.safegraph.requestDatasetRange(myParent.mainModel.allGISData, myParent.mainModel.ABM.studyScope, years, months, true, myParent.numProcessors);
+        myParent.mainModel.safegraph.requestDatasetRange(myParent.mainModel.datasetDirectory, myParent.mainModel.allGISData, myParent.mainModel.ABM.studyScope, years, months, true, myParent.numProcessors);
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed

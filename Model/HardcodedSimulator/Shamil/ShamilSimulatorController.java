@@ -148,6 +148,7 @@ public class ShamilSimulatorController {
     }
 
     public static void startDay(ArrayList<Person> people, int day) {
+        int counter = 0;//TEMP
         for (int i = 0; i < people.size(); i++) {
             double rnd = Math.random();
             if (rnd < ShamilPersonManager.smartphone_owner_percentage) {
@@ -156,10 +157,13 @@ public class ShamilSimulatorController {
                 people.get(i).shamilPersonProperties.isTraceable = false;
             }
             if (people.get(i).shamilPersonProperties.profession == null) {
-                System.out.println("!!!!!!!!!!!");
+                System.out.println("PROFESSION IS NULL");
             }
+//            if (people.get(i).shamilPersonProperties.profession.name.equals("Hospitalized")) {
+//                counter = counter + 1;
+//            }
         }
-
+//        System.out.println("num hospitalized " + counter);//TEMP
         ShamilDaySimulator.dayStart(people, day);
         boolean lockdown_started = false;
         if (day >= ShamilPersonManager.preference_def.get("quarantine_start")) {
@@ -202,11 +206,11 @@ public class ShamilSimulatorController {
 //            System.out.println("Hour: "+hour+" - Events: "+event_cnt+" - Event going people: "+event_going_person_cnt);
 //        }
         //COMMENTED BECAUSE IT'S FOR REPORTING ONLY
-
         daily_groups.add(person_group);
 
         for (int i = 0; i < groups.size(); i++) {
             groups.get(i).updateActions();
+//            System.out.println(groups.get(i).persons.size());
         }
 
         try {
@@ -225,15 +229,15 @@ public class ShamilSimulatorController {
                 parallelGroupEval[i].addRunnableToQueue(calls);
             }
 
-            myMainModel.agentEvalPool.invokeAny(calls);
-//            myMainModel.agentEvalPool.invokeAll(calls);
+//            myMainModel.agentEvalPool.invokeAny(calls);
+            myMainModel.agentEvalPool.invokeAll(calls);
         } catch (InterruptedException ex) {
             Logger.getLogger(ShamilSimulatorController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        catch (ExecutionException ex) {
-            Logger.getLogger(ShamilSimulatorController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
+//        catch (ExecutionException ex) {
+//            Logger.getLogger(ShamilSimulatorController.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+
         //SERIAL EVAULATION OF GROUP INTERACTIONS
 //        for (int i = 0; i < groups.size(); i++) {
 //            ShamilGroupSimulator.groupInteraction(groups.get(i));
@@ -248,11 +252,24 @@ public class ShamilSimulatorController {
 //            }
 //        }
         //SERIAL EVAULATION OF GROUP INTERACTIONS
-
         //pickle.dump(daily_groups,open('group_info_day_' + str(day) + '.p','wb'))
     }
 
     public static void endDay(ArrayList<Person> people, int day) {
+//        int counter1 = 0;
+//        for (int i = 0; i < people.size(); i++) {
+//            if (people.get(i).shamilPersonProperties.profession.name.equals("Hospitalized")) {
+//                counter1 = counter1 + 1;
+//            }
+//        }
+//        System.out.println("num hospitalized before end " + counter1);//TEMP
         ShamilDaySimulator.dayEnd(people, day, trace_days, quarantine_days, daily_groups);
+//        int counter2 = 0;
+//        for (int i = 0; i < people.size(); i++) {
+//            if (people.get(i).shamilPersonProperties.profession.name.equals("Hospitalized")) {
+//                counter2 = counter2 + 1;
+//            }
+//        }
+//        System.out.println("num hospitalized after end " + counter2);//TEMP
     }
 }

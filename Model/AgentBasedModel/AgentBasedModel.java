@@ -20,6 +20,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
@@ -48,6 +49,7 @@ public class AgentBasedModel {
     public transient Object studyScopeGeography;
 
     public boolean isReportContactRate = true;
+    public boolean isBuildingLogicActive = true;
 
     public boolean isOurABMActive = false;
     public boolean isShamilABMActive = false;
@@ -60,6 +62,8 @@ public class AgentBasedModel {
     public transient ZonedDateTime startTime;
     public transient ZonedDateTime currentTime;
     public transient ZonedDateTime endTime;
+
+    public Map<Integer, Double> travelProbabilityInHourAdjustmentForNumAgent;
 
     public boolean isPatternBasedTime = true;
 
@@ -105,15 +109,15 @@ public class AgentBasedModel {
                 parallelAgentEval[numProcessors - 1] = new AdvancedParallelAgentEvaluator(myMainModel, agents, (int) Math.floor((numProcessors - 1) * ((agents.size()) / numProcessors)), agents.size(), isHardCoded);
 
                 ArrayList<Callable<Object>> calls = new ArrayList<Callable<Object>>();
-                
+
                 for (int i = 0; i < numProcessors; i++) {
                     parallelAgentEval[i].addRunnableToQueue(calls);
                 }
-                
+
                 //myMainModel.agentEvalPool.invokeAny(calls);
                 myMainModel.agentEvalPool.invokeAll(calls);
-                
-            //\/\/\/ OLD DESIGN WITH THREADS
+
+                //\/\/\/ OLD DESIGN WITH THREADS
 //                for (int i = 0; i < numProcessors; i++) {
 //                    parallelAgentEval[i].myThread.start();
 //                }
@@ -125,8 +129,7 @@ public class AgentBasedModel {
 //                        System.out.println(ie.toString());
 //                    }
 //                }
-            //^^^ OLD DESIGN WITH THREADS
-
+                //^^^ OLD DESIGN WITH THREADS
             } catch (Exception ex) {
                 System.out.println("ERROR ON AGENT TYPE:");
                 System.out.println(currentEvaluatingAgent[0].myTemplate.agentTypeName);
@@ -176,15 +179,15 @@ public class AgentBasedModel {
                 parallelAgentEval[numProcessors - 1] = new AdvancedParallelAgentEvaluator(myMainModel, agents, (int) Math.floor((numProcessors - 1) * ((agents.size()) / numProcessors)), agents.size(), isHardCoded);
 
                 ArrayList<Callable<Object>> calls = new ArrayList<Callable<Object>>();
-                
+
                 for (int i = 0; i < numProcessors; i++) {
                     parallelAgentEval[i].addRunnableToQueue(calls);
                 }
-                
+
 //                myMainModel.agentEvalPool.invokeAny(calls);
                 myMainModel.agentEvalPool.invokeAll(calls);
-                
-            //\/\/\/ OLD DESIGN WITH THREADS
+
+                //\/\/\/ OLD DESIGN WITH THREADS
 //                for (int i = 0; i < numProcessors; i++) {
 //                    parallelAgentEval[i].myThread.start();
 //                }
@@ -196,8 +199,7 @@ public class AgentBasedModel {
 //                        System.out.println(ie.toString());
 //                    }
 //                }
-            //^^^ OLD DESIGN WITH THREADS
-
+                //^^^ OLD DESIGN WITH THREADS
             } catch (Exception ex) {
                 System.out.println("ERROR ON AGENT TYPE:");
                 System.out.println(currentEvaluatingAgent[0].myType);

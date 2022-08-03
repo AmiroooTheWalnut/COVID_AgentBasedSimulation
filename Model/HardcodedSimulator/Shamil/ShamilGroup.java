@@ -37,6 +37,16 @@ public class ShamilGroup {
         }
     }
 
+    public double triangularDistribution(double a, double b, double c) {
+        double F = (c - a) / (b - a);
+        double rand = Math.random();
+        if (rand < F) {
+            return a + Math.sqrt(rand * (b - a) * (c - a));
+        } else {
+            return b - Math.sqrt((1 - rand) * (b - a) * (b - c));
+        }
+    }
+
     public void updateProximity() {
 //        System.out.println("GROUP SIZE: "+persons.size());
 //        System.out.println("GROUP NAME: "+group_name);
@@ -44,6 +54,14 @@ public class ShamilGroup {
 //            System.out.println("@@@@@@@@@@@");
 //        }
         boolean full_random_proximity = false;
+        if(persons.size()>25){
+            full_random_proximity = true;
+//            if(persons.size()>500){
+//                System.out.println(group_name+" "+persons.size());
+//            }
+            
+        }
+        
         // # fline = open("seed.txt").readline().rstrip()
         // # ranseed = int(fline)
         // # np.random.seed(ranseed)
@@ -56,15 +74,13 @@ public class ShamilGroup {
         //System.out.println(persons.size());
         if (full_random_proximity == true) {
             proximity = new double[persons.size()][persons.size()];
-            for (int i = 0; i < persons.size(); i++) {
-                for (int j = 0; j < persons.size(); j++) {
-                    proximity[i][j] = ShamilPersonManager.rnd.nextGaussian();
-                }
+            if(actions.size()==0){
+                return;
             }
-
-//            proximity = np.random.randn(len(self.persons),len(self.persons))        
             for (int i = 0; i < persons.size(); i++) {
                 for (int j = 0; j < persons.size(); j++) {
+//                    proximity[i][j] = ShamilPersonManager.rnd.nextGaussian();
+                    proximity[i][j] = triangularDistribution(-1.5,0,1.5);
                     if (proximity[i][j] > max_proximity) {
                         proximity[i][j] = max_proximity;
                     }
@@ -73,11 +89,26 @@ public class ShamilGroup {
                     }
                 }
             }
+
+//            proximity = np.random.randn(len(self.persons),len(self.persons))        
+//            for (int i = 0; i < persons.size(); i++) {
+//                for (int j = 0; j < persons.size(); j++) {
+//                    if (proximity[i][j] > max_proximity) {
+//                        proximity[i][j] = max_proximity;
+//                    }
+//                    if (proximity[i][j] < min_proximity) {
+//                        proximity[i][j] = min_proximity;
+//                    }
+//                }
+//            }
 //            proximity = np.clip(self.proximity, min_proximity, max_proximity)
             return;
         }
 
         proximity = new double[persons.size()][persons.size()];
+        if(actions.size()==0){
+            return;
+        }
         /*
         for (int i = 0; i < persons.size(); i++) {
             for (int j = 0; j < persons.size(); j++) {
@@ -103,6 +134,7 @@ public class ShamilGroup {
                 temp[1] = j;
                 locs.add(temp);
                 random_locs.add(counter);
+                counter=counter+1;
             }
         }
 
@@ -122,6 +154,10 @@ public class ShamilGroup {
 //        ArrayList<Integer> random_locs = new ArrayList();
 //        for (int i = 0; i < tot_locs; i++) {
 //            random_locs.add(i);
+//        }
+
+//        if(random_locs.size()>100){
+//            System.out.println("!@#!@#");
 //        }
         Collections.shuffle(random_locs);
 

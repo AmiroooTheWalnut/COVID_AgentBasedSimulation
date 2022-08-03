@@ -53,21 +53,21 @@ public class Safegraph extends Dataset implements Serializable {
     public AllSafegraphPlaces allSafegraphPlaces;
 
     @Override
-    public void requestDataset(AllGISData allGISData, String project, String year, String month, boolean isParallel, int numCPU) {
+    public void requestDataset(String datasetRoot, AllGISData allGISData, String project, String year, String month, boolean isParallel, int numCPU) {
         clearPatternsPlaces();
-        loadPatternsPlacesSet(year + "_" + month, allGISData, project, isParallel, numCPU);
+        loadPatternsPlacesSet(datasetRoot,year + "_" + month, allGISData, project, isParallel, numCPU);
         startingDate = findEarliestPatternTime();
         endingDate = findLatestPatternTime();
     }
 
     @Override
-    public void requestDatasetRange(AllGISData allGISData, String project, String years[], String months[][], boolean isParallel, int numCPU) {
+    public void requestDatasetRange(String datasetRoot, AllGISData allGISData, String project, String years[], String months[][], boolean isParallel, int numCPU) {
         clearPatternsPlaces();
         for (int i = 0; i < years.length; i++) {
             for (int j = 0; j < months[i].length; j++) {
                 if (years[i] != null && months[i][j] != null) {
                     if (years[i].length() > 0 && months[i][j].length() > 0) {
-                        loadPatternsPlacesSet(years[i] + "_" + months[i][j], allGISData, project, isParallel, numCPU);
+                        loadPatternsPlacesSet(datasetRoot, years[i] + "_" + months[i][j], allGISData, project, isParallel, numCPU);
                     }
                 }
                 //connectPatternsAndPlaces(allPatterns.monthlyPatternsList.get(allPatterns.monthlyPatternsList.size()-1),allSafegraphPlaces.monthlySafegraphPlacesList.get(allSafegraphPlaces.monthlySafegraphPlacesList.size()-1),allGISData,isParallel,numCPU);
@@ -373,9 +373,9 @@ public class Safegraph extends Dataset implements Serializable {
         System.gc();
     }
 
-    public void loadPatternsPlacesSet(String date, AllGISData allGISData, String project, boolean isParallel, int numCPU) {
-        Patterns patterns = loadPatternsKryo("./datasets/Safegraph/" + project + "/patterns_" + date + "/processedData.bin");
-        SafegraphPlaces safegraphPlaces = loadSafegraphPlacesKryo("./datasets/Safegraph/" + project + "/core_poi_" + date + "/processedData_withArea.bin");
+    public void loadPatternsPlacesSet(String datasetRoot, String date, AllGISData allGISData, String project, boolean isParallel, int numCPU) {
+        Patterns patterns = loadPatternsKryo(datasetRoot+"/Safegraph/" + project + "/patterns_" + date + "/processedData.bin");
+        SafegraphPlaces safegraphPlaces = loadSafegraphPlacesKryo(datasetRoot+"/Safegraph/" + project + "/core_poi_" + date + "/processedData_withArea.bin");
 
         System.out.println("Data loaded");
         if (patterns == null || safegraphPlaces == null) {
@@ -896,7 +896,7 @@ public class Safegraph extends Dataset implements Serializable {
         System.out.println("START!");
         for (int i = 0; i < years.length; i++) {
             for (int j = 0; j < months[i].length; j++) {
-                loadPatternsPlacesSet(years[i] + "_" + months[i][j], allGISData, "FullData", isParallel, numCPU);
+                loadPatternsPlacesSet("./datasets", years[i] + "_" + months[i][j], allGISData, "FullData", isParallel, numCPU);
                 System.out.println(i);
                 System.out.println(j);
                 System.out.println(years[i] + "_" + months[i][j]);

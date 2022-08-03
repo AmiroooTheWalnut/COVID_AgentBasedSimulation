@@ -199,7 +199,6 @@ public class ShamilGroupManager {
 
                 if (regions.get(r).residents.get(i).shamilPersonProperties.isAlive == false) {
 //            if not prsn.is_alive:
-
                     continue;
                 }
                 String group_id = "";
@@ -250,7 +249,7 @@ public class ShamilGroupManager {
                     group_id = "H";
                 }
 
-                if (!groupDict.containsKey(group_id) && group_id.length() > 0) {//group_id not in groupDict):
+                if (group_id.length() > 0) {//if (!groupDict.containsKey(group_id) && group_id.length() > 0) {//group_id not in groupDict):
                     groupDict.put(group_id, new ShamilGroup(group_id));
 //                groupDict[group_id] = Group(group_id);
                 }
@@ -278,16 +277,13 @@ public class ShamilGroupManager {
                 // #print(prsn.id)
                 // #person_group[prsn.id] = personarr
                 person_group.put(personarr.get(j).shamilPersonProperties.id, personid_arr);//[prsn.id] = personid_arr
-
             }
 
             // #print(person_group)
         }
 
         ArrayList<ShamilGroup> groups = new ArrayList();
-
         for (int i = 0; i < groupDictKeySet.size(); i++) {// grp_id in groupDict:
-
             groups.add(groupDict.get(groupDictKeySet.get(i)));
         }
 
@@ -308,11 +304,14 @@ public class ShamilGroupManager {
                 parallelGroupEval[i].addRunnableToQueue(calls);
             }
 
-            //myMainModel.agentEvalPool.invokeAny(calls);
+//            myMainModel.agentEvalPool.invokeAny(calls);
             myMainModel.agentEvalPool.invokeAll(calls);
         } catch (InterruptedException ex) {
             Logger.getLogger(ShamilSimulatorController.class.getName()).log(Level.SEVERE, null, ex);
         }
+//        catch (ExecutionException ex) {
+//            Logger.getLogger(ShamilGroupManager.class.getName()).log(Level.SEVERE, null, ex);
+//        }
         //myMainModel.agentEvalPool.
         
         //SERIAL EVAULATION OF GROUP UPDATE

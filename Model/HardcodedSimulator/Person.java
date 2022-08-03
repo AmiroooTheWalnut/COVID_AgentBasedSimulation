@@ -32,6 +32,10 @@ public class Person extends Agent {
 
     public boolean isActive = false;//IF OUR ABM IS ACTIVE, THEN THIS CLASS'S BEHAVIOR WILL RUN
 
+    public int numTravels = 0;
+    public int numTravelsInDay = 0;
+    public int numContacts = 0;
+
     public Person(int index) {
         myType = "Person";
         myIndex = index;
@@ -56,7 +60,7 @@ public class Person extends Agent {
                 if (properties.isInTravel == true) {
                     properties.minutesStayed += 1;
 //                    myModelRoot.ABM.root.pOIs.get(properties.currentPattern.placeKey).contact(myModelRoot.ABM.currentTime, this);
-                    properties.currentPOI.contact(myModelRoot.ABM.currentTime, this);
+                    properties.currentPOI.contact(myModelRoot.ABM.currentTime, this, myModelRoot.ABM.isBuildingLogicActive);
                     returnFromTravel();
                 }
 //                pollContact();
@@ -109,6 +113,8 @@ public class Person extends Agent {
         PatternsRecordProcessed dest = chooseDestination(properties.workRegion);
         boolean decision = decideToTravel(dest, currentTime);
         if (decision == true) {
+            numTravels = numTravels + 1;
+            numTravelsInDay = numTravelsInDay + 1;
             properties.dwellTime = decideDwellTime(dest);
             lat = dest.place.lat;
             lon = dest.place.lon;
@@ -143,6 +149,8 @@ public class Person extends Agent {
         PatternsRecordProcessed dest = chooseDestination(properties.homeRegion);
         boolean decision = decideToTravel(dest, currentTime);
         if (decision == true) {
+            numTravels = numTravels + 1;
+            numTravelsInDay = numTravelsInDay + 1;
             properties.dwellTime = decideDwellTime(dest);
             lat = dest.place.lat;
             lon = dest.place.lon;
@@ -186,28 +194,31 @@ public class Person extends Agent {
 
     public boolean decideToTravel(PatternsRecordProcessed record, ZonedDateTime currentTime) {
         int dayInMonth = currentTime.getDayOfMonth() - 1;
-        try{
-        int selectedDayInMonth = (int) (Math.floor(Math.random() * record.sumVisitsByDayOfMonth));
-        int cumulativeDayInMonth = 0;
-        for (int i = 0; i < record.visits_by_day.length; i++) {
-            cumulativeDayInMonth += record.visits_by_day[i];
-            if (cumulativeDayInMonth > selectedDayInMonth) {
-                if (i == dayInMonth) {
-                    byte dayInWeek = (byte) ((currentTime.getDayOfWeek().getValue()) - 1);
-                    int selectedDayInWeek = (int) (Math.floor(Math.random() * record.sumVisitsByDayOfWeek));
-                    int cumulativeDayInWeek = 0;
-                    for (byte j = 0; j < 7; j++) {
-                        cumulativeDayInWeek += record.popularity_by_day.get(j);
-                        if (cumulativeDayInWeek > selectedDayInWeek) {
-                            if (j == dayInWeek) {
-                                int hourInDay = currentTime.getHour();
-                                int selectedHourInDay = (int) (Math.floor(Math.random() * record.sumVisitsByHourofDay));
-                                int cumulativeHourInDay = 0;
-                                for (byte k = 0; k < record.popularity_by_hour.length; k++) {
-                                    cumulativeHourInDay += record.popularity_by_hour[k];
-                                    if (cumulativeHourInDay > selectedHourInDay) {
-                                        if (k == hourInDay) {
-                                            return true;
+        try {
+            if (Math.random() < 0.085) {
+                int selectedDayInMonth = (int) (Math.floor(Math.random() * record.sumVisitsByDayOfMonth));
+                int cumulativeDayInMonth = 0;
+                for (int i = 0; i < record.visits_by_day.length; i++) {
+                    cumulativeDayInMonth += record.visits_by_day[i];
+                    if (cumulativeDayInMonth > selectedDayInMonth) {
+                        if (i == dayInMonth) {
+                            byte dayInWeek = (byte) ((currentTime.getDayOfWeek().getValue()) - 1);
+                            int selectedDayInWeek = (int) (Math.floor(Math.random() * record.sumVisitsByDayOfWeek));
+                            int cumulativeDayInWeek = 0;
+                            for (byte j = 0; j < 7; j++) {
+                                cumulativeDayInWeek += record.popularity_by_day.get(j);
+                                if (cumulativeDayInWeek > selectedDayInWeek) {
+                                    if (j == dayInWeek) {
+                                        int hourInDay = currentTime.getHour();
+                                        int selectedHourInDay = (int) (Math.floor(Math.random() * record.sumVisitsByHourofDay));
+                                        int cumulativeHourInDay = 0;
+                                        for (byte k = 0; k < record.popularity_by_hour.length; k++) {
+                                            cumulativeHourInDay += record.popularity_by_hour[k];
+                                            if (cumulativeHourInDay > selectedHourInDay) {
+                                                if (k == hourInDay) {
+                                                    return true;
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -216,12 +227,11 @@ public class Person extends Agent {
                     }
                 }
             }
-        }
-        }catch(Exception ex){
+        } catch (Exception ex) {
             //ex.printStackTrace(System.out);
             //System.out.println(ex.getMessage());
         }
-        
+
         return false;
     }
 
@@ -252,10 +262,10 @@ public class Person extends Agent {
 //                if(i>=properties.currentPOI.peopleInPOI.size()){
 //                    System.out.println("STRANGE2!!!");
 //                }
-                        myModelRoot.ABM.root.agentPairContact[myIndex][i] = myModelRoot.ABM.root.agentPairContact[myIndex][i] + properties.currentPOI.peopleInPOI.size();
-                        myModelRoot.ABM.root.agentPairContact[i][myIndex] = myModelRoot.ABM.root.agentPairContact[i][myIndex] + properties.currentPOI.peopleInPOI.size();
+                            myModelRoot.ABM.root.agentPairContact[myIndex][i] = myModelRoot.ABM.root.agentPairContact[myIndex][i] + properties.currentPOI.peopleInPOI.size();
+                            myModelRoot.ABM.root.agentPairContact[i][myIndex] = myModelRoot.ABM.root.agentPairContact[i][myIndex] + properties.currentPOI.peopleInPOI.size();
 
-                        properties.currentPOI.peopleInPOI.get(i).isPolled = true;
+                            properties.currentPOI.peopleInPOI.get(i).isPolled = true;
 
                         }
                     }

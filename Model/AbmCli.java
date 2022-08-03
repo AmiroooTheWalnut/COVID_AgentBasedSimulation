@@ -33,10 +33,10 @@ public class AbmCli {
         AbmCli test = new AbmCli();
 
         RunConfig runConfig = RunConfig.loadModel(args[1]);
-        test.init(args[0], runConfig);
+        test.init(args[2], args[0], runConfig);
     }
 
-    public void init(String projectLocation, RunConfig runConfig) {
+    public void init(String datasetRoot, String projectLocation, RunConfig runConfig) {
         if (runConfig.numCPUsInModel > 0) {
             numProcessorsInModel = runConfig.numCPUsInModel;
         } else {
@@ -50,13 +50,13 @@ public class AbmCli {
                     if (mainModel != null) {
                         if (mainModel.isRunning == false) {
                             if (currentNumRun < runConfig.numRuns) {
-                                runARun(projectLocation, runConfig);
+                                runARun(datasetRoot, projectLocation, runConfig);
                                 currentNumRun = currentNumRun + 1;
                             }
                         }
                     } else {
                         if (currentNumRun < runConfig.numRuns) {
-                            runARun(projectLocation, runConfig);
+                            runARun(datasetRoot, projectLocation, runConfig);
                             currentNumRun = currentNumRun + 1;
                         }
                     }
@@ -73,9 +73,9 @@ public class AbmCli {
                 AdvancedParallelTest[] parallelTest = new AdvancedParallelTest[runConfig.numRuns];
 
                 for (int i = 0; i < runConfig.numRuns - 1; i++) {
-                    parallelTest[i] = new AdvancedParallelTest(this, projectLocation, runConfig, numProcessorsInModel, -1, -1);
+                    parallelTest[i] = new AdvancedParallelTest(this, datasetRoot, projectLocation, runConfig, numProcessorsInModel, -1, -1);
                 }
-                parallelTest[runConfig.numRuns - 1] = new AdvancedParallelTest(this, projectLocation, runConfig, numProcessorsInModel, -1, -1);
+                parallelTest[runConfig.numRuns - 1] = new AdvancedParallelTest(this, datasetRoot, projectLocation, runConfig, numProcessorsInModel, -1, -1);
 
                 ArrayList<Callable<Object>> calls = new ArrayList<Callable<Object>>();
 
@@ -90,17 +90,18 @@ public class AbmCli {
         }
     }
 
-    public void runARun(String projectLocation, RunConfig runConfig) {
+    public void runARun(String datasetRoot, String projectLocation, RunConfig runConfig) {
         mainModel = new MainModel();
+        mainModel.datasetDirectory = datasetRoot;
         mainModel.numCPUs = numProcessorsInModel;
 
         mainModel.initAgentBasedModel(false);
         mainModel.initData();
 
         try {
-            File geoDataFile = new File("./datasets/ProcessedGeoData.bin");
+            File geoDataFile = new File(datasetRoot+"/ProcessedGeoData.bin");
             if (geoDataFile.exists()) {
-                AllGISData geoData = MainModel.loadAllGISDataKryo("./datasets/ProcessedGeoData.bin");
+                AllGISData geoData = MainModel.loadAllGISDataKryo(datasetRoot+"/ProcessedGeoData.bin");
                 mainModel.allGISData = geoData;
                 System.out.println("Geographical data loaded");
             } else {
@@ -111,9 +112,9 @@ public class AbmCli {
         }
 
         try {
-            File casesDataFile = new File("./datasets/ProcessedCasesData.bin");
+            File casesDataFile = new File(datasetRoot+"/ProcessedCasesData.bin");
             if (casesDataFile.exists()) {
-                CovidCsseJhu casesData = MainModel.loadCasesDataKryo("./datasets/ProcessedCasesData.bin");
+                CovidCsseJhu casesData = MainModel.loadCasesDataKryo(datasetRoot+"/ProcessedCasesData.bin");
                 mainModel.covidCsseJhu = casesData;
                 System.out.println("Cases data loaded");
             } else {
@@ -129,7 +130,7 @@ public class AbmCli {
         mainModel.ABM.isReportContactRate = runConfig.isReportContactRate;
         //mainModel.javaEvaluationEngine.connectToConsole(jTextArea1);
         //mainModel.pythonEvaluationEngine.connectToConsole(jTextArea2);
-        mainModel.loadAndConnectSupplementaryCaseStudyDataKryo("./datasets/Safegraph/" + mainModel.ABM.studyScope + "/supplementaryGIS.bin");
+        mainModel.loadAndConnectSupplementaryCaseStudyDataKryo(datasetRoot+"/Safegraph/" + mainModel.ABM.studyScope + "/supplementaryGIS.bin");
 //          myParent.mainModel.allGISData.loadScopeCBGPolygons((Scope)(myParent.mainModel.ABM.studyScopeGeography));//THIS IS NOW IN SUPPLAMENTARY DATA
         ArrayList<Integer> infectionIndices = new ArrayList();
         if (runConfig.isSpecialScenarioActive == false) {

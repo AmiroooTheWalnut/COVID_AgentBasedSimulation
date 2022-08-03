@@ -9,6 +9,7 @@ import COVID_AgentBasedSimulation.GUI.MainFrame;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.AllPatterns;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.Patterns;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.Safegraph;
+import java.util.ArrayList;
 
 /**
  *
@@ -27,7 +28,7 @@ public class ManualLoadPatternsDialog extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         myMainFrameParent = (MainFrame) parent;
-        myParent=passed_SafeGraphPreprocessDialog;
+        myParent = passed_SafeGraphPreprocessDialog;
     }
 
     public void refreshList() {
@@ -110,26 +111,30 @@ public class ManualLoadPatternsDialog extends javax.swing.JDialog {
         if (jList1.getSelectedIndex() > -1) {
             myParent.mainModel.safegraph.clearPatternsPlaces();
             Patterns patterns = Safegraph.loadPatternsKryo("./datasets/Safegraph/FullData/" + jList1.getSelectedValue() + "/processedData.bin");
-            System.out.println("PATTERNS SIZE: "+patterns.patternRecords.size());
-            double avg_num_visitors=0;
-            for(int i=0;i<patterns.patternRecords.size();i++){
-                avg_num_visitors=avg_num_visitors+patterns.patternRecords.get(i).raw_visitor_counts;
+            System.out.println("PATTERNS SIZE: " + patterns.patternRecords.size());
+            double avg_num_visitors = 0;
+            for (int i = 0; i < patterns.patternRecords.size(); i++) {
+                avg_num_visitors = avg_num_visitors + patterns.patternRecords.get(i).raw_visitor_counts;
             }
-            avg_num_visitors=avg_num_visitors/(double)patterns.patternRecords.size();
-            System.out.println("PATTERNS AVERAGE VISITORS: "+avg_num_visitors);
-            
-            double avg_num_visits=0;
-            for(int i=0;i<patterns.patternRecords.size();i++){
-                avg_num_visits=avg_num_visits+patterns.patternRecords.get(i).raw_visit_counts;
+            avg_num_visitors = avg_num_visitors / (double) patterns.patternRecords.size();
+            System.out.println("PATTERNS AVERAGE VISITORS: " + avg_num_visitors);
+
+            double avg_num_visits = 0;
+            for (int i = 0; i < patterns.patternRecords.size(); i++) {
+                avg_num_visits = avg_num_visits + patterns.patternRecords.get(i).raw_visit_counts;
             }
-            avg_num_visits=avg_num_visits/(double)patterns.patternRecords.size();
-            System.out.println("PATTERNS AVERAGE VISITS: "+avg_num_visits);
-            
+            avg_num_visits = avg_num_visits / (double) patterns.patternRecords.size();
+            System.out.println("PATTERNS AVERAGE VISITS: " + avg_num_visits);
+
             boolean isUnique = true;
-            for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.size(); i++) {
-                if (myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).name.equals(patterns.name)) {
-                    isUnique = false;
+            if (myParent.mainModel.safegraph.allPatterns.monthlyPatternsList != null) {
+                for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.size(); i++) {
+                    if (myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).name.equals(patterns.name)) {
+                        isUnique = false;
+                    }
                 }
+            }else{
+                myParent.mainModel.safegraph.allPatterns.monthlyPatternsList=new ArrayList();
             }
             if (isUnique == true) {
                 myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.add(patterns);

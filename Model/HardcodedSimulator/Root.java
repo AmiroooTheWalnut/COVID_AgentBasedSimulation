@@ -48,6 +48,10 @@ import java.util.logging.Logger;
  */
 public class Root extends Agent {
 
+    public int numTravels;
+    public int numRealTravels;
+    public int numContacts;
+
     public enum statusEnum {
         SUSCEPTIBLE, INFECTED_SYM, INFECTED_ASYM, RECOVERED, DEAD;
     }
@@ -126,9 +130,9 @@ public class Root extends Agent {
 
         generateSchedules(modelRoot, passed_regionType, regions);
         generateAgents(modelRoot, passed_numAgents);
-        
-        agentPairContact = new int[people.size()][people.size()];
-
+        if (modelRoot.ABM.isReportContactRate == true) {
+            agentPairContact = new int[people.size()][people.size()];
+        }
         if (modelRoot.ABM.isShamilABMActive == true) {
             if (modelRoot.ABM.isOurABMActive == true) {
                 ShamilSimulatorController.shamilAgentGenerationSpatial(regions, people);
@@ -182,6 +186,11 @@ public class Root extends Agent {
                 tessellationIndex = getTessellationLayerIndex((Scope) (modelRoot.ABM.studyScopeGeography), "VDFNC_" + n);
                 regions = makeByVDTessellation(modelRoot, tessellationIndex, true);
                 break;
+            case "AVDFMTH":
+//                regions = makeByRandomCBGs(modelRoot, n);
+                tessellationIndex = getTessellationLayerIndex((Scope) (modelRoot.ABM.studyScopeGeography), "VDFMTH");
+                regions = makeByVDTessellation(modelRoot, tessellationIndex, true);
+                break;
             default:
 
         }
@@ -216,9 +225,13 @@ public class Root extends Agent {
         }
     }
 
-    public void generateRegionSchedules(MainModel modelRoot, ArrayList<Region> regions, ArrayList<PatternsRecordProcessed> patternRecords) {
+    public void generateRegionSchedules(MainModel modelRoot, ArrayList<Region> regions, ArrayList<PatternsRecordProcessed> patternRecords, String type) {
         for (int j = 0; j < patternRecords.size(); j++) {
-
+            if (type.equals("AVDFMTH")) {
+                if (!(isFoodAndGrocery(patternRecords.get(j).place.naics_code) || isReligiousOrganization(patternRecords.get(j).place.naics_code) || isSchool(patternRecords.get(j).place.naics_code))) {
+                    continue;
+                }
+            }
             calcCumulativeMonthWeekHour(patternRecords.get(j));// COULD BE AVOIDED IF ALL DATA BE PREPROCESSED AND TRANSIENTS ARE REMOVED
 
             if (patternRecords.get(j).visitor_home_cbgs_place != null) {
@@ -297,7 +310,7 @@ public class Root extends Agent {
 
             }
         }
-        generateRegionSchedules(modelRoot, regions, patternRecords);
+        generateRegionSchedules(modelRoot, regions, patternRecords, type);
 //        switch (type) {
 //            case "CBG":
 //                generateRegionSchedules(modelRoot, regions, patternRecords);
@@ -321,7 +334,7 @@ public class Root extends Agent {
         sumRegionsPopulation = cumulativePopulation;
         for (int i = 0; i < passed_numAgents; i++) {
             Person person = new Person(i);
-            selectHomeRegion(person, sumRegionsPopulation,0);
+            selectHomeRegion(person, sumRegionsPopulation, 0);
             selectWorkRegion(person, person.properties.homeRegion);
 
             modelRoot.ABM.agents.add(person);
@@ -336,16 +349,16 @@ public class Root extends Agent {
         for (int j = 0; j < regions.size(); j++) {
             cumulativePopulationRun = cumulativePopulationRun + regions.get(j).population;
             if (cumulativePopulationRun > indexCumulativePopulation) {
-                if(regions.get(j).scheduleList.originalDestinations.size()>0){
-                person.properties.homeRegion = regions.get(j);
-                regions.get(j).residents.add(person);
-                break;
-                }else{
-                    if(retry<20){
-                        retry=retry+1;
-                    selectHomeRegion(person,cumulativePopulation,retry);
+                if (regions.get(j).scheduleList.originalDestinations.size() > 0) {
+                    person.properties.homeRegion = regions.get(j);
+                    regions.get(j).residents.add(person);
                     break;
-                    }else{
+                } else {
+                    if (retry < 20) {
+                        retry = retry + 1;
+                        selectHomeRegion(person, cumulativePopulation, retry);
+                        break;
+                    } else {
                         System.out.println("Failed to assign a home region with a schedule!");
                     }
                 }
@@ -759,7 +772,7 @@ public class Root extends Agent {
                 for (int i = 0; i < relevantDailyConfirmedCases.size(); i++) {
                     if ((myModelRoot.ABM.currentTime).truncatedTo(ChronoUnit.DAYS).isEqual(relevantDailyConfirmedCases.get(i).date.truncatedTo(ChronoUnit.DAYS)) == true) {
                         sumRelevantCountiesPopulation += relevantDailyConfirmedCases.get(i).county.population;
-                        sumRelevantCountiesInfection += relevantDailyConfirmedCases.get(i).numActiveCases*(10f/3f);
+                        sumRelevantCountiesInfection += relevantDailyConfirmedCases.get(i).numActiveCases * (10f / 3f);
                     }
                 }
                 int expectedInfectionInScope = (int) (((double) sumRelevantCountiesInfection / (double) sumRelevantCountiesPopulation) * (double) (scope.population));
@@ -807,7 +820,7 @@ public class Root extends Agent {
                 for (int i = 0; i < relevantDailyConfirmedCases.size(); i++) {
                     if ((myModelRoot.ABM.currentTime).truncatedTo(ChronoUnit.DAYS).isEqual(relevantDailyConfirmedCases.get(i).date.truncatedTo(ChronoUnit.DAYS)) == true) {
                         sumRelevantCountiesPopulation += relevantDailyConfirmedCases.get(i).county.population;
-                        sumRelevantCountiesInfection += relevantDailyConfirmedCases.get(i).numActiveCases*(10f/3f);
+                        sumRelevantCountiesInfection += relevantDailyConfirmedCases.get(i).numActiveCases * (10f / 3f);
                     }
                 }
                 int expectedInfectionInScope = (int) (((double) sumRelevantCountiesInfection / (double) sumRelevantCountiesPopulation) * (double) (scope.population));
@@ -886,6 +899,9 @@ public class Root extends Agent {
                                             residentIndices.add(o);
                                         }
                                     }
+                                    if (residentIndices.isEmpty()) {
+                                        continue;
+                                    }
                                     int selectedResidentRaw = (int) ((rnd.nextDouble() * (residentIndices.size() - 1)));
                                     int selectedResident = residentIndices.get(selectedResidentRaw);
                                     if (regions.get(i).residents.get(selectedResident).properties.status == statusEnum.SUSCEPTIBLE.ordinal()) {
@@ -915,32 +931,32 @@ public class Root extends Agent {
                 }
             }
             int sumRelevantCountiesPopulation = 0;
-                for (int i = 0; i < relevantDailyConfirmedCases.size(); i++) {
-                    if ((myModelRoot.ABM.currentTime).truncatedTo(ChronoUnit.DAYS).isEqual(relevantDailyConfirmedCases.get(i).date.truncatedTo(ChronoUnit.DAYS)) == true) {
-                        sumRelevantCountiesPopulation += relevantDailyConfirmedCases.get(i).county.population;
-                    }
+            for (int i = 0; i < relevantDailyConfirmedCases.size(); i++) {
+                if ((myModelRoot.ABM.currentTime).truncatedTo(ChronoUnit.DAYS).isEqual(relevantDailyConfirmedCases.get(i).date.truncatedTo(ChronoUnit.DAYS)) == true) {
+                    sumRelevantCountiesPopulation += relevantDailyConfirmedCases.get(i).county.population;
                 }
-            initialRecovered((double)numInfected/(double)sumRelevantCountiesPopulation);
-        }
-        
-    }
-    
-    private void initialRecovered(double percentage){
-        int numRecovered=(int)Math.round(people.size()*percentage);
-        int currentRecovered=0;
-        int counter=0;
-        int maxCounter=50;
-        while(currentRecovered<numRecovered){
-            int selectedResident = (int) ((rnd.nextDouble() * (people.size() - 1)));
-            if(people.get(selectedResident).properties.status==statusEnum.SUSCEPTIBLE.ordinal()){
-                people.get(selectedResident).properties.status=statusEnum.RECOVERED.ordinal();
-                people.get(selectedResident).shamilPersonProperties.infectedDays = 28 + (int) (Math.random() * 32);
-                currentRecovered=currentRecovered+1;
-                counter=0;
-            }else{
-                counter=counter+1;
             }
-            if(counter>maxCounter){
+            initialRecovered((double) numInfected / (double) sumRelevantCountiesPopulation);
+        }
+
+    }
+
+    private void initialRecovered(double percentage) {
+        int numRecovered = (int) Math.round(people.size() * percentage);
+        int currentRecovered = 0;
+        int counter = 0;
+        int maxCounter = 50;
+        while (currentRecovered < numRecovered) {
+            int selectedResident = (int) ((rnd.nextDouble() * (people.size() - 1)));
+            if (people.get(selectedResident).properties.status == statusEnum.SUSCEPTIBLE.ordinal()) {
+                people.get(selectedResident).properties.status = statusEnum.RECOVERED.ordinal();
+                people.get(selectedResident).shamilPersonProperties.infectedDays = 28 + (int) (Math.random() * 32);
+                currentRecovered = currentRecovered + 1;
+                counter = 0;
+            } else {
+                counter = counter + 1;
+            }
+            if (counter > maxCounter) {
                 break;
             }
         }
@@ -1009,7 +1025,21 @@ public class Root extends Agent {
     public void behavior() {
 
         if (myModelRoot.ABM.isOurABMActive == true && myModelRoot.ABM.isShamilABMActive == true) {
+//            int counter1=0;
+//            for (int i = 0; i < people.size(); i++) {
+//                if (people.get(i).shamilPersonProperties.profession.name.equals("Hospitalized")) {
+//                     counter1=counter1+1;
+//                }
+//            }
+//            System.out.println("num hospitalized outside "+counter1);//TEMP
             ShamilSimulatorController.convertOurToShamil(people);
+//            int counter1=0;
+//            for (int i = 0; i < people.size(); i++) {
+//                if (people.get(i).shamilPersonProperties.profession.name.equals("Hospitalized")) {
+//                     counter1=counter1+1;
+//                }
+//            }
+//            System.out.println("num hospitalized outside "+counter1);//TEMP
             runShamil(true);
             ShamilSimulatorController.convertShamilToOur(people);
             ArrayList<POI> values = new ArrayList<>(pOIs.values());
@@ -1017,7 +1047,9 @@ public class Root extends Agent {
                 values.get(i).updateContamination();
             }
             prepareHourlyRegionSnapshotData();
-            pollContactAllPeople();
+            if (myModelRoot.ABM.isReportContactRate == true) {
+                pollContactAllPeople();
+            }
         } else if (myModelRoot.ABM.isOurABMActive == false && myModelRoot.ABM.isShamilABMActive == true) {
             runShamil(false);
             ShamilSimulatorController.convertShamilToOur(people);
@@ -1030,7 +1062,9 @@ public class Root extends Agent {
             }
             reportConsoleOurABMInfection(false);
             prepareHourlyRegionSnapshotData();
-            pollContactAllPeople();
+            if (myModelRoot.ABM.isReportContactRate == true) {
+                pollContactAllPeople();
+            }
         }
         if (myModelRoot.ABM.currentTime.getHour() == 0 && myModelRoot.ABM.currentTime.getMinute() == 0) {
             pollDailyInfection();
@@ -1179,7 +1213,6 @@ public class Root extends Agent {
 //            }
 //        }
 //    }
-
     public void pollDailyInfection() {
         String[] row = new String[10];
         row[0] = myModelRoot.ABM.currentTime.format(DateTimeFormatter.ISO_DATE);
@@ -1216,13 +1249,13 @@ public class Root extends Agent {
         for (int i = 0; i < relevantDailyConfirmedCases.size(); i++) {
             if ((myModelRoot.ABM.currentTime.truncatedTo(ChronoUnit.DAYS)).isEqual(relevantDailyConfirmedCases.get(i).date.truncatedTo(ChronoUnit.DAYS)) == true) {
                 sumRelevantCountiesPopulation += relevantDailyConfirmedCases.get(i).county.population;
-                sumRelevantCountiesInfection += relevantDailyConfirmedCases.get(i).numActiveCases*(10f/3f);
+                sumRelevantCountiesInfection += relevantDailyConfirmedCases.get(i).numActiveCases * (10f / 3f);
             }
         }
         int expectedInfectionInScope = (int) (((double) sumRelevantCountiesInfection / (double) sumRelevantCountiesPopulation) * (double) (scope.population));
         float iPRJHU = (float) expectedInfectionInScope / (float) (scope.population);
 
-        row[6] = String.valueOf(iPRJHU*(10f/3f));
+        row[6] = String.valueOf(iPRJHU * (10f / 3f));
         row[7] = String.valueOf(iPRJHU);
         row[8] = String.valueOf((float) (numINFECTED_SYM + numINFECTED_ASYM) / (float) pop);
         row[9] = String.valueOf((float) (numINFECTED_SYM) / (float) pop);
@@ -1287,18 +1320,21 @@ public class Root extends Agent {
             sumDeaths = sumDeaths + Integer.valueOf(infectionPoll.get(i)[5]);
             sumRecovered = sumRecovered + Integer.valueOf(infectionPoll.get(i)[4]);
         }
-        for (int i = 0; i < agentPairContact.length; i++) {
-            for (int j = 0; j < agentPairContact[0].length; j++) {
-                sumContacts = sumContacts + agentPairContact[i][j];
+        if (myModelRoot.ABM.isReportContactRate == true) {
+            for (int i = 0; i < agentPairContact.length; i++) {
+                for (int j = 0; j < agentPairContact[0].length; j++) {
+                    sumContacts = sumContacts + agentPairContact[i][j];
+                }
             }
-        }
-        avgContacts = (float) sumContacts / (float) (agentPairContact.length * agentPairContact[0].length);
-        for (int i = 0; i < agentPairContact.length; i++) {
-            for (int j = 0; j < agentPairContact[0].length; j++) {
-                varContacts = varContacts + Math.pow(agentPairContact[i][j] - sumContacts, 2);
+            avgContacts = (float) sumContacts / (float) (agentPairContact.length * agentPairContact[0].length);
+            for (int i = 0; i < agentPairContact.length; i++) {
+                for (int j = 0; j < agentPairContact[0].length; j++) {
+                    varContacts = varContacts + Math.pow(agentPairContact[i][j] - sumContacts, 2);
+                }
             }
-        }
+        
         varContacts = (double) varContacts / (double) (agentPairContact.length * agentPairContact[0].length);
+        }
         String[] row = new String[12];
         row[0] = myModelRoot.ABM.startTime.format(DateTimeFormatter.ISO_DATE);
         row[1] = myModelRoot.ABM.endTime.format(DateTimeFormatter.ISO_DATE);
@@ -1310,8 +1346,13 @@ public class Root extends Agent {
         row[7] = String.valueOf(sumDeaths);
         row[8] = String.valueOf(sumRecovered);
         row[9] = String.valueOf(sumContacts);
-        row[10] = String.valueOf(avgContacts);
-        row[11] = String.valueOf(varContacts);
+        if (myModelRoot.ABM.isReportContactRate == true) {
+            row[10] = String.valueOf(avgContacts);
+            row[11] = String.valueOf(varContacts);
+        }else{
+            row[10] = "NA";
+            row[11] = "NA";
+        }
         rows.add(row);
         try {
             CsvWriter writer = new CsvWriter();
@@ -1513,6 +1554,30 @@ public class Root extends Agent {
                 regions.get(i).hourlyRegionSnapshot.add(snapshot);
             }
         }
+    }
+
+    public static boolean isFoodAndGrocery(int naicsCode) {
+        String naicsString = String.valueOf(naicsCode);
+        if ((naicsString.startsWith("44") || naicsString.startsWith("45")) && !naicsString.startsWith("4411") && !naicsString.startsWith("4412") && !naicsString.startsWith("4413")) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean isReligiousOrganization(int naicsCode) {
+        String naicsString = String.valueOf(naicsCode);
+        if (naicsString.startsWith("8131")) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean isSchool(int naicsCode) {
+        String naicsString = String.valueOf(naicsCode);
+        if (naicsString.startsWith("61")) {
+            return true;
+        }
+        return false;
     }
 
     public void writeConvertedToCBGInfection(String filePath) {

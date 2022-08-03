@@ -22,7 +22,7 @@ public class ShamilPersonManager {
 
     static double smartphone_owner_percentage = 0.75;
 //    static double tracing_percentage = 0.3;//ORIGINAL
-    static double tracing_percentage = 0.1;
+    static double tracing_percentage = 0.08;
 //    static int quarantine_days = 14;//ORIGINAL
     static int quarantine_days = 7;
     static int trace_days = 2;
@@ -65,12 +65,12 @@ public class ShamilPersonManager {
         {
 //            put("ACTION_OCCURRING_PROBABILITY", 0.55);//ORIGINAL
 //            put("ACTION_AFFECTING_PROBABILITY", 0.55);//ORIGINAL
-            put("ACTION_OCCURRING_PROBABILITY", 0.45);
-            put("ACTION_AFFECTING_PROBABILITY", 0.45);
+            put("ACTION_OCCURRING_PROBABILITY", 0.55);
+            put("ACTION_AFFECTING_PROBABILITY", 0.55);
             //put("ACTION_INFECT_THRESHOLD", 0.45);//ORIGINAL
-            put("ACTION_INFECT_THRESHOLD", 0.35);
+            put("ACTION_INFECT_THRESHOLD", 0.77);
             //put("INFECTION_PROBABILITY", 0.55);//ORIGINAL
-            put("INFECTION_PROBABILITY", 0.55);
+            put("INFECTION_PROBABILITY", 0.81);
             put("PROTECTION_LEVEL_THRESH", 0.2);
         }
     };
@@ -280,17 +280,20 @@ public class ShamilPersonManager {
         Collections.shuffle(worker_ids);
 //        int n_workgroup = (preference_def.get("n_workgroup")).intValue();
 //        int n_workgroup = (int) (worker_ids.size() * (preference_def.get("n_workgroup") / 7410d));//ORIGINAL
-        int n_workgroup = (int) (worker_ids.size() * (preference_def.get("n_workgroup") / 5000d));//ORIGINAL
-        if (n_workgroup == 0) {
-            n_workgroup = 1;
-        }
+//        int n_workgroup = (int) (worker_ids.size() * (preference_def.get("n_workgroup") / 150000d));//ORIGINAL
+//        int n_workgroup = (int)(Math.random()*100000);
+//        if (n_workgroup == 0) {
+//            n_workgroup = 1;
+//        }
 
-        int worker_per_workgroup = (int) (Math.floorDiv(worker_ids.size(), n_workgroup));
-        if (worker_per_workgroup == 0) {
-            worker_per_workgroup = 1;
-        }
+//        int worker_per_workgroup = (int) (Math.floorDiv(worker_ids.size(), n_workgroup));
+//        if (worker_per_workgroup == 0) {
+//            worker_per_workgroup = 1;
+//        }
+        int WS=worker_ids.size();
         for (int i = 0; i < worker_ids.size(); i++) {
-            persons.get(worker_ids.get(i)).shamilPersonProperties.professionGroupId = Math.min(Math.floorDiv(i, worker_per_workgroup), n_workgroup);
+//            persons.get(worker_ids.get(i)).shamilPersonProperties.professionGroupId = Math.min(Math.floorDiv(i, worker_per_workgroup), n_workgroup);
+            persons.get(worker_ids.get(i)).shamilPersonProperties.professionGroupId = (int)(Math.random()*WS/10.0);
         }
 //        for (int i = 0; i < persons.size(); i++) {
 //            System.out.println(persons.get(i).shamilPersonProperties.professionGroupId);
@@ -397,12 +400,12 @@ public class ShamilPersonManager {
         }
     }
 
-    public static void hospitalize(Person person) {
+    public static void hospitalize(Person person,int i) {
         if (person.shamilPersonProperties.isInfected == true && !(person.shamilPersonProperties.profession.name.equals("Hospitalized"))) {
             double tmp = Math.random();
             if (tmp > 0.75) {
-
-                person.shamilPersonProperties.profession.name = "Hospitalized";
+                person.shamilPersonProperties.profession=new ShamilProfession(profession_df.get(4));
+//                System.out.println("HOSPITALIZED: "+i);
                 //print('Person {} has been hospitalized'.format(self.id))
             }
         }

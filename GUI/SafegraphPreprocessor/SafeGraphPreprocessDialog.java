@@ -625,7 +625,7 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
             String[] patternsList = AllPatterns.detectAllPatterns("./datasets/Safegraph/FullData");
             for (int i = 0; i < patternsList.length; i++) {
                 myParent.mainModel.safegraph.clearPatternsPlaces();
-                mainModel.safegraph.loadPatternsPlacesSet(patternsList[i].split("_")[1] + "_" + patternsList[i].split("_")[2], myParent.mainModel.allGISData, "FullData", true, myParent.numProcessors);
+                mainModel.safegraph.loadPatternsPlacesSet(mainModel.datasetDirectory, patternsList[i].split("_")[1] + "_" + patternsList[i].split("_")[2], myParent.mainModel.allGISData, "FullData", true, myParent.numProcessors);
 
                 if (mainModel.safegraph.allPatterns.monthlyPatternsList != null && mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList != null) {
                     if (mainModel.safegraph.allPatterns.monthlyPatternsList.size() > 0 && mainModel.safegraph.allPatterns.monthlyPatternsList.size() > 0) {

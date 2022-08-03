@@ -20,23 +20,23 @@ public class AdvancedParallelTest extends ParallelProcessor {
 
     Runnable myRunnable;
 
-    public AdvancedParallelTest(AbmCli parent, String projectLocation, RunConfig runConfig, int numProcessors, int startIndex, int endIndex) {
+    public AdvancedParallelTest(AbmCli parent, String datasetRoot, String projectLocation, RunConfig runConfig, int numProcessors, int startIndex, int endIndex) {
         super(parent, runConfig, startIndex, endIndex);
 
         myRunnable = new Runnable() {
             @Override
             public void run() {
-
                 MainModel mainModel = new MainModel();
+                mainModel.datasetDirectory = datasetRoot;
                 mainModel.numCPUs = numProcessors;
 
                 mainModel.initAgentBasedModel(false);
                 mainModel.initData();
 
                 try {
-                    File geoDataFile = new File("./datasets/ProcessedGeoData.bin");
+                    File geoDataFile = new File(datasetRoot+"/ProcessedGeoData.bin");
                     if (geoDataFile.exists()) {
-                        AllGISData geoData = MainModel.loadAllGISDataKryo("./datasets/ProcessedGeoData.bin");
+                        AllGISData geoData = MainModel.loadAllGISDataKryo(datasetRoot+"/ProcessedGeoData.bin");
                         mainModel.allGISData = geoData;
                         System.out.println("Geographical data loaded");
                     } else {
@@ -47,9 +47,9 @@ public class AdvancedParallelTest extends ParallelProcessor {
                 }
 
                 try {
-                    File casesDataFile = new File("./datasets/ProcessedCasesData.bin");
+                    File casesDataFile = new File(datasetRoot+"/ProcessedCasesData.bin");
                     if (casesDataFile.exists()) {
-                        CovidCsseJhu casesData = MainModel.loadCasesDataKryo("./datasets/ProcessedCasesData.bin");
+                        CovidCsseJhu casesData = MainModel.loadCasesDataKryo(datasetRoot+"/ProcessedCasesData.bin");
                         mainModel.covidCsseJhu = casesData;
                         System.out.println("Cases data loaded");
                     } else {
@@ -65,7 +65,7 @@ public class AdvancedParallelTest extends ParallelProcessor {
                 mainModel.ABM.isReportContactRate = runConfig.isReportContactRate;
                 //mainModel.javaEvaluationEngine.connectToConsole(jTextArea1);
                 //mainModel.pythonEvaluationEngine.connectToConsole(jTextArea2);
-                mainModel.loadAndConnectSupplementaryCaseStudyDataKryo("./datasets/Safegraph/" + mainModel.ABM.studyScope + "/supplementaryGIS.bin");
+                mainModel.loadAndConnectSupplementaryCaseStudyDataKryo(datasetRoot+"/Safegraph/" + mainModel.ABM.studyScope + "/supplementaryGIS.bin");
 //          myParent.mainModel.allGISData.loadScopeCBGPolygons((Scope)(myParent.mainModel.ABM.studyScopeGeography));//THIS IS NOW IN SUPPLAMENTARY DATA
                 ArrayList<Integer> infectionIndices = new ArrayList();
                 if (runConfig.isSpecialScenarioActive == false) {

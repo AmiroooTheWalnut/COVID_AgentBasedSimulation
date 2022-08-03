@@ -85,7 +85,7 @@ public class ShamilDaySimulator {
 //                prsn.setTasks(TaskManager.generateTasks(tasks_df[tasks_df["profession"]=="Service"]))
             } else if (prof_pers.name.equals("Hospitalized")) {//ADDED BY AMIROOO
                 people.get(i).shamilPersonProperties.tasks = ShamilTaskManager.generateTasks(ShamilPersonManager.profession_df.get(4));
-            }else{
+            } else {
                 // isolated- no task - empty list
                 people.get(i).shamilPersonProperties.tasks.clear();
             }
@@ -93,28 +93,37 @@ public class ShamilDaySimulator {
     }
 
     public static void dayEnd(ArrayList<Person> persons, int num_of_day, int trace_days, int quarantine_days, ArrayList<HashMap<Integer, ArrayList<Integer>>> groupdetails) {
-        // # fline = open("seed.txt").readline().rstrip()
+// # fline = open("seed.txt").readline().rstrip()
         // # ranseed = int(fline)
         // # np.random.seed(ranseed)
 
         double INFECTION_PROBABILITY = thresholds_df.get("INFECTION_PROBABILITY");
 //        INFECTION_PROBABILITY = dfToFloat(thresholds_df,"INFECTION_PROBABILITY")        
-
+        double avgTravelsPerDay=0;
         for (int i = 0; i < persons.size(); i++) { // prsn in persons:
+
             Person prsn = persons.get(i);
+            avgTravelsPerDay=avgTravelsPerDay+prsn.numTravelsInDay;
+            prsn.numTravelsInDay=0;
+//            String initialProfessionName=prsn.shamilPersonProperties.profession.name;
             if (prsn.shamilPersonProperties.quarantinedDay > -1) {
                 prsn.shamilPersonProperties.quarantinedDay += 1;
                 if (prsn.shamilPersonProperties.quarantinedDay == quarantine_days && prsn.shamilPersonProperties.isInfected == false) {
                     prsn.shamilPersonProperties.quarantinedDay = -1;
-                    prsn.shamilPersonProperties.profession = prsn.shamilPersonProperties.initialProfession;
+                    prsn.shamilPersonProperties.profession = new ShamilProfession(prsn.shamilPersonProperties.initialProfession);
                 }
             }
+//            String endProfessionName1=prsn.shamilPersonProperties.profession.name;
+//            if(endProfessionName1.equals("Hospitalized") && !initialProfessionName.equals("Hospitalized")){
+//                 System.out.println("!!!!!!!!!!!!!!!!!!");
+//            }
 
             if (prsn.shamilPersonProperties.isInfected == false) {
 
                 if (prsn.shamilPersonProperties.infectionLevel >= INFECTION_PROBABILITY) {
                     prsn.shamilPersonProperties.isInfected = true;
                     prsn.shamilPersonProperties.state = "Infected_notContagious";//.setState('Infected_notContagious')
+//                    System.out.println("INFECTED BY SHAMIL");
                     // #print("\n\n\nNew Guy: {} by {} - Profession: {}".format(prsn.id, prsn.infected_by, prsn.profession))
 
                     // #if(prsn.profession=='Isolated'):
@@ -127,7 +136,7 @@ public class ShamilDaySimulator {
                 prsn.shamilPersonProperties.infectedDays += 1;
 
                 if (prsn_state.equals("contagious_symptomatic")) {
-                    ShamilPersonManager.hospitalize(prsn);
+                    ShamilPersonManager.hospitalize(prsn, i);
 //                    prsn.hospitalize();
                 }
 
@@ -141,17 +150,17 @@ public class ShamilDaySimulator {
                     if (prsn.shamilPersonProperties.isAlive == false) {
                         prsn.shamilPersonProperties.state = "Dead";
                         prsn.shamilPersonProperties.isInfected = false;//ADDED BY AMIROOO
-                    } else if (prsn.shamilPersonProperties.infectedDays >= Math.round(Math.max(50, 50+15*Math.random())) && prsn.shamilPersonProperties.state.equals("recovered")) {//ADDED BY AMIROOO WAS 60
+                    } else if (prsn.shamilPersonProperties.infectedDays >= Math.round(Math.max(50, 50 + 15 * Math.random())) && prsn.shamilPersonProperties.state.equals("recovered")) {//ADDED BY AMIROOO WAS 60
                         prsn.shamilPersonProperties.state = "Not_infected";
                         prsn.shamilPersonProperties.isInfected = false;
                         prsn.shamilPersonProperties.quarantinedDay = -1;
-                    } else if (prsn.shamilPersonProperties.infectedDays >= Math.round(Math.max(14, 14+10*Math.random())) && (prsn.shamilPersonProperties.state.equals("contagious_symptomatic") || prsn.shamilPersonProperties.state.equals("contagious_asymptomatic"))) {//ADDED BY AMIROOO WAS 18
+                    } else if (prsn.shamilPersonProperties.infectedDays >= Math.round(Math.max(14, 14 + 10 * Math.random())) && (prsn.shamilPersonProperties.state.equals("contagious_symptomatic") || prsn.shamilPersonProperties.state.equals("contagious_asymptomatic"))) {//ADDED BY AMIROOO WAS 18
                         prsn.shamilPersonProperties.state = "recovered";//ADDED BY AMIROOO
                         prsn.shamilPersonProperties.isInfected = false;//ADDED BY AMIROOO
-                    } else if (prsn.shamilPersonProperties.infectedDays >= Math.round(Math.max(5, 5+2*Math.random())) && prsn.shamilPersonProperties.state.equals("contagious_asymptomatic")) {//EDITTED BY AMIROOO IT WAS 6
+                    } else if (prsn.shamilPersonProperties.infectedDays >= Math.round(Math.max(5, 5 + 2 * Math.random())) && prsn.shamilPersonProperties.state.equals("contagious_asymptomatic")) {//EDITTED BY AMIROOO IT WAS 6
                         if (Math.random() > 0.5) {//ADDED BY AMIROOO
                             prsn.shamilPersonProperties.state = "contagious_symptomatic";
-                            prsn.shamilPersonProperties.isInfected=true;
+                            prsn.shamilPersonProperties.isInfected = true;
                             // # elif(prsn.infected_days==1):
                             // #     prsn.setState('contagious_symptomatic')
                             // #contact trace
@@ -174,19 +183,21 @@ public class ShamilDaySimulator {
 //                                        PROBABILITY_OF_RECORD_EXISTING = 0.9
                                             if (record_found_prob < PROBABILITY_OF_RECORD_EXISTING) {
                                                 ArrayList<Integer> grparray = groupdetails.get(k).get(prsn.shamilPersonProperties.id); //[prsn.id]
-                                                for (int m = 0; m < grparray.size(); m++) { // contactperson_id in grparray:
-                                                    int contactperson_id = grparray.get(m);
+                                                if (grparray != null) {
+                                                    for (int m = 0; m < grparray.size(); m++) { // contactperson_id in grparray:
+                                                        int contactperson_id = grparray.get(m);
 
-                                                    // #contactperson.initial_profession = contactperson.profession
-                                                    Person contactperson = persons.get(contactperson_id); //[contactperson_id]
-                                                    double isolated_prob = Math.random();
-                                                    if (isolated_prob < 0.5) {
-                                                        contactperson.shamilPersonProperties.profession.name = "Isolated";
-                                                    } else {
-                                                        contactperson.shamilPersonProperties.profession.name = "Unemployed";
+                                                        // #contactperson.initial_profession = contactperson.profession
+                                                        Person contactperson = persons.get(contactperson_id); //[contactperson_id]
+                                                        double isolated_prob = Math.random();
+                                                        if (isolated_prob < 0.5) {
+                                                            contactperson.shamilPersonProperties.profession.name = "Isolated";
+                                                        } else {
+                                                            contactperson.shamilPersonProperties.profession.name = "Unemployed";
+                                                        }
+                                                        contactperson.shamilPersonProperties.quarantinedDay = 0;
+                                                        // #print("{} has been tracked down!".format(contactperson.id))
                                                     }
-                                                    contactperson.shamilPersonProperties.quarantinedDay = 0;
-                                                    // #print("{} has been tracked down!".format(contactperson.id))
                                                 }
                                             }
                                         }
@@ -194,12 +205,18 @@ public class ShamilDaySimulator {
                                 }
                             }
                         }
-                    } else if (prsn.shamilPersonProperties.infectedDays >= Math.round(Math.max(3, 3+2*Math.random())) && prsn.shamilPersonProperties.state.equals("Infected_notContagious")) {//EDITTED BY AMIROOO IT WAS 4
+                    } else if (prsn.shamilPersonProperties.infectedDays >= Math.round(Math.max(3, 3 + 2 * Math.random())) && prsn.shamilPersonProperties.state.equals("Infected_notContagious")) {//EDITTED BY AMIROOO IT WAS 4
                         prsn.shamilPersonProperties.state = "contagious_asymptomatic";
-                        prsn.shamilPersonProperties.isInfected=true;
+                        prsn.shamilPersonProperties.isInfected = true;
                     }
                 }
             }
+//            String endProfessionName=prsn.shamilPersonProperties.profession.name;
+//            if(endProfessionName.equals("Hospitalized") && !initialProfessionName.equals("Hospitalized")){
+//                 System.out.println("!!!!!!!!!!!!!!!!!!");
+//            }
         }
+        avgTravelsPerDay=avgTravelsPerDay/(double)(persons.size());
+        System.out.println("Average travels per day per agent: "+avgTravelsPerDay);
     }
 }

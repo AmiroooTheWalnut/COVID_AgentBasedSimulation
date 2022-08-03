@@ -110,7 +110,7 @@ public class ManualLoadPatternsPlacesDialog extends javax.swing.JDialog {
         if (jList1.getSelectedIndex() > -1) {
             myParent.mainModel.safegraph.clearPatternsPlaces();
             String temp[]=jList1.getSelectedValue().split("_");
-            myParent.mainModel.safegraph.loadPatternsPlacesSet(temp[1]+"_"+temp[2], myParent.mainModel.allGISData, loadScope, true, myMainFrameParent.numProcessors);
+            myParent.mainModel.safegraph.loadPatternsPlacesSet(myParent.mainModel.datasetDirectory, temp[1]+"_"+temp[2], myParent.mainModel.allGISData, loadScope, true, myMainFrameParent.numProcessors);
             myParent.refreshPatternsList();
             myParent.refreshPlacesList();
                     

@@ -13,10 +13,10 @@ import java.util.ArrayList;
  * @author user
  */
 public class ScheduleList {
-    ArrayList<PatternsRecordProcessed> originalDestinations=new ArrayList();
-    ArrayList<Double> originalFrequencies=new ArrayList();
+    public ArrayList<PatternsRecordProcessed> originalDestinations=new ArrayList();
+    public ArrayList<Double> originalFrequencies=new ArrayList();
     
-    double originalSumFrequencies=0;
+    public double originalSumFrequencies=0;
     
     //FREQUENCIES STORED AFTER COLD RUN
     ArrayList<PatternsRecordProcessed> destinations=new ArrayList();

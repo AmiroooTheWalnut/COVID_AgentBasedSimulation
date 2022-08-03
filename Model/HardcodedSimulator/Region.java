@@ -21,9 +21,9 @@ public class Region extends Marker implements Serializable {
     public transient ScheduleList scheduleList=new ScheduleList();
     public transient double workPopulation;
     
-    public transient ArrayList<Long> cBGsIDsInvolved = new ArrayList();
+    public ArrayList<Long> cBGsIDsInvolved = new ArrayList();
     public transient ArrayList<CensusBlockGroup> cBGsInvolved = new ArrayList();
-    public transient ArrayList<Double> cBGsPercentageInvolved = new ArrayList();
+    public ArrayList<Double> cBGsPercentageInvolved = new ArrayList();
     
     public transient ArrayList<Person> residents=new ArrayList();
     public transient ArrayList<Person> workers=new ArrayList();

@@ -49,12 +49,12 @@ public class CovidCsseJhu extends Dataset implements Serializable {
     public ArrayList<DailyConfirmedCases> casesList = new ArrayList();
 
     @Override
-    public void requestDataset(AllGISData allGISData, String project, String year, String month, boolean isParallel, int numCPU) {
+    public void requestDataset(String datasetRoot, AllGISData allGISData, String project, String year, String month, boolean isParallel, int numCPU) {
 
     }
 
     @Override
-    public void requestDatasetRange(AllGISData allGISData, String project, String years[], String months[][], boolean isParallel, int numCPU) {
+    public void requestDatasetRange(String datasetRoot, AllGISData allGISData, String project, String years[], String months[][], boolean isParallel, int numCPU) {
 
     }
 

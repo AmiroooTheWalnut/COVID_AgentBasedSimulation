@@ -20,8 +20,8 @@ import java.util.List;
  */
 public class POI {
 
-    public static double CONTACT_RATE = 0.4;//CONTACT PER MINUTE
-    public static double CHANCE_OF_ENV_CONTAMINATION = 0.0002;
+    public static double CONTACT_RATE = 0.23;//0.55;//0.23;//CONTACT PER MINUTE
+    public static double CHANCE_OF_ENV_CONTAMINATION = 0.00015;//0.00055;//0.00015;
 
     public PatternsRecordProcessed patternsRecord;
     public double contaminatedTime = 0;
@@ -30,12 +30,26 @@ public class POI {
 
     double numInfected = 0;
 
-    public void contact(ZonedDateTime currentTime, Person person) {
-        double probability = getProbabilityOfInfection(currentTime);
+    final double fixedTransmissionRate = 0.000001;
 
-        infectedByEnvironment(person);
-        infectByContact(probability, person);
+    public void contact(ZonedDateTime currentTime, Person person, boolean isUseBuildingLogic) {
+        if (isUseBuildingLogic == true) {
+            double probability = getProbabilityOfInfection(currentTime);
 
+            infectedByEnvironment(person);
+            infectByContact(probability, person);
+        } else {
+            if (Math.random() < fixedTransmissionRate) {
+                if (person.properties.status == statusEnum.SUSCEPTIBLE.ordinal()) {
+//                System.out.println("CONTACT INFECTION");
+                    if (Math.random() > 0.7) {
+                        person.properties.status = statusEnum.INFECTED_ASYM.ordinal();
+                    } else {
+                        person.properties.status = statusEnum.INFECTED_SYM.ordinal();
+                    }
+                }
+            }
+        }
     }
 
     public double getProbabilityOfInfection(ZonedDateTime currentTime) {
@@ -70,13 +84,17 @@ public class POI {
 //                numInfected += 1;
 //            }
 //        }
-        if (Math.random() < CONTACT_RATE * (numInfected / (double) (peopleInPOI.size())) * probability) {
-            if (person.properties.status == statusEnum.SUSCEPTIBLE.ordinal()) {
+
+        if (Math.random() < CONTACT_RATE) {
+            person.numContacts = person.numContacts + 1;
+            if (Math.random() < (numInfected / (double) (peopleInPOI.size())) * probability) {
+                if (person.properties.status == statusEnum.SUSCEPTIBLE.ordinal()) {
 //                System.out.println("CONTACT INFECTION");
-                if (Math.random() > 0.7) {
-                    person.properties.status = statusEnum.INFECTED_ASYM.ordinal();
-                } else {
-                    person.properties.status = statusEnum.INFECTED_SYM.ordinal();
+                    if (Math.random() > 0.7) {
+                        person.properties.status = statusEnum.INFECTED_ASYM.ordinal();
+                    } else {
+                        person.properties.status = statusEnum.INFECTED_SYM.ordinal();
+                    }
                 }
             }
         }
