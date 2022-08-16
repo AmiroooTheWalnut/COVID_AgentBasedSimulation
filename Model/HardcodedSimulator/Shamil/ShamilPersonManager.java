@@ -22,7 +22,7 @@ public class ShamilPersonManager {
 
     static double smartphone_owner_percentage = 0.75;
 //    static double tracing_percentage = 0.3;//ORIGINAL
-    static double tracing_percentage = 0.08;
+    static double tracing_percentage = 0.3;
 //    static int quarantine_days = 14;//ORIGINAL
     static int quarantine_days = 7;
     static int trace_days = 2;
@@ -68,9 +68,9 @@ public class ShamilPersonManager {
             put("ACTION_OCCURRING_PROBABILITY", 0.55);
             put("ACTION_AFFECTING_PROBABILITY", 0.55);
             //put("ACTION_INFECT_THRESHOLD", 0.45);//ORIGINAL
-            put("ACTION_INFECT_THRESHOLD", 0.77);
+            put("ACTION_INFECT_THRESHOLD", 0.45);
             //put("INFECTION_PROBABILITY", 0.55);//ORIGINAL
-            put("INFECTION_PROBABILITY", 0.81);
+            put("INFECTION_PROBABILITY", 0.55);
             put("PROTECTION_LEVEL_THRESH", 0.2);
         }
     };
