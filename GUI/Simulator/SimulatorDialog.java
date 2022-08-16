@@ -211,6 +211,7 @@ public class SimulatorDialog extends javax.swing.JDialog {
         jSpinner4 = new javax.swing.JSpinner();
         jCheckBox7 = new javax.swing.JCheckBox();
         jButton5 = new javax.swing.JButton();
+        jCheckBox8 = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -1056,6 +1057,8 @@ public class SimulatorDialog extends javax.swing.JDialog {
             }
         });
 
+        jCheckBox8.setText("Is fuzzy status?");
+
         javax.swing.GroupLayout jPanel25Layout = new javax.swing.GroupLayout(jPanel25);
         jPanel25.setLayout(jPanel25Layout);
         jPanel25Layout.setHorizontalGroup(
@@ -1069,7 +1072,8 @@ public class SimulatorDialog extends javax.swing.JDialog {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jSpinner4, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jCheckBox7)
-                    .addComponent(jButton5))
+                    .addComponent(jButton5)
+                    .addComponent(jCheckBox8))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel25Layout.setVerticalGroup(
@@ -1083,7 +1087,9 @@ public class SimulatorDialog extends javax.swing.JDialog {
                     .addComponent(jSpinner4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(jCheckBox7)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 25, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addComponent(jCheckBox8)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jButton5)
                 .addContainerGap())
         );
@@ -1597,6 +1603,7 @@ public class SimulatorDialog extends javax.swing.JDialog {
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         myParent.mainModel.ABM.isReportContactRate = jCheckBox3.isSelected();
+        myParent.mainModel.ABM.isFuzzyStatus = jCheckBox8.isSelected();
 //        myParent.mainModel.javaEvaluationEngine.connectToConsole(jTextArea1);
 //        myParent.mainModel.pythonEvaluationEngine.connectToConsole(jTextArea2);
         myParent.mainModel.loadAndConnectSupplementaryCaseStudyDataKryo("./datasets/Safegraph/" + myParent.mainModel.ABM.studyScope + "/supplementaryGIS.bin");
@@ -1652,7 +1659,7 @@ public class SimulatorDialog extends javax.swing.JDialog {
                                 int status = -1;
                                 lat = (Float) ((Person) myParent.mainModel.ABM.agents.get(i)).lat;
                                 lon = (Float) ((Person) myParent.mainModel.ABM.agents.get(i)).lon;
-                                status = (Integer) ((Person) myParent.mainModel.ABM.agents.get(i)).properties.status;
+                                status = (Integer) ((Person) myParent.mainModel.ABM.agents.get(i)).insidePeople.get(0).fpp.status;//ONLY FIRST PERSON INSIDE THE AGENT
                                 if (lat != null && lon != null) {
                                     lats.add(lat);
                                     lons.add(lon);
@@ -1821,12 +1828,11 @@ public class SimulatorDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jCheckBox7ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-        for(int i=0;i<myParent.mainModel.ABM.root.regions.size();i++){
+//        for(int i=0;i<myParent.mainModel.ABM.root.regions.size();i++){
 //            ScheduleList a = myParent.mainModel.ABM.root.regions.get(i).scheduleList.;
-        }
-        
-        
-        
+//        }
+
+
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
@@ -1851,6 +1857,7 @@ public class SimulatorDialog extends javax.swing.JDialog {
     private javax.swing.JCheckBox jCheckBox5;
     private javax.swing.JCheckBox jCheckBox6;
     private javax.swing.JCheckBox jCheckBox7;
+    private javax.swing.JCheckBox jCheckBox8;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

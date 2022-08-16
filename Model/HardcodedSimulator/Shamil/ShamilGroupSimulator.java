@@ -37,52 +37,56 @@ public class ShamilGroupSimulator {
 //            acting_person = grp.persons[grp.person_mapper[acting_person_id]];
 
             for (int j = 0; j < grp.persons.size(); j++) {// prsn in grp.persons:
-                if (randn(actn.min_prob_affect , actn.max_prob_affect) > ACTION_AFFECTING_PROBABILITY) {
+                for (int m = 0; m < grp.persons.get(j).insidePeople.size(); m++) {
+                    if (randn(actn.min_prob_affect, actn.max_prob_affect) > ACTION_AFFECTING_PROBABILITY) {
 //                if(randn(actn.min_prob_affect,actn.max_prob_affect)>ACTION_AFFECTING_PROBABILITY):
-                    if (grp.persons.get(j).shamilPersonProperties.id == acting_person_id) {
-                        if (actn.min_effect_self >= 0) {
+                        if (grp.persons.get(j).shamilPersonProperties.id == acting_person_id) {
+                            if (actn.min_effect_self >= 0) {
 
-                            double infection = (1 - grp.persons.get(j).shamilPersonProperties.protectionLevel) * randn(actn.min_effect_self , actn.max_effect_self);
+                                double infection = (1 - grp.persons.get(j).shamilPersonProperties.protectionLevel) * randn(actn.min_effect_self, actn.max_effect_self);
 
-                            // #print(infection)
-                            if (infection > ACTION_INFECT_THRESHOLD) {
-
-                                grp.persons.get(j).shamilPersonProperties.infectionLevel = Math.max(Math.min(grp.persons.get(j).shamilPersonProperties.infectionLevel + infection, 1), 0);
-                                // #print("\n" + str(actn.name) + " the infection case for self infection is - " + str(prsn.infection_level));
-                            }
-                        } else {
-
-                            double infection = (1 - grp.persons.get(j).shamilPersonProperties.protectionLevel) * randn(actn.min_effect_self , actn.max_effect_self);
-                            // #print("the infection case is - " + str(infection))
-                            double infection_pos = (-1) * infection;
-
-                            if (infection_pos > ACTION_INFECT_THRESHOLD) {
-
-                                grp.persons.get(j).shamilPersonProperties.infectionLevel = Math.max(Math.min(grp.persons.get(j).shamilPersonProperties.infectionLevel + infection, 1), 0);
-                            }
-                        }
-                    } else {
-                        if (acting_person.shamilPersonProperties.state.equals("contagious_asymptomatic") || acting_person.shamilPersonProperties.state.equals("contagious_symptomatic")) {
-
-                            if (grp.persons.get(j).shamilPersonProperties.isInfected == false) {
-
-                                // #print("the people - " + str(acting_person_id) + " " +str(actn.person_id) + " " + str(prsn.id))
-                                double proximit = grp.getProximity(acting_person_id, grp.persons.get(j).shamilPersonProperties.id);
-                                // #proximit = 1
-
-                                double infection = (1 - grp.persons.get(j).shamilPersonProperties.protectionLevel) * randn(actn.min_effect_others , actn.max_effect_others);
-//                                infection = (1-grp.persons.get(j).shamilPersonProperties.protectionLevel) * randn(actn.min_effect_others,actn.max_effect_others)
-                                // #print("infection before = " + str(infection) + " proximity - " + str(proximit))
-
-                                infection = infection * proximit;
-
+                                // #print(infection)
                                 if (infection > ACTION_INFECT_THRESHOLD) {
 
-                                    grp.persons.get(j).shamilPersonProperties.infectionLevel = Math.max(Math.min(grp.persons.get(j).shamilPersonProperties.infectionLevel + infection, 1), 0);
+                                    grp.persons.get(j).insidePeople.get(m).sfpp.infectionLevel = Math.max(Math.min(grp.persons.get(j).insidePeople.get(m).sfpp.infectionLevel + infection, 1), 0);
+                                    // #print("\n" + str(actn.name) + " the infection case for self infection is - " + str(prsn.infection_level));
+                                }
+                            } else {
 
-                                    grp.persons.get(j).shamilPersonProperties.infectedBy = acting_person_id;
+                                double infection = (1 - grp.persons.get(j).shamilPersonProperties.protectionLevel) * randn(actn.min_effect_self, actn.max_effect_self);
+                                // #print("the infection case is - " + str(infection))
+                                double infection_pos = (-1) * infection;
 
-                                    grp.persons.get(j).shamilPersonProperties.infectedByUpdt += 1;
+                                if (infection_pos > ACTION_INFECT_THRESHOLD) {
+
+                                    grp.persons.get(j).insidePeople.get(m).sfpp.infectionLevel = Math.max(Math.min(grp.persons.get(j).insidePeople.get(m).sfpp.infectionLevel + infection, 1), 0);
+                                }
+                            }
+                        } else {
+                            for (int n = 0; n < acting_person.insidePeople.size(); n++) {
+                                if (acting_person.insidePeople.get(n).sfpp.state.equals("contagious_asymptomatic") || acting_person.insidePeople.get(n).sfpp.state.equals("contagious_symptomatic")) {
+
+                                    if (grp.persons.get(j).insidePeople.get(m).sfpp.isInfected == false) {
+
+                                        // #print("the people - " + str(acting_person_id) + " " +str(actn.person_id) + " " + str(prsn.id))
+                                        double proximit = grp.getProximity(acting_person_id, grp.persons.get(j).shamilPersonProperties.id);
+                                        // #proximit = 1
+
+                                        double infection = (1 - grp.persons.get(j).shamilPersonProperties.protectionLevel) * randn(actn.min_effect_others, actn.max_effect_others);
+//                                infection = (1-grp.persons.get(j).shamilPersonProperties.protectionLevel) * randn(actn.min_effect_others,actn.max_effect_others)
+                                        // #print("infection before = " + str(infection) + " proximity - " + str(proximit))
+
+                                        infection = infection * proximit;
+
+                                        if (infection > ACTION_INFECT_THRESHOLD) {
+
+                                            grp.persons.get(j).insidePeople.get(m).sfpp.infectionLevel = Math.max(Math.min(grp.persons.get(j).insidePeople.get(m).sfpp.infectionLevel + infection, 1), 0);
+
+                                            grp.persons.get(j).shamilPersonProperties.infectedBy = acting_person_id;
+
+                                            grp.persons.get(j).shamilPersonProperties.infectedByUpdt += 1;
+                                        }
+                                    }
                                 }
                             }
                         }

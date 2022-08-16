@@ -15,10 +15,13 @@ import COVID_AgentBasedSimulation.Model.HardcodedSimulator.RegionSnapshot;
 import COVID_AgentBasedSimulation.Model.HistoricalRun;
 import COVID_AgentBasedSimulation.Model.Structure.Marker;
 import de.fhpotsdam.unfolding.geo.Location;
+import de.siegmar.fastcsv.writer.CsvWriter;
 import java.awt.Component;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.charset.Charset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,6 +31,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.TreeSelectionEvent;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
@@ -43,10 +47,14 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
     Timer zoomTimer;
 
     HistoricalRun currentHistoricalRun;
+    HistoricalRun currentHistoricalRunCBG;
+    HistoricalRun currentHistoricalRunVD;
 
     ProcessingMapRenderer sketch;
 
     LegendRange legendRange = new LegendRange();
+    
+    TreeSelectionEvent lastEvent;
 
     /**
      * Creates new form PreviousRunsDialog
@@ -135,6 +143,9 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
         jButton1 = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
         jTree1 = new javax.swing.JTree();
+        jToggleButton1 = new javax.swing.JToggleButton();
+        jToggleButton2 = new javax.swing.JToggleButton();
+        jButton3 = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jList2 = new javax.swing.JList<>();
@@ -164,20 +175,54 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
         });
         jScrollPane3.setViewportView(jTree1);
 
+        jToggleButton1.setText("Set CBG");
+        jToggleButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButton1ActionPerformed(evt);
+            }
+        });
+
+        jToggleButton2.setText("Set VD");
+        jToggleButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButton2ActionPerformed(evt);
+            }
+        });
+
+        jButton3.setText("Get report (last index)");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addComponent(jButton1)
-                .addGap(0, 76, Short.MAX_VALUE))
+                .addGap(0, 0, Short.MAX_VALUE))
             .addComponent(jScrollPane3)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jToggleButton1)
+                    .addComponent(jToggleButton2)
+                    .addComponent(jButton3))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 897, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 806, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jToggleButton1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jToggleButton2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
                 .addComponent(jButton1)
                 .addContainerGap())
         );
@@ -322,6 +367,99 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
         sketch.saveFile();
     }//GEN-LAST:event_jButton2ActionPerformed
 
+    private void jToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
+        if (jToggleButton1.isSelected()) {
+            loadHistoricalRunCBG(lastEvent);
+        } else {
+            currentHistoricalRunCBG = null;
+        }
+    }//GEN-LAST:event_jToggleButton1ActionPerformed
+
+    private void jToggleButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton2ActionPerformed
+        if (jToggleButton1.isSelected()) {
+            loadHistoricalRunVD(lastEvent);
+        } else {
+            currentHistoricalRunVD = null;
+        }
+    }//GEN-LAST:event_jToggleButton2ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        if (jList2.getSelectedIndex() > -1) {
+            if (currentHistoricalRunVD != null && currentHistoricalRunCBG != null) {
+                String splitted[] = jList2.getSelectedValue().split(File.separator + "(");
+                try {
+                    Field field = RegionSnapshot.class.getDeclaredField(splitted[1].substring(0, splitted[1].length() - 1));
+                    ArrayList<String[]> allValues = new ArrayList();
+                    for (int i = 0; i < currentHistoricalRunVD.regions.size(); i++) {
+                        String[] row = new String[currentHistoricalRunVD.regions.get(i).cBGsPercentageInvolved.size()];
+                        for (int h = 0; h < currentHistoricalRunVD.regions.get(i).cBGsPercentageInvolved.size(); h++) {
+                            for (int m = 0; m < currentHistoricalRunCBG.regions.size(); m++) {
+                                if (currentHistoricalRunCBG.regions.get(m).cBGsIDsInvolved.get(0).equals(currentHistoricalRunVD.regions.get(i).cBGsIDsInvolved.get(h))) {
+                                    String val = String.valueOf(Double.valueOf(String.valueOf(field.get(currentHistoricalRunCBG.regions.get(m).hourlyRegionSnapshot.get(jSlider1.getValue())))) * currentHistoricalRunVD.regions.get(i).cBGsPercentageInvolved.get(h));
+                                    row[h] = val;
+                                }
+                            }
+
+                        }
+                        allValues.add(row);
+//                        if(val>0){
+//                            System.out.println("Region: "+i);
+//                        }
+                    }
+                    try {
+                        CsvWriter writer = new CsvWriter();
+                        writer.write(new File("ReportCBGInVD.csv"), Charset.forName("US-ASCII"), allValues);
+                    } catch (IOException ex) {
+                        Logger.getLogger(PreviousRunsDialog.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                } catch (NoSuchFieldException ex) {
+                    Logger.getLogger(PreviousRunsDialog.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (SecurityException ex) {
+                    Logger.getLogger(PreviousRunsDialog.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IllegalArgumentException ex) {
+                    Logger.getLogger(PreviousRunsDialog.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(PreviousRunsDialog.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+                try {
+                    Field field = RegionSnapshot.class.getDeclaredField(splitted[1].substring(0, splitted[1].length() - 1));
+                    ArrayList<String[]> allValues = new ArrayList();
+                    for (int i = 0; i < currentHistoricalRunVD.regions.size(); i++) {
+                        String[] row = new String[currentHistoricalRunVD.regions.get(i).cBGsPercentageInvolved.size()];
+                        for (int h = 0; h < currentHistoricalRunVD.regions.get(i).cBGsPercentageInvolved.size(); h++) {
+                            for (int m = 0; m < currentHistoricalRunCBG.regions.size(); m++) {
+                                if (currentHistoricalRunCBG.regions.get(m).cBGsIDsInvolved.get(0).equals(currentHistoricalRunVD.regions.get(i).cBGsIDsInvolved.get(h))) {
+                                    String val = String.valueOf(Double.valueOf(String.valueOf(field.get(currentHistoricalRunCBG.regions.get(m).hourlyRegionSnapshot.get(jSlider1.getValue())))) / (double)(currentHistoricalRunCBG.regions.get(m).population));
+                                    row[h] = val;
+                                }
+                            }
+
+                        }
+                        allValues.add(row);
+//                        if(val>0){
+//                            System.out.println("Region: "+i);
+//                        }
+                    }
+                    try {
+                        CsvWriter writer = new CsvWriter();
+                        writer.write(new File("ReportCBGInVDRatio.csv"), Charset.forName("US-ASCII"), allValues);
+                    } catch (IOException ex) {
+                        Logger.getLogger(PreviousRunsDialog.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                } catch (NoSuchFieldException ex) {
+                    Logger.getLogger(PreviousRunsDialog.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (SecurityException ex) {
+                    Logger.getLogger(PreviousRunsDialog.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IllegalArgumentException ex) {
+                    Logger.getLogger(PreviousRunsDialog.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(PreviousRunsDialog.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+    }//GEN-LAST:event_jButton3ActionPerformed
+
     public void setRendererRegionLayerShades() {
         if (jList2.getSelectedIndex() > -1) {
             DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) jTree1.getLastSelectedPathComponent();
@@ -421,6 +559,28 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
 
 //        System.out.println("!!!!");
     }
+    
+    public void loadHistoricalRunCBG(javax.swing.event.TreeSelectionEvent evt) {
+        TreePath treepath = evt.getPath();
+        String path = "projects" + File.separator;
+        Object elements[] = treepath.getPath();
+        for (int i = 0, n = elements.length; i < n; i++) {
+            path = path + elements[i] + File.separator;
+        }
+        currentHistoricalRunCBG = HistoricalRun.loadHistoricalRunKryo(path + "data.bin");
+//        System.out.println("!!!!");
+    }
+
+    public void loadHistoricalRunVD(javax.swing.event.TreeSelectionEvent evt) {
+        TreePath treepath = evt.getPath();
+        String path = "projects" + File.separator;
+        Object elements[] = treepath.getPath();
+        for (int i = 0, n = elements.length; i < n; i++) {
+            path = path + elements[i] + File.separator;
+        }
+        currentHistoricalRunVD = HistoricalRun.loadHistoricalRunKryo(path + "data.bin");
+//        System.out.println("!!!!");
+    }
 
     public void setRendererPolygons() {
         ArrayList<MyPolygons> polygons = new ArrayList();
@@ -460,6 +620,7 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -474,6 +635,8 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JSlider jSlider1;
+    private javax.swing.JToggleButton jToggleButton1;
+    private javax.swing.JToggleButton jToggleButton2;
     private javax.swing.JTree jTree1;
     // End of variables declaration//GEN-END:variables
 }

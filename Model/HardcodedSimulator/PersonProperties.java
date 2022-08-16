@@ -7,6 +7,7 @@ package COVID_AgentBasedSimulation.Model.HardcodedSimulator;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.DwellTime;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.PatternsRecordProcessed;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilPersonProperties;
+import java.util.ArrayList;
 
 /**
  *
@@ -19,11 +20,11 @@ public class PersonProperties {
     
     public Region homeRegion;
     public Region workRegion;
-    public ShamilPersonProperties shamilProperties;
+//    public ShamilPersonProperties shamilProperties;
     
     public PatternsRecordProcessed currentPattern;
     
-    public int status;
+    //public int numRepresentedPeople;
     
     public int minutesStayed;
     public DwellTime dwellTime;
@@ -37,8 +38,6 @@ public class PersonProperties {
     
     public int minutesTravelToWorkFrom7;
     public int minutesTravelFromWorkFrom16;
-    
-    public boolean isInitiallyInfectedEnteringPOI=false;
     
     public POI currentPOI;
     

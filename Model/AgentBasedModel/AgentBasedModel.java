@@ -54,6 +54,8 @@ public class AgentBasedModel {
     public boolean isOurABMActive = false;
     public boolean isShamilABMActive = false;
     public boolean isAirQualityActive = false;
+    
+    public boolean  isFuzzyStatus = false;
 
     private transient MainModel myMainModel;
 

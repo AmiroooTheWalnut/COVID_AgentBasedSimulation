@@ -20,6 +20,7 @@ import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilS
 import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilSimulatorController.startDay;
 import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilSimulatorController.updateHour;
 import COVID_AgentBasedSimulation.Model.Structure.CBGVDCell;
+import COVID_AgentBasedSimulation.Model.Structure.City;
 import COVID_AgentBasedSimulation.Model.Structure.Scope;
 import COVID_AgentBasedSimulation.Model.Structure.TessellationCell;
 import COVID_AgentBasedSimulation.Model.Structure.VDCell;
@@ -51,6 +52,8 @@ public class Root extends Agent {
     public int numTravels;
     public int numRealTravels;
     public int numContacts;
+
+    public double pTSFraction;//USED FOR FUZZY STATUS
 
     public enum statusEnum {
         SUSCEPTIBLE, INFECTED_SYM, INFECTED_ASYM, RECOVERED, DEAD;
@@ -331,12 +334,24 @@ public class Root extends Agent {
         for (int i = 0; i < regions.size(); i++) {
             cumulativePopulation = cumulativePopulation + regions.get(i).population;
         }
+        pTSFraction = Math.round((double) ((City) (modelRoot.ABM.studyScopeGeography)).population / (double) passed_numAgents);
+        if (pTSFraction < 1) {
+            System.out.println("THE NUMBER OF AGENTS IS MORE THAN REAL NUMBER OF PEOPLE!!!");
+        }
         sumRegionsPopulation = cumulativePopulation;
         for (int i = 0; i < passed_numAgents; i++) {
             Person person = new Person(i);
             selectHomeRegion(person, sumRegionsPopulation, 0);
             selectWorkRegion(person, person.properties.homeRegion);
-
+            if (modelRoot.ABM.isFuzzyStatus == true) {
+                person.insidePeople = new ArrayList();
+                person.insidePeople.add(new FuzzyPerson());
+            } else {
+                person.insidePeople = new ArrayList();
+                for (int m = 0; m < pTSFraction; m++) {
+                    person.insidePeople.add(new FuzzyPerson());
+                }
+            }
             modelRoot.ABM.agents.add(person);
             person.constructor(modelRoot);
             people.add(person);
@@ -747,7 +762,9 @@ public class Root extends Agent {
     public void initiallyInfectDummy() {
         Scope scope = (Scope) (myModelRoot.ABM.studyScopeGeography);
         detectRelevantCounties(scope);
-        people.get(0).properties.status = statusEnum.INFECTED_ASYM.ordinal();
+        for (int m = 0; m < people.get(0).insidePeople.size(); m++) {
+            people.get(0).insidePeople.get(m).fpp.status = statusEnum.INFECTED_ASYM.ordinal();
+        }
 //        boolean isBreak=false;
 //        for(int i=0;i<regions.size();i++){
 //            for(int j=0;j<regions.get(i).residents.size();j++){
@@ -762,6 +779,215 @@ public class Root extends Agent {
 
     }
 
+    public void initiallyInfect(boolean isCompleteInfection, boolean isInfectCBGOnly, ArrayList<Integer> initialInfectionRegionIndex) {
+        Scope scope = (Scope) (myModelRoot.ABM.studyScopeGeography);
+        if (isInfectCBGOnly == false) {
+            if (isCompleteInfection == true) {
+                detectRelevantCounties(scope);
+                int sumRelevantCountiesPopulation = 0;
+                int sumRelevantCountiesInfection = 0;
+                for (int i = 0; i < relevantDailyConfirmedCases.size(); i++) {
+                    if ((myModelRoot.ABM.currentTime).truncatedTo(ChronoUnit.DAYS).isEqual(relevantDailyConfirmedCases.get(i).date.truncatedTo(ChronoUnit.DAYS)) == true) {
+                        sumRelevantCountiesPopulation += relevantDailyConfirmedCases.get(i).county.population;
+                        sumRelevantCountiesInfection += relevantDailyConfirmedCases.get(i).numActiveCases * (10f / 3f);
+                    }
+                }
+                int expectedInfectionInScope = (int) (((double) sumRelevantCountiesInfection / (double) sumRelevantCountiesPopulation) * (double) (scope.population));
+                double expectedInfectionPercentage = (double) (expectedInfectionInScope) / (double) (scope.population);
+                initialRecovered(expectedInfectionPercentage);
+                double currentInfections = 0;
+                double currentInfectionPercentage = 0;
+                while (currentInfectionPercentage < expectedInfectionPercentage) {
+//            System.out.println("S currentInfectionPercentage: "+currentInfectionPercentage +" expectedInfectionPercentage: "+expectedInfectionPercentage);
+                    double selectedRegion = (rnd.nextDouble() * (sumRegionsPopulation));
+                    double cumulativeRegionPopulation = 0;
+                    for (int j = 0; j < regions.size(); j++) {
+                        cumulativeRegionPopulation += regions.get(j).population;
+                        if (cumulativeRegionPopulation > selectedRegion) {
+                            if (!regions.get(j).residents.isEmpty()) {
+                                int selectedResident = (int) ((rnd.nextDouble() * (regions.get(j).residents.size() - 1)));
+                                if (rnd.nextDouble() > 0.7) {
+                                    for (int m = 0; m < regions.get(j).residents.get(selectedResident).insidePeople.size(); m++) {
+                                        if (regions.get(j).residents.get(selectedResident).insidePeople.get(m).fpp.status == statusEnum.SUSCEPTIBLE.ordinal()) {
+                                            regions.get(j).residents.get(selectedResident).insidePeople.get(m).fpp.status = statusEnum.INFECTED_SYM.ordinal();
+                                            regions.get(j).residents.get(selectedResident).insidePeople.get(m).sfpp.infectedDays = 4 + (int) (Math.random() * 10);
+                                            //regions.get(j).residents.get(selectedResident).shamilPersonProperties.infectedDays = 4 + (int) (Math.random() * 10);
+                                            currentInfections = currentInfections + 1;
+                                            currentInfectionPercentage = currentInfections / (people.size() * pTSFraction);
+                                            //break;
+                                        }
+                                    }
+                                } else {
+                                    for (int m = 0; m < regions.get(j).residents.get(selectedResident).insidePeople.size(); m++) {
+                                        if (regions.get(j).residents.get(selectedResident).insidePeople.get(m).fpp.status == statusEnum.SUSCEPTIBLE.ordinal()) {
+                                            regions.get(j).residents.get(selectedResident).insidePeople.get(m).fpp.status = statusEnum.INFECTED_ASYM.ordinal();
+                                            regions.get(j).residents.get(selectedResident).insidePeople.get(m).sfpp.infectedDays = 3 + (int) (Math.random() * 3);
+                                            //regions.get(j).residents.get(selectedResident).shamilPersonProperties.infectedDays = 3 + (int) (Math.random() * 3);
+//                                            currentInfections = currentInfections + 1;
+//                                            currentInfectionPercentage = currentInfections / (people.size() * pTSFraction);
+                                            //break;
+                                        }
+                                    }
+                                }
+//                                currentInfections = currentInfections + 1;
+//                                currentInfectionPercentage = currentInfections / (people.size());
+                                break;
+                            }
+                        }
+                    }
+//            System.out.println("E currentInfectionPercentage: "+currentInfectionPercentage +" expectedInfectionPercentage: "+expectedInfectionPercentage);
+                }
+            } else {
+                int regionPopulation = 0;
+                for (int i = 0; i < initialInfectionRegionIndex.size(); i++) {
+                    regionPopulation += regions.get(initialInfectionRegionIndex.get(i)).population;
+                }
+                int aBMRegionPopulation = 0;
+                for (int i = 0; i < initialInfectionRegionIndex.size(); i++) {
+                    aBMRegionPopulation += regions.get(initialInfectionRegionIndex.get(i)).residents.size() * pTSFraction;
+                }
+                detectRelevantCounties(scope);
+
+                int sumRelevantCountiesPopulation = 0;
+                int sumRelevantCountiesInfection = 0;
+                for (int i = 0; i < relevantDailyConfirmedCases.size(); i++) {
+                    if ((myModelRoot.ABM.currentTime).truncatedTo(ChronoUnit.DAYS).isEqual(relevantDailyConfirmedCases.get(i).date.truncatedTo(ChronoUnit.DAYS)) == true) {
+                        sumRelevantCountiesPopulation += relevantDailyConfirmedCases.get(i).county.population;
+                        sumRelevantCountiesInfection += relevantDailyConfirmedCases.get(i).numActiveCases * (10f / 3f);
+                    }
+                }
+                int expectedInfectionInScope = (int) (((double) sumRelevantCountiesInfection / (double) sumRelevantCountiesPopulation) * (double) (scope.population));
+                double expectedInfectionPercentage = ((double) (expectedInfectionInScope) / (double) (scope.population)) * ((double) (regionPopulation) / (double) (scope.population));
+                initialRecovered(expectedInfectionPercentage);
+                double currentInfections = 0;
+                double currentInfectionPercentage = 0;
+                int maxRetry = 200;
+                int tryCounter = 0;
+                while (currentInfectionPercentage < expectedInfectionPercentage) {
+//            System.out.println("S currentInfectionPercentage: "+currentInfectionPercentage +" expectedInfectionPercentage: "+expectedInfectionPercentage);
+                    double selectedRegion = (rnd.nextDouble() * (regionPopulation));
+                    double cumulativeRegionPopulation = 0;
+                    for (int j = 0; j < initialInfectionRegionIndex.size(); j++) {
+                        cumulativeRegionPopulation += regions.get(initialInfectionRegionIndex.get(j)).population;
+                        if (cumulativeRegionPopulation > selectedRegion) {
+                            if (!regions.get(initialInfectionRegionIndex.get(j)).residents.isEmpty()) {
+                                int selectedResident = (int) ((rnd.nextDouble() * (regions.get(initialInfectionRegionIndex.get(j)).residents.size() - 1)));
+                                for (int m = 0; m < regions.get(j).residents.get(selectedResident).insidePeople.size(); m++) {
+                                    if (regions.get(initialInfectionRegionIndex.get(j)).residents.get(selectedResident).insidePeople.get(m).fpp.status == statusEnum.SUSCEPTIBLE.ordinal()) {
+                                        if (rnd.nextDouble() > 0.7) {
+                                            if (regions.get(j).residents.get(selectedResident).insidePeople.get(m).fpp.status == statusEnum.SUSCEPTIBLE.ordinal()) {
+                                                regions.get(initialInfectionRegionIndex.get(j)).residents.get(selectedResident).insidePeople.get(m).fpp.status = statusEnum.INFECTED_SYM.ordinal();
+                                                regions.get(initialInfectionRegionIndex.get(j)).residents.get(selectedResident).insidePeople.get(m).sfpp.infectedDays = 4 + (int) (Math.random() * 10);
+                                            }
+                                        } else {
+                                            if (regions.get(j).residents.get(selectedResident).insidePeople.get(m).fpp.status == statusEnum.SUSCEPTIBLE.ordinal()) {
+                                                regions.get(initialInfectionRegionIndex.get(j)).residents.get(selectedResident).insidePeople.get(m).fpp.status = statusEnum.INFECTED_ASYM.ordinal();
+                                                regions.get(initialInfectionRegionIndex.get(j)).residents.get(selectedResident).insidePeople.get(m).sfpp.infectedDays = 3 + (int) (Math.random() * 3);
+                                            }
+                                        }
+                                        currentInfections = currentInfections + 1;
+                                        currentInfectionPercentage = (double) currentInfections / (double) aBMRegionPopulation;
+                                        tryCounter = 0;
+                                        break;
+                                    } else {
+                                        tryCounter += 1;
+                                    }
+                                }
+//                            break;
+                            } else {
+                                tryCounter += 1;
+                            }
+                            if (tryCounter > maxRetry) {
+                                System.out.println("MAXIMUM INFECTION TRY IS REACHED!");
+                                break;
+                            }
+
+                        }
+                    }
+//            System.out.println("E currentInfectionPercentage: "+currentInfectionPercentage +" expectedInfectionPercentage: "+expectedInfectionPercentage);
+                }
+            }
+        } else {
+            int subPop = 0;
+            subPop = cBGregions.get(initialInfectionRegionIndex.get(0)).population;
+
+            detectRelevantCounties(scope);
+            int aBMRegionPopulation = 0;
+//            System.out.println(cBGregions.get(initialInfectionRegionIndex.get(0)).cBGsIDsInvolved.get(0));
+            for (int i = 0; i < regions.size(); i++) {
+                for (int j = 0; j < regions.get(i).cBGsIDsInvolved.size(); j++) {
+//                    System.out.println(regions.get(i).cBGsIDsInvolved.get(j));
+                    if (regions.get(i).cBGsIDsInvolved.get(j).equals(cBGregions.get(initialInfectionRegionIndex.get(0)).cBGsIDsInvolved.get(0))) {
+                        int regPop = regions.get(i).population;
+                        double frac = ((double) subPop / (double) regPop) * regions.get(i).cBGsPercentageInvolved.get(j);
+                        aBMRegionPopulation += regions.get(i).residents.size() * frac * pTSFraction;
+                    }
+                }
+            }
+            int numInfected = 0;
+            int maxRetry = 200;
+            int tryCounter = 0;
+            while (numInfected < aBMRegionPopulation) {
+                for (int i = 0; i < regions.size(); i++) {
+                    for (int j = 0; j < regions.get(i).cBGsIDsInvolved.size(); j++) {
+                        if (regions.get(i).cBGsIDsInvolved.get(j).equals(cBGregions.get(initialInfectionRegionIndex.get(0)).cBGsIDsInvolved.get(0))) {
+                            if (!regions.get(i).residents.isEmpty()) {
+                                if (Math.random() < regions.get(i).cBGsPercentageInvolved.get(j)) {
+                                    ArrayList<Integer> residentIndices = new ArrayList();
+                                    for (int o = 0; o < regions.get(i).residents.size(); o++) {
+                                        for (int m = 0; m < regions.get(i).residents.get(o).insidePeople.size(); m++) {
+                                            if (regions.get(i).residents.get(o).insidePeople.get(m).fpp.status == statusEnum.SUSCEPTIBLE.ordinal()) {
+                                                residentIndices.add(o);
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    if (residentIndices.isEmpty()) {
+                                        continue;
+                                    }
+                                    int selectedResidentRaw = (int) ((rnd.nextDouble() * (residentIndices.size() - 1)));
+                                    int selectedResident = residentIndices.get(selectedResidentRaw);
+                                    for (int m = 0; m < regions.get(i).residents.get(selectedResident).insidePeople.size(); m++) {
+                                        if (regions.get(i).residents.get(selectedResident).insidePeople.get(m).fpp.status == statusEnum.SUSCEPTIBLE.ordinal()) {
+                                            if (rnd.nextDouble() > 0.7) {
+                                                regions.get(i).residents.get(selectedResident).insidePeople.get(m).fpp.status = statusEnum.INFECTED_SYM.ordinal();
+                                                regions.get(i).residents.get(selectedResident).insidePeople.get(m).sfpp.infectedDays = 4 + (int) (Math.random() * 10);
+                                            } else {
+                                                regions.get(i).residents.get(selectedResident).insidePeople.get(m).fpp.status = statusEnum.INFECTED_ASYM.ordinal();
+                                                regions.get(i).residents.get(selectedResident).insidePeople.get(m).sfpp.infectedDays = 3 + (int) (Math.random() * 3);
+                                            }
+                                            numInfected = numInfected + 1;
+                                            tryCounter = 0;
+                                            break;
+                                        } else {
+                                            tryCounter += 1;
+                                        }
+                                        break;
+                                    }
+                                }
+                            } else {
+                                tryCounter += 1;
+                            }
+
+                        }
+                    }
+                }
+                if (tryCounter > maxRetry) {
+                    System.out.println("MAXIMUM INFECTION TRY IS REACHED!");
+                    break;
+                }
+            }
+            int sumRelevantCountiesPopulation = 0;
+            for (int i = 0; i < relevantDailyConfirmedCases.size(); i++) {
+                if ((myModelRoot.ABM.currentTime).truncatedTo(ChronoUnit.DAYS).isEqual(relevantDailyConfirmedCases.get(i).date.truncatedTo(ChronoUnit.DAYS)) == true) {
+                    sumRelevantCountiesPopulation += relevantDailyConfirmedCases.get(i).county.population;
+                }
+            }
+            initialRecovered((double) numInfected / (double) sumRelevantCountiesPopulation);
+        }
+    }
+
+    /*
     public void initiallyInfect(boolean isCompleteInfection, boolean isInfectCBGOnly, ArrayList<Integer> initialInfectionRegionIndex) {
         Scope scope = (Scope) (myModelRoot.ABM.studyScopeGeography);
         if (isInfectCBGOnly == false) {
@@ -940,21 +1166,23 @@ public class Root extends Agent {
         }
 
     }
-
+     */
     private void initialRecovered(double percentage) {
         int numRecovered = (int) Math.round(people.size() * percentage);
         int currentRecovered = 0;
         int counter = 0;
-        int maxCounter = 50;
+        int maxCounter = 150;
         while (currentRecovered < numRecovered) {
             int selectedResident = (int) ((rnd.nextDouble() * (people.size() - 1)));
-            if (people.get(selectedResident).properties.status == statusEnum.SUSCEPTIBLE.ordinal()) {
-                people.get(selectedResident).properties.status = statusEnum.RECOVERED.ordinal();
-                people.get(selectedResident).shamilPersonProperties.infectedDays = 28 + (int) (Math.random() * 32);
-                currentRecovered = currentRecovered + 1;
-                counter = 0;
-            } else {
-                counter = counter + 1;
+            for (int m = 0; m < people.get(selectedResident).insidePeople.size(); m++) {
+                if (people.get(selectedResident).insidePeople.get(m).fpp.status == statusEnum.SUSCEPTIBLE.ordinal()) {
+                    people.get(selectedResident).insidePeople.get(m).fpp.status = statusEnum.RECOVERED.ordinal();
+                    people.get(selectedResident).insidePeople.get(m).sfpp.infectedDays = 28 + (int) (Math.random() * 32);
+                    currentRecovered = currentRecovered + 1;
+                    counter = 0;
+                } else {
+                    counter = counter + 1;
+                }
             }
             if (counter > maxCounter) {
                 break;
@@ -989,7 +1217,7 @@ public class Root extends Agent {
         }
     }
 
-    public void runShamil(boolean isSpatial) {
+    public void runShamil(boolean isSpatial, boolean isFuzzyStatus, double pTSFraction) {
         Duration d = Duration.between(myModelRoot.ABM.startTime, myModelRoot.ABM.currentTime);
         int day = (int) (d.toDays());
         if (myModelRoot.ABM.currentTime.getHour() == 0 && myModelRoot.ABM.currentTime.getMinute() == 0) {
@@ -1003,7 +1231,7 @@ public class Root extends Agent {
             updateHour(people, regions, myModelRoot.ABM.currentTime.getHour(), day, isSpatial, debug, myModelRoot);
         }
         if (myModelRoot.ABM.currentTime.getHour() == 23 && myModelRoot.ABM.currentTime.getMinute() == 59) {
-            endDay(people, day);
+            endDay(people, day, isFuzzyStatus, pTSFraction);
             int sumInfected = 0;
             for (int i = 0; i < people.size(); i++) {
 //                if (people.get(i).shamilPersonProperties.isInfected == true) {
@@ -1013,9 +1241,20 @@ public class Root extends Agent {
 //                    System.out.println("isAlive: " + people.get(i).shamilPersonProperties.isAlive);
 //                    System.out.println();
 //                }
-                if (people.get(i).shamilPersonProperties.isInfected == true && !people.get(i).shamilPersonProperties.state.equals("recovered") && people.get(i).shamilPersonProperties.isAlive == true) {
-                    sumInfected = sumInfected + 1;
+//                if (people.get(i).shamilPersonProperties.isInfected == true && !people.get(i).shamilPersonProperties.state.equals("recovered") && people.get(i).shamilPersonProperties.isAlive == true) {
+//                    sumInfected = sumInfected + 1;
+//                }
+
+                double numInfectedFound = 0;
+                for (int m = 0; m < people.get(i).insidePeople.size(); m++) {
+                    if (people.get(i).insidePeople.get(m).fpp.status == Root.statusEnum.INFECTED_SYM.ordinal() || people.get(i).insidePeople.get(m).fpp.status == Root.statusEnum.INFECTED_ASYM.ordinal()) {
+                        numInfectedFound += 1;
+                    }
                 }
+//                if (numInfectedFound / pTSFraction > 0.5) {
+//                    sumInfected = sumInfected + 1;
+//                }
+                sumInfected = sumInfected + (int) numInfectedFound;
             }
             System.out.println("Day: " + day + " sumInfected: " + sumInfected);
         }
@@ -1032,7 +1271,8 @@ public class Root extends Agent {
 //                }
 //            }
 //            System.out.println("num hospitalized outside "+counter1);//TEMP
-            ShamilSimulatorController.convertOurToShamil(people);
+//            ShamilSimulatorController.convertOurToShamil(people);
+            ShamilSimulatorController.convertOurToShamilParallel(people, myModelRoot);
 //            int counter1=0;
 //            for (int i = 0; i < people.size(); i++) {
 //                if (people.get(i).shamilPersonProperties.profession.name.equals("Hospitalized")) {
@@ -1040,8 +1280,9 @@ public class Root extends Agent {
 //                }
 //            }
 //            System.out.println("num hospitalized outside "+counter1);//TEMP
-            runShamil(true);
-            ShamilSimulatorController.convertShamilToOur(people);
+            runShamil(true, myModelRoot.ABM.isFuzzyStatus, myModelRoot.ABM.root.pTSFraction);
+//            ShamilSimulatorController.convertShamilToOur(people);
+            ShamilSimulatorController.convertShamilToOurParallel(people, myModelRoot);
             ArrayList<POI> values = new ArrayList<>(pOIs.values());
             for (int i = 0; i < values.size(); i++) {
                 values.get(i).updateContamination();
@@ -1051,8 +1292,9 @@ public class Root extends Agent {
                 pollContactAllPeople();
             }
         } else if (myModelRoot.ABM.isOurABMActive == false && myModelRoot.ABM.isShamilABMActive == true) {
-            runShamil(false);
-            ShamilSimulatorController.convertShamilToOur(people);
+            runShamil(false, false, 0);
+//            ShamilSimulatorController.convertShamilToOur(people);
+            ShamilSimulatorController.convertShamilToOurParallel(people, myModelRoot);
         } else if (myModelRoot.ABM.isOurABMActive == true && myModelRoot.ABM.isShamilABMActive == false) {
             handleHomeWorkActivities(myModelRoot.ABM.currentTime);
             handleInfectionProgress();
@@ -1089,9 +1331,19 @@ public class Root extends Agent {
             int day = (int) (d.toDays());
             int sumInfected = 0;
             for (int i = 0; i < people.size(); i++) {
-                if (people.get(i).properties.status == statusEnum.INFECTED_ASYM.ordinal() || people.get(i).properties.status == statusEnum.INFECTED_SYM.ordinal()) {
-                    sumInfected = sumInfected + 1;
+                double numInfectedFound = 0;
+                for (int m = 0; m < people.get(i).insidePeople.size(); m++) {
+                    if (people.get(i).insidePeople.get(m).fpp.status == Root.statusEnum.INFECTED_SYM.ordinal() || people.get(i).insidePeople.get(m).fpp.status == Root.statusEnum.INFECTED_ASYM.ordinal()) {
+                        numInfectedFound += 1;
+                    }
                 }
+//                    if(numInfectedFound>0){
+//                        System.out.println("!!!");
+//                    }
+//                if (numInfectedFound / pTSFraction > 0.5) {
+//                    sumInfected = sumInfected + 1;
+//                }
+                sumInfected = sumInfected + (int) numInfectedFound;
             }
             System.out.println("Day: " + day + " sumInfected: " + sumInfected);
         } else {
@@ -1100,10 +1352,18 @@ public class Root extends Agent {
                 int day = (int) (d.toDays());
                 int sumInfected = 0;
                 for (int i = 0; i < people.size(); i++) {
-                    if (people.get(i).properties.status == statusEnum.INFECTED_ASYM.ordinal() || people.get(i).properties.status == statusEnum.INFECTED_SYM.ordinal()) {
-                        sumInfected = sumInfected + 1;
+                    double numInfectedFound = 0;
+                    for (int m = 0; m < people.get(i).insidePeople.size(); m++) {
+                        if (people.get(i).insidePeople.get(m).fpp.status == Root.statusEnum.INFECTED_SYM.ordinal() || people.get(i).insidePeople.get(m).fpp.status == Root.statusEnum.INFECTED_ASYM.ordinal()) {
+                            numInfectedFound += 1;
+                        }
                     }
+//                    if (numInfectedFound / pTSFraction > 0.5) {
+//                        sumInfected = sumInfected + 1;
+//                    }
+                    sumInfected = sumInfected + (int) numInfectedFound;
                 }
+
                 System.out.println("Day: " + day + " sumInfected: " + sumInfected);
             }
         }
@@ -1116,40 +1376,42 @@ public class Root extends Agent {
     }
 
     public void handleInfectionProgressPerson(Person person) {
-        if (person.properties.status == statusEnum.INFECTED_SYM.ordinal() || person.properties.status == statusEnum.INFECTED_ASYM.ordinal()) {//if infected
-            if (person.properties.minutesSick == -1) {
-                person.properties.minutesSick = 1;
-                if (rnd.nextDouble() < 0.02) {//0.0018
-                    person.properties.isDestinedToDeath = true;
-                } else {
-                    person.properties.isDestinedToDeath = false;
-                }
-            } else {
-                int minsSick = person.properties.minutesSick;
-                person.properties.minutesSick = minsSick + 1;
-                if (person.properties.isDestinedToDeath == false) {
-                    if (minsSick > 20160) {
-                        if (rnd.nextDouble() < Math.pow((double) (minsSick - 30240) / (double) (30240), 5)) {
-//                            person.properties.minutesSick = -1;
-                            person.properties.status = statusEnum.RECOVERED.ordinal();//RECOVERED
-                        }
+        for (int m = 0; m < person.insidePeople.size(); m++) {
+            if (person.insidePeople.get(m).fpp.status == statusEnum.INFECTED_SYM.ordinal() || person.insidePeople.get(m).fpp.status == statusEnum.INFECTED_ASYM.ordinal()) {//if infected
+                if (person.properties.minutesSick == -1) {
+                    person.properties.minutesSick = 1;
+                    if (rnd.nextDouble() < 0.02) {//0.0018
+                        person.properties.isDestinedToDeath = true;
+                    } else {
+                        person.properties.isDestinedToDeath = false;
                     }
                 } else {
-                    if (minsSick > 10080) {
-                        if (rnd.nextDouble() < Math.pow((double) (minsSick - 20160) / (double) (20160), 5)) {
-                            person.properties.minutesSick = -1;
-                            person.properties.status = statusEnum.DEAD.ordinal();
+                    int minsSick = person.properties.minutesSick;
+                    person.properties.minutesSick = minsSick + 1;
+                    if (person.properties.isDestinedToDeath == false) {
+                        if (minsSick > 20160) {
+                            if (rnd.nextDouble() < Math.pow((double) (minsSick - 30240) / (double) (30240), 5)) {
+//                            person.properties.minutesSick = -1;
+                                person.insidePeople.get(m).fpp.status = statusEnum.RECOVERED.ordinal();//RECOVERED
+                            }
+                        }
+                    } else {
+                        if (minsSick > 10080) {
+                            if (rnd.nextDouble() < Math.pow((double) (minsSick - 20160) / (double) (20160), 5)) {
+                                person.properties.minutesSick = -1;
+                                person.insidePeople.get(m).fpp.status = statusEnum.DEAD.ordinal();
+                            }
                         }
                     }
                 }
             }
-        }
-        if (person.properties.status == statusEnum.RECOVERED.ordinal()) {
-            int minsSick = person.properties.minutesSick;
-            person.properties.minutesSick = minsSick + 1;
-            if (minsSick > 86400) {
-                person.properties.minutesSick = -1;
-                person.properties.status = statusEnum.SUSCEPTIBLE.ordinal();
+            if (person.insidePeople.get(m).fpp.status == statusEnum.RECOVERED.ordinal()) {
+                int minsSick = person.properties.minutesSick;
+                person.properties.minutesSick = minsSick + 1;
+                if (minsSick > 86400) {
+                    person.properties.minutesSick = -1;
+                    person.insidePeople.get(m).fpp.status = statusEnum.SUSCEPTIBLE.ordinal();
+                }
             }
         }
     }
@@ -1190,7 +1452,6 @@ public class Root extends Agent {
                     int minutesTravelFromWorkFrom16 = (int) (rnd.nextDouble() * 120);
                     person.properties.minutesTravelFromWorkFrom16 = minutesTravelFromWorkFrom16;
                 } else {
-
                     int passed = currentTime.getMinute() + ((int) (currentTime.getHour()) - 16) * 60;
                     if (passed > person.properties.minutesTravelFromWorkFrom16) {
                         lat = person.properties.homeRegion.lat;
@@ -1222,16 +1483,18 @@ public class Root extends Agent {
         int numRECOVERED = 0;
         int numDEAD = 0;
         for (int i = 0; i < people.size(); i++) {
-            if (people.get(i).properties.status == statusEnum.SUSCEPTIBLE.ordinal()) {
-                numSUSCEPTIBLE += 1;
-            } else if (people.get(i).properties.status == statusEnum.INFECTED_SYM.ordinal()) {
-                numINFECTED_SYM += 1;
-            } else if (people.get(i).properties.status == statusEnum.INFECTED_ASYM.ordinal()) {
-                numINFECTED_ASYM += 1;
-            } else if (people.get(i).properties.status == statusEnum.RECOVERED.ordinal()) {
-                numRECOVERED += 1;
-            } else if (people.get(i).properties.status == statusEnum.DEAD.ordinal()) {
-                numDEAD += 1;
+            for (int m = 0; m < people.get(i).insidePeople.size(); m++) {
+                if (people.get(i).insidePeople.get(m).fpp.status == statusEnum.SUSCEPTIBLE.ordinal()) {
+                    numSUSCEPTIBLE += 1;
+                } else if (people.get(i).insidePeople.get(m).fpp.status == statusEnum.INFECTED_SYM.ordinal()) {
+                    numINFECTED_SYM += 1;
+                } else if (people.get(i).insidePeople.get(m).fpp.status == statusEnum.INFECTED_ASYM.ordinal()) {
+                    numINFECTED_ASYM += 1;
+                } else if (people.get(i).insidePeople.get(m).fpp.status == statusEnum.RECOVERED.ordinal()) {
+                    numRECOVERED += 1;
+                } else if (people.get(i).insidePeople.get(m).fpp.status == statusEnum.DEAD.ordinal()) {
+                    numDEAD += 1;
+                }
             }
         }
         row[1] = String.valueOf(numSUSCEPTIBLE);
@@ -1332,8 +1595,8 @@ public class Root extends Agent {
                     varContacts = varContacts + Math.pow(agentPairContact[i][j] - sumContacts, 2);
                 }
             }
-        
-        varContacts = (double) varContacts / (double) (agentPairContact.length * agentPairContact[0].length);
+
+            varContacts = (double) varContacts / (double) (agentPairContact.length * agentPairContact[0].length);
         }
         String[] row = new String[12];
         row[0] = myModelRoot.ABM.startTime.format(DateTimeFormatter.ISO_DATE);
@@ -1349,7 +1612,7 @@ public class Root extends Agent {
         if (myModelRoot.ABM.isReportContactRate == true) {
             row[10] = String.valueOf(avgContacts);
             row[11] = String.valueOf(varContacts);
-        }else{
+        } else {
             row[10] = "NA";
             row[11] = "NA";
         }
@@ -1523,32 +1786,34 @@ public class Root extends Agent {
                     snapshot.rate = regions.get(i).hourlyRegionSnapshot.get(regions.get(i).hourlyRegionSnapshot.size() - 1).rate;
                 }
                 for (int j = 0; j < regions.get(i).residents.size(); j++) {
-                    switch (regions.get(i).residents.get(j).properties.status) {
-                        case 0:
-                            snapshot.N += 1;
-                            snapshot.S += 1;
-                            break;
-                        case 1:
-                            snapshot.N += 1;
-                            snapshot.IS += 1;
-                            snapshot.sick += 1;
-                            snapshot.rate += 1;
-                            break;
-                        case 2:
-                            snapshot.N += 1;
-                            snapshot.IAS += 1;
-                            snapshot.sick += 1;
-                            snapshot.rate += 1;
-                            break;
-                        case 3:
-                            snapshot.N += 1;
-                            snapshot.R += 1;
-                            break;
-                        case 4:
-                            snapshot.D += 1;
-                            break;
-                        default:
-                            break;
+                    for (int m = 0; m < people.get(i).insidePeople.size(); m++) {
+                        switch (regions.get(i).residents.get(j).insidePeople.get(m).fpp.status) {
+                            case 0:
+                                snapshot.N += 1;
+                                snapshot.S += 1;
+                                break;
+                            case 1:
+                                snapshot.N += 1;
+                                snapshot.IS += 1;
+                                snapshot.sick += 1;
+                                snapshot.rate += 1;
+                                break;
+                            case 2:
+                                snapshot.N += 1;
+                                snapshot.IAS += 1;
+                                snapshot.sick += 1;
+                                snapshot.rate += 1;
+                                break;
+                            case 3:
+                                snapshot.N += 1;
+                                snapshot.R += 1;
+                                break;
+                            case 4:
+                                snapshot.D += 1;
+                                break;
+                            default:
+                                break;
+                        }
                     }
                 }
                 regions.get(i).hourlyRegionSnapshot.add(snapshot);
@@ -1592,21 +1857,23 @@ public class Root extends Agent {
                     if (regions.get(j).cBGsIDsInvolved.get(m).equals(cBGregions.get(i).cBGsIDsInvolved.get(0))) {
                         double addedInfection = 0;
                         for (int k = 0; k < regions.get(j).residents.size(); k++) {
-                            switch (regions.get(j).residents.get(k).properties.status) {
-                                case 0:
-                                    break;
-                                case 1:
-                                    addedInfection += 1;
-                                    break;
-                                case 2:
-                                    addedInfection += 1;
-                                    break;
-                                case 3:
-                                    break;
-                                case 4:
-                                    break;
-                                default:
-                                    break;
+                            for (int g = 0; g < regions.get(j).residents.get(k).insidePeople.size(); g++) {
+                                switch (regions.get(j).residents.get(k).insidePeople.get(g).fpp.status) {
+                                    case 0:
+                                        break;
+                                    case 1:
+                                        addedInfection += 1;
+                                        break;
+                                    case 2:
+                                        addedInfection += 1;
+                                        break;
+                                    case 3:
+                                        break;
+                                    case 4:
+                                        break;
+                                    default:
+                                        break;
+                                }
                             }
                         }
                         addedInfection = addedInfection * regions.get(j).cBGsPercentageInvolved.get(m);

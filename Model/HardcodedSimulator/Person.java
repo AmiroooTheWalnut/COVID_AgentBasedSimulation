@@ -1,7 +1,6 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package COVID_AgentBasedSimulation.Model.HardcodedSimulator;
 
@@ -9,13 +8,11 @@ import COVID_AgentBasedSimulation.Model.AgentBasedModel.Agent;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.DwellTime;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.PatternsRecordProcessed;
 import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.POI.CHANCE_OF_ENV_CONTAMINATION;
+import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilFuzzyablePersonProperties;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilPersonProperties;
 import COVID_AgentBasedSimulation.Model.MainModel;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -25,16 +22,18 @@ public class Person extends Agent {
 
     Person currentAgent = this;
 
-    public boolean isPolled = false;
+    public ArrayList<FuzzyPerson> insidePeople;
 
-    public PersonProperties properties = new PersonProperties();
-    public ShamilPersonProperties shamilPersonProperties = new ShamilPersonProperties();
+    public boolean isPolled = false;
 
     public boolean isActive = false;//IF OUR ABM IS ACTIVE, THEN THIS CLASS'S BEHAVIOR WILL RUN
 
     public int numTravels = 0;
     public int numTravelsInDay = 0;
     public int numContacts = 0;
+
+    public PersonProperties properties = new PersonProperties();
+    public ShamilPersonProperties shamilPersonProperties = new ShamilPersonProperties();
 
     public Person(int index) {
         myType = "Person";
@@ -49,21 +48,24 @@ public class Person extends Agent {
     @Override
     public void behavior() {
         if (isActive == true) {
-            if (properties.status != Root.statusEnum.DEAD.ordinal()) {
-                isPolled = false;
-                if (properties.isAtHome == true) {
-                    travelFromHome(myModelRoot.ABM.currentTime);
-                }
-                if (properties.isAtWork == true) {
-                    travelFromWork(myModelRoot.ABM.currentTime);
-                }
-                if (properties.isInTravel == true) {
-                    properties.minutesStayed += 1;
+            for (int m = 0; m < insidePeople.size(); m++) {
+                if (insidePeople.get(m).fpp.status != Root.statusEnum.DEAD.ordinal()) {
+                    isPolled = false;
+                    if (properties.isAtHome == true) {
+                        travelFromHome(myModelRoot.ABM.currentTime);
+                    }
+                    if (properties.isAtWork == true) {
+                        travelFromWork(myModelRoot.ABM.currentTime);
+                    }
+                    if (properties.isInTravel == true) {
+                        properties.minutesStayed += 1;
 //                    myModelRoot.ABM.root.pOIs.get(properties.currentPattern.placeKey).contact(myModelRoot.ABM.currentTime, this);
-                    properties.currentPOI.contact(myModelRoot.ABM.currentTime, this, myModelRoot.ABM.isBuildingLogicActive);
-                    returnFromTravel();
-                }
+                        properties.currentPOI.contact(myModelRoot.ABM.currentTime, this, myModelRoot.ABM.isBuildingLogicActive,myModelRoot.ABM.root.pTSFraction);
+                        returnFromTravel();
+                    }
+                    break;
 //                pollContact();
+                }
             }
         }
     }
@@ -101,9 +103,11 @@ public class Person extends Agent {
         properties.currentPOI.peopleInPOI.remove(this);
 
 //        System.out.println("properties.currentPOI.peopleInPOI.size(): after:"+properties.currentPOI.peopleInPOI.size());
-        if (properties.isInitiallyInfectedEnteringPOI == true) {
-            properties.currentPOI.numInfected -= 1;
-            properties.isInitiallyInfectedEnteringPOI = false;
+        for (int m = 0; m < insidePeople.size(); m++) {
+            if (insidePeople.get(m).fpp.isInitiallyInfectedEnteringPOI == true) {
+                properties.currentPOI.numInfected -= 1;
+                insidePeople.get(m).fpp.isInitiallyInfectedEnteringPOI = false;
+            }
         }
         properties.currentPOI = null;
         properties.currentPattern = null;
@@ -134,14 +138,15 @@ public class Person extends Agent {
             properties.currentPOI = pOI;
 
 //        System.out.println("properties.currentPOI.peopleInPOI.size(): after:"+properties.currentPOI.peopleInPOI.size());
-            if (properties.status == Root.statusEnum.INFECTED_ASYM.ordinal() || properties.status == Root.statusEnum.INFECTED_SYM.ordinal()) {
-                if (Math.random() < CHANCE_OF_ENV_CONTAMINATION) {
-                    pOI.contaminatedTime = 1440;
+            for (int m = 0; m < insidePeople.size(); m++) {
+                if (insidePeople.get(m).fpp.status == Root.statusEnum.INFECTED_ASYM.ordinal() || insidePeople.get(m).fpp.status == Root.statusEnum.INFECTED_SYM.ordinal()) {
+                    if (Math.random() < CHANCE_OF_ENV_CONTAMINATION) {
+                        pOI.contaminatedTime = 1440;
+                    }
+                    pOI.numInfected += 1;
+                    insidePeople.get(m).fpp.isInitiallyInfectedEnteringPOI = true;
                 }
-                pOI.numInfected += 1;
-                properties.isInitiallyInfectedEnteringPOI = true;
             }
-
         }
     }
 
@@ -168,13 +173,27 @@ public class Person extends Agent {
             pOI.peopleInPOI.add(this);
             properties.currentPOI = pOI;
 
+            int dayInMonth = currentTime.getDayOfMonth() - 1;
+            byte dayInWeek = (byte) ((currentTime.getDayOfWeek().getValue()) - 1);
+            int hourInDay = currentTime.getHour();
+            double percentDayInMonth = 1;
+            if (dayInMonth < properties.currentPattern.visits_by_day.length) {
+                percentDayInMonth = (double) (properties.currentPattern.visits_by_day[dayInMonth]) / (double) (properties.currentPattern.sumVisitsByDayOfMonth);
+            }
+            double percentDayInWeek = (double) (properties.currentPattern.popularity_by_day.get(dayInWeek)) / (double) (properties.currentPattern.sumVisitsByDayOfWeek);
+            double percentHourInDay = (double) (properties.currentPattern.popularity_by_hour[hourInDay]) / (double) (properties.currentPattern.sumVisitsByHourofDay);
+            int numPeopleInPOI = (int) Math.ceil(properties.currentPattern.raw_visit_counts * percentDayInMonth * percentDayInWeek * percentHourInDay);
+
 //            System.out.println("properties.currentPOI.peopleInPOI.size(): after:"+properties.currentPOI.peopleInPOI.size());
-            if (properties.status == Root.statusEnum.INFECTED_ASYM.ordinal() || properties.status == Root.statusEnum.INFECTED_SYM.ordinal()) {
-                if (Math.random() < CHANCE_OF_ENV_CONTAMINATION) {
-                    pOI.contaminatedTime = 1440;
+            for (int m = 0; m < insidePeople.size(); m++) {
+                if (insidePeople.get(m).fpp.status == Root.statusEnum.INFECTED_ASYM.ordinal() || insidePeople.get(m).fpp.status == Root.statusEnum.INFECTED_SYM.ordinal()) {
+                    pOI.numInfected += 1;
+                    insidePeople.get(m).fpp.isInitiallyInfectedEnteringPOI = true;
                 }
-                pOI.numInfected += 1;
-                properties.isInitiallyInfectedEnteringPOI = true;
+            }
+            double infFrac = Math.min(1, pOI.numInfected / numPeopleInPOI);
+            if (Math.random() < CHANCE_OF_ENV_CONTAMINATION * infFrac * shamilPersonProperties.protectionLevel) {
+                pOI.contaminatedTime = 1440;
             }
 
         }
@@ -195,7 +214,7 @@ public class Person extends Agent {
     public boolean decideToTravel(PatternsRecordProcessed record, ZonedDateTime currentTime) {
         int dayInMonth = currentTime.getDayOfMonth() - 1;
         try {
-            if (Math.random() < 0.085) {
+            if (Math.random() < 0.01) {
                 int selectedDayInMonth = (int) (Math.floor(Math.random() * record.sumVisitsByDayOfMonth));
                 int cumulativeDayInMonth = 0;
                 for (int i = 0; i < record.visits_by_day.length; i++) {

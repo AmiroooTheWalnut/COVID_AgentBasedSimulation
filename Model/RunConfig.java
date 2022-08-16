@@ -29,6 +29,7 @@ public class RunConfig {
     public boolean isReportContactRate;
     public boolean isSpecialScenarioActive;
     public boolean isSpecificRegionInfected;
+    public boolean isFuzzyStatus;
     public String infectedRegionIndicesString;
     public int CBGIndexToInfect;// "isSpecificRegionInfected" must be true to work
     public String scenarioName;

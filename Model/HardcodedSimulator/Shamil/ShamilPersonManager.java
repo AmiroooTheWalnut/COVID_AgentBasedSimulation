@@ -22,7 +22,7 @@ public class ShamilPersonManager {
 
     static double smartphone_owner_percentage = 0.75;
 //    static double tracing_percentage = 0.3;//ORIGINAL
-    static double tracing_percentage = 0.08;
+    static double tracing_percentage = 0.3;
 //    static int quarantine_days = 14;//ORIGINAL
     static int quarantine_days = 7;
     static int trace_days = 2;
@@ -68,9 +68,9 @@ public class ShamilPersonManager {
             put("ACTION_OCCURRING_PROBABILITY", 0.55);
             put("ACTION_AFFECTING_PROBABILITY", 0.55);
             //put("ACTION_INFECT_THRESHOLD", 0.45);//ORIGINAL
-            put("ACTION_INFECT_THRESHOLD", 0.77);
+            put("ACTION_INFECT_THRESHOLD", 0.45);
             //put("INFECTION_PROBABILITY", 0.55);//ORIGINAL
-            put("INFECTION_PROBABILITY", 0.81);
+            put("INFECTION_PROBABILITY", 0.55);
             put("PROTECTION_LEVEL_THRESH", 0.2);
         }
     };
@@ -290,10 +290,10 @@ public class ShamilPersonManager {
 //        if (worker_per_workgroup == 0) {
 //            worker_per_workgroup = 1;
 //        }
-        int WS=worker_ids.size();
+        int WS = worker_ids.size();
         for (int i = 0; i < worker_ids.size(); i++) {
 //            persons.get(worker_ids.get(i)).shamilPersonProperties.professionGroupId = Math.min(Math.floorDiv(i, worker_per_workgroup), n_workgroup);
-            persons.get(worker_ids.get(i)).shamilPersonProperties.professionGroupId = (int)(Math.random()*WS/10.0);
+            persons.get(worker_ids.get(i)).shamilPersonProperties.professionGroupId = (int) (Math.random() * WS / 10.0);
         }
 //        for (int i = 0; i < persons.size(); i++) {
 //            System.out.println(persons.get(i).shamilPersonProperties.professionGroupId);
@@ -328,17 +328,34 @@ public class ShamilPersonManager {
         while (n_infected_init > 0) {
 
             int person_id = (int) (Math.random() * people.size()); //np.random.randint(0,len(persons))
-
-            while (people.get(person_id).shamilPersonProperties.isInfected == true) {
+            boolean isFound = false;
+            for (int m = 0; m < people.get(person_id).insidePeople.size(); m++) {
+                if (people.get(person_id).insidePeople.get(m).sfpp.isInfected == false) {
+                    isFound = true;
+                    people.get(person_id).insidePeople.get(m).sfpp.isInfected = true;
+                    people.get(person_id).insidePeople.get(m).sfpp.state = "Infected_notContagious";
+                    //print('Person {} is initially infected'.format(person_id))
+                    n_infected_init -= 1;
+                    break;
+                }
+            }
+            while (isFound == false) {
 
                 person_id = (int) (Math.random() * people.size());
 
+                isFound = false;
+                for (int m = 0; m < people.get(person_id).insidePeople.size(); m++) {
+                    if (people.get(person_id).insidePeople.get(m).sfpp.isInfected == false) {
+                        isFound = true;
+                        people.get(person_id).insidePeople.get(m).sfpp.isInfected = true;
+                        people.get(person_id).insidePeople.get(m).sfpp.state = "Infected_notContagious";
+                        //print('Person {} is initially infected'.format(person_id))
+                        n_infected_init -= 1;
+                        break;
+                    }
+                }
             }
 
-            people.get(person_id).shamilPersonProperties.isInfected = true;
-            people.get(person_id).shamilPersonProperties.state = "Infected_notContagious";
-            //print('Person {} is initially infected'.format(person_id))
-            n_infected_init -= 1;
         }
     }
 
@@ -400,11 +417,17 @@ public class ShamilPersonManager {
         }
     }
 
-    public static void hospitalize(Person person,int i) {
-        if (person.shamilPersonProperties.isInfected == true && !(person.shamilPersonProperties.profession.name.equals("Hospitalized"))) {
+    public static void hospitalize(Person person, int i) {
+        int numInf = 0;
+        for (int m = 0; m < person.insidePeople.size(); m++) {
+            if (person.insidePeople.get(m).sfpp.isInfected == true && !(person.shamilPersonProperties.profession.name.equals("Hospitalized"))) {
+                numInf += 1;
+            }
+        }
+        if (numInf / person.insidePeople.size() > 0.5) {
             double tmp = Math.random();
             if (tmp > 0.75) {
-                person.shamilPersonProperties.profession=new ShamilProfession(profession_df.get(4));
+                person.shamilPersonProperties.profession = new ShamilProfession(profession_df.get(4));
 //                System.out.println("HOSPITALIZED: "+i);
                 //print('Person {} has been hospitalized'.format(self.id))
             }
@@ -412,10 +435,12 @@ public class ShamilPersonManager {
     }
 
     public static void die(Person person) {
-        if (person.shamilPersonProperties.infectedDays > 15) {
-            if (Math.random() > 0.97) {
-                person.shamilPersonProperties.isAlive = false;
-                //print('Person {} has died'.format(self.id));
+        for (int m = 0; m < person.insidePeople.size(); m++) {
+            if (person.insidePeople.get(m).sfpp.infectedDays > 15) {
+                if (Math.random() > 0.97) {
+                    person.insidePeople.get(m).sfpp.isAlive = false;
+                    //print('Person {} has died'.format(self.id));
+                }
             }
         }
     }

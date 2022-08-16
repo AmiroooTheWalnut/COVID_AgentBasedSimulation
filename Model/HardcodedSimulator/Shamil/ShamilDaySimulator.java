@@ -5,6 +5,7 @@
 package COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil;
 
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Person;
+import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Root;
 import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilPersonManager.thresholds_df;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,16 +23,20 @@ public class ShamilDaySimulator {
 
         int sumInfected = 0;
         for (int i = 0; i < people.size(); i++) {
-            if (people.get(i).shamilPersonProperties.isInfected == true && !people.get(i).shamilPersonProperties.state.equals("recovered") && people.get(i).shamilPersonProperties.isAlive == true) {
-                sumInfected = sumInfected + 1;
+            for (int m = 0; m < people.get(i).insidePeople.size(); m++) {
+                if (people.get(i).insidePeople.get(m).sfpp.isInfected == true && !people.get(i).insidePeople.get(m).sfpp.state.equals("recovered") && people.get(i).insidePeople.get(m).sfpp.isAlive == true) {
+                    sumInfected = sumInfected + 1;
+                }
             }
         }
 
         for (int i = 0; i < people.size(); i++) {
-            people.get(i).shamilPersonProperties.infectionLevel = 0;
-            if (day >= awareness_start) {
-                ShamilPersonManager.raiseAwareness(people.get(i));
-                ShamilPersonManager.becomeProtected(people.get(i), sumInfected);
+            for (int m = 0; m < people.get(i).insidePeople.size(); m++) {
+                people.get(i).insidePeople.get(m).sfpp.infectionLevel = 0;
+                if (day >= awareness_start) {
+                    ShamilPersonManager.raiseAwareness(people.get(i));
+                    ShamilPersonManager.becomeProtected(people.get(i), sumInfected);
+                }
             }
         }
 
@@ -92,23 +97,34 @@ public class ShamilDaySimulator {
         }
     }
 
-    public static void dayEnd(ArrayList<Person> persons, int num_of_day, int trace_days, int quarantine_days, ArrayList<HashMap<Integer, ArrayList<Integer>>> groupdetails) {
+    public static void dayEnd(ArrayList<Person> persons, int num_of_day, int trace_days, int quarantine_days, ArrayList<HashMap<Integer, ArrayList<Integer>>> groupdetails, boolean isFuzzyStatus, double pTSFraction) {
 // # fline = open("seed.txt").readline().rstrip()
         // # ranseed = int(fline)
         // # np.random.seed(ranseed)
 
         double INFECTION_PROBABILITY = thresholds_df.get("INFECTION_PROBABILITY");
 //        INFECTION_PROBABILITY = dfToFloat(thresholds_df,"INFECTION_PROBABILITY")        
-        double avgTravelsPerDay=0;
+        double avgTravelsPerDay = 0;
         for (int i = 0; i < persons.size(); i++) { // prsn in persons:
 
             Person prsn = persons.get(i);
-            avgTravelsPerDay=avgTravelsPerDay+prsn.numTravelsInDay;
-            prsn.numTravelsInDay=0;
+            avgTravelsPerDay = avgTravelsPerDay + prsn.numTravelsInDay;
+            prsn.numTravelsInDay = 0;
 //            String initialProfessionName=prsn.shamilPersonProperties.profession.name;
+            int numInf=0;
+            for (int m = 0; m < prsn.insidePeople.size(); m++) {
+                if (prsn.insidePeople.get(m).fpp.status == Root.statusEnum.INFECTED_ASYM.ordinal() || prsn.insidePeople.get(m).fpp.status == Root.statusEnum.INFECTED_SYM.ordinal()) {
+                    numInf+=1;
+                }
+            }
+            boolean isInfected=false;
+            if(numInf/prsn.insidePeople.size()>0.5){
+                isInfected=true;
+            }
+
             if (prsn.shamilPersonProperties.quarantinedDay > -1) {
                 prsn.shamilPersonProperties.quarantinedDay += 1;
-                if (prsn.shamilPersonProperties.quarantinedDay == quarantine_days && prsn.shamilPersonProperties.isInfected == false) {
+                if (prsn.shamilPersonProperties.quarantinedDay == quarantine_days && isInfected == false) {
                     prsn.shamilPersonProperties.quarantinedDay = -1;
                     prsn.shamilPersonProperties.profession = new ShamilProfession(prsn.shamilPersonProperties.initialProfession);
                 }
@@ -117,12 +133,12 @@ public class ShamilDaySimulator {
 //            if(endProfessionName1.equals("Hospitalized") && !initialProfessionName.equals("Hospitalized")){
 //                 System.out.println("!!!!!!!!!!!!!!!!!!");
 //            }
+            for (int O = 0; O < prsn.insidePeople.size(); O++) {
+            if (prsn.insidePeople.get(O).sfpp.isInfected == false) {
 
-            if (prsn.shamilPersonProperties.isInfected == false) {
-
-                if (prsn.shamilPersonProperties.infectionLevel >= INFECTION_PROBABILITY) {
-                    prsn.shamilPersonProperties.isInfected = true;
-                    prsn.shamilPersonProperties.state = "Infected_notContagious";//.setState('Infected_notContagious')
+                if (prsn.insidePeople.get(O).sfpp.infectionLevel >= INFECTION_PROBABILITY) {
+                    prsn.insidePeople.get(O).sfpp.isInfected = true;
+                    prsn.insidePeople.get(O).sfpp.state = "Infected_notContagious";//.setState('Infected_notContagious')
 //                    System.out.println("INFECTED BY SHAMIL");
                     // #print("\n\n\nNew Guy: {} by {} - Profession: {}".format(prsn.id, prsn.infected_by, prsn.profession))
 
@@ -132,8 +148,8 @@ public class ShamilDaySimulator {
                 }
             } else {
 
-                String prsn_state = prsn.shamilPersonProperties.state;//.getState()
-                prsn.shamilPersonProperties.infectedDays += 1;
+                String prsn_state = prsn.insidePeople.get(O).sfpp.state;//.getState()
+                prsn.insidePeople.get(O).sfpp.infectedDays += 1;
 
                 if (prsn_state.equals("contagious_symptomatic")) {
                     ShamilPersonManager.hospitalize(prsn, i);
@@ -147,20 +163,20 @@ public class ShamilDaySimulator {
                     // #person dead do nothing but immunity and stuff deal later
                     //int dummy = 1;// NOT NEEDED
                 } else {
-                    if (prsn.shamilPersonProperties.isAlive == false) {
-                        prsn.shamilPersonProperties.state = "Dead";
-                        prsn.shamilPersonProperties.isInfected = false;//ADDED BY AMIROOO
-                    } else if (prsn.shamilPersonProperties.infectedDays >= Math.round(Math.max(50, 50 + 15 * Math.random())) && prsn.shamilPersonProperties.state.equals("recovered")) {//ADDED BY AMIROOO WAS 60
-                        prsn.shamilPersonProperties.state = "Not_infected";
-                        prsn.shamilPersonProperties.isInfected = false;
+                    if (prsn.insidePeople.get(O).sfpp.isAlive == false) {
+                        prsn.insidePeople.get(O).sfpp.state = "Dead";
+                        prsn.insidePeople.get(O).sfpp.isInfected = false;//ADDED BY AMIROOO
+                    } else if (prsn.insidePeople.get(O).sfpp.infectedDays >= Math.round(Math.max(50, 50 + 15 * Math.random())) && prsn.insidePeople.get(O).sfpp.state.equals("recovered")) {//ADDED BY AMIROOO WAS 60
+                        prsn.insidePeople.get(O).sfpp.state = "Not_infected";
+                        prsn.insidePeople.get(O).sfpp.isInfected = false;
                         prsn.shamilPersonProperties.quarantinedDay = -1;
-                    } else if (prsn.shamilPersonProperties.infectedDays >= Math.round(Math.max(14, 14 + 10 * Math.random())) && (prsn.shamilPersonProperties.state.equals("contagious_symptomatic") || prsn.shamilPersonProperties.state.equals("contagious_asymptomatic"))) {//ADDED BY AMIROOO WAS 18
-                        prsn.shamilPersonProperties.state = "recovered";//ADDED BY AMIROOO
-                        prsn.shamilPersonProperties.isInfected = false;//ADDED BY AMIROOO
-                    } else if (prsn.shamilPersonProperties.infectedDays >= Math.round(Math.max(5, 5 + 2 * Math.random())) && prsn.shamilPersonProperties.state.equals("contagious_asymptomatic")) {//EDITTED BY AMIROOO IT WAS 6
+                    } else if (prsn.insidePeople.get(O).sfpp.infectedDays >= Math.round(Math.max(14, 14 + 10 * Math.random())) && (prsn.insidePeople.get(O).sfpp.state.equals("contagious_symptomatic") || prsn.insidePeople.get(O).sfpp.state.equals("contagious_asymptomatic"))) {//ADDED BY AMIROOO WAS 18
+                        prsn.insidePeople.get(O).sfpp.state = "recovered";//ADDED BY AMIROOO
+                        prsn.insidePeople.get(O).sfpp.isInfected = false;//ADDED BY AMIROOO
+                    } else if (prsn.insidePeople.get(O).sfpp.infectedDays >= Math.round(Math.max(5, 5 + 2 * Math.random())) && prsn.insidePeople.get(O).sfpp.state.equals("contagious_asymptomatic")) {//EDITTED BY AMIROOO IT WAS 6
                         if (Math.random() > 0.5) {//ADDED BY AMIROOO
-                            prsn.shamilPersonProperties.state = "contagious_symptomatic";
-                            prsn.shamilPersonProperties.isInfected = true;
+                            prsn.insidePeople.get(O).sfpp.state = "contagious_symptomatic";
+                            prsn.insidePeople.get(O).sfpp.isInfected = true;
                             // # elif(prsn.infected_days==1):
                             // #     prsn.setState('contagious_symptomatic')
                             // #contact trace
@@ -205,18 +221,19 @@ public class ShamilDaySimulator {
                                 }
                             }
                         }
-                    } else if (prsn.shamilPersonProperties.infectedDays >= Math.round(Math.max(3, 3 + 2 * Math.random())) && prsn.shamilPersonProperties.state.equals("Infected_notContagious")) {//EDITTED BY AMIROOO IT WAS 4
-                        prsn.shamilPersonProperties.state = "contagious_asymptomatic";
-                        prsn.shamilPersonProperties.isInfected = true;
+                    } else if (prsn.insidePeople.get(O).sfpp.infectedDays >= Math.round(Math.max(3, 3 + 2 * Math.random())) && prsn.insidePeople.get(O).sfpp.state.equals("Infected_notContagious")) {//EDITTED BY AMIROOO IT WAS 4
+                        prsn.insidePeople.get(O).sfpp.state = "contagious_asymptomatic";
+                        prsn.insidePeople.get(O).sfpp.isInfected = true;
                     }
                 }
+            }
             }
 //            String endProfessionName=prsn.shamilPersonProperties.profession.name;
 //            if(endProfessionName.equals("Hospitalized") && !initialProfessionName.equals("Hospitalized")){
 //                 System.out.println("!!!!!!!!!!!!!!!!!!");
 //            }
         }
-        avgTravelsPerDay=avgTravelsPerDay/(double)(persons.size());
-        System.out.println("Average travels per day per agent: "+avgTravelsPerDay);
+        avgTravelsPerDay = avgTravelsPerDay / (double) (persons.size());
+        System.out.println("Average travels per day per agent: " + avgTravelsPerDay);
     }
 }

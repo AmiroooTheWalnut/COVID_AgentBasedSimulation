@@ -54,8 +54,14 @@ public class ShamilGroupManager {
 
         for (int i = 0; i < persons.size(); i++) {
 //        for prsn in persons:
+            boolean isAlive = false;
+            for (int m = 0; m < persons.get(i).insidePeople.size(); m++) {
+                if (persons.get(i).insidePeople.get(m).sfpp.isAlive == true) {
+                    isAlive = true;
+                }
+            }
 
-            if (persons.get(i).shamilPersonProperties.isAlive == false) {
+            if (isAlive == false) {
 //            if not prsn.is_alive:
 
                 continue;
@@ -196,8 +202,14 @@ public class ShamilGroupManager {
         for (int r = 0; r < regions.size(); r++) {
             for (int i = 0; i < regions.get(r).residents.size(); i++) {
 //        for prsn in persons:
+                boolean isAlive = false;
+                for (int m = 0; m < regions.get(r).residents.get(i).insidePeople.size(); m++) {
+                    if (regions.get(r).residents.get(i).insidePeople.get(m).sfpp.isAlive == true) {
+                        isAlive = true;
+                    }
+                }
 
-                if (regions.get(r).residents.get(i).shamilPersonProperties.isAlive == false) {
+                if (isAlive == false) {
 //            if not prsn.is_alive:
                     continue;
                 }
@@ -313,7 +325,7 @@ public class ShamilGroupManager {
 //            Logger.getLogger(ShamilGroupManager.class.getName()).log(Level.SEVERE, null, ex);
 //        }
         //myMainModel.agentEvalPool.
-        
+
         //SERIAL EVAULATION OF GROUP UPDATE
 //        for (int i = 0; i < groups.size(); i++) {// grp in groups:
 //
@@ -332,7 +344,6 @@ public class ShamilGroupManager {
 //
 //        }
         //SERIAL EVAULATION OF GROUP UPDATE
-
         Object output[] = new Object[2];
         output[0] = groups;
         output[1] = person_group;

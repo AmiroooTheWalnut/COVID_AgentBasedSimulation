@@ -28,6 +28,52 @@ public class ShamilSimulatorController {
     public static ArrayList<HashMap<Integer, ArrayList<Integer>>> daily_groups;
     public static int n_infected_init = 200;
 
+    public static void convertShamilToOurParallel(ArrayList<Person> people, MainModel myMainModel) {
+        int numProcessors = myMainModel.numCPUs;
+        try {
+            AdvancedParallelShamilToOur parallelShamilToOur[] = new AdvancedParallelShamilToOur[numProcessors];
+
+            for (int i = 0; i < numProcessors - 1; i++) {
+                parallelShamilToOur[i] = new AdvancedParallelShamilToOur(myMainModel, people, (int) Math.floor(i * ((people.size()) / numProcessors)), (int) Math.floor((i + 1) * ((people.size()) / numProcessors)));
+            }
+            parallelShamilToOur[numProcessors - 1] = new AdvancedParallelShamilToOur(myMainModel, people, (int) Math.floor((numProcessors - 1) * ((people.size()) / numProcessors)), people.size());
+
+            ArrayList<Callable<Object>> calls = new ArrayList<>();
+
+            for (int i = 0; i < numProcessors; i++) {
+                parallelShamilToOur[i].addRunnableToQueue(calls);
+            }
+
+            //myMainModel.agentEvalPool.invokeAny(calls);
+            myMainModel.agentEvalPool.invokeAll(calls);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(ShamilSimulatorController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public static void convertOurToShamilParallel(ArrayList<Person> people, MainModel myMainModel) {
+        int numProcessors = myMainModel.numCPUs;
+        try {
+            AdvancedParallelOurToShamil parallelOurToShamil[] = new AdvancedParallelOurToShamil[numProcessors];
+
+            for (int i = 0; i < numProcessors - 1; i++) {
+                parallelOurToShamil[i] = new AdvancedParallelOurToShamil(myMainModel, people, (int) Math.floor(i * ((people.size()) / numProcessors)), (int) Math.floor((i + 1) * ((people.size()) / numProcessors)));
+            }
+            parallelOurToShamil[numProcessors - 1] = new AdvancedParallelOurToShamil(myMainModel, people, (int) Math.floor((numProcessors - 1) * ((people.size()) / numProcessors)), people.size());
+
+            ArrayList<Callable<Object>> calls = new ArrayList<>();
+
+            for (int i = 0; i < numProcessors; i++) {
+                parallelOurToShamil[i].addRunnableToQueue(calls);
+            }
+
+            //myMainModel.agentEvalPool.invokeAny(calls);
+            myMainModel.agentEvalPool.invokeAll(calls);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(ShamilSimulatorController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     public static void convertShamilToOur(ArrayList<Person> people) {
 //        int inf=0;
         for (int i = 0; i < people.size(); i++) {
@@ -49,56 +95,137 @@ public class ShamilSimulatorController {
                     people.get(i).properties.didTravelFromWork = true;
                 }
             }
-            switch (people.get(i).shamilPersonProperties.state) {
-                case "Not_infected":
-                    people.get(i).properties.status = statusEnum.SUSCEPTIBLE.ordinal();
-                    break;
-                case "Infected_notContagious":
-                    people.get(i).properties.status = statusEnum.SUSCEPTIBLE.ordinal();
-                    break;
-                case "contagious_symptomatic":
-                    people.get(i).properties.status = statusEnum.INFECTED_SYM.ordinal();
+            for (int m = 0; m < people.get(i).insidePeople.size(); m++) {
+                switch (people.get(i).insidePeople.get(m).sfpp.state) {
+                    case "Not_infected":
+                        people.get(i).insidePeople.get(m).fpp.status = statusEnum.SUSCEPTIBLE.ordinal();
+                        break;
+                    case "Infected_notContagious":
+                        people.get(i).insidePeople.get(m).fpp.status = statusEnum.SUSCEPTIBLE.ordinal();
+                        break;
+                    case "contagious_symptomatic":
+                        people.get(i).insidePeople.get(m).fpp.status = statusEnum.INFECTED_SYM.ordinal();
 //                inf+=1;
-                    break;
-                case "contagious_asymptomatic":
-                    people.get(i).properties.status = statusEnum.INFECTED_ASYM.ordinal();
+                        break;
+                    case "contagious_asymptomatic":
+                        people.get(i).insidePeople.get(m).fpp.status = statusEnum.INFECTED_ASYM.ordinal();
 //                inf+=1;
-                    break;
-                case "Dead":
-                    people.get(i).properties.status = statusEnum.DEAD.ordinal();
-                    break;
-                case "recovered":
-                    people.get(i).properties.status = statusEnum.RECOVERED.ordinal();
-                    break;
-                default:
-                    break;
+                        break;
+                    case "Dead":
+                        people.get(i).insidePeople.get(m).fpp.status = statusEnum.DEAD.ordinal();
+                        break;
+                    case "recovered":
+                        people.get(i).insidePeople.get(m).fpp.status = statusEnum.RECOVERED.ordinal();
+                        break;
+                    default:
+                        break;
+                }
             }
         }
 //        System.out.println("convertOurToShamil INF: "+inf);
     }
 
+    public static void convertShamilToOurPerson(Person person) {
+        if (person.shamilPersonProperties.currentTask.name.equals("Stay Home")) {
+            if (person.properties.isInTravel == false) {
+                person.properties.isAtHome = true;
+                person.properties.isAtWork = false;
+            } else {
+                person.properties.didTravelFromHome = true;
+                person.properties.didTravelFromWork = false;
+            }
+        }
+        if (person.shamilPersonProperties.currentTask.name.equals("Go to Work") || person.shamilPersonProperties.currentTask.name.equals("Work") || person.shamilPersonProperties.currentTask.name.equals("Returns Home") || person.shamilPersonProperties.currentTask.name.equals("Treat Patients")) {
+            if (person.properties.isInTravel == false) {
+                person.properties.isAtHome = false;
+                person.properties.isAtWork = true;
+            } else {
+                person.properties.didTravelFromHome = false;
+                person.properties.didTravelFromWork = true;
+            }
+        }
+        for (int m = 0; m < person.insidePeople.size(); m++) {
+            switch (person.insidePeople.get(m).sfpp.state) {
+                case "Not_infected":
+                    person.insidePeople.get(m).fpp.status = statusEnum.SUSCEPTIBLE.ordinal();
+                    break;
+                case "Infected_notContagious":
+                    person.insidePeople.get(m).fpp.status = statusEnum.SUSCEPTIBLE.ordinal();
+                    break;
+                case "contagious_symptomatic":
+                    person.insidePeople.get(m).fpp.status = statusEnum.INFECTED_SYM.ordinal();
+//                inf+=1;
+                    break;
+                case "contagious_asymptomatic":
+                    person.insidePeople.get(m).fpp.status = statusEnum.INFECTED_ASYM.ordinal();
+//                inf+=1;
+                    break;
+                case "Dead":
+                    person.insidePeople.get(m).fpp.status = statusEnum.DEAD.ordinal();
+                    break;
+                case "recovered":
+                    person.insidePeople.get(m).fpp.status = statusEnum.RECOVERED.ordinal();
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
     public static void convertOurToShamil(ArrayList<Person> people) {
 //        int inf=0;
         for (int i = 0; i < people.size(); i++) {
-            switch (people.get(i).properties.status) {
+            for (int m = 0; m < people.get(i).insidePeople.size(); m++) {
+                switch (people.get(i).insidePeople.get(m).fpp.status) {
+                    case 0:
+                        people.get(i).insidePeople.get(m).sfpp.state = "Not_infected";
+                        break;
+                    case 1:
+                        people.get(i).insidePeople.get(m).sfpp.state = "contagious_symptomatic";
+                        people.get(i).insidePeople.get(m).sfpp.isInfected = true;
+//                inf+=1;
+                        break;
+                    case 2:
+                        people.get(i).insidePeople.get(m).sfpp.state = "contagious_asymptomatic";
+                        people.get(i).insidePeople.get(m).sfpp.isInfected = true;
+//                inf+=1;
+                        break;
+                    case 3:
+                        people.get(i).insidePeople.get(m).sfpp.state = "recovered";
+                        break;
+                    case 4:
+                        people.get(i).insidePeople.get(m).sfpp.state = "Dead";
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+//        System.out.println("convertOurToShamil INF: "+inf);
+    }
+
+    public static void convertOurToShamilPerson(Person person) {
+//        int inf=0;
+        for (int m = 0; m < person.insidePeople.size(); m++) {
+            switch (person.insidePeople.get(m).fpp.status) {
                 case 0:
-                    people.get(i).shamilPersonProperties.state = "Not_infected";
+                    person.insidePeople.get(m).sfpp.state = "Not_infected";
                     break;
                 case 1:
-                    people.get(i).shamilPersonProperties.state = "contagious_symptomatic";
-                    people.get(i).shamilPersonProperties.isInfected = true;
+                    person.insidePeople.get(m).sfpp.state = "contagious_symptomatic";
+                    person.insidePeople.get(m).sfpp.isInfected = true;
 //                inf+=1;
                     break;
                 case 2:
-                    people.get(i).shamilPersonProperties.state = "contagious_asymptomatic";
-                    people.get(i).shamilPersonProperties.isInfected = true;
+                    person.insidePeople.get(m).sfpp.state = "contagious_asymptomatic";
+                    person.insidePeople.get(m).sfpp.isInfected = true;
 //                inf+=1;
                     break;
                 case 3:
-                    people.get(i).shamilPersonProperties.state = "recovered";
+                    person.insidePeople.get(m).sfpp.state = "recovered";
                     break;
                 case 4:
-                    people.get(i).shamilPersonProperties.state = "Dead";
+                    person.insidePeople.get(m).sfpp.state = "Dead";
                     break;
                 default:
                     break;
@@ -114,7 +241,7 @@ public class ShamilSimulatorController {
             for (int h = 0; h < 24; h++) {
                 updateHour(people, null, h, d, false, false, mainModel);
             }
-            endDay(people, d);
+            endDay(people, d, false, 0);
         }
     }
 
@@ -124,7 +251,7 @@ public class ShamilSimulatorController {
             for (int h = 0; h < 24; h++) {
                 updateHour(people, null, h, d, false, false, mainModel);
             }
-            endDay(people, d);
+            endDay(people, d, false, 0);
         }
     }
 
@@ -255,7 +382,7 @@ public class ShamilSimulatorController {
         //pickle.dump(daily_groups,open('group_info_day_' + str(day) + '.p','wb'))
     }
 
-    public static void endDay(ArrayList<Person> people, int day) {
+    public static void endDay(ArrayList<Person> people, int day, boolean isFuzzyStatus, double pTSFraction) {
 //        int counter1 = 0;
 //        for (int i = 0; i < people.size(); i++) {
 //            if (people.get(i).shamilPersonProperties.profession.name.equals("Hospitalized")) {
@@ -263,7 +390,7 @@ public class ShamilSimulatorController {
 //            }
 //        }
 //        System.out.println("num hospitalized before end " + counter1);//TEMP
-        ShamilDaySimulator.dayEnd(people, day, trace_days, quarantine_days, daily_groups);
+        ShamilDaySimulator.dayEnd(people, day, trace_days, quarantine_days, daily_groups, isFuzzyStatus, pTSFraction);
 //        int counter2 = 0;
 //        for (int i = 0; i < people.size(); i++) {
 //            if (people.get(i).shamilPersonProperties.profession.name.equals("Hospitalized")) {

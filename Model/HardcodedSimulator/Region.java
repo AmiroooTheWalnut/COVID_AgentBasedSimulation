@@ -7,6 +7,7 @@ package COVID_AgentBasedSimulation.Model.HardcodedSimulator;
 
 import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MyPolygon;
 import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MyPolygons;
+import static COVID_AgentBasedSimulation.Model.MainModel.softwareVersion;
 import COVID_AgentBasedSimulation.Model.Structure.CensusBlockGroup;
 import COVID_AgentBasedSimulation.Model.Structure.Marker;
 import java.io.Serializable;
@@ -18,6 +19,9 @@ import java.util.HashMap;
  * @author user
  */
 public class Region extends Marker implements Serializable {
+    
+    static final long serialVersionUID = softwareVersion;
+    
     public transient ScheduleList scheduleList=new ScheduleList();
     public transient double workPopulation;
     

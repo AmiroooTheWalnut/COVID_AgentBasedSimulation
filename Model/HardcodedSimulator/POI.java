@@ -20,8 +20,8 @@ import java.util.List;
  */
 public class POI {
 
-    public static double CONTACT_RATE = 0.23;//0.55;//0.23;//CONTACT PER MINUTE
-    public static double CHANCE_OF_ENV_CONTAMINATION = 0.00015;//0.00055;//0.00015;
+    public static double CONTACT_RATE = 0.2;//0.55;//0.23;//CONTACT PER MINUTE
+    public static double CHANCE_OF_ENV_CONTAMINATION = 0.0001;//0.00055;//0.00015;
 
     public PatternsRecordProcessed patternsRecord;
     public double contaminatedTime = 0;
@@ -29,23 +29,48 @@ public class POI {
     public List<Person> peopleInPOI = Collections.synchronizedList(new ArrayList());
 
     double numInfected = 0;
+    //double numInfectedFuzzy = 0;
 
     final double fixedTransmissionRate = 0.000001;
 
-    public void contact(ZonedDateTime currentTime, Person person, boolean isUseBuildingLogic) {
+    public void contact(ZonedDateTime currentTime, Person person, boolean isUseBuildingLogic, double pTSFraction) {
         if (isUseBuildingLogic == true) {
             double probability = getProbabilityOfInfection(currentTime);
 
-            infectedByEnvironment(person);
-            infectByContact(probability, person);
+            infectedByEnvironment(person,pTSFraction);
+            infectByContact(probability, person,pTSFraction);
         } else {
             if (Math.random() < fixedTransmissionRate) {
-                if (person.properties.status == statusEnum.SUSCEPTIBLE.ordinal()) {
-//                System.out.println("CONTACT INFECTION");
-                    if (Math.random() > 0.7) {
-                        person.properties.status = statusEnum.INFECTED_ASYM.ordinal();
-                    } else {
-                        person.properties.status = statusEnum.INFECTED_SYM.ordinal();
+                for (int m = 0; m < person.insidePeople.size(); m++) {
+                    if (person.insidePeople.get(m).fpp.status == statusEnum.SUSCEPTIBLE.ordinal()) {
+//                  System.out.println("CONTACT INFECTION");
+                        if (Math.random() > 0.7) {
+                            person.insidePeople.get(m).fpp.status = statusEnum.INFECTED_ASYM.ordinal();
+                        } else {
+                            person.insidePeople.get(m).fpp.status = statusEnum.INFECTED_SYM.ordinal();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public void contactFuzzy(ZonedDateTime currentTime, Person person, boolean isUseBuildingLogic, double pTSFraction) {
+        if (isUseBuildingLogic == true) {
+            double probability = getProbabilityOfInfection(currentTime);
+
+            infectedByEnvironment(person, pTSFraction);
+            infectByContact(probability, person, pTSFraction);
+        } else {
+            if (Math.random() < fixedTransmissionRate) {
+                for (int m = 0; m < person.insidePeople.size(); m++) {
+                    if (person.insidePeople.get(m).fpp.status == statusEnum.SUSCEPTIBLE.ordinal()) {
+//                  System.out.println("CONTACT INFECTION");
+                        if (Math.random() > 0.7) {
+                            person.insidePeople.get(m).fpp.status=statusEnum.INFECTED_ASYM.ordinal();
+                        } else {
+                            person.insidePeople.get(m).fpp.status=statusEnum.INFECTED_SYM.ordinal();
+                        }
                     }
                 }
             }
@@ -74,7 +99,7 @@ public class POI {
         return probability;
     }
 
-    public void infectByContact(double probability, Person person) {
+    public void infectByContact(double probability, Person person, double pTSFraction) {
 //        double numInfected = 0;
 //        for (int i = 0; i < peopleInPOI.size(); i++) {
 //            if (peopleInPOI.get(i).properties.status == statusEnum.INFECTED_ASYM.ordinal() || peopleInPOI.get(i).properties.status == statusEnum.INFECTED_SYM.ordinal()) {
@@ -87,28 +112,32 @@ public class POI {
 
         if (Math.random() < CONTACT_RATE) {
             person.numContacts = person.numContacts + 1;
-            if (Math.random() < (numInfected / (double) (peopleInPOI.size())) * probability) {
-                if (person.properties.status == statusEnum.SUSCEPTIBLE.ordinal()) {
-//                System.out.println("CONTACT INFECTION");
-                    if (Math.random() > 0.7) {
-                        person.properties.status = statusEnum.INFECTED_ASYM.ordinal();
-                    } else {
-                        person.properties.status = statusEnum.INFECTED_SYM.ordinal();
+            if (Math.random() < (numInfected / (double) (peopleInPOI.size()*pTSFraction)) * probability) {
+                for (int m = 0; m < person.insidePeople.size(); m++) {
+                    if (person.insidePeople.get(m).fpp.status == statusEnum.SUSCEPTIBLE.ordinal()) {
+//                  System.out.println("CONTACT INFECTION");
+                        if (Math.random() > 0.7) {
+                            person.insidePeople.get(m).fpp.status = statusEnum.INFECTED_ASYM.ordinal();
+                        } else {
+                            person.insidePeople.get(m).fpp.status = statusEnum.INFECTED_SYM.ordinal();
+                        }
                     }
                 }
             }
         }
     }
 
-    public void infectedByEnvironment(Person person) {
+    public void infectedByEnvironment(Person person, double pTSFraction) {
         if (contaminatedTime > 0) {
-            if (Math.random() < CHANCE_OF_ENV_CONTAMINATION * CONTACT_RATE / (numInfected / (double) (peopleInPOI.size()))) {
-                if (person.properties.status == statusEnum.SUSCEPTIBLE.ordinal()) {
-//                    System.out.println("ENV INFECTION");
-                    if (Math.random() > 0.7) {
-                        person.properties.status = statusEnum.INFECTED_ASYM.ordinal();
-                    } else {
-                        person.properties.status = statusEnum.INFECTED_SYM.ordinal();
+            if (Math.random() < CHANCE_OF_ENV_CONTAMINATION * CONTACT_RATE / (numInfected / (double) (peopleInPOI.size() * pTSFraction))) {
+                for (int m = 0; m < person.insidePeople.size(); m++) {
+                    if (person.insidePeople.get(m).fpp.status == statusEnum.SUSCEPTIBLE.ordinal()) {
+//                      System.out.println("ENV INFECTION");
+                        if (Math.random() > 0.7) {
+                            person.insidePeople.get(m).fpp.status = statusEnum.INFECTED_ASYM.ordinal();
+                        } else {
+                            person.insidePeople.get(m).fpp.status = statusEnum.INFECTED_SYM.ordinal();
+                        }
                     }
                 }
             }
