@@ -63,6 +63,7 @@ public class AdvancedParallelTest extends ParallelProcessor {
                 mainModel.ABM.filePath = projectLocation;
 
                 mainModel.ABM.isReportContactRate = runConfig.isReportContactRate;
+                mainModel.ABM.isFuzzyStatus = runConfig.isFuzzyStatus;
                 //mainModel.javaEvaluationEngine.connectToConsole(jTextArea1);
                 //mainModel.pythonEvaluationEngine.connectToConsole(jTextArea2);
                 mainModel.loadAndConnectSupplementaryCaseStudyDataKryo(datasetRoot+"/Safegraph/" + mainModel.ABM.studyScope + "/supplementaryGIS.bin");
