@@ -88,6 +88,7 @@ public class AbmCli {
                 Logger.getLogger(AbmCli.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        //System.out.println("FREAK!!!!!!!!!!!!!!!!!!!!");
     }
 
     public void runARun(String datasetRoot, String projectLocation, RunConfig runConfig) {
@@ -151,8 +152,8 @@ public class AbmCli {
             numRegions = Integer.parseInt(values[1]);
         }
         mainModel.simulationDelayTime = -1;
-        mainModel.initModelHardCoded(true, runConfig.isParallelBehaviorEvaluation, runConfig.numResidents, numRegions, runConfig.numCPUsInModel, !runConfig.isSpecificRegionInfected, runConfig.isSpecialScenarioActive, infectionIndices);
+        mainModel.initModelHardCoded(false, true, runConfig.isParallelBehaviorEvaluation, runConfig.numResidents, numRegions, runConfig.numCPUsInModel, !runConfig.isSpecificRegionInfected, runConfig.isSpecialScenarioActive, infectionIndices);
         mainModel.startTimeNanoSecond = System.nanoTime();
-        mainModel.resume(runConfig.isParallelBehaviorEvaluation, runConfig.numCPUsInModel, true, runConfig.isSpecialScenarioActive);
+        mainModel.resume(false,runConfig.isParallelBehaviorEvaluation, runConfig.numCPUsInModel, true, runConfig.isSpecialScenarioActive);
     }
 }

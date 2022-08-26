@@ -1131,7 +1131,7 @@ public class SimulatorDialog extends javax.swing.JDialog {
         if (jToggleButton1.getText().equals("Run")) {
             myParent.mainModel.isPause = false;
             jToggleButton1.setText("Pause");
-            myParent.mainModel.resume(jCheckBox1.isSelected(), myParent.numProcessors, false, false);
+            myParent.mainModel.resume(true, jCheckBox1.isSelected(), myParent.numProcessors, false, false);
         } else if (jToggleButton1.getText().equals("Pause")) {
             myParent.mainModel.isPause = true;
             myParent.mainModel.pause();
@@ -1146,7 +1146,7 @@ public class SimulatorDialog extends javax.swing.JDialog {
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         myParent.mainModel.javaEvaluationEngine.connectToConsole(jTextArea1);
         myParent.mainModel.pythonEvaluationEngine.connectToConsole(jTextArea2);
-        myParent.mainModel.initModel(true, jCheckBox1.isSelected(), myParent.numProcessors);
+        myParent.mainModel.initModel(true, true, jCheckBox1.isSelected(), myParent.numProcessors);
         jLabel2.setText(myParent.mainModel.ABM.startTime.toString());
         Timer refreshSimulationDialogTimer = new Timer();
         refreshSimulationDialogTimer.schedule(new TimerTask() {
@@ -1244,9 +1244,9 @@ public class SimulatorDialog extends javax.swing.JDialog {
                 if (isRateChanged == true) {
                     myParent.mainModel.pause();
                     if (jToggleButton4.getText().equals("Pause")) {
-                        myParent.mainModel.resume(jCheckBox1.isSelected(), myParent.numProcessors, true, false);
+                        myParent.mainModel.resume(true, jCheckBox1.isSelected(), myParent.numProcessors, true, false);
                     } else if (jToggleButton1.getText().equals("Pause")) {
-                        myParent.mainModel.resume(jCheckBox1.isSelected(), myParent.numProcessors, false, false);
+                        myParent.mainModel.resume(true, jCheckBox1.isSelected(), myParent.numProcessors, false, false);
                     }
 
                     isRateChanged = false;
@@ -1621,12 +1621,12 @@ public class SimulatorDialog extends javax.swing.JDialog {
         }
         if (jRadioButton19.isSelected()) {
             myParent.mainModel.scenario.scenarioName = "VDFNC_" + jSpinner3.getValue();
-            myParent.mainModel.initModelHardCoded(true, jCheckBox1.isSelected(), (int) (jSpinner1.getValue()), (int) (jSpinner3.getValue()), myParent.numProcessors, jRadioButton21.isSelected(), isSpecialScenarioActive, infectionIndices);
+            myParent.mainModel.initModelHardCoded(true, true, jCheckBox1.isSelected(), (int) (jSpinner1.getValue()), (int) (jSpinner3.getValue()), myParent.numProcessors, jRadioButton21.isSelected(), isSpecialScenarioActive, infectionIndices);
         } else if (jRadioButton18.isSelected()) {
             myParent.mainModel.scenario.scenarioName = "RMCBG_" + jSpinner2.getValue();
-            myParent.mainModel.initModelHardCoded(true, jCheckBox1.isSelected(), (int) (jSpinner1.getValue()), (int) (jSpinner2.getValue()), myParent.numProcessors, jRadioButton21.isSelected(), isSpecialScenarioActive, infectionIndices);
+            myParent.mainModel.initModelHardCoded(true, true, jCheckBox1.isSelected(), (int) (jSpinner1.getValue()), (int) (jSpinner2.getValue()), myParent.numProcessors, jRadioButton21.isSelected(), isSpecialScenarioActive, infectionIndices);
         } else {
-            myParent.mainModel.initModelHardCoded(true, jCheckBox1.isSelected(), (int) (jSpinner1.getValue()), (int) (jSpinner2.getValue()), myParent.numProcessors, jRadioButton21.isSelected(), isSpecialScenarioActive, infectionIndices);
+            myParent.mainModel.initModelHardCoded(true, true, jCheckBox1.isSelected(), (int) (jSpinner1.getValue()), (int) (jSpinner2.getValue()), myParent.numProcessors, jRadioButton21.isSelected(), isSpecialScenarioActive, infectionIndices);
         }
 
         jLabel2.setText(myParent.mainModel.ABM.startTime.toString());
@@ -1719,9 +1719,9 @@ public class SimulatorDialog extends javax.swing.JDialog {
                 if (isRateChanged == true) {
                     myParent.mainModel.pause();
                     if (jToggleButton4.getText().equals("Pause")) {
-                        myParent.mainModel.resume(jCheckBox1.isSelected(), myParent.numProcessors, true, isSpecialScenarioActive);
+                        myParent.mainModel.resume(true, jCheckBox1.isSelected(), myParent.numProcessors, true, isSpecialScenarioActive);
                     } else if (jToggleButton1.getText().equals("Pause")) {
-                        myParent.mainModel.resume(jCheckBox1.isSelected(), myParent.numProcessors, false, isSpecialScenarioActive);
+                        myParent.mainModel.resume(true, jCheckBox1.isSelected(), myParent.numProcessors, false, isSpecialScenarioActive);
                     }
                     isRateChanged = false;
                 }
@@ -1748,7 +1748,7 @@ public class SimulatorDialog extends javax.swing.JDialog {
     private void jToggleButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton4ActionPerformed
         if (jToggleButton4.getText().equals("Run")) {
             myParent.mainModel.isPause = false;
-            myParent.mainModel.resume(jCheckBox2.isSelected(), myParent.numProcessors, true, isSpecialScenarioActive);
+            myParent.mainModel.resume(true, jCheckBox2.isSelected(), myParent.numProcessors, true, isSpecialScenarioActive);
             jToggleButton4.setText("Pause");
             jButton4.setEnabled(false);
         } else if (jToggleButton4.getText().equals("Pause")) {

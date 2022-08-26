@@ -34,9 +34,9 @@ public class AdvancedParallelTest extends ParallelProcessor {
                 mainModel.initData();
 
                 try {
-                    File geoDataFile = new File(datasetRoot+"/ProcessedGeoData.bin");
+                    File geoDataFile = new File(datasetRoot + "/ProcessedGeoData.bin");
                     if (geoDataFile.exists()) {
-                        AllGISData geoData = MainModel.loadAllGISDataKryo(datasetRoot+"/ProcessedGeoData.bin");
+                        AllGISData geoData = MainModel.loadAllGISDataKryo(datasetRoot + "/ProcessedGeoData.bin");
                         mainModel.allGISData = geoData;
                         System.out.println("Geographical data loaded");
                     } else {
@@ -47,9 +47,9 @@ public class AdvancedParallelTest extends ParallelProcessor {
                 }
 
                 try {
-                    File casesDataFile = new File(datasetRoot+"/ProcessedCasesData.bin");
+                    File casesDataFile = new File(datasetRoot + "/ProcessedCasesData.bin");
                     if (casesDataFile.exists()) {
-                        CovidCsseJhu casesData = MainModel.loadCasesDataKryo(datasetRoot+"/ProcessedCasesData.bin");
+                        CovidCsseJhu casesData = MainModel.loadCasesDataKryo(datasetRoot + "/ProcessedCasesData.bin");
                         mainModel.covidCsseJhu = casesData;
                         System.out.println("Cases data loaded");
                     } else {
@@ -66,7 +66,7 @@ public class AdvancedParallelTest extends ParallelProcessor {
                 mainModel.ABM.isFuzzyStatus = runConfig.isFuzzyStatus;
                 //mainModel.javaEvaluationEngine.connectToConsole(jTextArea1);
                 //mainModel.pythonEvaluationEngine.connectToConsole(jTextArea2);
-                mainModel.loadAndConnectSupplementaryCaseStudyDataKryo(datasetRoot+"/Safegraph/" + mainModel.ABM.studyScope + "/supplementaryGIS.bin");
+                mainModel.loadAndConnectSupplementaryCaseStudyDataKryo(datasetRoot + "/Safegraph/" + mainModel.ABM.studyScope + "/supplementaryGIS.bin");
 //          myParent.mainModel.allGISData.loadScopeCBGPolygons((Scope)(myParent.mainModel.ABM.studyScopeGeography));//THIS IS NOW IN SUPPLAMENTARY DATA
                 ArrayList<Integer> infectionIndices = new ArrayList();
                 if (runConfig.isSpecialScenarioActive == false) {
@@ -86,9 +86,9 @@ public class AdvancedParallelTest extends ParallelProcessor {
                     numRegions = Integer.parseInt(values[1]);
                 }
                 mainModel.simulationDelayTime = -1;
-                mainModel.initModelHardCoded(true, runConfig.isParallelBehaviorEvaluation, runConfig.numResidents, numRegions, runConfig.numCPUsInModel, !runConfig.isSpecificRegionInfected, runConfig.isSpecialScenarioActive, infectionIndices);
+                mainModel.initModelHardCoded(false, true, runConfig.isParallelBehaviorEvaluation, runConfig.numResidents, numRegions, runConfig.numCPUsInModel, !runConfig.isSpecificRegionInfected, runConfig.isSpecialScenarioActive, infectionIndices);
                 mainModel.startTimeNanoSecond = System.nanoTime();
-                mainModel.resume(runConfig.isParallelBehaviorEvaluation, runConfig.numCPUsInModel, true, runConfig.isSpecialScenarioActive);
+                mainModel.resume(false, runConfig.isParallelBehaviorEvaluation, runConfig.numCPUsInModel, true, runConfig.isSpecialScenarioActive);
             }
         };
     }

@@ -329,7 +329,7 @@ public class MainModel extends Dataset {
         ABM.agentTemplates.add(rootAgentTemplate);
     }
 
-    public void initModelHardCoded(boolean isParallelLoadingData, boolean isParallelBehaviorEvaluation, int numResidents, int numRegions, int numCPUs, boolean isCompleteInfection, boolean isInfectCBGOnly, ArrayList<Integer> initialInfectionRegionIndex) {
+    public void initModelHardCoded(boolean isRunFromGUI, boolean isParallelLoadingData, boolean isParallelBehaviorEvaluation, int numResidents, int numRegions, int numCPUs, boolean isCompleteInfection, boolean isInfectCBGOnly, ArrayList<Integer> initialInfectionRegionIndex) {
         isResultSavedAtTheEnd = false;
         int month = ABM.startTime.getMonthValue();
         currentMonth = month;
@@ -391,10 +391,10 @@ public class MainModel extends Dataset {
             passingNumCPU = 1;
         }
 //        pollBarrier = new CyclicBarrier(passingNumCPU);
-        resetTimerTask(passingNumCPU, true, isInfectCBGOnly);
+        resetTimerTask(isRunFromGUI, passingNumCPU, true, isInfectCBGOnly);
     }
 
-    public void initModel(boolean isParallelLoadingData, boolean isParallelBehaviorEvaluation, int numCPUs) {
+    public void initModel(boolean isRunFromGUI, boolean isParallelLoadingData, boolean isParallelBehaviorEvaluation, int numCPUs) {
         isResultSavedAtTheEnd = false;
         //\/\/\/ THIS IS FOR ERROR CHECKING ONLY!
         javaEvaluationEngine.parseAllScripts(ABM.agentTemplates);
@@ -445,7 +445,7 @@ public class MainModel extends Dataset {
 //            System.out.println("!!!!");
 //        }
 //        ABM.rootAgent = new Agent(ABM.agentTemplates.get(0));
-        resetTimerTask(passingNumCPU, false, false);
+        resetTimerTask(isRunFromGUI, passingNumCPU, false, false);
 
 //        if (ABM.rootAgent.myTemplate.constructor.isJavaScriptActive == true) {
 //
@@ -456,16 +456,16 @@ public class MainModel extends Dataset {
 //        }
     }
 
-    public void resetTimerTask(int numCPUs, boolean isHardCoded, boolean isInfectCBGOnly) {
+    public void resetTimerTask(boolean isRunFromGUI, int numCPUs, boolean isHardCoded, boolean isInfectCBGOnly) {
         runTask = new TimerTask() {
             @Override
             public void run() {
-                iterate(numCPUs, isHardCoded, isInfectCBGOnly);
+                iterate(isRunFromGUI, numCPUs, isHardCoded, isInfectCBGOnly);
             }
         };
     }
 
-    public void fastForward(boolean isParallel, int numCPUs, boolean isHardCoded, boolean isInfectCBGOnly) {
+    public void fastForward(boolean isRunFromGUI, boolean isParallel, int numCPUs, boolean isHardCoded, boolean isInfectCBGOnly) {
 
 //        fastForwardthread = new Thread(new Runnable() {
 //            @Override
@@ -478,29 +478,43 @@ public class MainModel extends Dataset {
 //                isRunning = false;
 //            }
 //        });
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                fastForwardPool.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        while (isPause == false) {
-                            iterate(numCPUs, isHardCoded, isInfectCBGOnly);
+        if (isRunFromGUI == true) {
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    fastForwardPool.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            while (isPause == false) {
+                                iterate(isRunFromGUI, numCPUs, isHardCoded, isInfectCBGOnly);
 //                    System.out.println(isPause);
+                            }
+                            isPause = false;
+                            isRunning = false;
                         }
-                        isPause = false;
-                        isRunning = false;
-                    }
-                });
-                //\/\/\/ OLD DESIGN WITH THREADS
+                    });
+                    //\/\/\/ OLD DESIGN WITH THREADS
 //                fastForwardthread.start();
-                //^^^ OLD DESIGN WITH THREADS
-            }
-        });
+                    //^^^ OLD DESIGN WITH THREADS
+                }
+            });
+        } else {
+            fastForwardPool.execute(new Runnable() {
+                @Override
+                public void run() {
+                    while (isPause == false) {
+                        iterate(isRunFromGUI, numCPUs, isHardCoded, isInfectCBGOnly);
+//                    System.out.println(isPause);
+                    }
+                    isPause = false;
+                    isRunning = false;
+                }
+            });
+        }
 
     }
 
-    public void iterate(int numCPUs, boolean isHardCoded, boolean isInfectCBGOnly) {
+    public void iterate(boolean isRunFromGUI, int numCPUs, boolean isHardCoded, boolean isInfectCBGOnly) {
         if (isResultSavedAtTheEnd == false) {
             if (ABM.currentTime.isEqual(ABM.endTime) || ABM.currentTime.isAfter(ABM.endTime)) {
                 isRunning = false;
@@ -508,16 +522,20 @@ public class MainModel extends Dataset {
                 double elapsed = ((endTimeNanoSecond - startTimeNanoSecond) / 1000000000);
                 System.out.println("ABM runtime (seconds): " + elapsed);
                 System.out.println("Num real travels: " + ABM.root.numRealTravels);
-                for(int i=0;i<ABM.root.people.size();i++){
-                    ABM.root.numTravels=ABM.root.numTravels+ABM.root.people.get(i).numTravels;
+                for (int i = 0; i < ABM.root.people.size(); i++) {
+                    ABM.root.numTravels = ABM.root.numTravels + ABM.root.people.get(i).numTravels;
                 }
-                for(int i=0;i<ABM.root.people.size();i++){
-                    ABM.root.numContacts=ABM.root.numContacts+ABM.root.people.get(i).numContacts;
+                for (int i = 0; i < ABM.root.people.size(); i++) {
+                    ABM.root.numContacts = ABM.root.numContacts + ABM.root.people.get(i).numContacts;
                 }
                 System.out.println("Num ABM travels: " + ABM.root.numTravels);
                 pause();
                 saveResult(ABM.root.regions, isInfectCBGOnly);
-                return;
+                if(isRunFromGUI==false){
+                    System.exit(0);
+                }else{
+                    return;
+                }
             }
         }
         //\/\/\/ DYNAMICALLY ADD NEW PATTERNS OF THE NEW MONTH AND GENERATE SCHEDULES
@@ -546,26 +564,26 @@ public class MainModel extends Dataset {
         ABM.currentTime = ABM.currentTime.plusMinutes(1);
     }
 
-    public void resume(boolean isParallel, int numCPUs, boolean isHardCoded, boolean isInfectCBGOnly) {
+    public void resume(boolean isRunFromGUI, boolean isParallel, int numCPUs, boolean isHardCoded, boolean isInfectCBGOnly) {
         if (agentEvalPool == null) {
             agentEvalPool = Executors.newFixedThreadPool(numCPUs);
         }
         if (isHardCoded == true) {
             if (simulationDelayTime > -1) {
                 simulationTimer = new Timer();
-                resetTimerTask(numCPUs, isHardCoded, isHardCoded);
+                resetTimerTask(isRunFromGUI, numCPUs, isHardCoded, isHardCoded);
                 simulationTimer.schedule(runTask, 0, simulationDelayTime);
             } else {
-                fastForward(isParallel, numCPUs, isHardCoded, isInfectCBGOnly);
+                fastForward(isRunFromGUI, isParallel, numCPUs, isHardCoded, isInfectCBGOnly);
             }
             isRunning = true;
         } else {
             if (simulationDelayTime > -1) {
                 simulationTimer = new Timer();
-                resetTimerTask(numCPUs, isHardCoded, isHardCoded);
+                resetTimerTask(isRunFromGUI, numCPUs, isHardCoded, isHardCoded);
                 simulationTimer.schedule(runTask, 0, simulationDelayTime);
             } else {
-                fastForward(isParallel, numCPUs, isHardCoded, isInfectCBGOnly);
+                fastForward(isRunFromGUI, isParallel, numCPUs, isHardCoded, isInfectCBGOnly);
             }
             isRunning = true;
         }
