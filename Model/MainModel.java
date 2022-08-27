@@ -532,7 +532,9 @@ public class MainModel extends Dataset {
                 pause();
                 saveResult(ABM.root.regions, isInfectCBGOnly);
                 if(isRunFromGUI==false){
-                    System.exit(0);
+                    fastForwardPool.shutdown();
+                    agentEvalPool.shutdown();
+                    return;
                 }else{
                     return;
                 }

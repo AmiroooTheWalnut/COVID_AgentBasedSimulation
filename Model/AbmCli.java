@@ -88,7 +88,7 @@ public class AbmCli {
                 Logger.getLogger(AbmCli.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        //System.out.println("FREAK!!!!!!!!!!!!!!!!!!!!");
+        testThreadPool.shutdown();
     }
 
     public void runARun(String datasetRoot, String projectLocation, RunConfig runConfig) {
