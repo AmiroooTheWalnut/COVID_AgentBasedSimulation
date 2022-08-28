@@ -343,7 +343,7 @@ public class Root extends Agent {
             Person person = new Person(i);
             selectHomeRegion(person, sumRegionsPopulation, 0);
             selectWorkRegion(person, person.properties.homeRegion);
-            if (modelRoot.ABM.isFuzzyStatus == true) {
+            if (modelRoot.ABM.isFuzzyStatus == false) {
                 person.insidePeople = new ArrayList();
                 person.insidePeople.add(new FuzzyPerson());
             } else {
@@ -806,27 +806,32 @@ public class Root extends Agent {
                         if (cumulativeRegionPopulation > selectedRegion) {
                             if (!regions.get(j).residents.isEmpty()) {
                                 int selectedResident = (int) ((rnd.nextDouble() * (regions.get(j).residents.size() - 1)));
+//                                double randFillingChance = rnd.nextDouble();
                                 if (rnd.nextDouble() > 0.7) {
                                     for (int m = 0; m < regions.get(j).residents.get(selectedResident).insidePeople.size(); m++) {
-                                        if (regions.get(j).residents.get(selectedResident).insidePeople.get(m).fpp.status == statusEnum.SUSCEPTIBLE.ordinal()) {
-                                            regions.get(j).residents.get(selectedResident).insidePeople.get(m).fpp.status = statusEnum.INFECTED_SYM.ordinal();
-                                            regions.get(j).residents.get(selectedResident).insidePeople.get(m).sfpp.infectedDays = 4 + (int) (Math.random() * 10);
-                                            //regions.get(j).residents.get(selectedResident).shamilPersonProperties.infectedDays = 4 + (int) (Math.random() * 10);
-                                            currentInfections = currentInfections + 1;
-                                            currentInfectionPercentage = currentInfections / (people.size() * pTSFraction);
-                                            //break;
-                                        }
+//                                        if (randFillingChance < rnd.nextDouble()) {
+                                            if (regions.get(j).residents.get(selectedResident).insidePeople.get(m).fpp.status == statusEnum.SUSCEPTIBLE.ordinal()) {
+                                                regions.get(j).residents.get(selectedResident).insidePeople.get(m).fpp.status = statusEnum.INFECTED_SYM.ordinal();
+                                                regions.get(j).residents.get(selectedResident).insidePeople.get(m).sfpp.infectedDays = 4 + (int) (Math.random() * 10);
+                                                //regions.get(j).residents.get(selectedResident).shamilPersonProperties.infectedDays = 4 + (int) (Math.random() * 10);
+                                                currentInfections = currentInfections + 1;
+                                                currentInfectionPercentage = currentInfections / (people.size() * pTSFraction);
+                                                //break;
+                                            }
+//                                        }
                                     }
                                 } else {
                                     for (int m = 0; m < regions.get(j).residents.get(selectedResident).insidePeople.size(); m++) {
-                                        if (regions.get(j).residents.get(selectedResident).insidePeople.get(m).fpp.status == statusEnum.SUSCEPTIBLE.ordinal()) {
-                                            regions.get(j).residents.get(selectedResident).insidePeople.get(m).fpp.status = statusEnum.INFECTED_ASYM.ordinal();
-                                            regions.get(j).residents.get(selectedResident).insidePeople.get(m).sfpp.infectedDays = 3 + (int) (Math.random() * 3);
-                                            //regions.get(j).residents.get(selectedResident).shamilPersonProperties.infectedDays = 3 + (int) (Math.random() * 3);
-//                                            currentInfections = currentInfections + 1;
-//                                            currentInfectionPercentage = currentInfections / (people.size() * pTSFraction);
-                                            //break;
-                                        }
+//                                        if (randFillingChance < rnd.nextDouble()) {
+                                            if (regions.get(j).residents.get(selectedResident).insidePeople.get(m).fpp.status == statusEnum.SUSCEPTIBLE.ordinal()) {
+                                                regions.get(j).residents.get(selectedResident).insidePeople.get(m).fpp.status = statusEnum.INFECTED_ASYM.ordinal();
+                                                regions.get(j).residents.get(selectedResident).insidePeople.get(m).sfpp.infectedDays = 3 + (int) (Math.random() * 3);
+                                                //regions.get(j).residents.get(selectedResident).shamilPersonProperties.infectedDays = 3 + (int) (Math.random() * 3);
+                                            currentInfections = currentInfections + 1;
+                                            currentInfectionPercentage = currentInfections / (people.size() * pTSFraction);
+                                                //break;
+                                            }
+//                                        }
                                     }
                                 }
 //                                currentInfections = currentInfections + 1;
