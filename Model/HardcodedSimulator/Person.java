@@ -214,7 +214,7 @@ public class Person extends Agent {
     public boolean decideToTravel(PatternsRecordProcessed record, ZonedDateTime currentTime) {
         int dayInMonth = currentTime.getDayOfMonth() - 1;
         try {
-            if (Math.random() < 0.01) {
+            if (Math.random() < 0.02) {
                 int selectedDayInMonth = (int) (Math.floor(Math.random() * record.sumVisitsByDayOfMonth));
                 int cumulativeDayInMonth = 0;
                 for (int i = 0; i < record.visits_by_day.length; i++) {

@@ -346,6 +346,7 @@ public class Root extends Agent {
             if (modelRoot.ABM.isFuzzyStatus == false) {
                 person.insidePeople = new ArrayList();
                 person.insidePeople.add(new FuzzyPerson());
+                pTSFraction=1;
             } else {
                 person.insidePeople = new ArrayList();
                 for (int m = 0; m < pTSFraction; m++) {
