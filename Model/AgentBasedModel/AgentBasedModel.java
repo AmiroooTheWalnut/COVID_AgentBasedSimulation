@@ -64,6 +64,10 @@ public class AgentBasedModel {
     public transient ZonedDateTime startTime;
     public transient ZonedDateTime currentTime;
     public transient ZonedDateTime endTime;
+    
+    public transient int infectedByPOIContactDaily=0;
+    public transient int infectedByPOIEnvDaily=0;
+    public transient int infectedByShamilDaily=0;
 
     public Map<Integer, Double> travelProbabilityInHourAdjustmentForNumAgent;
 
@@ -469,7 +473,7 @@ public class AgentBasedModel {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         FileReader in;
         try {
-            in = new FileReader(path);
+            in = new FileReader(path.trim());
             BufferedReader br = new BufferedReader(in);
             StringBuilder sb = new StringBuilder();
 

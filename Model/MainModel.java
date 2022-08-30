@@ -103,6 +103,8 @@ public class MainModel extends Dataset {
     public ExecutorService agentEvalPool;
 
     public String datasetDirectory = "./datasets";
+    
+    public boolean isDebugging=false;
 
     public void startScriptEngines() {
         javaEvaluationEngine = new JavaEvaluationEngine(this);

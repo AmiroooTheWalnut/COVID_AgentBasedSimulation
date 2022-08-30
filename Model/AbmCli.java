@@ -35,14 +35,15 @@ public class AbmCli {
 
         RunConfig runConfig = RunConfig.loadModel(args[1]);
         if (args.length > 3) {
-            parseExceptions(runConfig, args[3]);
+            String revArg = args[3].replaceAll("\\s", "");
+            parseExceptions(runConfig, revArg);
         }
         test.init(args[2], args[0], runConfig);
     }
 
     public static void parseExceptions(RunConfig base, String input) {
         if (input.startsWith("_")) {
-            input=input.substring(1);
+            input = input.substring(1);
             String[] pairs = input.split(":");
             for (int i = 0; i < pairs.length; i++) {
                 String[] varVal = pairs[i].split("_");
@@ -130,7 +131,7 @@ public class AbmCli {
         mainModel.datasetDirectory = datasetRoot;
         mainModel.numCPUs = numProcessorsInModel;
 
-        mainModel.initAgentBasedModel(false);
+//        mainModel.initAgentBasedModel(false);
         mainModel.initData();
 
         try {

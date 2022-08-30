@@ -60,7 +60,7 @@ public class Person extends Agent {
                     if (properties.isInTravel == true) {
                         properties.minutesStayed += 1;
 //                    myModelRoot.ABM.root.pOIs.get(properties.currentPattern.placeKey).contact(myModelRoot.ABM.currentTime, this);
-                        properties.currentPOI.contact(myModelRoot.ABM.currentTime, this, myModelRoot.ABM.isBuildingLogicActive,myModelRoot.ABM.root.pTSFraction);
+                        properties.currentPOI.contact(myModelRoot, myModelRoot.ABM.currentTime, this, myModelRoot.ABM.isBuildingLogicActive,myModelRoot.ABM.root.pTSFraction);
                         returnFromTravel();
                     }
                     break;
@@ -214,7 +214,7 @@ public class Person extends Agent {
     public boolean decideToTravel(PatternsRecordProcessed record, ZonedDateTime currentTime) {
         int dayInMonth = currentTime.getDayOfMonth() - 1;
         try {
-            if (Math.random() < 0.02) {
+            if (Math.random() < 0.04) {
                 int selectedDayInMonth = (int) (Math.floor(Math.random() * record.sumVisitsByDayOfMonth));
                 int cumulativeDayInMonth = 0;
                 for (int i = 0; i < record.visits_by_day.length; i++) {

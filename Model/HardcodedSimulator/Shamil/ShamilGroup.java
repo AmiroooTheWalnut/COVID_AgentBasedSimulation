@@ -9,6 +9,7 @@ import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Person;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  *
@@ -17,14 +18,18 @@ import java.util.HashMap;
 public class ShamilGroup {
 
     public String group_name;
-    public ArrayList<Person> persons;
+    public List<Person> persons;
     public HashMap<Integer, Integer> person_mapper;
     public ArrayList<ShamilAction> actions;
     public double[][] proximity = null;
 
-    public ShamilGroup(String passed_group_name) {
+    public ShamilGroup(String passed_group_name, boolean isParallel) {
         group_name = passed_group_name;
-        persons = new ArrayList();
+        if(isParallel==true){
+            persons = Collections.synchronizedList(new ArrayList());
+        }else{
+            persons = new ArrayList();
+        }
         person_mapper = new HashMap();
         actions = new ArrayList();
 //        proximity = null;

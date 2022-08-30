@@ -179,6 +179,7 @@ public class ShamilSimulatorController {
                 switch (people.get(i).insidePeople.get(m).fpp.status) {
                     case 0:
                         people.get(i).insidePeople.get(m).sfpp.state = "Not_infected";
+//                        people.get(i).insidePeople.get(m).sfpp.isInfected=false;
                         break;
                     case 1:
                         people.get(i).insidePeople.get(m).sfpp.state = "contagious_symptomatic";
@@ -192,9 +193,11 @@ public class ShamilSimulatorController {
                         break;
                     case 3:
                         people.get(i).insidePeople.get(m).sfpp.state = "recovered";
+//                        people.get(i).insidePeople.get(m).sfpp.isInfected=false;
                         break;
                     case 4:
                         people.get(i).insidePeople.get(m).sfpp.state = "Dead";
+//                        people.get(i).insidePeople.get(m).sfpp.isInfected=false;
                         break;
                     default:
                         break;
@@ -210,6 +213,7 @@ public class ShamilSimulatorController {
             switch (person.insidePeople.get(m).fpp.status) {
                 case 0:
                     person.insidePeople.get(m).sfpp.state = "Not_infected";
+//                    person.insidePeople.get(m).sfpp.isInfected=false;
                     break;
                 case 1:
                     person.insidePeople.get(m).sfpp.state = "contagious_symptomatic";
@@ -223,9 +227,11 @@ public class ShamilSimulatorController {
                     break;
                 case 3:
                     person.insidePeople.get(m).sfpp.state = "recovered";
+//                    person.insidePeople.get(m).sfpp.isInfected=false;
                     break;
                 case 4:
                     person.insidePeople.get(m).sfpp.state = "Dead";
+//                    person.insidePeople.get(m).sfpp.isInfected=false;
                     break;
                 default:
                     break;
@@ -241,7 +247,7 @@ public class ShamilSimulatorController {
             for (int h = 0; h < 24; h++) {
                 updateHour(people, null, h, d, false, false, mainModel);
             }
-            endDay(people, d, false, 0);
+            endDay(mainModel, people, d, false, 0);
         }
     }
 
@@ -251,7 +257,7 @@ public class ShamilSimulatorController {
             for (int h = 0; h < 24; h++) {
                 updateHour(people, null, h, d, false, false, mainModel);
             }
-            endDay(people, d, false, 0);
+            endDay(mainModel, people, d, false, 0);
         }
     }
 
@@ -382,7 +388,7 @@ public class ShamilSimulatorController {
         //pickle.dump(daily_groups,open('group_info_day_' + str(day) + '.p','wb'))
     }
 
-    public static void endDay(ArrayList<Person> people, int day, boolean isFuzzyStatus, double pTSFraction) {
+    public static void endDay(MainModel mainModel, ArrayList<Person> people, int day, boolean isFuzzyStatus, double pTSFraction) {
 //        int counter1 = 0;
 //        for (int i = 0; i < people.size(); i++) {
 //            if (people.get(i).shamilPersonProperties.profession.name.equals("Hospitalized")) {
@@ -390,7 +396,7 @@ public class ShamilSimulatorController {
 //            }
 //        }
 //        System.out.println("num hospitalized before end " + counter1);//TEMP
-        ShamilDaySimulator.dayEnd(people, day, trace_days, quarantine_days, daily_groups, isFuzzyStatus, pTSFraction);
+        ShamilDaySimulator.dayEnd(mainModel, people, day, trace_days, quarantine_days, daily_groups, isFuzzyStatus, pTSFraction);
 //        int counter2 = 0;
 //        for (int i = 0; i < people.size(); i++) {
 //            if (people.get(i).shamilPersonProperties.profession.name.equals("Hospitalized")) {

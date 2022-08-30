@@ -9,8 +9,12 @@ import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Region;
 import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilPersonManager.rnd;
 import COVID_AgentBasedSimulation.Model.MainModel;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -113,7 +117,7 @@ public class ShamilGroupManager {
             }
 
             if (!groupDict.containsKey(group_id) && group_id.length() > 0) {//group_id not in groupDict):
-                groupDict.put(group_id, new ShamilGroup(group_id));
+                groupDict.put(group_id, new ShamilGroup(group_id,false));
 //                groupDict[group_id] = Group(group_id);
             }
             groupDict.get(group_id).persons.add(persons.get(i));
@@ -124,7 +128,7 @@ public class ShamilGroupManager {
         for (int i = 0; i < groupDictKeySet.size(); i++) { // grpid in groupDict:
             ShamilGroup grouparr = groupDict.get(groupDictKeySet.get(i));
 //            grouparr = groupDict[grpid]
-            ArrayList<Person> personarr = grouparr.persons;
+            ArrayList<Person> personarr = new ArrayList(grouparr.persons);
 
             ArrayList<Integer> personid_arr = new ArrayList();
             for (int j = 0; j < personarr.size(); j++) { // pers in personarr:
@@ -175,7 +179,7 @@ public class ShamilGroupManager {
         //# ranseed = int(fline)
         //# np.random.seed(ranseed)
         //# random.seed(ranseed)
-        HashMap<String, ShamilGroup> groupDict = new HashMap();
+        ConcurrentHashMap<String, ShamilGroup> groupDict = new ConcurrentHashMap();
 //        groupDict = {}
 
         ArrayList<Integer> transport_free_seats = new ArrayList();
@@ -198,84 +202,108 @@ public class ShamilGroupManager {
             transport_free_seats.addAll(temp);
 //            transport_free_seats.extend([i]*transport_seat_limit)
         }
+        List<Integer> transport_free_seats_Sync = Collections.synchronizedList(transport_free_seats);
 
-        for (int r = 0; r < regions.size(); r++) {
-            for (int i = 0; i < regions.get(r).residents.size(); i++) {
-//        for prsn in persons:
-                boolean isAlive = false;
-                for (int m = 0; m < regions.get(r).residents.get(i).insidePeople.size(); m++) {
-                    if (regions.get(r).residents.get(i).insidePeople.get(m).sfpp.isAlive == true) {
-                        isAlive = true;
-                    }
-                }
+        try {
+            int numProcessors = myMainModel.numCPUs;
 
-                if (isAlive == false) {
-//            if not prsn.is_alive:
-                    continue;
-                }
-                String group_id = "";
+            AdvancedParallelGroupCreator parallelGroupCreate[] = new AdvancedParallelGroupCreator[numProcessors];
 
-//                if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask != null) {
-                if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Stay Home")) {
-//            if(prsn.current_task.name=="Stay Home"):
-                    group_id = "F-" + regions.get(r).residents.get(i).shamilPersonProperties.familyId;
-//                group_id = "F-{}".format(prsn.family_id)
-                } else if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Go to Work") || regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Returns Home")) {
-                    int selected_transport_index = (int) (Math.random() * transport_free_seats.size());
-                    int selected_transport = transport_free_seats.get(selected_transport_index);
-//                selected_transport = random.choice(transport_free_seats)
-
-                    transport_free_seats.remove(selected_transport);
-//                transport_free_seats.remove(selected_transport)
-
-                    group_id = "T-" + selected_transport;
-//                group_id = "T-{}".format(selected_transport);
-                } else if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Work")) {
-                    group_id = "W-" + regions.get(r).residents.get(i).shamilPersonProperties.professionGroupId;
-//                group_id = "W-{}".format(prsn.profession_group_id)                
-
-                } else if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Attend Event")) {
-                    group_id = "E-" + (int) (Math.round(Math.random() * n_events));
-//                group_id = "E-{}".format(np.random.randint(0,n_events))
-                    /*
-                effort = 0
-                while True:
-                    group_id = "E-{}".format(np.random.randint(0,n_events))
-                    if(num_of_day >= quarantine_start):
-                        if(group_id in groupDict):
-                            if(len(groupDict[group_id].persons)<15):
-                                break
-                        else:
-                            break
-                    else:
-                        break
-
-                    effort +=1
-                    if(effort==3):
-                        break
-                     */
-
-                } else if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Stay Hospital")) {
-                    group_id = "H";
-                } else if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Treat Patients")) {
-                    group_id = "H";
-                }
-
-                if (group_id.length() > 0) {//if (!groupDict.containsKey(group_id) && group_id.length() > 0) {//group_id not in groupDict):
-                    groupDict.put(group_id, new ShamilGroup(group_id));
-//                groupDict[group_id] = Group(group_id);
-                }
-                groupDict.get(group_id).persons.add(regions.get(r).residents.get(i));
-//            groupDict[group_id].addPerson(prsn)
-//                }
+            for (int i = 0; i < numProcessors - 1; i++) {
+                parallelGroupCreate[i] = new AdvancedParallelGroupCreator(myMainModel, regions, transport_free_seats_Sync, n_events, groupDict, (int) Math.floor(i * ((regions.size()) / numProcessors)), (int) Math.floor((i + 1) * ((regions.size()) / numProcessors)));
             }
+            parallelGroupCreate[numProcessors - 1] = new AdvancedParallelGroupCreator(myMainModel, regions, transport_free_seats_Sync, n_events, groupDict, (int) Math.floor((numProcessors - 1) * ((regions.size()) / numProcessors)), regions.size());
+
+            ArrayList<Callable<Object>> calls = new ArrayList<Callable<Object>>();
+
+            for (int i = 0; i < numProcessors; i++) {
+                parallelGroupCreate[i].addRunnableToQueue(calls);
+            }
+
+//            myMainModel.agentEvalPool.invokeAny(calls);
+            myMainModel.agentEvalPool.invokeAll(calls);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(ShamilSimulatorController.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+//        for (int r = 0; r < regions.size(); r++) {
+//            for (int i = 0; i < regions.get(r).residents.size(); i++) {
+////        for prsn in persons:
+//                boolean isAlive = false;
+//                for (int m = 0; m < regions.get(r).residents.get(i).insidePeople.size(); m++) {
+//                    if (regions.get(r).residents.get(i).insidePeople.get(m).sfpp.isAlive == true) {
+//                        isAlive = true;
+//                    }
+//                }
+//
+//                if (isAlive == false) {
+////            if not prsn.is_alive:
+//                    continue;
+//                }
+//                String group_id = "";
+//
+////                if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask != null) {
+//                if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Stay Home")) {
+////            if(prsn.current_task.name=="Stay Home"):
+//                    group_id = "F-" + regions.get(r).residents.get(i).shamilPersonProperties.familyId;
+////                group_id = "F-{}".format(prsn.family_id)
+//                } else if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Go to Work") || regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Returns Home")) {
+//                    int selected_transport_index = (int) (Math.random() * transport_free_seats.size());
+//                    int selected_transport = transport_free_seats.get(selected_transport_index);
+////                selected_transport = random.choice(transport_free_seats)
+//
+//                    transport_free_seats.remove(selected_transport);
+////                transport_free_seats.remove(selected_transport)
+//
+//                    group_id = "T-" + selected_transport;
+////                group_id = "T-{}".format(selected_transport);
+//                } else if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Work")) {
+//                    group_id = "W-" + regions.get(r).residents.get(i).shamilPersonProperties.professionGroupId;
+////                group_id = "W-{}".format(prsn.profession_group_id)                
+//
+//                } else if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Attend Event")) {
+//                    group_id = "E-" + (int) (Math.round(Math.random() * n_events));
+////                group_id = "E-{}".format(np.random.randint(0,n_events))
+//                    /*
+//                effort = 0
+//                while True:
+//                    group_id = "E-{}".format(np.random.randint(0,n_events))
+//                    if(num_of_day >= quarantine_start):
+//                        if(group_id in groupDict):
+//                            if(len(groupDict[group_id].persons)<15):
+//                                break
+//                        else:
+//                            break
+//                    else:
+//                        break
+//
+//                    effort +=1
+//                    if(effort==3):
+//                        break
+//                     */
+//
+//                } else if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Stay Hospital")) {
+//                    group_id = "H";
+//                } else if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Treat Patients")) {
+//                    group_id = "H";
+//                }
+//
+////                if (group_id.length() > 0) {//if (!groupDict.containsKey(group_id) && group_id.length() > 0) {//group_id not in groupDict):
+//                if (!groupDict.containsKey(group_id) && group_id.length() > 0) {
+//                    groupDict.put(group_id, new ShamilGroup(group_id));
+////                groupDict[group_id] = Group(group_id);
+//                }
+//                groupDict.get(group_id).persons.add(regions.get(r).residents.get(i));
+////            groupDict[group_id].addPerson(prsn)
+////                }
+//            }
+//        }
+        
         ArrayList<String> groupDictKeySet = new ArrayList<>(groupDict.keySet());
         for (int i = 0; i < groupDictKeySet.size(); i++) { // grpid in groupDict:
             ShamilGroup grouparr = groupDict.get(groupDictKeySet.get(i));
 //            grouparr = groupDict[grpid]
-            ArrayList<Person> personarr = grouparr.persons;
+            ArrayList<Person> personarr = new ArrayList(grouparr.persons);
 
             ArrayList<Integer> personid_arr = new ArrayList();
             for (int j = 0; j < personarr.size(); j++) { // pers in personarr:
@@ -349,6 +377,154 @@ public class ShamilGroupManager {
         output[1] = person_group;
         return output;
 
+    }
+
+    public static void createGroupRegion(Region region, List<Integer> transport_free_seats, int n_events, ConcurrentHashMap<String, ShamilGroup> groupDict) {
+        for (int i = 0; i < region.residents.size(); i++) {
+//        for prsn in persons:
+            boolean isAlive = false;
+            for (int m = 0; m < region.residents.get(i).insidePeople.size(); m++) {
+                if (region.residents.get(i).insidePeople.get(m).sfpp.isAlive == true) {
+                    isAlive = true;
+                }
+            }
+
+            if (isAlive == false) {
+//            if not prsn.is_alive:
+                continue;
+            }
+            String group_id = "";
+
+//                if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask != null) {
+            if (region.residents.get(i).shamilPersonProperties.currentTask.name.equals("Stay Home")) {
+//            if(prsn.current_task.name=="Stay Home"):
+                group_id = "F-" + region.residents.get(i).shamilPersonProperties.familyId;
+//                group_id = "F-{}".format(prsn.family_id)
+            } else if (region.residents.get(i).shamilPersonProperties.currentTask.name.equals("Go to Work") || region.residents.get(i).shamilPersonProperties.currentTask.name.equals("Returns Home")) {
+                int selected_transport_index = (int) (Math.random() * transport_free_seats.size());
+                int selected_transport = transport_free_seats.get(selected_transport_index);
+//                selected_transport = random.choice(transport_free_seats)
+
+                transport_free_seats.remove(selected_transport);
+//                transport_free_seats.remove(selected_transport)
+
+                group_id = "T-" + selected_transport;
+//                group_id = "T-{}".format(selected_transport);
+            } else if (region.residents.get(i).shamilPersonProperties.currentTask.name.equals("Work")) {
+                group_id = "W-" + region.residents.get(i).shamilPersonProperties.professionGroupId;
+//                group_id = "W-{}".format(prsn.profession_group_id)                
+
+            } else if (region.residents.get(i).shamilPersonProperties.currentTask.name.equals("Attend Event")) {
+                group_id = "E-" + (int) (Math.round(Math.random() * n_events));
+//                group_id = "E-{}".format(np.random.randint(0,n_events))
+                /*
+                effort = 0
+                while True:
+                    group_id = "E-{}".format(np.random.randint(0,n_events))
+                    if(num_of_day >= quarantine_start):
+                        if(group_id in groupDict):
+                            if(len(groupDict[group_id].persons)<15):
+                                break
+                        else:
+                            break
+                    else:
+                        break
+
+                    effort +=1
+                    if(effort==3):
+                        break
+                 */
+
+            } else if (region.residents.get(i).shamilPersonProperties.currentTask.name.equals("Stay Hospital")) {
+                group_id = "H";
+            } else if (region.residents.get(i).shamilPersonProperties.currentTask.name.equals("Treat Patients")) {
+                group_id = "H";
+            }
+
+//                if (group_id.length() > 0) {//if (!groupDict.containsKey(group_id) && group_id.length() > 0) {//group_id not in groupDict):
+            if (!groupDict.containsKey(group_id) && group_id.length() > 0) {
+                groupDict.put(group_id, new ShamilGroup(group_id,true));
+//                groupDict[group_id] = Group(group_id);
+            }
+            groupDict.get(group_id).persons.add(region.residents.get(i));
+//            groupDict[group_id].addPerson(prsn)
+//                }
+        }
+    }
+
+    public void createGroups(ArrayList<Region> regions, List<Integer> transport_free_seats, int n_events, ConcurrentHashMap<String, ShamilGroup> groupDict) {
+        for (int r = 0; r < regions.size(); r++) {
+            for (int i = 0; i < regions.get(r).residents.size(); i++) {
+//        for prsn in persons:
+                boolean isAlive = false;
+                for (int m = 0; m < regions.get(r).residents.get(i).insidePeople.size(); m++) {
+                    if (regions.get(r).residents.get(i).insidePeople.get(m).sfpp.isAlive == true) {
+                        isAlive = true;
+                    }
+                }
+
+                if (isAlive == false) {
+//            if not prsn.is_alive:
+                    continue;
+                }
+                String group_id = "";
+
+//                if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask != null) {
+                if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Stay Home")) {
+//            if(prsn.current_task.name=="Stay Home"):
+                    group_id = "F-" + regions.get(r).residents.get(i).shamilPersonProperties.familyId;
+//                group_id = "F-{}".format(prsn.family_id)
+                } else if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Go to Work") || regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Returns Home")) {
+                    int selected_transport_index = (int) (Math.random() * transport_free_seats.size());
+                    int selected_transport = transport_free_seats.get(selected_transport_index);
+//                selected_transport = random.choice(transport_free_seats)
+
+                    transport_free_seats.remove(selected_transport);
+//                transport_free_seats.remove(selected_transport)
+
+                    group_id = "T-" + selected_transport;
+//                group_id = "T-{}".format(selected_transport);
+                } else if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Work")) {
+                    group_id = "W-" + regions.get(r).residents.get(i).shamilPersonProperties.professionGroupId;
+//                group_id = "W-{}".format(prsn.profession_group_id)                
+
+                } else if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Attend Event")) {
+                    group_id = "E-" + (int) (Math.round(Math.random() * n_events));
+//                group_id = "E-{}".format(np.random.randint(0,n_events))
+                    /*
+                effort = 0
+                while True:
+                    group_id = "E-{}".format(np.random.randint(0,n_events))
+                    if(num_of_day >= quarantine_start):
+                        if(group_id in groupDict):
+                            if(len(groupDict[group_id].persons)<15):
+                                break
+                        else:
+                            break
+                    else:
+                        break
+
+                    effort +=1
+                    if(effort==3):
+                        break
+                     */
+
+                } else if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Stay Hospital")) {
+                    group_id = "H";
+                } else if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Treat Patients")) {
+                    group_id = "H";
+                }
+
+//                if (group_id.length() > 0) {//if (!groupDict.containsKey(group_id) && group_id.length() > 0) {//group_id not in groupDict):
+                if (!groupDict.containsKey(group_id) && group_id.length() > 0) {
+                    groupDict.put(group_id, new ShamilGroup(group_id,true));
+//                groupDict[group_id] = Group(group_id);
+                }
+                groupDict.get(group_id).persons.add(regions.get(r).residents.get(i));
+//            groupDict[group_id].addPerson(prsn)
+//                }
+            }
+        }
     }
 
     public static void updateActions(ShamilGroup grp) {

@@ -9,6 +9,7 @@ package COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil;
  * @author user
  */
 public class ShamilFuzzyablePersonProperties {
+    public boolean isGoingToBeInfected = false;
     public int infectedDays = 0;
     public boolean isAlive = true;
     public boolean isInfected = false;
