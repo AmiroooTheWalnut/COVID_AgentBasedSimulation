@@ -24,7 +24,7 @@ public class AdvancedParallelGroupInteractionEvaluator extends ParallelProcessor
             @Override
             public void run() {
                 for (int i = myStartIndex; i < myEndIndex; i++) {
-                    ShamilGroupSimulator.groupInteraction(groups.get(i));
+                    ShamilGroupSimulator.groupInteraction(parent, groups.get(i));
                 }
             }
         };

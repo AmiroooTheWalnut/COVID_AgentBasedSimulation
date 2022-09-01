@@ -7,6 +7,7 @@ package COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Person;
 import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilPersonManager.randn;
 import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilPersonManager.rnd;
+import COVID_AgentBasedSimulation.Model.MainModel;
 
 /**
  *
@@ -14,7 +15,7 @@ import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilP
  */
 public class ShamilGroupSimulator {
 
-    public static ShamilGroup groupInteraction(ShamilGroup grp) {
+    public static ShamilGroup groupInteraction(MainModel mainModel, ShamilGroup grp) {
 
         Double ACTION_AFFECTING_PROBABILITY = ShamilPersonManager.thresholds_df.get("ACTION_AFFECTING_PROBABILITY");
         Double ACTION_INFECT_THRESHOLD = ShamilPersonManager.thresholds_df.get("ACTION_INFECT_THRESHOLD");
@@ -51,6 +52,7 @@ public class ShamilGroupSimulator {
                                     // #print("\n" + str(actn.name) + " the infection case for self infection is - " + str(prsn.infection_level));
 //                                    System.out.println("INF INC 1");
 //                                    System.out.println("INF INC 1: "+grp.persons.get(j).insidePeople.get(m).sfpp.infectionLevel);
+                                    mainModel.ABM.shamilInf1+=1;
                                 }
                             } else {
 
@@ -62,11 +64,13 @@ public class ShamilGroupSimulator {
                                     grp.persons.get(j).insidePeople.get(m).sfpp.infectionLevel = Math.max(Math.min(grp.persons.get(j).insidePeople.get(m).sfpp.infectionLevel + infection, 1), 0);
 //                                    System.out.println("INF INC 2");
 //                                    System.out.println("INF INC 2: "+grp.persons.get(j).insidePeople.get(m).sfpp.infectionLevel);
+                                    mainModel.ABM.shamilInf2+=1;
                                 }
                             }
                         } else {
-                            for (int n = 0; n < acting_person.insidePeople.size(); n++) {
-                                if (acting_person.insidePeople.get(n).sfpp.state.equals("contagious_asymptomatic") || acting_person.insidePeople.get(n).sfpp.state.equals("contagious_symptomatic")) {
+                            int insidePersonIndex = (int) ((rnd.nextDouble() * (acting_person.insidePeople.size() - 1)));
+//                            for (int n = 0; n < acting_person.insidePeople.size(); n++) {
+                                if (acting_person.insidePeople.get(insidePersonIndex).sfpp.state.equals("contagious_asymptomatic") || acting_person.insidePeople.get(insidePersonIndex).sfpp.state.equals("contagious_symptomatic")) {
 
                                     if (grp.persons.get(j).insidePeople.get(m).sfpp.isInfected == false) {
 
@@ -86,10 +90,11 @@ public class ShamilGroupSimulator {
                                             grp.persons.get(j).shamilPersonProperties.infectedByUpdt += 1;
 //                                            System.out.println("INF INC 3");
 //                                            System.out.println("INF INC 3: "+grp.persons.get(j).insidePeople.get(m).sfpp.infectionLevel);
+                                            mainModel.ABM.shamilInf3+=1;
                                         }
                                     }
                                 }
-                            }
+//                            }
                         }
                     }
                 }

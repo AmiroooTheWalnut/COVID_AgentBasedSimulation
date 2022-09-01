@@ -1320,11 +1320,17 @@ public class Root extends Agent {
                 System.out.println("infectedByPOIEnvDaily: " + myModelRoot.ABM.infectedByPOIEnvDaily);
                 System.out.println("infectedByShamilDaily: " + myModelRoot.ABM.infectedByShamilDaily);
                 System.out.println("infectedPOIDaily: " + myModelRoot.ABM.infectedPOIDaily);
+                System.out.println("shamilInf1: " + myModelRoot.ABM.shamilInf1);
+                System.out.println("shamilInf2: " + myModelRoot.ABM.shamilInf2);
+                System.out.println("shamilInf3: " + myModelRoot.ABM.shamilInf3);
 
                 myModelRoot.ABM.infectedByPOIContactDaily = 0;
                 myModelRoot.ABM.infectedByPOIEnvDaily = 0;
                 myModelRoot.ABM.infectedByShamilDaily = 0;
                 myModelRoot.ABM.infectedPOIDaily = 0;
+                myModelRoot.ABM.shamilInf1=0;
+                myModelRoot.ABM.shamilInf2=0;
+                myModelRoot.ABM.shamilInf3=0;
             }
             pollDailyInfection();
         }

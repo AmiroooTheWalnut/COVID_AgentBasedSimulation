@@ -69,6 +69,9 @@ public class AgentBasedModel {
     public transient int infectedByPOIEnvDaily=0;
     public transient int infectedByShamilDaily=0;
     public transient int infectedPOIDaily=0;
+    public transient int shamilInf1=0;
+    public transient int shamilInf2=0;
+    public transient int shamilInf3=0;
 
     public Map<Integer, Double> travelProbabilityInHourAdjustmentForNumAgent;
 

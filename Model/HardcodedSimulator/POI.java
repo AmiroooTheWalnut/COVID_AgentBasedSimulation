@@ -22,7 +22,7 @@ import java.util.List;
 public class POI {
 
     public static double CONTACT_RATE = 0.6;//0.55;//0.23;//CONTACT PER MINUTE
-    public static double CHANCE_OF_ENV_CONTAMINATION = 0.002;//0.00055;//0.00015;
+    public static double CHANCE_OF_ENV_CONTAMINATION = 0.0025;//0.00055;//0.00015;
 
     public PatternsRecordProcessed patternsRecord;
     public double contaminatedTime = 0;
@@ -94,7 +94,7 @@ public class POI {
             person.numContacts = person.numContacts + 1;
 
             for (int m = 0; m < person.insidePeople.size(); m++) {
-                if (Math.random() < (numInfected / (double) (peopleInPOI.size() * pTSFraction)) * probability) {
+                if (Math.random() < (numInfected / (double) (peopleInPOI.size() * pTSFraction)) * probability * 1.1) {
                     if (person.insidePeople.get(m).fpp.status == statusEnum.SUSCEPTIBLE.ordinal()) {
 //                  System.out.println("CONTACT INFECTION");
                         if (Math.random() > 0.7) {
