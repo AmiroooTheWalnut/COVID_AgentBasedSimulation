@@ -29,7 +29,7 @@ public class SimulatorDialog extends javax.swing.JDialog {
 
     boolean isRateChanged = false;
 
-    boolean isSpecialScenarioActive = true;
+    boolean isSpecialScenarioActive = false;
 
     /**
      * Creates new form Simulator
@@ -369,7 +369,6 @@ public class SimulatorDialog extends javax.swing.JDialog {
             }
         });
 
-        jCheckBox3.setSelected(true);
         jCheckBox3.setText("Report contact stats");
         jCheckBox3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1030,7 +1029,6 @@ public class SimulatorDialog extends javax.swing.JDialog {
 
         jPanel25.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        jCheckBox6.setSelected(true);
         jCheckBox6.setText("Special scenario init");
         jCheckBox6.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

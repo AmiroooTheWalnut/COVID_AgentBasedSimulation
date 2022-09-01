@@ -22,7 +22,7 @@ import java.util.List;
 public class POI {
 
     public static double CONTACT_RATE = 0.6;//0.55;//0.23;//CONTACT PER MINUTE
-    public static double CHANCE_OF_ENV_CONTAMINATION = 0.001;//0.00055;//0.00015;
+    public static double CHANCE_OF_ENV_CONTAMINATION = 0.002;//0.00055;//0.00015;
 
     public PatternsRecordProcessed patternsRecord;
     public double contaminatedTime = 0;
@@ -92,8 +92,9 @@ public class POI {
 
         if (Math.random() < CONTACT_RATE) {
             person.numContacts = person.numContacts + 1;
-            if (Math.random() < (numInfected / (double) (peopleInPOI.size() * pTSFraction)) * probability) {
-                for (int m = 0; m < person.insidePeople.size(); m++) {
+
+            for (int m = 0; m < person.insidePeople.size(); m++) {
+                if (Math.random() < (numInfected / (double) (peopleInPOI.size() * pTSFraction)) * probability) {
                     if (person.insidePeople.get(m).fpp.status == statusEnum.SUSCEPTIBLE.ordinal()) {
 //                  System.out.println("CONTACT INFECTION");
                         if (Math.random() > 0.7) {
@@ -114,17 +115,21 @@ public class POI {
         if (contaminatedTime > 0) {
 //            System.out.println("awarenessLevel: "+person.shamilPersonProperties.awarenessLevel);
 //            System.out.println("protectionLevel: "+person.shamilPersonProperties.protectionLevel);
-            if (Math.random() < (1 - person.shamilPersonProperties.protectionLevel) * 0.00085) {
-                for (int m = 0; m < person.insidePeople.size(); m++) {
-                    if (person.insidePeople.get(m).fpp.status == statusEnum.SUSCEPTIBLE.ordinal()) {
+
+            for (int m = 0; m < person.insidePeople.size(); m++) {
+                if (Math.random() < CONTACT_RATE*0.05) {
+                    double r = Math.random();
+                    if (r < (1 - person.shamilPersonProperties.protectionLevel) * 0.00085) {
+                        if (person.insidePeople.get(m).fpp.status == statusEnum.SUSCEPTIBLE.ordinal()) {
 //                      System.out.println("ENV INFECTION");
-                        if (Math.random() > 0.7) {
-                            person.insidePeople.get(m).fpp.status = statusEnum.INFECTED_ASYM.ordinal();
-                        } else {
-                            person.insidePeople.get(m).fpp.status = statusEnum.INFECTED_SYM.ordinal();
-                        }
-                        if (mainModel.isDebugging == true) {
-                            mainModel.ABM.infectedByPOIEnvDaily += 1;
+                            if (Math.random() > 0.7) {
+                                person.insidePeople.get(m).fpp.status = statusEnum.INFECTED_ASYM.ordinal();
+                            } else {
+                                person.insidePeople.get(m).fpp.status = statusEnum.INFECTED_SYM.ordinal();
+                            }
+                            if (mainModel.isDebugging == true) {
+                                mainModel.ABM.infectedByPOIEnvDaily += 1;
+                            }
                         }
                     }
                 }

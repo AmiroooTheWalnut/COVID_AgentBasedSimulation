@@ -136,7 +136,6 @@ public class ShamilDaySimulator {
 //            }
             for (int O = 0; O < prsn.insidePeople.size(); O++) {
                 if (prsn.insidePeople.get(O).sfpp.isInfected == false) {
-
                     if (prsn.insidePeople.get(O).sfpp.infectionLevel >= INFECTION_PROBABILITY) {
                         prsn.insidePeople.get(O).sfpp.isInfected = true;
                         prsn.insidePeople.get(O).sfpp.state = "Infected_notContagious";//.setState('Infected_notContagious')

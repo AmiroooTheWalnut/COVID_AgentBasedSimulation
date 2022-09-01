@@ -60,7 +60,7 @@ public class Person extends Agent {
                     if (properties.isInTravel == true) {
                         properties.minutesStayed += 1;
 //                    myModelRoot.ABM.root.pOIs.get(properties.currentPattern.placeKey).contact(myModelRoot.ABM.currentTime, this);
-                        properties.currentPOI.contact(myModelRoot, myModelRoot.ABM.currentTime, this, myModelRoot.ABM.isBuildingLogicActive,myModelRoot.ABM.root.pTSFraction);
+                        properties.currentPOI.contact(myModelRoot, myModelRoot.ABM.currentTime, this, myModelRoot.ABM.isBuildingLogicActive, myModelRoot.ABM.root.pTSFraction);
                         returnFromTravel();
                     }
                     break;
@@ -138,13 +138,38 @@ public class Person extends Agent {
             properties.currentPOI = pOI;
 
 //        System.out.println("properties.currentPOI.peopleInPOI.size(): after:"+properties.currentPOI.peopleInPOI.size());
+//            for (int m = 0; m < insidePeople.size(); m++) {
+//                if (insidePeople.get(m).fpp.status == Root.statusEnum.INFECTED_ASYM.ordinal() || insidePeople.get(m).fpp.status == Root.statusEnum.INFECTED_SYM.ordinal()) {
+//                    if (Math.random() < CHANCE_OF_ENV_CONTAMINATION) {
+//                        pOI.contaminatedTime = 1440;
+//                    }
+//                    pOI.numInfected += 1;
+//                    insidePeople.get(m).fpp.isInitiallyInfectedEnteringPOI = true;
+//                }
+//            }
+            int dayInMonth = currentTime.getDayOfMonth() - 1;
+            byte dayInWeek = (byte) ((currentTime.getDayOfWeek().getValue()) - 1);
+            int hourInDay = currentTime.getHour();
+            double percentDayInMonth = 1;
+            if (dayInMonth < properties.currentPattern.visits_by_day.length) {
+                percentDayInMonth = (double) (properties.currentPattern.visits_by_day[dayInMonth]) / (double) (properties.currentPattern.sumVisitsByDayOfMonth);
+            }
+            double percentDayInWeek = (double) (properties.currentPattern.popularity_by_day.get(dayInWeek)) / (double) (properties.currentPattern.sumVisitsByDayOfWeek);
+            double percentHourInDay = (double) (properties.currentPattern.popularity_by_hour[hourInDay]) / (double) (properties.currentPattern.sumVisitsByHourofDay);
+            int numPeopleInPOI = (int) Math.ceil(properties.currentPattern.raw_visit_counts * percentDayInMonth * percentDayInWeek * percentHourInDay);
+
+//            System.out.println("properties.currentPOI.peopleInPOI.size(): after:"+properties.currentPOI.peopleInPOI.size());
             for (int m = 0; m < insidePeople.size(); m++) {
                 if (insidePeople.get(m).fpp.status == Root.statusEnum.INFECTED_ASYM.ordinal() || insidePeople.get(m).fpp.status == Root.statusEnum.INFECTED_SYM.ordinal()) {
-                    if (Math.random() < CHANCE_OF_ENV_CONTAMINATION) {
-                        pOI.contaminatedTime = 1440;
-                    }
                     pOI.numInfected += 1;
                     insidePeople.get(m).fpp.isInitiallyInfectedEnteringPOI = true;
+                }
+            }
+            double infFrac = Math.min(1, ((double) (pOI.numInfected) / (double) (myModelRoot.ABM.root.pTSFraction)) / (double) numPeopleInPOI);
+            if (Math.random() < CHANCE_OF_ENV_CONTAMINATION * infFrac * shamilPersonProperties.protectionLevel) {
+                pOI.contaminatedTime = 1440;
+                if (myModelRoot.isDebugging == true) {
+                    myModelRoot.ABM.infectedPOIDaily += 1;
                 }
             }
         }
@@ -191,9 +216,12 @@ public class Person extends Agent {
                     insidePeople.get(m).fpp.isInitiallyInfectedEnteringPOI = true;
                 }
             }
-            double infFrac = Math.min(1, pOI.numInfected / numPeopleInPOI);
+            double infFrac = Math.min(1, ((double) (pOI.numInfected) / (double) (myModelRoot.ABM.root.pTSFraction)) / (double) numPeopleInPOI);
             if (Math.random() < CHANCE_OF_ENV_CONTAMINATION * infFrac * shamilPersonProperties.protectionLevel) {
                 pOI.contaminatedTime = 1440;
+                if (myModelRoot.isDebugging == true) {
+                    myModelRoot.ABM.infectedPOIDaily += 1;
+                }
             }
 
         }

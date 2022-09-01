@@ -47,9 +47,10 @@ public class ShamilGroupSimulator {
 
                                 // #print(infection)
                                 if (infection > ACTION_INFECT_THRESHOLD) {
-
                                     grp.persons.get(j).insidePeople.get(m).sfpp.infectionLevel = Math.max(Math.min(grp.persons.get(j).insidePeople.get(m).sfpp.infectionLevel + infection, 1), 0);
                                     // #print("\n" + str(actn.name) + " the infection case for self infection is - " + str(prsn.infection_level));
+//                                    System.out.println("INF INC 1");
+//                                    System.out.println("INF INC 1: "+grp.persons.get(j).insidePeople.get(m).sfpp.infectionLevel);
                                 }
                             } else {
 
@@ -58,8 +59,9 @@ public class ShamilGroupSimulator {
                                 double infection_pos = (-1) * infection;
 
                                 if (infection_pos > ACTION_INFECT_THRESHOLD) {
-
                                     grp.persons.get(j).insidePeople.get(m).sfpp.infectionLevel = Math.max(Math.min(grp.persons.get(j).insidePeople.get(m).sfpp.infectionLevel + infection, 1), 0);
+//                                    System.out.println("INF INC 2");
+//                                    System.out.println("INF INC 2: "+grp.persons.get(j).insidePeople.get(m).sfpp.infectionLevel);
                                 }
                             }
                         } else {
@@ -79,12 +81,11 @@ public class ShamilGroupSimulator {
                                         infection = infection * proximit;
 
                                         if (infection > ACTION_INFECT_THRESHOLD) {
-
                                             grp.persons.get(j).insidePeople.get(m).sfpp.infectionLevel = Math.max(Math.min(grp.persons.get(j).insidePeople.get(m).sfpp.infectionLevel + infection, 1), 0);
-
                                             grp.persons.get(j).shamilPersonProperties.infectedBy = acting_person_id;
-
                                             grp.persons.get(j).shamilPersonProperties.infectedByUpdt += 1;
+//                                            System.out.println("INF INC 3");
+//                                            System.out.println("INF INC 3: "+grp.persons.get(j).insidePeople.get(m).sfpp.infectionLevel);
                                         }
                                     }
                                 }

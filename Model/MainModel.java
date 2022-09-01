@@ -104,7 +104,7 @@ public class MainModel extends Dataset {
 
     public String datasetDirectory = "./datasets";
     
-    public boolean isDebugging=false;
+    public boolean isDebugging=true;
 
     public void startScriptEngines() {
         javaEvaluationEngine = new JavaEvaluationEngine(this);

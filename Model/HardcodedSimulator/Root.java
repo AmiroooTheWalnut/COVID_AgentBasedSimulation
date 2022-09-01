@@ -1319,10 +1319,12 @@ public class Root extends Agent {
                 System.out.println("infectedByPOIContactDaily: " + myModelRoot.ABM.infectedByPOIContactDaily);
                 System.out.println("infectedByPOIEnvDaily: " + myModelRoot.ABM.infectedByPOIEnvDaily);
                 System.out.println("infectedByShamilDaily: " + myModelRoot.ABM.infectedByShamilDaily);
+                System.out.println("infectedPOIDaily: " + myModelRoot.ABM.infectedPOIDaily);
 
                 myModelRoot.ABM.infectedByPOIContactDaily = 0;
                 myModelRoot.ABM.infectedByPOIEnvDaily = 0;
                 myModelRoot.ABM.infectedByShamilDaily = 0;
+                myModelRoot.ABM.infectedPOIDaily = 0;
             }
             pollDailyInfection();
         }
@@ -1395,7 +1397,7 @@ public class Root extends Agent {
             if (person.insidePeople.get(m).fpp.status == statusEnum.INFECTED_SYM.ordinal() || person.insidePeople.get(m).fpp.status == statusEnum.INFECTED_ASYM.ordinal()) {//if infected
                 if (person.properties.minutesSick == -1) {
                     person.properties.minutesSick = 1;
-                    if (rnd.nextDouble() < 0.02) {//0.0018
+                    if (rnd.nextDouble() < 0.0018) {//0.0018
                         person.properties.isDestinedToDeath = true;
                     } else {
                         person.properties.isDestinedToDeath = false;
