@@ -46,7 +46,16 @@ public class AbmCli {
             input = input.substring(1);
             String[] pairs = input.split(":");
             for (int i = 0; i < pairs.length; i++) {
-                String[] varVal = pairs[i].split("_");
+                String[] varValRaw = pairs[i].split("_");
+                String[] varVal=new String[2];
+                varVal[0]=varValRaw[0];
+                varVal[1]="";
+                for(int m=1;m<varValRaw.length;m++){
+                    varVal[1]=varVal[1]+varValRaw[m];
+                    if(m!=varValRaw.length-1){
+                        varVal[1]=varVal[1]+"_";
+                    }
+                }
                 try {
                     Field field = RunConfig.class.getField(varVal[0]);
                     if (field.getType().getTypeName().equals("java.lang.String")) {

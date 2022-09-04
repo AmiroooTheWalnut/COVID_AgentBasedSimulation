@@ -1809,7 +1809,7 @@ public class Root extends Agent {
                     snapshot.rate = regions.get(i).hourlyRegionSnapshot.get(regions.get(i).hourlyRegionSnapshot.size() - 1).rate;
                 }
                 for (int j = 0; j < regions.get(i).residents.size(); j++) {
-                    for (int m = 0; m < people.get(i).insidePeople.size(); m++) {
+                    for (int m = 0; m < regions.get(i).residents.get(j).insidePeople.size(); m++) {
                         switch (regions.get(i).residents.get(j).insidePeople.get(m).fpp.status) {
                             case 0:
                                 snapshot.N += 1;
