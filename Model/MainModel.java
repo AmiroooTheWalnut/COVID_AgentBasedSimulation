@@ -103,8 +103,8 @@ public class MainModel extends Dataset {
     public ExecutorService agentEvalPool;
 
     public String datasetDirectory = "./datasets";
-    
-    public boolean isDebugging=true;
+
+    public boolean isDebugging = true;
 
     public void startScriptEngines() {
         javaEvaluationEngine = new JavaEvaluationEngine(this);
@@ -533,11 +533,11 @@ public class MainModel extends Dataset {
                 System.out.println("Num ABM travels: " + ABM.root.numTravels);
                 pause();
                 saveResult(ABM.root.regions, isInfectCBGOnly);
-                if(isRunFromGUI==false){
+                if (isRunFromGUI == false) {
                     fastForwardPool.shutdown();
                     agentEvalPool.shutdown();
                     return;
-                }else{
+                } else {
                     return;
                 }
             }
@@ -744,13 +744,15 @@ public class MainModel extends Dataset {
         if (!testDirectory.exists()) {
             testDirectory.mkdirs();
         }
-        HistoricalRun historicalRun = new HistoricalRun();
-        historicalRun.regions = regions;
-        historicalRun.startTime = ABM.startTime;
-        historicalRun.endTime = ABM.endTime;
-        historicalRun.regionsLayer = ABM.root.regionsLayer;
+        if (ABM.isSaveHistoricalRun == true) {
+            HistoricalRun historicalRun = new HistoricalRun();
+            historicalRun.regions = regions;
+            historicalRun.startTime = ABM.startTime;
+            historicalRun.endTime = ABM.endTime;
+            historicalRun.regionsLayer = ABM.root.regionsLayer;
 //        historicalRun.saveHistoricalRunJson("./projects/" + ABM.filePath + "/" + formatter.format(date)+"/data.json");
-        HistoricalRun.saveHistoricalRunKryo(testPath + File.separator + "data", historicalRun);
+            HistoricalRun.saveHistoricalRunKryo(testPath + File.separator + "data", historicalRun);
+        }
 
 //        for (int i = 0; i < historicalRun.regions.size(); i++) {
 //            for (int j = 0; j < historicalRun.regions.get(i).hourlyRegionSnapshot.size(); j++) {

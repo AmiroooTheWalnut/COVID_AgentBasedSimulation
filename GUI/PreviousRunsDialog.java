@@ -53,7 +53,7 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
     ProcessingMapRenderer sketch;
 
     LegendRange legendRange = new LegendRange();
-    
+
     TreeSelectionEvent lastEvent;
 
     /**
@@ -101,7 +101,7 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
 
     public void updateProjects() {
         String filePath = myParent.mainModel.ABM.filePath;
-        String directoryPath = "projects"+ File.separator + filePath.substring(filePath.lastIndexOf(File.separator) + 1, filePath.length());
+        String directoryPath = "projects" + File.separator + filePath.substring(filePath.lastIndexOf(File.separator) + 1, filePath.length());
         File directory = new File(directoryPath);
         if (!directory.exists()) {
             directory.mkdirs();
@@ -146,6 +146,8 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
         jToggleButton1 = new javax.swing.JToggleButton();
         jToggleButton2 = new javax.swing.JToggleButton();
         jButton3 = new javax.swing.JButton();
+        jLabel4 = new javax.swing.JLabel();
+        jSpinner1 = new javax.swing.JSpinner();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jList2 = new javax.swing.JList<>();
@@ -196,6 +198,8 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
             }
         });
 
+        jLabel4.setText("Percentage drop:");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -209,20 +213,27 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jToggleButton1)
                     .addComponent(jToggleButton2)
-                    .addComponent(jButton3))
+                    .addComponent(jButton3)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(jSpinner1, javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 806, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 741, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jToggleButton1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jToggleButton2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel4)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(12, 12, 12)
                 .addComponent(jButton1)
                 .addContainerGap())
         );
@@ -352,6 +363,7 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
         setRegionImageLayer();
         setRegionIndicesNames();
         setRegionCentralLocations();
+        lastEvent=evt;
     }//GEN-LAST:event_jTree1ValueChanged
 
     private void jList2ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList2ValueChanged
@@ -391,24 +403,27 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
                     Field field = RegionSnapshot.class.getDeclaredField(splitted[1].substring(0, splitted[1].length() - 1));
                     ArrayList<String[]> allValues = new ArrayList();
                     for (int i = 0; i < currentHistoricalRunVD.regions.size(); i++) {
-                        String[] row = new String[currentHistoricalRunVD.regions.get(i).cBGsPercentageInvolved.size()];
+                        ArrayList<String> row = new ArrayList();
+//                        String[] row = new String[currentHistoricalRunVD.regions.get(i).cBGsPercentageInvolved.size()];
                         for (int h = 0; h < currentHistoricalRunVD.regions.get(i).cBGsPercentageInvolved.size(); h++) {
                             for (int m = 0; m < currentHistoricalRunCBG.regions.size(); m++) {
                                 if (currentHistoricalRunCBG.regions.get(m).cBGsIDsInvolved.get(0).equals(currentHistoricalRunVD.regions.get(i).cBGsIDsInvolved.get(h))) {
-                                    String val = String.valueOf(Double.valueOf(String.valueOf(field.get(currentHistoricalRunCBG.regions.get(m).hourlyRegionSnapshot.get(jSlider1.getValue())))) * currentHistoricalRunVD.regions.get(i).cBGsPercentageInvolved.get(h));
-                                    row[h] = val;
+                                    if (currentHistoricalRunVD.regions.get(i).cBGsPercentageInvolved.get(h) > ((int) (jSpinner1.getValue()) / 100d)) {
+                                        String val = String.valueOf(Double.valueOf(String.valueOf(field.get(currentHistoricalRunCBG.regions.get(m).hourlyRegionSnapshot.get(jSlider1.getValue())))) * currentHistoricalRunVD.regions.get(i).cBGsPercentageInvolved.get(h));
+                                        row.add(val);
+                                    }
                                 }
                             }
-
                         }
-                        allValues.add(row);
-//                        if(val>0){
-//                            System.out.println("Region: "+i);
-//                        }
+                        String[] rowArray = new String[row.size()];
+                        for (int y = 0; y < row.size(); y++) {
+                            rowArray[y] = row.get(y);
+                        }
+                        allValues.add(rowArray);
                     }
                     try {
                         CsvWriter writer = new CsvWriter();
-                        writer.write(new File("ReportCBGInVD.csv"), Charset.forName("US-ASCII"), allValues);
+                        writer.write(new File("ReportCBGInVD_"+(int) (jSpinner1.getValue())+".csv"), Charset.forName("US-ASCII"), allValues);
                     } catch (IOException ex) {
                         Logger.getLogger(PreviousRunsDialog.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -421,29 +436,33 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
                 } catch (IllegalAccessException ex) {
                     Logger.getLogger(PreviousRunsDialog.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                
+
                 try {
                     Field field = RegionSnapshot.class.getDeclaredField(splitted[1].substring(0, splitted[1].length() - 1));
                     ArrayList<String[]> allValues = new ArrayList();
                     for (int i = 0; i < currentHistoricalRunVD.regions.size(); i++) {
-                        String[] row = new String[currentHistoricalRunVD.regions.get(i).cBGsPercentageInvolved.size()];
+                        ArrayList<String> row = new ArrayList();
+//                        String[] row = new String[currentHistoricalRunVD.regions.get(i).cBGsPercentageInvolved.size()];
                         for (int h = 0; h < currentHistoricalRunVD.regions.get(i).cBGsPercentageInvolved.size(); h++) {
                             for (int m = 0; m < currentHistoricalRunCBG.regions.size(); m++) {
                                 if (currentHistoricalRunCBG.regions.get(m).cBGsIDsInvolved.get(0).equals(currentHistoricalRunVD.regions.get(i).cBGsIDsInvolved.get(h))) {
-                                    String val = String.valueOf(Double.valueOf(String.valueOf(field.get(currentHistoricalRunCBG.regions.get(m).hourlyRegionSnapshot.get(jSlider1.getValue())))) / (double)(currentHistoricalRunCBG.regions.get(m).population));
-                                    row[h] = val;
+                                    if (currentHistoricalRunVD.regions.get(i).cBGsPercentageInvolved.get(h) > ((int) (jSpinner1.getValue()) / 100d)) {
+                                        String val = String.valueOf(Double.valueOf(String.valueOf(field.get(currentHistoricalRunCBG.regions.get(m).hourlyRegionSnapshot.get(jSlider1.getValue())))) / (double) (currentHistoricalRunCBG.regions.get(m).population));
+                                        row.add(val);
+                                    }
                                 }
                             }
 
                         }
-                        allValues.add(row);
-//                        if(val>0){
-//                            System.out.println("Region: "+i);
-//                        }
+                        String[] rowArray = new String[row.size()];
+                        for (int y = 0; y < row.size(); y++) {
+                            rowArray[y] = row.get(y);
+                        }
+                        allValues.add(rowArray);
                     }
                     try {
                         CsvWriter writer = new CsvWriter();
-                        writer.write(new File("ReportCBGInVDRatio.csv"), Charset.forName("US-ASCII"), allValues);
+                        writer.write(new File("ReportCBGInVDRatio_"+(int) (jSpinner1.getValue())+".csv"), Charset.forName("US-ASCII"), allValues);
                     } catch (IOException ex) {
                         Logger.getLogger(PreviousRunsDialog.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -464,7 +483,7 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
         if (jList2.getSelectedIndex() > -1) {
             DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) jTree1.getLastSelectedPathComponent();
             if (selectedNode != null) {
-                String splitted[] = jList2.getSelectedValue().split(File.separator+"(");
+                String splitted[] = jList2.getSelectedValue().split(File.separator + "(");
                 try {
                     Field field = RegionSnapshot.class.getDeclaredField(splitted[1].substring(0, splitted[1].length() - 1));
                     ArrayList<Double> allValues = new ArrayList();
@@ -496,7 +515,7 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
         if (jList2.getSelectedIndex() > -1) {
             DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) jTree1.getLastSelectedPathComponent();
             if (selectedNode != null) {
-                String splitted[] = jList2.getSelectedValue().split(File.separator+"(");
+                String splitted[] = jList2.getSelectedValue().split(File.separator + "(");
                 try {
                     Field field = RegionSnapshot.class.getDeclaredField(splitted[1].substring(0, splitted[1].length() - 1));
                     ArrayList<Double> allValues = new ArrayList();
@@ -542,24 +561,28 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
     public void loadHistoricalRun(javax.swing.event.TreeSelectionEvent evt) {
 //        DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) jTree1.getLastSelectedPathComponent();
         TreePath treepath = evt.getPath();
-        String path = "projects"+File.separator;
+        String path = "projects" + File.separator;
         Object elements[] = treepath.getPath();
         for (int i = 0, n = elements.length; i < n; i++) {
             path = path + elements[i] + File.separator;
         }
         currentHistoricalRun = HistoricalRun.loadHistoricalRunKryo(path + "data.bin");
 
-        jSlider1.setMinimum(0);
-        jSlider1.setMaximum(currentHistoricalRun.regions.get(0).hourlyRegionSnapshot.size() - 1);
-        jSlider1.setValue(0);
+        if (currentHistoricalRun != null) {
+            jSlider1.setMinimum(0);
+            jSlider1.setMaximum(currentHistoricalRun.regions.get(0).hourlyRegionSnapshot.size() - 1);
+            jSlider1.setValue(0);
 
-        jLabel1.setText("Start: " + currentHistoricalRun.startTimeString);
-        jLabel2.setText("Current: " + currentHistoricalRun.startTimeString);
-        jLabel3.setText("End: " + currentHistoricalRun.endTimeString);
+            jLabel1.setText("Start: " + currentHistoricalRun.startTimeString);
+            jLabel2.setText("Current: " + currentHistoricalRun.startTimeString);
+            jLabel3.setText("End: " + currentHistoricalRun.endTimeString);
+        }else{
+            System.out.println("HISTORICAL RUN IS NULL!");
+        }
 
 //        System.out.println("!!!!");
     }
-    
+
     public void loadHistoricalRunCBG(javax.swing.event.TreeSelectionEvent evt) {
         TreePath treepath = evt.getPath();
         String path = "projects" + File.separator;
@@ -625,6 +648,7 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JList<String> jList2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
@@ -635,6 +659,7 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JSlider jSlider1;
+    private javax.swing.JSpinner jSpinner1;
     private javax.swing.JToggleButton jToggleButton1;
     private javax.swing.JToggleButton jToggleButton2;
     private javax.swing.JTree jTree1;

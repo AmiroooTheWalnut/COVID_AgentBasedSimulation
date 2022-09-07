@@ -174,6 +174,7 @@ public class AbmCli {
 
         mainModel.ABM.isReportContactRate = runConfig.isReportContactRate;
         mainModel.ABM.isFuzzyStatus = runConfig.isFuzzyStatus;
+        mainModel.ABM.isSaveHistoricalRun = runConfig.isSaveHistoricalRun;
         //mainModel.javaEvaluationEngine.connectToConsole(jTextArea1);
         //mainModel.pythonEvaluationEngine.connectToConsole(jTextArea2);
         mainModel.loadAndConnectSupplementaryCaseStudyDataKryo(datasetRoot + "/Safegraph/" + mainModel.ABM.studyScope + "/supplementaryGIS.bin");
