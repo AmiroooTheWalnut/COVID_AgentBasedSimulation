@@ -22,7 +22,7 @@ import java.util.logging.Logger;
  *
  * @author user
  */
-public class PrepareReport extends javax.swing.JDialog {
+public class PrepareReportDialog extends javax.swing.JDialog {
 
     MainFrame myParent;
 
@@ -32,7 +32,7 @@ public class PrepareReport extends javax.swing.JDialog {
     /**
      * Creates new form PrepareReport
      */
-    public PrepareReport(java.awt.Frame parent, boolean modal) {
+    public PrepareReportDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
 
@@ -227,10 +227,10 @@ public class PrepareReport extends javax.swing.JDialog {
                         isRealRead = true;
                         csvReader.close();
                     } catch (IOException ex) {
-                        Logger.getLogger(PrepareReport.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(PrepareReportDialog.class.getName()).log(Level.SEVERE, null, ex);
                         System.out.println("TRAVEL DISTANCES FAILED TO READ");
                     } catch (CsvException ex) {
-                        Logger.getLogger(PrepareReport.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(PrepareReportDialog.class.getName()).log(Level.SEVERE, null, ex);
                         System.out.println("TRAVEL DISTANCES FAILED TO READ");
                     }
                 }
@@ -250,7 +250,7 @@ public class PrepareReport extends javax.swing.JDialog {
             writer.close();
             System.out.println("SUMMARY SUCCESSFULLY WRITTEN");
         } catch (IOException ex) {
-            Logger.getLogger(PrepareReport.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(PrepareReportDialog.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 

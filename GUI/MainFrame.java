@@ -739,7 +739,7 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton13ActionPerformed
 
     private void jButton14ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton14ActionPerformed
-        PrepareReport prepareReport=new PrepareReport(this,false);
+        PrepareReportDialog prepareReport=new PrepareReportDialog(this,false);
         prepareReport.setVisible(true);
     }//GEN-LAST:event_jButton14ActionPerformed
 
