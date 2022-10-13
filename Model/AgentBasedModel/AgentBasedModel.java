@@ -7,13 +7,18 @@ package COVID_AgentBasedSimulation.Model.AgentBasedModel;
 
 import COVID_AgentBasedSimulation.GUI.MainFrame;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Root;
+import COVID_AgentBasedSimulation.Model.HardcodedSimulator.RootArtificial;
 import COVID_AgentBasedSimulation.Model.MainModel;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import esmaieeli.gisFastLocationOptimization.GIS3D.AllData;
+import esmaieeli.gisFastLocationOptimization.GIS3D.PreProcessor;
+import esmaieeli.gisFastLocationOptimization.GIS3D.Scaling;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -39,6 +44,7 @@ public class AgentBasedModel {
     public transient String filePath;
     public ArrayList<AgentTemplate> agentTemplates = new ArrayList();
     public transient Root root;
+//    public transient RootArtificial rootArtificial;
     public transient Agent rootAgent;
     public transient CopyOnWriteArrayList<Agent> agents;
 
@@ -46,6 +52,7 @@ public class AgentBasedModel {
     public String endTimeString;
 
     public String studyScope = "FullData";
+    public String exactSimGeoData = "";
     public transient Object studyScopeGeography;
 
     public boolean isReportContactRate = false;
@@ -55,8 +62,8 @@ public class AgentBasedModel {
     public boolean isOurABMActive = false;
     public boolean isShamilABMActive = false;
     public boolean isAirQualityActive = false;
-    
-    public boolean  isFuzzyStatus = false;
+
+    public boolean isFuzzyStatus = false;
 
     private transient MainModel myMainModel;
 
@@ -65,18 +72,21 @@ public class AgentBasedModel {
     public transient ZonedDateTime startTime;
     public transient ZonedDateTime currentTime;
     public transient ZonedDateTime endTime;
-    
-    public transient int infectedByPOIContactDaily=0;
-    public transient int infectedByPOIEnvDaily=0;
-    public transient int infectedByShamilDaily=0;
-    public transient int infectedPOIDaily=0;
-    public transient int shamilInf1=0;
-    public transient int shamilInf2=0;
-    public transient int shamilInf3=0;
+
+    public transient int infectedByPOIContactDaily = 0;
+    public transient int infectedByPOIEnvDaily = 0;
+    public transient int infectedByShamilDaily = 0;
+    public transient int infectedPOIDaily = 0;
+    public transient int shamilInf1 = 0;
+    public transient int shamilInf2 = 0;
+    public transient int shamilInf3 = 0;
 
     public Map<Integer, Double> travelProbabilityInHourAdjustmentForNumAgent;
 
     public boolean isPatternBasedTime = true;
+
+    public transient AllData allData;
+    public transient PreProcessor preProcessor;
 
     public AgentBasedModel(MainModel mainModel) {
         myMainModel = mainModel;
@@ -519,6 +529,7 @@ public class AgentBasedModel {
             isShamilABMActive = result.isShamilABMActive;
             isAirQualityActive = result.isAirQualityActive;
             isPatternBasedTime = result.isPatternBasedTime;
+            exactSimGeoData=result.exactSimGeoData;
         } catch (FileNotFoundException ex) {
             Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -613,4 +624,14 @@ public class AgentBasedModel {
             System.out.println("GEOGRAPHY DATA IS UNAVAILABLE TO GET CASE STUDY'S GEOGRAPHY. calculateStudyScopeGeography SKIPPED!");
         }
     }
+
+    public void loadExactGeoData(RootArtificial root) {
+        File file = new File(exactSimGeoData);
+        preProcessor=new PreProcessor(root.mainFParent);
+        String properFileName=file.getName().substring(0, file.getName().lastIndexOf("."));
+        allData = preProcessor.read_allData_kryo(allData, file.getParent(), properFileName, "data");
+        allData.myScale = new Scaling(allData.all_Nodes);
+        allData.myScale.calculate();
+    }
+
 }

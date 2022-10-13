@@ -5,6 +5,7 @@
  */
 package COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization;
 
+import COVID_AgentBasedSimulation.Model.HardcodedSimulator.PersonExactProperties;
 import static COVID_AgentBasedSimulation.Model.MainModel.softwareVersion;
 import java.io.Serializable;
 
@@ -25,6 +26,14 @@ public class RegionImageLayer implements Serializable {
     public double endLat;
     public double startLon;
     public double endLon;
+    
+    public int getCellOfAgent(PersonExactProperties person){
+        double lat = person.exactHomeLocation.lat;
+        double lon = person.exactHomeLocation.lon;
+        int indX=(int)Math.round(((double)(endLat-lon)/(double)(endLat-startLat))*indexedImage.length);
+        int indY=(int)Math.round(((double)(endLon-lat)/(double)(endLon-startLon))*indexedImage[0].length);
+        return indexedImage[indX][indY];
+    }
 
     public static boolean[][] getImageBoundaries(int[][] input) {
         boolean[][] output = new boolean[input.length][input[0].length];

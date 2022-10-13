@@ -695,6 +695,17 @@ public class Safegraph extends Dataset implements Serializable {
         }
         return output;
     }
+    
+    public ArrayList<TessellationCell> getCBGVDTessellationFromCaseStudy(Object restriction, int tessellationIndex) {
+        ArrayList<TessellationCell> output = new ArrayList();
+        if (restriction instanceof City) {//SO FAR ONLY CITY IS SUPPORT
+            City temp = ((City) restriction);
+            for (int k = 0; k < temp.tessellations.get(tessellationIndex).cells.size(); k++) {
+                output.add(temp.tessellations.get(tessellationIndex).cells.get(k));
+            }
+        }
+        return output;
+    }
 
     public ArrayList<CBGVDCell> getCBGVDsFromCaseStudy(Object restriction) {
         ArrayList<CBGVDCell> output = new ArrayList();

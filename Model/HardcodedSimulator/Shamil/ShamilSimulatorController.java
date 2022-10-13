@@ -241,9 +241,9 @@ public class ShamilSimulatorController {
     }
 
     public static void runRawShamilSimulation(ArrayList<Person> people, int numDaysToSimulate, MainModel mainModel) {
-        shamilAgentGeneration(people);
+        shamilAgentGeneration(mainModel, people);
         for (int d = 0; d < numDaysToSimulate; d++) {
-            startDay(people, d);
+            startDay(mainModel, people, d);
             for (int h = 0; h < 24; h++) {
                 updateHour(people, null, h, d, false, false, mainModel);
             }
@@ -253,7 +253,7 @@ public class ShamilSimulatorController {
 
     public static void runShamilSimulationOnly(ArrayList<Person> people, int numDaysToSimulate, MainModel mainModel) {
         for (int d = 0; d < numDaysToSimulate; d++) {
-            startDay(people, d);
+            startDay(mainModel, people, d);
             for (int h = 0; h < 24; h++) {
                 updateHour(people, null, h, d, false, false, mainModel);
             }
@@ -261,29 +261,29 @@ public class ShamilSimulatorController {
         }
     }
 
-    public static void shamilAgentGeneration(ArrayList<Person> people) {
+    public static void shamilAgentGeneration(MainModel myMainModel, ArrayList<Person> people) {
         //SHAMIL'S AGET GENERATION
-        ShamilPersonManager.generatePersons(people);
+        ShamilPersonManager.generatePersons(myMainModel, people);
         ShamilPersonManager.assignProfessionGroup(people);
     }
 
     /*
     *   Added by Amirooo
      */
-    public static void shamilAgentGenerationSpatial(ArrayList<Region> regions, ArrayList<Person> people) {
+    public static void shamilAgentGenerationSpatial(MainModel myMainModel, ArrayList<Region> regions, ArrayList<Person> people) {
         //SHAMIL'S AGET GENERATION
-        ShamilPersonManager.generatePersonsSpatial(regions);
-        ShamilPersonManager.assignProfessionGroupSpatial(regions, people);
+        ShamilPersonManager.generatePersonsSpatial(myMainModel, regions);
+        ShamilPersonManager.assignProfessionGroupSpatial(myMainModel, regions, people);
     }
 
-    public static void shamilInitialInfection(ArrayList<Person> people) {
-        ShamilPersonManager.initialInfection(people, n_infected_init);
+    public static void shamilInitialInfection(MainModel myMainModel, ArrayList<Person> people) {
+        ShamilPersonManager.initialInfection(myMainModel, people, n_infected_init);
     }
 
-    public static void startDay(ArrayList<Person> people, int day) {
+    public static void startDay(MainModel mainModel, ArrayList<Person> people, int day) {
         int counter = 0;//TEMP
         for (int i = 0; i < people.size(); i++) {
-            double rnd = Math.random();
+            double rnd = mainModel.ABM.root.rnd.nextDouble();
             if (rnd < ShamilPersonManager.smartphone_owner_percentage) {
                 people.get(i).shamilPersonProperties.isTraceable = true;
             } else {
@@ -297,12 +297,12 @@ public class ShamilSimulatorController {
 //            }
         }
 //        System.out.println("num hospitalized " + counter);//TEMP
-        ShamilDaySimulator.dayStart(people, day);
+        ShamilDaySimulator.dayStart(mainModel, people, day);
         boolean lockdown_started = false;
         if (day >= ShamilPersonManager.preference_def.get("quarantine_start")) {
             lockdown_started = true;
         }
-        ShamilDaySimulator.generateDailyTasks(people, lockdown_started);
+        ShamilDaySimulator.generateDailyTasks(mainModel, people, lockdown_started);
 
         daily_groups = new ArrayList();
     }
@@ -314,12 +314,12 @@ public class ShamilSimulatorController {
 //                System.out.println("NULL TASK!");
 //            }
         }
-        ShamilHourSimulator.generateHourlyActions(people, hour);
+        ShamilHourSimulator.generateHourlyActions(myMainModel, people, hour);
         Object output[];
         if (isSpatial == true) {
             output = ShamilGroupManager.assignGroupsSpatial(regions, tracing_percentage, day, debug, myMainModel);
         } else {
-            output = ShamilGroupManager.assignGroups(people, tracing_percentage, day);
+            output = ShamilGroupManager.assignGroups(myMainModel, people, tracing_percentage, day);
         }
 
         ArrayList<ShamilGroup> groups = (ArrayList<ShamilGroup>) output[0];

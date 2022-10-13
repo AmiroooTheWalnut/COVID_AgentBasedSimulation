@@ -1806,7 +1806,7 @@ public class SimulatorDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jRadioButton17ActionPerformed
 
     private void jRadioButton18ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton18ActionPerformed
-        myParent.mainModel.scenario.scenarioName = "RMCBG";
+        myParent.mainModel.scenario.scenarioName = "RMCBG_" + jSpinner2.getValue();
     }//GEN-LAST:event_jRadioButton18ActionPerformed
 
     private void jRadioButton19ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton19ActionPerformed

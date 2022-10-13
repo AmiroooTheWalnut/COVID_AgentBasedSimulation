@@ -6,6 +6,7 @@
 package COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil;
 
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Person;
+import COVID_AgentBasedSimulation.Model.MainModel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -42,9 +43,9 @@ public class ShamilGroup {
         }
     }
 
-    public double triangularDistribution(double a, double b, double c) {
+    public double triangularDistribution(MainModel mainModel, double a, double b, double c) {
         double F = (c - a) / (b - a);
-        double rand = Math.random();
+        double rand = mainModel.ABM.root.rnd.nextDouble();
         if (rand < F) {
             return a + Math.sqrt(rand * (b - a) * (c - a));
         } else {
@@ -52,7 +53,7 @@ public class ShamilGroup {
         }
     }
 
-    public void updateProximity() {
+    public void updateProximity(MainModel mainModel) {
 //        System.out.println("GROUP SIZE: "+persons.size());
 //        System.out.println("GROUP NAME: "+group_name);
 //        if(persons.size()>100){
@@ -85,7 +86,7 @@ public class ShamilGroup {
             for (int i = 0; i < persons.size(); i++) {
                 for (int j = 0; j < persons.size(); j++) {
 //                    proximity[i][j] = ShamilPersonManager.rnd.nextGaussian();
-                    proximity[i][j] = triangularDistribution(-1.5,0,1.5);
+                    proximity[i][j] = triangularDistribution(mainModel, -1.5,0,1.5);
                     if (proximity[i][j] > max_proximity) {
                         proximity[i][j] = max_proximity;
                     }
@@ -180,7 +181,7 @@ public class ShamilGroup {
                 next_reduction += reduction_step;
             }
 
-            double rand_proximity = Math.random() * reduction_amount;
+            double rand_proximity = mainModel.ABM.root.rnd.nextDouble() * reduction_amount;
 
             double var1 = Math.max(max_proximity - rand_proximity, 0);
             double var2 = Math.max(max_proximity - rand_proximity, 0);

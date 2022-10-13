@@ -10,6 +10,7 @@ import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MyPolygons;
 import static COVID_AgentBasedSimulation.Model.MainModel.softwareVersion;
 import COVID_AgentBasedSimulation.Model.Structure.CensusBlockGroup;
 import COVID_AgentBasedSimulation.Model.Structure.Marker;
+import esmaieeli.gisFastLocationOptimization.GIS3D.LocationNode;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,4 +38,21 @@ public class Region extends Marker implements Serializable {
     public ArrayList<MyPolygons> polygons=new ArrayList();
     
     public ArrayList<RegionSnapshot> hourlyRegionSnapshot=new ArrayList();
+    
+    public transient ArrayList<LocationNode> locationNodes=new ArrayList();
+    public transient ArrayList<Integer> locationNodeHomeFreqs=new ArrayList();
+    public transient ArrayList<Integer> locationNodeWorkFreqs=new ArrayList();
+    public transient int sumHomeFreqs;
+    public transient int sumWorkFreqs;
+    
+    public transient int myIndex;
+    
+    public Region(int passed_index){
+        myIndex=passed_index;
+    }
+    
+    public Region(){
+        
+    }
+    
 }

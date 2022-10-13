@@ -6,7 +6,7 @@ package COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil;
 
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Person;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Region;
-import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilPersonManager.rnd;
+//import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilPersonManager.rnd;
 import COVID_AgentBasedSimulation.Model.MainModel;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,7 +25,7 @@ import java.util.logging.Logger;
  */
 public class ShamilGroupManager {
 
-    public static Object[] assignGroups(ArrayList<Person> persons, double tracing_percentage, int num_of_day) {
+    public static Object[] assignGroups(MainModel mainModel, ArrayList<Person> persons, double tracing_percentage, int num_of_day) {
         HashMap<Integer, ArrayList<Integer>> person_group = new HashMap();
 //        person_group = {}
         //# fline = open("seed.txt").readline().rstrip()
@@ -77,7 +77,7 @@ public class ShamilGroupManager {
                 group_id = "F-" + persons.get(i).shamilPersonProperties.familyId;
 //                group_id = "F-{}".format(prsn.family_id)
             } else if (persons.get(i).shamilPersonProperties.currentTask.name.equals("Go to Work") || persons.get(i).shamilPersonProperties.currentTask.name.equals("Returns Home")) {
-                int selected_transport = (int) (Math.random() * transport_free_seats.size());
+                int selected_transport = (int) (mainModel.ABM.root.rnd.nextDouble() * transport_free_seats.size());
 //                selected_transport = random.choice(transport_free_seats)
 
                 transport_free_seats.remove(selected_transport);
@@ -90,7 +90,7 @@ public class ShamilGroupManager {
 //                group_id = "W-{}".format(prsn.profession_group_id)                
 
             } else if (persons.get(i).shamilPersonProperties.currentTask.name.equals("Attend Event")) {
-                group_id = "E-" + (int) (Math.round(Math.random() * n_events));
+                group_id = "E-" + (int) (Math.round(mainModel.ABM.root.rnd.nextDouble() * n_events));
 //                group_id = "E-{}".format(np.random.randint(0,n_events))
                 /*
                 effort = 0
@@ -132,7 +132,7 @@ public class ShamilGroupManager {
 
             ArrayList<Integer> personid_arr = new ArrayList();
             for (int j = 0; j < personarr.size(); j++) { // pers in personarr:
-                double decision_var = Math.random();
+                double decision_var = mainModel.ABM.root.rnd.nextDouble();
                 if (decision_var < tracing_percentage && personarr.get(j).shamilPersonProperties.isTraceable) {
                     personid_arr.add(personarr.get(j).shamilPersonProperties.id);
                 }
@@ -161,7 +161,7 @@ public class ShamilGroupManager {
 
             groups.get(i).updatePersonMapper();
 
-            groups.get(i).updateProximity();
+            groups.get(i).updateProximity(mainModel);
 
         }
 
@@ -248,7 +248,7 @@ public class ShamilGroupManager {
 //                    group_id = "F-" + regions.get(r).residents.get(i).shamilPersonProperties.familyId;
 ////                group_id = "F-{}".format(prsn.family_id)
 //                } else if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Go to Work") || regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Returns Home")) {
-//                    int selected_transport_index = (int) (Math.random() * transport_free_seats.size());
+//                    int selected_transport_index = (int) (mainModel.ABM.root.rnd.nextDouble() * transport_free_seats.size());
 //                    int selected_transport = transport_free_seats.get(selected_transport_index);
 ////                selected_transport = random.choice(transport_free_seats)
 //
@@ -262,7 +262,7 @@ public class ShamilGroupManager {
 ////                group_id = "W-{}".format(prsn.profession_group_id)                
 //
 //                } else if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Attend Event")) {
-//                    group_id = "E-" + (int) (Math.round(Math.random() * n_events));
+//                    group_id = "E-" + (int) (Math.round(mainModel.ABM.root.rnd.nextDouble() * n_events));
 ////                group_id = "E-{}".format(np.random.randint(0,n_events))
 //                    /*
 //                effort = 0
@@ -307,7 +307,7 @@ public class ShamilGroupManager {
 
             ArrayList<Integer> personid_arr = new ArrayList();
             for (int j = 0; j < personarr.size(); j++) { // pers in personarr:
-                double decision_var = Math.random();
+                double decision_var = myMainModel.ABM.root.rnd.nextDouble();
                 if (decision_var < tracing_percentage && personarr.get(j).shamilPersonProperties.isTraceable) {
                     personid_arr.add(personarr.get(j).shamilPersonProperties.id);
                 }
@@ -379,7 +379,8 @@ public class ShamilGroupManager {
 
     }
 
-    public static void createGroupRegion(Region region, List<Integer> transport_free_seats, int n_events, ConcurrentHashMap<String, ShamilGroup> groupDict) {
+    public static void createGroupRegion(MainModel mainModel, Region region, List<Integer> transport_free_seats, int n_events, ConcurrentHashMap<String, ShamilGroup> groupDict) {
+        int transport_free_seats_size=transport_free_seats.size();
         for (int i = 0; i < region.residents.size(); i++) {
 //        for prsn in persons:
             boolean isAlive = false;
@@ -401,7 +402,7 @@ public class ShamilGroupManager {
                 group_id = "F-" + region.residents.get(i).shamilPersonProperties.familyId;
 //                group_id = "F-{}".format(prsn.family_id)
             } else if (region.residents.get(i).shamilPersonProperties.currentTask.name.equals("Go to Work") || region.residents.get(i).shamilPersonProperties.currentTask.name.equals("Returns Home")) {
-                int selected_transport_index = (int) (Math.random() * transport_free_seats.size());
+                int selected_transport_index = (int) (mainModel.ABM.root.rnd.nextDouble() * transport_free_seats_size);
                 int selected_transport = transport_free_seats.get(selected_transport_index);
 //                selected_transport = random.choice(transport_free_seats)
 
@@ -415,7 +416,7 @@ public class ShamilGroupManager {
 //                group_id = "W-{}".format(prsn.profession_group_id)                
 
             } else if (region.residents.get(i).shamilPersonProperties.currentTask.name.equals("Attend Event")) {
-                group_id = "E-" + (int) (Math.round(Math.random() * n_events));
+                group_id = "E-" + (int) (Math.round(mainModel.ABM.root.rnd.nextDouble() * n_events));
 //                group_id = "E-{}".format(np.random.randint(0,n_events))
                 /*
                 effort = 0
@@ -452,7 +453,7 @@ public class ShamilGroupManager {
         }
     }
 
-    public void createGroups(ArrayList<Region> regions, List<Integer> transport_free_seats, int n_events, ConcurrentHashMap<String, ShamilGroup> groupDict) {
+    public void createGroups(MainModel mainModel, ArrayList<Region> regions, List<Integer> transport_free_seats, int n_events, ConcurrentHashMap<String, ShamilGroup> groupDict) {
         for (int r = 0; r < regions.size(); r++) {
             for (int i = 0; i < regions.get(r).residents.size(); i++) {
 //        for prsn in persons:
@@ -475,7 +476,7 @@ public class ShamilGroupManager {
                     group_id = "F-" + regions.get(r).residents.get(i).shamilPersonProperties.familyId;
 //                group_id = "F-{}".format(prsn.family_id)
                 } else if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Go to Work") || regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Returns Home")) {
-                    int selected_transport_index = (int) (Math.random() * transport_free_seats.size());
+                    int selected_transport_index = (int) (mainModel.ABM.root.rnd.nextDouble() * transport_free_seats.size());
                     int selected_transport = transport_free_seats.get(selected_transport_index);
 //                selected_transport = random.choice(transport_free_seats)
 
@@ -489,7 +490,7 @@ public class ShamilGroupManager {
 //                group_id = "W-{}".format(prsn.profession_group_id)                
 
                 } else if (regions.get(r).residents.get(i).shamilPersonProperties.currentTask.name.equals("Attend Event")) {
-                    group_id = "E-" + (int) (Math.round(Math.random() * n_events));
+                    group_id = "E-" + (int) (Math.round(mainModel.ABM.root.rnd.nextDouble() * n_events));
 //                group_id = "E-{}".format(np.random.randint(0,n_events))
                     /*
                 effort = 0

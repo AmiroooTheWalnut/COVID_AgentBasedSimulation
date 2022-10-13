@@ -6,7 +6,7 @@ package COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil;
 
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Person;
 import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilPersonManager.randn;
-import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilPersonManager.rnd;
+//import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilPersonManager.rnd;
 import COVID_AgentBasedSimulation.Model.MainModel;
 
 /**
@@ -28,7 +28,7 @@ public class ShamilGroupSimulator {
             ShamilAction actn = grp.actions.get(i);
             if (actn.timestamp >= next_timestamp) {
 
-                grp.updateProximity();
+                grp.updateProximity(mainModel);
 
                 next_timestamp += 10;
             }
@@ -39,12 +39,12 @@ public class ShamilGroupSimulator {
 
             for (int j = 0; j < grp.persons.size(); j++) {// prsn in grp.persons:
                 for (int m = 0; m < grp.persons.get(j).insidePeople.size(); m++) {
-                    if (randn(actn.min_prob_affect, actn.max_prob_affect) > ACTION_AFFECTING_PROBABILITY) {
+                    if (randn(mainModel, actn.min_prob_affect, actn.max_prob_affect) > ACTION_AFFECTING_PROBABILITY) {
 //                if(randn(actn.min_prob_affect,actn.max_prob_affect)>ACTION_AFFECTING_PROBABILITY):
                         if (grp.persons.get(j).shamilPersonProperties.id == acting_person_id) {
                             if (actn.min_effect_self >= 0) {
 
-                                double infection = (1 - grp.persons.get(j).shamilPersonProperties.protectionLevel) * randn(actn.min_effect_self, actn.max_effect_self);
+                                double infection = (1 - grp.persons.get(j).shamilPersonProperties.protectionLevel) * randn(mainModel, actn.min_effect_self, actn.max_effect_self);
 
                                 // #print(infection)
                                 if (infection > ACTION_INFECT_THRESHOLD) {
@@ -56,7 +56,7 @@ public class ShamilGroupSimulator {
                                 }
                             } else {
 
-                                double infection = (1 - grp.persons.get(j).shamilPersonProperties.protectionLevel) * randn(actn.min_effect_self, actn.max_effect_self);
+                                double infection = (1 - grp.persons.get(j).shamilPersonProperties.protectionLevel) * randn(mainModel, actn.min_effect_self, actn.max_effect_self);
                                 // #print("the infection case is - " + str(infection))
                                 double infection_pos = (-1) * infection;
 
@@ -68,7 +68,7 @@ public class ShamilGroupSimulator {
                                 }
                             }
                         } else {
-                            int insidePersonIndex = (int) ((rnd.nextDouble() * (acting_person.insidePeople.size() - 1)));
+                            int insidePersonIndex = (int) ((mainModel.ABM.root.rnd.nextDouble() * (acting_person.insidePeople.size() - 1)));
 //                            for (int n = 0; n < acting_person.insidePeople.size(); n++) {
                                 if (acting_person.insidePeople.get(insidePersonIndex).sfpp.state.equals("contagious_asymptomatic") || acting_person.insidePeople.get(insidePersonIndex).sfpp.state.equals("contagious_symptomatic")) {
 
@@ -78,7 +78,7 @@ public class ShamilGroupSimulator {
                                         double proximit = grp.getProximity(acting_person_id, grp.persons.get(j).shamilPersonProperties.id);
                                         // #proximit = 1
 
-                                        double infection = (1 - grp.persons.get(j).shamilPersonProperties.protectionLevel) * randn(actn.min_effect_others, actn.max_effect_others);
+                                        double infection = (1 - grp.persons.get(j).shamilPersonProperties.protectionLevel) * randn(mainModel, actn.min_effect_others, actn.max_effect_others);
 //                                infection = (1-grp.persons.get(j).shamilPersonProperties.protectionLevel) * randn(actn.min_effect_others,actn.max_effect_others)
                                         // #print("infection before = " + str(infection) + " proximity - " + str(proximit))
 

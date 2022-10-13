@@ -26,7 +26,7 @@ public class AdvancedParallelGroupUpdateEvaluator extends ParallelProcessor {
                 for (int i = myStartIndex; i < myEndIndex; i++) {
                     groups.get(i).updatePersonMapper();
 
-                    groups.get(i).updateProximity();
+                    groups.get(i).updateProximity(parent);
                 }
             }
         };

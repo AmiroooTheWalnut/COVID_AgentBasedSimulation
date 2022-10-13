@@ -7,6 +7,7 @@ package COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Person;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Region;
 import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilSimulatorController.n_infected_init;
+import COVID_AgentBasedSimulation.Model.MainModel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -18,7 +19,7 @@ import java.util.Random;
  */
 public class ShamilPersonManager {
 
-    static Random rnd = new Random();
+    //static Random rnd = new Random();
 
     static double smartphone_owner_percentage = 0.75;
 //    static double tracing_percentage = 0.3;//ORIGINAL
@@ -180,14 +181,14 @@ public class ShamilPersonManager {
         }
     };
 
-    public static void generatePersons(ArrayList<Person> persons) {
+    public static void generatePersons(MainModel mainModel, ArrayList<Person> persons) {
         int family_id = 0;
         int family_size_orig = 0;
         int family_size_counter = 0;
         int age = 0;
         int selectedProfession = -1;
         for (int i = 0; i < persons.size(); i++) {
-            double professionRand = Math.random();
+            double professionRand = mainModel.ABM.root.rnd.nextDouble();
             if (professionRand < 0.22) {
                 selectedProfession = 0;
             } else if (professionRand < 0.22 + 0.741) {
@@ -202,10 +203,10 @@ public class ShamilPersonManager {
             persons.get(i).shamilPersonProperties.profession = new ShamilProfession(profession_df.get(selectedProfession));//ADDED "NEW" TO MAKE SURE A DEEP COPY IS TAKEN
             persons.get(i).shamilPersonProperties.initialProfession = new ShamilProfession(persons.get(i).shamilPersonProperties.profession);
 
-            age = (int) (profession_df.get(selectedProfession).min_age + Math.random() * (profession_df.get(selectedProfession).max_age - profession_df.get(selectedProfession).min_age));
+            age = (int) (profession_df.get(selectedProfession).min_age + mainModel.ABM.root.rnd.nextDouble() * (profession_df.get(selectedProfession).max_age - profession_df.get(selectedProfession).min_age));
             if (family_size_counter == 0) {
                 family_id = family_id + 1;
-                family_size_orig = (int) Math.round(preference_def.get("min_family_size") + Math.random() * (preference_def.get("max_family_size") - preference_def.get("min_family_size")));
+                family_size_orig = (int) Math.round(preference_def.get("min_family_size") + mainModel.ABM.root.rnd.nextDouble() * (preference_def.get("max_family_size") - preference_def.get("min_family_size")));
                 family_size_counter = family_size_orig;
             }
             persons.get(i).shamilPersonProperties.familyId = family_id;
@@ -224,7 +225,7 @@ public class ShamilPersonManager {
     /*
     *   Added by Amirooo
      */
-    public static void generatePersonsSpatial(ArrayList<Region> regions) {
+    public static void generatePersonsSpatial(MainModel mainModel, ArrayList<Region> regions) {
         int family_id = 0;
         int family_size_orig = 0;
         int family_size_counter = 0;
@@ -233,7 +234,7 @@ public class ShamilPersonManager {
         int uniqurCounter = 0;//ADDED BY AMIROOO
         for (int r = 0; r < regions.size(); r++) {
             for (int i = 0; i < regions.get(r).residents.size(); i++) {
-                double professionRand = Math.random();
+                double professionRand = mainModel.ABM.root.rnd.nextDouble();
                 if (professionRand < 0.22) {
                     selectedProfession = 0;
                 } else if (professionRand < 0.22 + 0.741) {
@@ -248,10 +249,10 @@ public class ShamilPersonManager {
                 regions.get(r).residents.get(i).shamilPersonProperties.profession = new ShamilProfession(profession_df.get(selectedProfession));//ADDED "NEW" TO MAKE SURE A DEEP COPY IS TAKEN
                 regions.get(r).residents.get(i).shamilPersonProperties.initialProfession = new ShamilProfession(regions.get(r).residents.get(i).shamilPersonProperties.profession);
 
-                age = (int) (profession_df.get(selectedProfession).min_age + Math.random() * (profession_df.get(selectedProfession).max_age - profession_df.get(selectedProfession).min_age));
+                age = (int) (profession_df.get(selectedProfession).min_age + mainModel.ABM.root.rnd.nextDouble() * (profession_df.get(selectedProfession).max_age - profession_df.get(selectedProfession).min_age));
                 if (family_size_counter == 0) {
                     family_id = family_id + 1;
-                    family_size_orig = (int) Math.round(preference_def.get("min_family_size") + Math.random() * (preference_def.get("max_family_size") - preference_def.get("min_family_size")));
+                    family_size_orig = (int) Math.round(preference_def.get("min_family_size") + mainModel.ABM.root.rnd.nextDouble() * (preference_def.get("max_family_size") - preference_def.get("min_family_size")));
                     family_size_counter = family_size_orig;
                 }
                 regions.get(r).residents.get(i).shamilPersonProperties.familyId = family_id;
@@ -268,7 +269,7 @@ public class ShamilPersonManager {
         }
     }
 
-    public static void assignProfessionGroupSpatial(ArrayList<Region> regions, ArrayList<Person> persons) {
+    public static void assignProfessionGroupSpatial(MainModel mainModel, ArrayList<Region> regions, ArrayList<Person> persons) {
         ArrayList<Integer> worker_ids = new ArrayList();
         for (int r = 0; r < regions.size(); r++) {
             for (int i = 0; i < regions.get(r).residents.size(); i++) {
@@ -281,7 +282,7 @@ public class ShamilPersonManager {
 //        int n_workgroup = (preference_def.get("n_workgroup")).intValue();
 //        int n_workgroup = (int) (worker_ids.size() * (preference_def.get("n_workgroup") / 7410d));//ORIGINAL
 //        int n_workgroup = (int) (worker_ids.size() * (preference_def.get("n_workgroup") / 150000d));//ORIGINAL
-//        int n_workgroup = (int)(Math.random()*100000);
+//        int n_workgroup = (int)(mainModel.ABM.root.rnd.nextDouble()*100000);
 //        if (n_workgroup == 0) {
 //            n_workgroup = 1;
 //        }
@@ -293,7 +294,7 @@ public class ShamilPersonManager {
         int WS = worker_ids.size();
         for (int i = 0; i < worker_ids.size(); i++) {
 //            persons.get(worker_ids.get(i)).shamilPersonProperties.professionGroupId = Math.min(Math.floorDiv(i, worker_per_workgroup), n_workgroup);
-            persons.get(worker_ids.get(i)).shamilPersonProperties.professionGroupId = (int) (Math.random() * WS / 10.0);
+            persons.get(worker_ids.get(i)).shamilPersonProperties.professionGroupId = (int) (mainModel.ABM.root.rnd.nextDouble() * WS / 10.0);
         }
 //        for (int i = 0; i < persons.size(); i++) {
 //            System.out.println(persons.get(i).shamilPersonProperties.professionGroupId);
@@ -324,10 +325,10 @@ public class ShamilPersonManager {
         }
     }
 
-    public static void initialInfection(ArrayList<Person> people, int n_infected_init) {
+    public static void initialInfection(MainModel mainModel, ArrayList<Person> people, int n_infected_init) {
         while (n_infected_init > 0) {
 
-            int person_id = (int) (Math.random() * people.size()); //np.random.randint(0,len(persons))
+            int person_id = (int) (mainModel.ABM.root.rnd.nextDouble() * people.size()); //np.random.randint(0,len(persons))
             boolean isFound = false;
             for (int m = 0; m < people.get(person_id).insidePeople.size(); m++) {
                 if (people.get(person_id).insidePeople.get(m).sfpp.isInfected == false) {
@@ -341,7 +342,7 @@ public class ShamilPersonManager {
             }
             while (isFound == false) {
 
-                person_id = (int) (Math.random() * people.size());
+                person_id = (int) (mainModel.ABM.root.rnd.nextDouble() * people.size());
 
                 isFound = false;
                 for (int m = 0; m < people.get(person_id).insidePeople.size(); m++) {
@@ -372,14 +373,14 @@ public class ShamilPersonManager {
         return buffer.toString();
     }
 
-    public static void raiseAwareness(Person person) {
-        if (randn(0, 1) > 0.5) {
-            person.shamilPersonProperties.awarenessLevel = Math.min(person.shamilPersonProperties.awarenessLevel + randn(0, 1), 1.0);
+    public static void raiseAwareness(MainModel mainModel, Person person) {
+        if (randn(mainModel, 0, 1) > 0.5) {
+            person.shamilPersonProperties.awarenessLevel = Math.min(person.shamilPersonProperties.awarenessLevel + randn(mainModel, 0, 1), 1.0);
         }
     }
 
-    public static void becomeProtected(Person person, int numInfection) {//numInfection IS ADDED BY AMIROOO FOR DEBUG
-        double randnum = randn(0, 1);
+    public static void becomeProtected(MainModel mainModel, Person person, int numInfection) {//numInfection IS ADDED BY AMIROOO FOR DEBUG
+        double randnum = randn(mainModel, 0, 1);
         double extra_protection = 0.0;
 //        if(numInfection==0){//ADDED BY AMIROOO
 //            System.out.println("!!!!!!!!!");//ADDED BY AMIROOO
@@ -403,7 +404,7 @@ public class ShamilPersonManager {
             }
         } else {
             if (randnum > 0.7) {
-                person.shamilPersonProperties.protectionLevel = Math.min(randn(0, person.shamilPersonProperties.awarenessLevel), 0.25 + extra_protection);
+                person.shamilPersonProperties.protectionLevel = Math.min(randn(mainModel, 0, person.shamilPersonProperties.awarenessLevel), 0.25 + extra_protection);
             }
         }
     }
@@ -417,7 +418,7 @@ public class ShamilPersonManager {
         }
     }
 
-    public static void hospitalize(Person person, int i) {
+    public static void hospitalize(MainModel mainModel, Person person, int i) {
         int numInf = 0;
         for (int m = 0; m < person.insidePeople.size(); m++) {
             if (person.insidePeople.get(m).sfpp.isInfected == true && !(person.shamilPersonProperties.profession.name.equals("Hospitalized"))) {
@@ -425,7 +426,7 @@ public class ShamilPersonManager {
             }
         }
         if (numInf / person.insidePeople.size() > 0.5) {
-            double tmp = Math.random();
+            double tmp = mainModel.ABM.root.rnd.nextDouble();
             if (tmp > 0.75) {
                 person.shamilPersonProperties.profession = new ShamilProfession(profession_df.get(4));
 //                System.out.println("HOSPITALIZED: "+i);
@@ -434,10 +435,10 @@ public class ShamilPersonManager {
         }
     }
 
-    public static void die(Person person) {
+    public static void die(MainModel mainModel, Person person) {
         for (int m = 0; m < person.insidePeople.size(); m++) {
             if (person.insidePeople.get(m).sfpp.infectedDays > 15) {
-                if (Math.random() > 0.97) {
+                if (mainModel.ABM.root.rnd.nextDouble() > 0.97) {
                     person.insidePeople.get(m).sfpp.isAlive = false;
                     //print('Person {} has died'.format(self.id));
                 }
@@ -445,11 +446,11 @@ public class ShamilPersonManager {
         }
     }
 
-    public static double randn(double lo, double hi) {
+    public static double randn(MainModel mainModel, double lo, double hi) {
         //# fline = open("seed.txt").readline().rstrip()
         //# ranseed = int(fline)
         //# np.random.seed(ranseed)
-        return Math.random() * (hi - lo) + lo;
+        return mainModel.ABM.root.rnd.nextDouble() * (hi - lo) + lo;
     }
 
 }

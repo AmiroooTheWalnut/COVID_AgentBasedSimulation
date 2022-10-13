@@ -5,7 +5,8 @@
 package COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil;
 
 import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilPersonManager.randn;
-import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilPersonManager.rnd;
+import COVID_AgentBasedSimulation.Model.MainModel;
+//import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilPersonManager.rnd;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -15,19 +16,19 @@ import java.util.Collections;
  */
 public class ShamilTaskManager {
     
-    public static ArrayList<ShamilTask> generateTasks(ShamilProfession profession) {
+    public static ArrayList<ShamilTask> generateTasks(MainModel mainModel, ShamilProfession profession) {
         
         ArrayList<ShamilTask> taskList = new ArrayList();
         
         for (int index = 0; index < profession.tasks_df.size(); index++) {
-            double prob = randn(profession.tasks_df.get(index).min_prob, profession.tasks_df.get(index).max_prob);
+            double prob = randn(mainModel, profession.tasks_df.get(index).min_prob, profession.tasks_df.get(index).max_prob);
             
             if (prob < 0.5) {
                 
                 continue;
             }
-            double start_time = Math.round(randn(profession.tasks_df.get(index).min_start_time,profession.tasks_df.get(index).max_start_time));
-            double duration = Math.round(randn(profession.tasks_df.get(index).min_duration,profession.tasks_df.get(index).max_duration));
+            double start_time = Math.round(randn(mainModel, profession.tasks_df.get(index).min_start_time,profession.tasks_df.get(index).max_start_time));
+            double duration = Math.round(randn(mainModel, profession.tasks_df.get(index).min_duration,profession.tasks_df.get(index).max_duration));
             
             taskList.add(new ShamilTask(profession.tasks_df.get(index).task, start_time, start_time + duration));
 

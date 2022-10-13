@@ -12,6 +12,7 @@ import COVID_AgentBasedSimulation.Model.Data.CovidCsseJhu.CovidCsseJhu;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.Safegraph;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Region;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Root;
+import COVID_AgentBasedSimulation.Model.HardcodedSimulator.RootArtificial;
 import COVID_AgentBasedSimulation.Model.Structure.AllGISData;
 import COVID_AgentBasedSimulation.Model.Structure.CensusBlockGroup;
 import COVID_AgentBasedSimulation.Model.Structure.City;
@@ -60,6 +61,8 @@ public class MainModel extends Dataset {
     public static final long softwareVersion = 1L;
     static final long serialVersionUID = softwareVersion;
 
+    public boolean isArtificialExact=false;
+    
     public Safegraph safegraph;
     public AllGISData allGISData;
     public SupplementaryCaseStudyData supplementaryCaseStudyData;
@@ -375,6 +378,79 @@ public class MainModel extends Dataset {
             ABM.root.constructor(this, numResidents, "VDFNC", numCells, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
         } else if (scenario.scenarioName.equals("OVD")) {
             ABM.root.constructor(this, numResidents, "OVD", numRegions, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
+        }
+
+//        if (scenario.equals("CBG")) {
+//            ((Root) (ABM.rootAgent)).constructorCBG(this, sparsifyFraction);
+//        } else if (scenario.equals("VD")) {
+//            ((Root) (ABM.rootAgent)).constructorVD(this);
+//        } else if (scenario.equals("CBGVD")) {
+//            ((Root) (ABM.rootAgent)).constructorCBGVD(this);
+//        } else if (scenario.equals("ABSVD")) {
+//            ((Root) (ABM.rootAgent)).constructorABSVD(this);
+//        }
+        int passingNumCPU;
+        if (isParallelBehaviorEvaluation == true) {
+            passingNumCPU = numCPUs;
+        } else {
+            passingNumCPU = 1;
+        }
+//        pollBarrier = new CyclicBarrier(passingNumCPU);
+        resetTimerTask(isRunFromGUI, passingNumCPU, true, isInfectCBGOnly);
+    }
+
+    public void initModelArtificial(boolean isRunFromGUI, boolean isParallelLoadingData, boolean isParallelBehaviorEvaluation, int numResidents, int numRegions, int numCPUs, boolean isCompleteInfection, boolean isInfectCBGOnly, ArrayList<Integer> initialInfectionRegionIndex) {
+        isResultSavedAtTheEnd = false;
+        int month = ABM.startTime.getMonthValue();
+        currentMonth = month;
+        String monthString = String.valueOf(month);
+        if (monthString.length() < 2) {
+            monthString = "0" + monthString;
+        }
+        String dateName = ABM.startTime.getYear() + "_" + monthString;
+        safegraph.clearPatternsPlaces();
+        System.gc();
+        safegraph.loadPatternsPlacesSet(datasetDirectory, dateName, allGISData, ABM.studyScope, isParallelLoadingData, numCPUs);
+        ABM.agents = new CopyOnWriteArrayList();
+        ABM.currentTime = ABM.startTime;
+
+//        ABM.rootAgent = ABM.makeRootAgentHardCoded();
+        ABM.root = new RootArtificial(this);
+        
+        if(ABM.exactSimGeoData.length()==0){
+            System.out.println("EXACT GEOGRAPHY IS MISSING!");
+            System.out.println("SIMULATION STOPPED!");
+            return;
+        }
+        ABM.loadExactGeoData((RootArtificial)(ABM.root));
+
+        //\/\/\/ get the total travels for the month from SafeGraph
+        for (int i = 0; i < safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.size(); i++) {
+            ABM.root.calcCumulativeMonthWeekHour(safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i));// COULD BE AVOIDED IF ALL DATA BE PREPROCESSED AND TRANSIENTS ARE REMOVED
+            ABM.root.numRealTravels = ABM.root.numRealTravels + safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).sumVisitsByDayOfMonth;
+        }
+        //^^^
+
+        ABM.root.numAgents = numResidents;
+
+        if (scenario.scenarioName.equals("CBG")) {
+            ABM.root.constructor(this, numResidents, "CBG", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
+        } else if (scenario.scenarioName.equals("VDFMTH")) {
+            ABM.root.constructor(this, numResidents, "VDFMTH", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
+        } else if (scenario.scenarioName.equals("CBGVDFMTH")) {
+            ABM.root.constructor(this, numResidents, "CBGVDFMTH", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
+        } else if (scenario.scenarioName.equals("AVDFMTH")) {
+            ABM.root.constructor(this, numResidents, "AVDFMTH", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
+        } else if (scenario.scenarioName.startsWith("RMCBG")) {
+            ABM.root.constructor(this, numResidents, "RMCBG", numRegions, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
+        } else if (scenario.scenarioName.startsWith("VDFNC")) {
+            String[] temp = scenario.scenarioName.split("_");
+            int numCells = Integer.valueOf(temp[1]);
+            ABM.root.constructor(this, numResidents, "VDFNC", numCells, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
+        } else if (scenario.scenarioName.equals("OVD")) {
+            ABM.root.constructor(this, numResidents, "OVD", numRegions, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
+        } else if (scenario.scenarioName.equals("no tessellation")) {
+            ABM.root.constructor(this, numResidents, "no tessellation", numRegions, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
         }
 
 //        if (scenario.equals("CBG")) {
@@ -772,9 +848,9 @@ public class MainModel extends Dataset {
 //        }
         ABM.root.writeDailyInfection(testPath + File.separator + "infectionReport");
         ABM.root.writeSimulationSummary(testPath + File.separator + "simulationSummary");
-        if (isInfectCBGOnly == true) {
-            ABM.root.writeConvertedToCBGInfection(testPath + File.separator + "CBGInf");
-        }
+//        if (isInfectCBGOnly == true) {
+        ABM.root.writeConvertedToCBGInfection(testPath + File.separator + "CBGInf");
+//        }
         ABM.root.writeTotalContacts(testPath + File.separator + "rawContactData");
         isResultSavedAtTheEnd = true;
     }

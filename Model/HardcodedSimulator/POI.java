@@ -22,7 +22,7 @@ import java.util.List;
 public class POI {
 
     public static double CONTACT_RATE = 0.6;//0.55;//0.23;//CONTACT PER MINUTE
-    public static double CHANCE_OF_ENV_CONTAMINATION = 0.0025;//0.00055;//0.00015;
+    public static double CHANCE_OF_ENV_CONTAMINATION = 0.004;//0.00055;//0.00015;
 
     public PatternsRecordProcessed patternsRecord;
     public double contaminatedTime = 0;
@@ -42,11 +42,11 @@ public class POI {
             infectedByEnvironment(mainModel, person, pTSFraction);
             infectByContact(mainModel, probability, person, pTSFraction);
         } else {
-            if (Math.random() < fixedTransmissionRate) {
+            if (mainModel.ABM.root.rnd.nextDouble() < fixedTransmissionRate) {
                 for (int m = 0; m < person.insidePeople.size(); m++) {
                     if (person.insidePeople.get(m).fpp.status == statusEnum.SUSCEPTIBLE.ordinal()) {
 //                  System.out.println("CONTACT INFECTION");
-                        if (Math.random() > 0.7) {
+                        if (mainModel.ABM.root.rnd.nextDouble() > 0.7) {
                             person.insidePeople.get(m).fpp.status = statusEnum.INFECTED_ASYM.ordinal();
                         } else {
                             person.insidePeople.get(m).fpp.status = statusEnum.INFECTED_SYM.ordinal();
@@ -90,14 +90,14 @@ public class POI {
 //            }
 //        }
 
-        if (Math.random() < CONTACT_RATE) {
+        if (mainModel.ABM.root.rnd.nextDouble() < CONTACT_RATE) {
             person.numContacts = person.numContacts + 1;
 
             for (int m = 0; m < person.insidePeople.size(); m++) {
-                if (Math.random() < (numInfected / (double) (peopleInPOI.size() * pTSFraction)) * probability * 1.1) {
+                if (mainModel.ABM.root.rnd.nextDouble() < (numInfected / (double) (peopleInPOI.size() * pTSFraction)) * probability * 1.1) {
                     if (person.insidePeople.get(m).fpp.status == statusEnum.SUSCEPTIBLE.ordinal()) {
 //                  System.out.println("CONTACT INFECTION");
-                        if (Math.random() > 0.7) {
+                        if (mainModel.ABM.root.rnd.nextDouble() > 0.7) {
                             person.insidePeople.get(m).fpp.status = statusEnum.INFECTED_ASYM.ordinal();
                         } else {
                             person.insidePeople.get(m).fpp.status = statusEnum.INFECTED_SYM.ordinal();
@@ -117,12 +117,12 @@ public class POI {
 //            System.out.println("protectionLevel: "+person.shamilPersonProperties.protectionLevel);
 
             for (int m = 0; m < person.insidePeople.size(); m++) {
-                if (Math.random() < CONTACT_RATE*0.05) {
-                    double r = Math.random();
+                if (mainModel.ABM.root.rnd.nextDouble() < CONTACT_RATE*0.05) {
+                    double r = mainModel.ABM.root.rnd.nextDouble();
                     if (r < (1 - person.shamilPersonProperties.protectionLevel) * 0.00085) {
                         if (person.insidePeople.get(m).fpp.status == statusEnum.SUSCEPTIBLE.ordinal()) {
 //                      System.out.println("ENV INFECTION");
-                            if (Math.random() > 0.7) {
+                            if (mainModel.ABM.root.rnd.nextDouble() > 0.7) {
                                 person.insidePeople.get(m).fpp.status = statusEnum.INFECTED_ASYM.ordinal();
                             } else {
                                 person.insidePeople.get(m).fpp.status = statusEnum.INFECTED_SYM.ordinal();

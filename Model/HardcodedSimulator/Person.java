@@ -13,6 +13,7 @@ import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilPersonPr
 import COVID_AgentBasedSimulation.Model.MainModel;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  *
@@ -34,6 +35,7 @@ public class Person extends Agent {
 
     public PersonProperties properties = new PersonProperties();
     public ShamilPersonProperties shamilPersonProperties = new ShamilPersonProperties();
+    public PersonExactProperties exactProperties = new PersonExactProperties();
 
     public Person(int index) {
         myType = "Person";
@@ -52,10 +54,10 @@ public class Person extends Agent {
                 if (insidePeople.get(m).fpp.status != Root.statusEnum.DEAD.ordinal()) {
                     isPolled = false;
                     if (properties.isAtHome == true) {
-                        travelFromHome(myModelRoot.ABM.currentTime);
+                        travelFromHome(myModelRoot.ABM.currentTime, myModelRoot.isArtificialExact);
                     }
                     if (properties.isAtWork == true) {
-                        travelFromWork(myModelRoot.ABM.currentTime);
+                        travelFromWork(myModelRoot.ABM.currentTime, myModelRoot.isArtificialExact);
                     }
                     if (properties.isInTravel == true) {
                         properties.minutesStayed += 1;
@@ -72,7 +74,7 @@ public class Person extends Agent {
 
     public void returnFromTravel() {
         if (properties.minutesStayed > properties.dwellTime.dwellDuration[0]) {
-            if (Math.random() < (float) (properties.minutesStayed - properties.dwellTime.dwellDuration[0]) / (float) (properties.dwellTime.dwellDuration[1] - properties.dwellTime.dwellDuration[0])) {
+            if (myModelRoot.ABM.root.rnd.nextDouble() < (float) (properties.minutesStayed - properties.dwellTime.dwellDuration[0]) / (float) (properties.dwellTime.dwellDuration[1] - properties.dwellTime.dwellDuration[0])) {
                 returnAction();
             }
         }
@@ -113,122 +115,223 @@ public class Person extends Agent {
         properties.currentPattern = null;
     }
 
-    public void travelFromWork(ZonedDateTime currentTime) {
-        PatternsRecordProcessed dest = chooseDestination(properties.workRegion);
-        boolean decision = decideToTravel(dest, currentTime);
-        if (decision == true) {
-            numTravels = numTravels + 1;
-            numTravelsInDay = numTravelsInDay + 1;
-            properties.dwellTime = decideDwellTime(dest);
-            lat = dest.place.lat;
-            lon = dest.place.lon;
-            properties.isAtWork = false;
-            properties.isInTravel = true;
-            properties.minutesStayed = 0;
-            properties.didTravelFromHome = false;
-            properties.didTravelFromWork = true;
-            properties.currentPattern = dest;
-            POI pOI = myModelRoot.ABM.root.pOIs.get(properties.currentPattern.placeKey);
+    public void travelFromWork(ZonedDateTime currentTime, boolean isExact) {
+        if (isExact == false) {
+            PatternsRecordProcessed dest = chooseDestination(properties.workRegion);
+            boolean decision = decideToTravel(dest, currentTime);
+            if (decision == true) {
+                numTravels = numTravels + 1;
+                numTravelsInDay = numTravelsInDay + 1;
+                properties.dwellTime = decideDwellTime(dest);
+                lat = dest.place.lat;
+                lon = dest.place.lon;
+                properties.isAtWork = false;
+                properties.isInTravel = true;
+                properties.minutesStayed = 0;
+                properties.didTravelFromHome = false;
+                properties.didTravelFromWork = true;
+                properties.currentPattern = dest;
+                POI pOI = myModelRoot.ABM.root.pOIs.get(properties.currentPattern.placeKey);
 
 //            System.out.println("TRAVELFROMWORK");
 //            System.out.println("mtIndex: "+myIndex);
 //        System.out.println("properties.currentPOI.peopleInPOI.size(): before:"+pOI.peopleInPOI.size());
-            pOI.peopleInPOI.add(this);
+                pOI.peopleInPOI.add(this);
 
-            properties.currentPOI = pOI;
+                properties.currentPOI = pOI;
 
 //        System.out.println("properties.currentPOI.peopleInPOI.size(): after:"+properties.currentPOI.peopleInPOI.size());
 //            for (int m = 0; m < insidePeople.size(); m++) {
 //                if (insidePeople.get(m).fpp.status == Root.statusEnum.INFECTED_ASYM.ordinal() || insidePeople.get(m).fpp.status == Root.statusEnum.INFECTED_SYM.ordinal()) {
-//                    if (Math.random() < CHANCE_OF_ENV_CONTAMINATION) {
+//                    if (myModelRoot.ABM.root.rnd.nextDouble() < CHANCE_OF_ENV_CONTAMINATION) {
 //                        pOI.contaminatedTime = 1440;
 //                    }
 //                    pOI.numInfected += 1;
 //                    insidePeople.get(m).fpp.isInitiallyInfectedEnteringPOI = true;
 //                }
 //            }
-            int dayInMonth = currentTime.getDayOfMonth() - 1;
-            byte dayInWeek = (byte) ((currentTime.getDayOfWeek().getValue()) - 1);
-            int hourInDay = currentTime.getHour();
-            double percentDayInMonth = 1;
-            if (dayInMonth < properties.currentPattern.visits_by_day.length) {
-                percentDayInMonth = (double) (properties.currentPattern.visits_by_day[dayInMonth]) / (double) (properties.currentPattern.sumVisitsByDayOfMonth);
-            }
-            double percentDayInWeek = (double) (properties.currentPattern.popularity_by_day.get(dayInWeek)) / (double) (properties.currentPattern.sumVisitsByDayOfWeek);
-            double percentHourInDay = (double) (properties.currentPattern.popularity_by_hour[hourInDay]) / (double) (properties.currentPattern.sumVisitsByHourofDay);
-            int numPeopleInPOI = (int) Math.ceil(properties.currentPattern.raw_visit_counts * percentDayInMonth * percentDayInWeek * percentHourInDay);
+                int dayInMonth = currentTime.getDayOfMonth() - 1;
+                byte dayInWeek = (byte) ((currentTime.getDayOfWeek().getValue()) - 1);
+                int hourInDay = currentTime.getHour();
+                double percentDayInMonth = 1;
+                if (dayInMonth < properties.currentPattern.visits_by_day.length) {
+                    percentDayInMonth = (double) (properties.currentPattern.visits_by_day[dayInMonth]) / (double) (properties.currentPattern.sumVisitsByDayOfMonth);
+                }
+                double percentDayInWeek = (double) (properties.currentPattern.popularity_by_day.get(dayInWeek)) / (double) (properties.currentPattern.sumVisitsByDayOfWeek);
+                double percentHourInDay = (double) (properties.currentPattern.popularity_by_hour[hourInDay]) / (double) (properties.currentPattern.sumVisitsByHourofDay);
+                int numPeopleInPOI = (int) Math.ceil(properties.currentPattern.raw_visit_counts * percentDayInMonth * percentDayInWeek * percentHourInDay);
 
 //            System.out.println("properties.currentPOI.peopleInPOI.size(): after:"+properties.currentPOI.peopleInPOI.size());
-            for (int m = 0; m < insidePeople.size(); m++) {
-                if (insidePeople.get(m).fpp.status == Root.statusEnum.INFECTED_ASYM.ordinal() || insidePeople.get(m).fpp.status == Root.statusEnum.INFECTED_SYM.ordinal()) {
-                    pOI.numInfected += 1;
-                    insidePeople.get(m).fpp.isInitiallyInfectedEnteringPOI = true;
+                for (int m = 0; m < insidePeople.size(); m++) {
+                    if (insidePeople.get(m).fpp.status == Root.statusEnum.INFECTED_ASYM.ordinal() || insidePeople.get(m).fpp.status == Root.statusEnum.INFECTED_SYM.ordinal()) {
+                        pOI.numInfected += 1;
+                        insidePeople.get(m).fpp.isInitiallyInfectedEnteringPOI = true;
+                    }
+                }
+                double infFrac = Math.min(1, ((double) (pOI.numInfected) / (double) (myModelRoot.ABM.root.pTSFraction)) / (double) numPeopleInPOI);
+                if (myModelRoot.ABM.root.rnd.nextDouble() < CHANCE_OF_ENV_CONTAMINATION * infFrac * shamilPersonProperties.protectionLevel) {
+                    pOI.contaminatedTime = 1440;
+                    if (myModelRoot.isDebugging == true) {
+                        myModelRoot.ABM.infectedPOIDaily += 1;
+                    }
                 }
             }
-            double infFrac = Math.min(1, ((double) (pOI.numInfected) / (double) (myModelRoot.ABM.root.pTSFraction)) / (double) numPeopleInPOI);
-            if (Math.random() < CHANCE_OF_ENV_CONTAMINATION * infFrac * shamilPersonProperties.protectionLevel) {
-                pOI.contaminatedTime = 1440;
-                if (myModelRoot.isDebugging == true) {
-                    myModelRoot.ABM.infectedPOIDaily += 1;
-                }
-            }
-        }
-    }
-
-    public void travelFromHome(ZonedDateTime currentTime) {
-        PatternsRecordProcessed dest = chooseDestination(properties.homeRegion);
-        boolean decision = decideToTravel(dest, currentTime);
-        if (decision == true) {
-            numTravels = numTravels + 1;
-            numTravelsInDay = numTravelsInDay + 1;
-            properties.dwellTime = decideDwellTime(dest);
-            lat = dest.place.lat;
-            lon = dest.place.lon;
-            properties.isAtHome = false;
-            properties.isInTravel = true;
-            properties.minutesStayed = 0;
-            properties.didTravelFromHome = true;
-            properties.didTravelFromWork = false;
-            properties.currentPattern = dest;
-            POI pOI = myModelRoot.ABM.root.pOIs.get(properties.currentPattern.placeKey);
+        } else {
+            POI dest = chooseDestinationExact(false);
+            boolean decision = decideToTravelExact(currentTime);
+            if (decision == true) {
+                numTravels = numTravels + 1;
+                numTravelsInDay = numTravelsInDay + 1;
+                properties.dwellTime = decideDwellTime(dest.patternsRecord);
+                lat = dest.patternsRecord.place.lat;
+                lon = dest.patternsRecord.place.lon;
+                properties.isAtWork = false;
+                properties.isInTravel = true;
+                properties.minutesStayed = 0;
+                properties.didTravelFromHome = false;
+                properties.didTravelFromWork = true;
+                properties.currentPattern = dest.patternsRecord;
+                POI pOI = myModelRoot.ABM.root.pOIs.get(properties.currentPattern.placeKey);
 
 //            System.out.println("TRAVELFROMHOME");
 //            System.out.println("mtIndex: "+myIndex);
 //        System.out.println("properties.currentPOI.peopleInPOI.size(): before:"+pOI.peopleInPOI.size());
-            pOI.peopleInPOI.add(this);
-            properties.currentPOI = pOI;
+                pOI.peopleInPOI.add(this);
+                properties.currentPOI = pOI;
 
-            int dayInMonth = currentTime.getDayOfMonth() - 1;
-            byte dayInWeek = (byte) ((currentTime.getDayOfWeek().getValue()) - 1);
-            int hourInDay = currentTime.getHour();
-            double percentDayInMonth = 1;
-            if (dayInMonth < properties.currentPattern.visits_by_day.length) {
-                percentDayInMonth = (double) (properties.currentPattern.visits_by_day[dayInMonth]) / (double) (properties.currentPattern.sumVisitsByDayOfMonth);
-            }
-            double percentDayInWeek = (double) (properties.currentPattern.popularity_by_day.get(dayInWeek)) / (double) (properties.currentPattern.sumVisitsByDayOfWeek);
-            double percentHourInDay = (double) (properties.currentPattern.popularity_by_hour[hourInDay]) / (double) (properties.currentPattern.sumVisitsByHourofDay);
-            int numPeopleInPOI = (int) Math.ceil(properties.currentPattern.raw_visit_counts * percentDayInMonth * percentDayInWeek * percentHourInDay);
+                int dayInMonth = currentTime.getDayOfMonth() - 1;
+                byte dayInWeek = (byte) ((currentTime.getDayOfWeek().getValue()) - 1);
+                int hourInDay = currentTime.getHour();
+                double percentDayInMonth = 1;
+                if (dayInMonth < properties.currentPattern.visits_by_day.length) {
+                    percentDayInMonth = (double) (properties.currentPattern.visits_by_day[dayInMonth]) / (double) (properties.currentPattern.sumVisitsByDayOfMonth);
+                }
+                double percentDayInWeek = (double) (properties.currentPattern.popularity_by_day.get(dayInWeek)) / (double) (properties.currentPattern.sumVisitsByDayOfWeek);
+                double percentHourInDay = (double) (properties.currentPattern.popularity_by_hour[hourInDay]) / (double) (properties.currentPattern.sumVisitsByHourofDay);
+                int numPeopleInPOI = (int) Math.ceil(properties.currentPattern.raw_visit_counts * percentDayInMonth * percentDayInWeek * percentHourInDay);
 
 //            System.out.println("properties.currentPOI.peopleInPOI.size(): after:"+properties.currentPOI.peopleInPOI.size());
-            for (int m = 0; m < insidePeople.size(); m++) {
-                if (insidePeople.get(m).fpp.status == Root.statusEnum.INFECTED_ASYM.ordinal() || insidePeople.get(m).fpp.status == Root.statusEnum.INFECTED_SYM.ordinal()) {
-                    pOI.numInfected += 1;
-                    insidePeople.get(m).fpp.isInitiallyInfectedEnteringPOI = true;
+                for (int m = 0; m < insidePeople.size(); m++) {
+                    if (insidePeople.get(m).fpp.status == Root.statusEnum.INFECTED_ASYM.ordinal() || insidePeople.get(m).fpp.status == Root.statusEnum.INFECTED_SYM.ordinal()) {
+                        pOI.numInfected += 1;
+                        insidePeople.get(m).fpp.isInitiallyInfectedEnteringPOI = true;
+                    }
+                }
+                double infFrac = Math.min(1, ((double) (pOI.numInfected) / (double) (myModelRoot.ABM.root.pTSFraction)) / (double) numPeopleInPOI);
+                if (myModelRoot.ABM.root.rnd.nextDouble() < CHANCE_OF_ENV_CONTAMINATION * infFrac * shamilPersonProperties.protectionLevel) {
+                    pOI.contaminatedTime = 1440;
+                    if (myModelRoot.isDebugging == true) {
+                        myModelRoot.ABM.infectedPOIDaily += 1;
+                    }
                 }
             }
-            double infFrac = Math.min(1, ((double) (pOI.numInfected) / (double) (myModelRoot.ABM.root.pTSFraction)) / (double) numPeopleInPOI);
-            if (Math.random() < CHANCE_OF_ENV_CONTAMINATION * infFrac * shamilPersonProperties.protectionLevel) {
-                pOI.contaminatedTime = 1440;
-                if (myModelRoot.isDebugging == true) {
-                    myModelRoot.ABM.infectedPOIDaily += 1;
-                }
-            }
+        }
+    }
 
+    public void travelFromHome(ZonedDateTime currentTime, boolean isExact) {
+        if (isExact == false) {
+            PatternsRecordProcessed dest = chooseDestination(properties.homeRegion);
+            boolean decision = decideToTravel(dest, currentTime);
+            if (decision == true) {
+                numTravels = numTravels + 1;
+                numTravelsInDay = numTravelsInDay + 1;
+                properties.dwellTime = decideDwellTime(dest);
+                lat = dest.place.lat;
+                lon = dest.place.lon;
+                properties.isAtHome = false;
+                properties.isInTravel = true;
+                properties.minutesStayed = 0;
+                properties.didTravelFromHome = true;
+                properties.didTravelFromWork = false;
+                properties.currentPattern = dest;
+                POI pOI = myModelRoot.ABM.root.pOIs.get(properties.currentPattern.placeKey);
+
+//            System.out.println("TRAVELFROMHOME");
+//            System.out.println("mtIndex: "+myIndex);
+//        System.out.println("properties.currentPOI.peopleInPOI.size(): before:"+pOI.peopleInPOI.size());
+                pOI.peopleInPOI.add(this);
+                properties.currentPOI = pOI;
+
+                int dayInMonth = currentTime.getDayOfMonth() - 1;
+                byte dayInWeek = (byte) ((currentTime.getDayOfWeek().getValue()) - 1);
+                int hourInDay = currentTime.getHour();
+                double percentDayInMonth = 1;
+                if (dayInMonth < properties.currentPattern.visits_by_day.length) {
+                    percentDayInMonth = (double) (properties.currentPattern.visits_by_day[dayInMonth]) / (double) (properties.currentPattern.sumVisitsByDayOfMonth);
+                }
+                double percentDayInWeek = (double) (properties.currentPattern.popularity_by_day.get(dayInWeek)) / (double) (properties.currentPattern.sumVisitsByDayOfWeek);
+                double percentHourInDay = (double) (properties.currentPattern.popularity_by_hour[hourInDay]) / (double) (properties.currentPattern.sumVisitsByHourofDay);
+                int numPeopleInPOI = (int) Math.ceil(properties.currentPattern.raw_visit_counts * percentDayInMonth * percentDayInWeek * percentHourInDay);
+
+//            System.out.println("properties.currentPOI.peopleInPOI.size(): after:"+properties.currentPOI.peopleInPOI.size());
+                for (int m = 0; m < insidePeople.size(); m++) {
+                    if (insidePeople.get(m).fpp.status == Root.statusEnum.INFECTED_ASYM.ordinal() || insidePeople.get(m).fpp.status == Root.statusEnum.INFECTED_SYM.ordinal()) {
+                        pOI.numInfected += 1;
+                        insidePeople.get(m).fpp.isInitiallyInfectedEnteringPOI = true;
+                    }
+                }
+                double infFrac = Math.min(1, ((double) (pOI.numInfected) / (double) (myModelRoot.ABM.root.pTSFraction)) / (double) numPeopleInPOI);
+                if (myModelRoot.ABM.root.rnd.nextDouble() < CHANCE_OF_ENV_CONTAMINATION * infFrac * shamilPersonProperties.protectionLevel) {
+                    pOI.contaminatedTime = 1440;
+                    if (myModelRoot.isDebugging == true) {
+                        myModelRoot.ABM.infectedPOIDaily += 1;
+                    }
+                }
+            }
+        } else {
+            POI dest = chooseDestinationExact(true);
+            boolean decision = decideToTravelExact(currentTime);
+            if (decision == true) {
+                numTravels = numTravels + 1;
+                numTravelsInDay = numTravelsInDay + 1;
+                properties.dwellTime = decideDwellTime(dest.patternsRecord);
+                lat = dest.patternsRecord.place.lat;
+                lon = dest.patternsRecord.place.lon;
+                properties.isAtHome = false;
+                properties.isInTravel = true;
+                properties.minutesStayed = 0;
+                properties.didTravelFromHome = true;
+                properties.didTravelFromWork = false;
+                properties.currentPattern = dest.patternsRecord;
+                POI pOI = myModelRoot.ABM.root.pOIs.get(properties.currentPattern.placeKey);
+
+//            System.out.println("TRAVELFROMHOME");
+//            System.out.println("mtIndex: "+myIndex);
+//        System.out.println("properties.currentPOI.peopleInPOI.size(): before:"+pOI.peopleInPOI.size());
+                pOI.peopleInPOI.add(this);
+                properties.currentPOI = pOI;
+
+                int dayInMonth = currentTime.getDayOfMonth() - 1;
+                byte dayInWeek = (byte) ((currentTime.getDayOfWeek().getValue()) - 1);
+                int hourInDay = currentTime.getHour();
+                double percentDayInMonth = 1;
+                if (dayInMonth < properties.currentPattern.visits_by_day.length) {
+                    percentDayInMonth = (double) (properties.currentPattern.visits_by_day[dayInMonth]) / (double) (properties.currentPattern.sumVisitsByDayOfMonth);
+                }
+                double percentDayInWeek = (double) (properties.currentPattern.popularity_by_day.get(dayInWeek)) / (double) (properties.currentPattern.sumVisitsByDayOfWeek);
+                double percentHourInDay = (double) (properties.currentPattern.popularity_by_hour[hourInDay]) / (double) (properties.currentPattern.sumVisitsByHourofDay);
+                int numPeopleInPOI = (int) Math.ceil(properties.currentPattern.raw_visit_counts * percentDayInMonth * percentDayInWeek * percentHourInDay);
+
+//            System.out.println("properties.currentPOI.peopleInPOI.size(): after:"+properties.currentPOI.peopleInPOI.size());
+                for (int m = 0; m < insidePeople.size(); m++) {
+                    if (insidePeople.get(m).fpp.status == Root.statusEnum.INFECTED_ASYM.ordinal() || insidePeople.get(m).fpp.status == Root.statusEnum.INFECTED_SYM.ordinal()) {
+                        pOI.numInfected += 1;
+                        insidePeople.get(m).fpp.isInitiallyInfectedEnteringPOI = true;
+                    }
+                }
+                double infFrac = Math.min(1, ((double) (pOI.numInfected) / (double) (myModelRoot.ABM.root.pTSFraction)) / (double) numPeopleInPOI);
+                if (myModelRoot.ABM.root.rnd.nextDouble() < CHANCE_OF_ENV_CONTAMINATION * infFrac * shamilPersonProperties.protectionLevel) {
+                    pOI.contaminatedTime = 1440;
+                    if (myModelRoot.isDebugging == true) {
+                        myModelRoot.ABM.infectedPOIDaily += 1;
+                    }
+                }
+            }
         }
     }
 
     public DwellTime decideDwellTime(PatternsRecordProcessed record) {
-        int selectedDwellTime = (int) (Math.floor(Math.random() * record.sumDwellTime));
+        int selectedDwellTime = (int) (Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * record.sumDwellTime));
         int cumulativeDwellTime = 0;
         for (byte i = 0; i < record.bucketed_dwell_times.size(); i++) {
             cumulativeDwellTime += record.bucketed_dwell_times.get(i).number;
@@ -239,25 +342,39 @@ public class Person extends Agent {
         return null;
     }
 
+    public boolean decideToTravelExact(ZonedDateTime currentTime) {
+        int hourInDay = currentTime.getHour();
+        if (hourInDay > 8 && hourInDay < 20) {
+            if (myModelRoot.ABM.root.rnd.nextDouble() < 0.1) {
+                return true;
+            }
+        } else {
+            if (myModelRoot.ABM.root.rnd.nextDouble() < 0.01) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean decideToTravel(PatternsRecordProcessed record, ZonedDateTime currentTime) {
         int dayInMonth = currentTime.getDayOfMonth() - 1;
         try {
-            if (Math.random() < 0.04) {
-                int selectedDayInMonth = (int) (Math.floor(Math.random() * record.sumVisitsByDayOfMonth));
+            if (myModelRoot.ABM.root.rnd.nextDouble() < 0.04) {
+                int selectedDayInMonth = (int) (Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * record.sumVisitsByDayOfMonth));
                 int cumulativeDayInMonth = 0;
                 for (int i = 0; i < record.visits_by_day.length; i++) {
                     cumulativeDayInMonth += record.visits_by_day[i];
                     if (cumulativeDayInMonth > selectedDayInMonth) {
                         if (i == dayInMonth) {
                             byte dayInWeek = (byte) ((currentTime.getDayOfWeek().getValue()) - 1);
-                            int selectedDayInWeek = (int) (Math.floor(Math.random() * record.sumVisitsByDayOfWeek));
+                            int selectedDayInWeek = (int) (Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * record.sumVisitsByDayOfWeek));
                             int cumulativeDayInWeek = 0;
                             for (byte j = 0; j < 7; j++) {
                                 cumulativeDayInWeek += record.popularity_by_day.get(j);
                                 if (cumulativeDayInWeek > selectedDayInWeek) {
                                     if (j == dayInWeek) {
                                         int hourInDay = currentTime.getHour();
-                                        int selectedHourInDay = (int) (Math.floor(Math.random() * record.sumVisitsByHourofDay));
+                                        int selectedHourInDay = (int) (Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * record.sumVisitsByHourofDay));
                                         int cumulativeHourInDay = 0;
                                         for (byte k = 0; k < record.popularity_by_hour.length; k++) {
                                             cumulativeHourInDay += record.popularity_by_hour[k];
@@ -283,7 +400,7 @@ public class Person extends Agent {
     }
 
     public PatternsRecordProcessed chooseDestination(Region region) {
-        double selectedDestFreq = (Math.floor(Math.random() * region.scheduleList.originalSumFrequencies));
+        double selectedDestFreq = (Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * region.scheduleList.originalSumFrequencies));
         double cumulativeDestFreqs = 0;
         for (int i = 0; i < region.scheduleList.originalFrequencies.size(); i++) {
             cumulativeDestFreqs += region.scheduleList.originalFrequencies.get(i);
@@ -292,6 +409,34 @@ public class Person extends Agent {
             }
         }
         return null;
+    }
+
+    public POI chooseDestinationExact(boolean isFromHome) {
+        if (isFromHome == true) {
+            double selectedDestFreq = (Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * this.exactProperties.sumHomeFreqs));
+            double cumulativeDestFreqs = 0;
+            for (HashMap.Entry<POI, Double> mapElement : this.exactProperties.pOIHomeProbabilities.entrySet()) {
+                POI key = mapElement.getKey();
+                Double value = mapElement.getValue();
+                cumulativeDestFreqs = cumulativeDestFreqs + value;
+                if (cumulativeDestFreqs > selectedDestFreq) {
+                    return key;
+                }
+            }
+            return null;
+        } else {
+            double selectedDestFreq = (Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * this.exactProperties.sumWorkFreqs));
+            double cumulativeDestFreqs = 0;
+            for (HashMap.Entry<POI, Double> mapElement : this.exactProperties.pOIWorkProbabilities.entrySet()) {
+                POI key = mapElement.getKey();
+                Double value = mapElement.getValue();
+                cumulativeDestFreqs = cumulativeDestFreqs + value;
+                if (cumulativeDestFreqs > selectedDestFreq) {
+                    return key;
+                }
+            }
+            return null;
+        }
     }
 
     public void pollContact() {

@@ -5,7 +5,8 @@
 package COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil;
 
 import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilPersonManager.randn;
-import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilPersonManager.rnd;
+import COVID_AgentBasedSimulation.Model.MainModel;
+//import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilPersonManager.rnd;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -15,7 +16,7 @@ import java.util.Collections;
  */
 public class ShamilActionManager {
 
-    public static ArrayList<ShamilAction> generateActions(int prerson_id, ArrayList<ShamilTemplateAction> actions_def) {
+    public static ArrayList<ShamilAction> generateActions(MainModel mainModel, int prerson_id, ArrayList<ShamilTemplateAction> actions_def) {
 
         ArrayList<ShamilAction> actionsList = new ArrayList();
 
@@ -25,7 +26,7 @@ public class ShamilActionManager {
 
             int cur_time = 0;
 
-            double nxt_tme = randn(actions_def.get(i).min_time_gap, actions_def.get(i).max_time_gap);
+            double nxt_tme = randn(mainModel, actions_def.get(i).min_time_gap, actions_def.get(i).max_time_gap);
 
             cur_time += nxt_tme;
 
@@ -33,11 +34,11 @@ public class ShamilActionManager {
 //            cur_time += nxt_tme
             while (cur_time < 60) {
 
-                double prob = randn(actions_def.get(i).min_prob , actions_def.get(i).max_prob);
+                double prob = randn(mainModel, actions_def.get(i).min_prob , actions_def.get(i).max_prob);
 
 //                prob = randn(row["min_prob"],row["max_prob"])
                 if (prob < ACTION_OCCURRING_PROBABILITY) {
-                    nxt_tme = randn(actions_def.get(i).min_time_gap , actions_def.get(i).max_time_gap);
+                    nxt_tme = randn(mainModel, actions_def.get(i).min_time_gap , actions_def.get(i).max_time_gap);
 //                    nxt_tme = int(randn(row["min_time_gap"],row["max_time_gap"]))
                     cur_time += nxt_tme;
 
@@ -52,7 +53,7 @@ public class ShamilActionManager {
                 actionsList.add(new ShamilAction(prerson_id, actions_def.get(i).action, cur_time, min_prob_affect, max_prob_affect, min_effect_others, max_effect_others, min_effect_self, max_effect_self));
 //                actionsList.append(Action(prerson_id, row["action"],cur_time,row["min_prob_affect"],row["max_prob_affect"],row["min_effect_others"], row["max_effect_others"], row["min_effect_self"], row["max_effect_self"]))
 
-                nxt_tme = randn(actions_def.get(i).min_time_gap , actions_def.get(i).max_time_gap);
+                nxt_tme = randn(mainModel, actions_def.get(i).min_time_gap , actions_def.get(i).max_time_gap);
 //                nxt_tme = int(randn(row["min_time_gap"],row["max_time_gap"]))
                 cur_time += nxt_tme;
             }

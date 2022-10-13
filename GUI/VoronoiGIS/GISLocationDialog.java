@@ -930,7 +930,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
                 System.out.println(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.size());
                 for (int j = 0; j < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.size(); j++) {
                     if (isFoodAndGrocery(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.naics_code) == true) {
-                        LocationNode place = getNearestNode(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.lat, myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.lon, null);
+                        LocationNode place = getNearestNode(mainFParent, myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.lat, myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.lon, null);
                         if (place != null) {
 
                             boolean isUniqueLocationNode = true;
@@ -1081,7 +1081,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
         for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.size(); i++) {
             for (int j = 0; j < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.size(); j++) {
                 if (isSchool(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.naics_code) == true) {
-                    LocationNode place = getNearestNode(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.lat, myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.lon, null);
+                    LocationNode place = getNearestNode(mainFParent, myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.lat, myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.lon, null);
                     if (place != null) {
 
                         boolean isUniqueLocationNode = true;
@@ -1109,7 +1109,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
                             if (myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).visitor_home_cbgs != null) {
                                 for (int k = 0; k < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).visitor_home_cbgs.size(); k++) {
                                     CensusBlockGroup cBG = myParent.mainModel.allGISData.findCensusBlockGroup(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).visitor_home_cbgs.get(k).key);
-                                    LocationNode home = getNearestNode(cBG.lon, cBG.lat, null);
+                                    LocationNode home = getNearestNode(mainFParent, cBG.lon, cBG.lat, null);
 
                                     if (home == null) {
                                         float collisionPositionx = cBG.lat;
@@ -1218,7 +1218,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
         for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.size(); i++) {
             for (int j = 0; j < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.size(); j++) {
                 if (isReligiousOrganization(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.naics_code) == true) {
-                    LocationNode place = getNearestNode(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.lat, myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.lon, null);
+                    LocationNode place = getNearestNode(mainFParent, myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.lat, myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.lon, null);
                     if (place != null) {
 
                         boolean isUniqueLocationNode = true;
@@ -1246,7 +1246,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
                             if (myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).visitor_home_cbgs != null) {
                                 for (int k = 0; k < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).visitor_home_cbgs.size(); k++) {
                                     CensusBlockGroup cBG = myParent.mainModel.allGISData.findCensusBlockGroup(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).visitor_home_cbgs.get(k).key);
-                                    LocationNode home = getNearestNode(cBG.lon, cBG.lat, null);
+                                    LocationNode home = getNearestNode(mainFParent, cBG.lon, cBG.lat, null);
 
                                     if (home == null) {
                                         float collisionPositionx = cBG.lat;
@@ -1355,7 +1355,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
         for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.size(); i++) {
             for (int j = 0; j < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.size(); j++) {
                 if (isFoodAndGrocery(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.naics_code) == true) {
-                    LocationNode place = getNearestNode(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.lat, myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.lon, null);
+                    LocationNode place = getNearestNode(mainFParent, myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.lat, myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.lon, null);
                     if (place != null) {
 
                         boolean isUniqueLocationNode = true;
@@ -1383,7 +1383,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
                             if (myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).visitor_daytime_cbgs != null) {
                                 for (int k = 0; k < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).visitor_daytime_cbgs.size(); k++) {
                                     CensusBlockGroup cBG = myParent.mainModel.allGISData.findCensusBlockGroup(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).visitor_daytime_cbgs.get(k).key);
-                                    LocationNode work = getNearestNode(cBG.lon, cBG.lat, null);
+                                    LocationNode work = getNearestNode(mainFParent, cBG.lon, cBG.lat, null);
 
                                     if (work == null) {
                                         float collisionPositionx = cBG.lat;
@@ -2457,7 +2457,6 @@ public class GISLocationDialog extends javax.swing.JDialog {
 //                                if(((LayerDefinition)(mainFParent.allData.all_Layers.get(i))).layerName.equals("CBG")){
 //                                    System.out.println("DEBUG123");
 //                                }
-                                
                                 cBGNumNodesHashMap = getHashNumNodeForCBG(vdIndex, i, cBGLayerIndex);
 
                                 double sumNodes = 0;
@@ -2501,7 +2500,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
                             int[][] indexedImage = vp.layerToIndexedImage(mainFParent.allData, i, false);
 
                             vDLayer.indexedImage = indexedImage;
-                            if(((LayerDefinition) (mainFParent.allData.all_Layers.get(i))).layerName.toLowerCase().equals("cbg")){
+                            if (((LayerDefinition) (mainFParent.allData.all_Layers.get(i))).layerName.toLowerCase().equals("cbg")) {
                                 vDLayer.cBGIndexs = vp.cBGlayerToIndexedIDImage(mainFParent.allData, cBGLayerIndex, indexedImage);
                             }
                             vDLayer.startLat = vp.scaleOffsetX;
@@ -2616,7 +2615,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
                 if (/*data.get(j)[0].equals("shopping") ||*/data.get(j)[0].equals("supermarket")) {
                     float lon = Float.parseFloat(data.get(j)[1]);
                     float lat = Float.parseFloat(data.get(j)[2]);
-                    LocationNode node = getNearestNode(lat, lon, null);
+                    LocationNode node = getNearestNode(mainFParent, lat, lon, null);
                     if (node != null) {
                         LocationNodeSafegraph tempLoc = new LocationNodeSafegraph();
 
@@ -2627,7 +2626,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
                 if (data.get(j)[0].equals("school")) {
                     float lon = Float.parseFloat(data.get(j)[1]);
                     float lat = Float.parseFloat(data.get(j)[2]);
-                    LocationNode node = getNearestNode(lat, lon, null);
+                    LocationNode node = getNearestNode(mainFParent, lat, lon, null);
                     if (node != null) {
                         LocationNodeSafegraph tempLoc = new LocationNodeSafegraph();
 
@@ -2711,7 +2710,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
                 if (/*data.get(j)[0].equals("shopping") ||*/data.get(j)[0].equals("supermarket")) {
                     float lon = Float.parseFloat(data.get(j)[1]);
                     float lat = Float.parseFloat(data.get(j)[2]);
-                    LocationNode node = getNearestNode(lat, lon, null);
+                    LocationNode node = getNearestNode(mainFParent, lat, lon, null);
                     if (node != null) {
                         LocationNodeSafegraph tempLoc = new LocationNodeSafegraph();
 
@@ -2722,7 +2721,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
                 if (data.get(j)[0].equals("school")) {
                     float lon = Float.parseFloat(data.get(j)[1]);
                     float lat = Float.parseFloat(data.get(j)[2]);
-                    LocationNode node = getNearestNode(lat, lon, null);
+                    LocationNode node = getNearestNode(mainFParent, lat, lon, null);
                     if (node != null) {
                         LocationNodeSafegraph tempLoc = new LocationNodeSafegraph();
 
@@ -2774,7 +2773,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
                 if (revisedData.get(i)[0].equals("house")) {
                     float lon = Float.parseFloat(data.get(i)[1]);
                     float lat = Float.parseFloat(data.get(i)[2]);
-                    LocationNode node = getNearestNode(lat, lon, null);
+                    LocationNode node = getNearestNode(mainFParent, lat, lon, null);
                     //short shopIndex = (short) (((short[]) node.layers.get(shopLayer))[0] - 1);
                     //if (shopIndex == 0) {
                     //    System.out.println("ERROR: THE HOUSE HAS NO SHOP!");
@@ -2986,7 +2985,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
 //                deleteLayer("VDFNC_"+ targetNumCells);
 //            }
             StoreProcessedData saving = new StoreProcessedData();
-            saving.save_allData_kryo("C:"+File.separator+"Users"+File.separator+"user"+File.separator+"Documents"+File.separator+"Seattle_temp_" + iter, mainFParent.allData);
+            saving.save_allData_kryo("C:" + File.separator + "Users" + File.separator + "user" + File.separator + "Documents" + File.separator + "Seattle_temp_" + iter, mainFParent.allData);
         }
 
     }//GEN-LAST:event_jButton29ActionPerformed
@@ -3274,7 +3273,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
             for (int j = 0; j < myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.size(); j++) {
                 if (myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).censusBlock != null) {
                     if (isFoodAndGrocery(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).naics_code) == true) {
-                        LocationNode node = getNearestNode(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lat, myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lon, null);
+                        LocationNode node = getNearestNode(mainFParent, myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lat, myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lon, null);
                         if (node != null) {
                             if (isUniqueLocationNode(shops, node)) {
                                 LocationNodeSafegraph nodeSafegraph = new LocationNodeSafegraph();
@@ -3297,7 +3296,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
             for (int j = 0; j < myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.size(); j++) {
                 if (myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).censusBlock != null) {
                     if (isSchool(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).naics_code) == true) {
-                        LocationNode node = getNearestNode(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lat, myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lon, null);
+                        LocationNode node = getNearestNode(mainFParent, myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lat, myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lon, null);
                         if (node != null) {
                             if (isUniqueLocationNode(schools, node)) {
                                 LocationNodeSafegraph locationNodeSafegraph = new LocationNodeSafegraph();
@@ -3320,7 +3319,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
             for (int j = 0; j < myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.size(); j++) {
                 if (myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).censusBlock != null) {
                     if (isReligiousOrganization(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).naics_code) == true) {
-                        LocationNode node = getNearestNode(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lat, myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lon, null);
+                        LocationNode node = getNearestNode(mainFParent, myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lat, myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lon, null);
                         if (node != null) {
                             if (isUniqueLocationNode(temples, node)) {
                                 LocationNodeSafegraph locationNodeSafegraph = new LocationNodeSafegraph();
@@ -3441,7 +3440,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
         ArrayList<LocationNodeSafegraph> output = new ArrayList();
 
         for (int i = 0; i < centroids.length; i++) {
-            centroids[i].node = getNearestNode((float) centroids[i].node.lat, (float) centroids[i].node.lon, null);
+            centroids[i].node = getNearestNode(mainFParent, (float) centroids[i].node.lat, (float) centroids[i].node.lon, null);
             output.add(centroids[i]);
         }
 
@@ -3518,7 +3517,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
         return true;
     }
 
-    public LocationNode getNearestNode(float collisionPositionx, float collisionPositiony, ArrayList<LocationNode> bannedNodes) {
+    public static LocationNode getNearestNode(MainFramePanel mainFParent, float collisionPositionx, float collisionPositiony, ArrayList<LocationNode> bannedNodes) {
         boolean isValidCollition = false;
         Grid outputGrid = new Grid(0, 0, 0, 0, 0, 0, "");
         for (int i = 0; i < mainFParent.allData.grid.length; i++) {
@@ -3611,6 +3610,23 @@ public class GISLocationDialog extends javax.swing.JDialog {
 
     }
 
+    public static LocationNode getExhaustiveNearestNode(MainFramePanel mainFParent, float lat, float lon) {
+        LocationNode nearestNode = null;
+        double leastDistance = Double.POSITIVE_INFINITY;
+        for (int i = 0; i < mainFParent.allData.all_Ways.length; i++) {
+            if (!mainFParent.allData.all_Ways[i].type.equals("unclassified")) {
+                for (int j = 0; j < mainFParent.allData.all_Ways[i].myNodes.length; j++) {
+                    double dist = Math.sqrt(Math.pow(lat - mainFParent.allData.all_Ways[i].myNodes[j].lat, 2) + Math.pow(lon - mainFParent.allData.all_Ways[i].myNodes[j].lon, 2));
+                    if (dist < leastDistance) {
+                        leastDistance = dist;
+                        nearestNode = mainFParent.allData.all_Ways[i].myNodes[j];
+                    }
+                }
+            }
+        }
+        return nearestNode;
+    }
+
     public class ParallelRouting extends ParallelProcessor {
 
         public ArrayList<PatternsRecordProcessed> records;
@@ -3664,7 +3680,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
 
                         Routing routing = new Routing(mainFParent.allData, trafficLayerIndex, threadIndex);
 
-                        LocationNode home = getNearestNode(cbgs.get(cBGIndex).lon, cbgs.get(cBGIndex).lat, bannedNodes);
+                        LocationNode home = getNearestNode(mainFParent, cbgs.get(cBGIndex).lon, cbgs.get(cBGIndex).lat, bannedNodes);
 
                         if (home == null) {
                             float collisionPositionx = cbgs.get(cBGIndex).lat;
@@ -3699,7 +3715,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
                                 shopOriginalLocationNode = shopMergedLocations.get(h).node;
                             }
 
-                            LocationNode newShopLocation = getNearestNode((float) (shopMergedLocations.get(h).node.lat), (float) (shopMergedLocations.get(h).node.lon), bannedNodes);
+                            LocationNode newShopLocation = getNearestNode(mainFParent, (float) (shopMergedLocations.get(h).node.lat), (float) (shopMergedLocations.get(h).node.lon), bannedNodes);
                             shopMergedLocations.get(h).node = newShopLocation;
                             h = h - 1;
                             counterSearch = counterSearch + 1;
@@ -3906,7 +3922,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
     private HashMap<CensusBlockGroup, Integer> getHashNumNodeForCBG(int vdIndex, int vDLayerIndex, int cBGLayerIndex) {
         HashMap<CensusBlockGroup, Integer> cBGNumNodesHashMap = new HashMap();
         for (int i = 0; i < mainFParent.allData.all_Nodes.length; i++) {
-            if (((short[]) (mainFParent.allData.all_Nodes[i].layers.get(vDLayerIndex)))[0]-1 == vdIndex) {
+            if (((short[]) (mainFParent.allData.all_Nodes[i].layers.get(vDLayerIndex)))[0] - 1 == vdIndex) {
                 Double value = Double.valueOf(Math.round(((LayerDefinition) (mainFParent.allData.all_Layers.get(cBGLayerIndex))).values[((short[]) (mainFParent.allData.all_Nodes[i].layers.get(cBGLayerIndex)))[0] - 1]));
                 CensusBlockGroup cBG = myParent.mainModel.allGISData.findCensusBlockGroup(value.longValue());
                 if (cBG != null) {

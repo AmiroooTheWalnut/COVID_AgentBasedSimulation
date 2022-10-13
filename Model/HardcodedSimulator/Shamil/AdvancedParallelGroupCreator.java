@@ -26,7 +26,7 @@ public class AdvancedParallelGroupCreator extends ParallelProcessor {
             @Override
             public void run() {
                 for (int i = myStartIndex; i < myEndIndex; i++) {
-                    ShamilGroupManager.createGroupRegion(regions.get(i), transport_free_seats, n_events, groupDict);
+                    ShamilGroupManager.createGroupRegion(parent, regions.get(i), transport_free_seats, n_events, groupDict);
                 }
             }
         };

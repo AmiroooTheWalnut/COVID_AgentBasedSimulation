@@ -18,7 +18,7 @@ import java.util.HashMap;
  */
 public class ShamilDaySimulator {
 
-    public static void dayStart(ArrayList<Person> people, int day) {
+    public static void dayStart(MainModel mainModel, ArrayList<Person> people, int day) {
         double awareness_start = ShamilPersonManager.preference_def.get("awareness_start");
         double quarantine_start = ShamilPersonManager.preference_def.get("quarantine_start");
 
@@ -35,8 +35,8 @@ public class ShamilDaySimulator {
             for (int m = 0; m < people.get(i).insidePeople.size(); m++) {
                 people.get(i).insidePeople.get(m).sfpp.infectionLevel = 0;
                 if (day >= awareness_start) {
-                    ShamilPersonManager.raiseAwareness(people.get(i));
-                    ShamilPersonManager.becomeProtected(people.get(i), sumInfected);
+                    ShamilPersonManager.raiseAwareness(mainModel, people.get(i));
+                    ShamilPersonManager.becomeProtected(mainModel, people.get(i), sumInfected);
                 }
             }
         }
@@ -70,27 +70,27 @@ public class ShamilDaySimulator {
         }
     }
 
-    public static void generateDailyTasks(ArrayList<Person> people, boolean lockdown_started) {
+    public static void generateDailyTasks(MainModel mainModel, ArrayList<Person> people, boolean lockdown_started) {
         for (int i = 0; i < people.size(); i++) {
             ShamilProfession prof_pers = people.get(i).shamilPersonProperties.profession;
             if (prof_pers.name.equals("Unemployed")) {
                 double prob = Math.random();
                 if (lockdown_started == true && prob < 0.7) {
-                    people.get(i).shamilPersonProperties.tasks = ShamilTaskManager.generateTasks(new ShamilProfession("NoOutingAllowed", 0, 0, 0));
+                    people.get(i).shamilPersonProperties.tasks = ShamilTaskManager.generateTasks(mainModel, new ShamilProfession("NoOutingAllowed", 0, 0, 0));
                 } else {
-                    people.get(i).shamilPersonProperties.tasks = ShamilTaskManager.generateTasks(ShamilPersonManager.profession_df.get(3));
+                    people.get(i).shamilPersonProperties.tasks = ShamilTaskManager.generateTasks(mainModel, ShamilPersonManager.profession_df.get(3));
                 }
             } else if (prof_pers.name.equals("Doctor")) {
-                people.get(i).shamilPersonProperties.tasks = ShamilTaskManager.generateTasks(ShamilPersonManager.profession_df.get(2));
+                people.get(i).shamilPersonProperties.tasks = ShamilTaskManager.generateTasks(mainModel, ShamilPersonManager.profession_df.get(2));
 //                prsn.setTasks(TaskManager.generateTasks(tasks_df[tasks_df["profession"]=="Doctor"]))
             } else if (prof_pers.name.equals("Student")) {
-                people.get(i).shamilPersonProperties.tasks = ShamilTaskManager.generateTasks(ShamilPersonManager.profession_df.get(0));
+                people.get(i).shamilPersonProperties.tasks = ShamilTaskManager.generateTasks(mainModel, ShamilPersonManager.profession_df.get(0));
 //                prsn.setTasks(TaskManager.generateTasks(tasks_df[tasks_df["profession"]=="Student"]))
             } else if (prof_pers.name.equals("Service")) {
-                people.get(i).shamilPersonProperties.tasks = ShamilTaskManager.generateTasks(ShamilPersonManager.profession_df.get(1));
+                people.get(i).shamilPersonProperties.tasks = ShamilTaskManager.generateTasks(mainModel, ShamilPersonManager.profession_df.get(1));
 //                prsn.setTasks(TaskManager.generateTasks(tasks_df[tasks_df["profession"]=="Service"]))
             } else if (prof_pers.name.equals("Hospitalized")) {//ADDED BY AMIROOO
-                people.get(i).shamilPersonProperties.tasks = ShamilTaskManager.generateTasks(ShamilPersonManager.profession_df.get(4));
+                people.get(i).shamilPersonProperties.tasks = ShamilTaskManager.generateTasks(mainModel, ShamilPersonManager.profession_df.get(4));
             } else {
                 // isolated- no task - empty list
                 people.get(i).shamilPersonProperties.tasks.clear();
@@ -156,11 +156,11 @@ public class ShamilDaySimulator {
                     prsn.insidePeople.get(O).sfpp.infectedDays += 1;
 
                     if (prsn_state.equals("contagious_symptomatic")) {
-                        ShamilPersonManager.hospitalize(prsn, i);
+                        ShamilPersonManager.hospitalize(mainModel, prsn, i);
 //                    prsn.hospitalize();
                     }
 
-                    ShamilPersonManager.die(prsn);
+                    ShamilPersonManager.die(mainModel, prsn);
 //                prsn.die()
 
                     if (prsn_state.equals("Dead")) {
