@@ -231,7 +231,7 @@ public class ShamilPersonManager {
         int family_size_counter = 0;
         int age = 0;
         int selectedProfession = -1;
-        int uniqurCounter = 0;//ADDED BY AMIROOO
+        int uniqueCounter = 0;//ADDED BY AMIROOO
         for (int r = 0; r < regions.size(); r++) {
             for (int i = 0; i < regions.get(r).residents.size(); i++) {
                 double professionRand = mainModel.ABM.root.rnd.nextDouble();
@@ -258,8 +258,8 @@ public class ShamilPersonManager {
                 regions.get(r).residents.get(i).shamilPersonProperties.familyId = family_id;
                 regions.get(r).residents.get(i).shamilPersonProperties.familySize = family_size_orig;
 
-                regions.get(r).residents.get(i).shamilPersonProperties.id = uniqurCounter;
-                uniqurCounter += 1;
+                regions.get(r).residents.get(i).shamilPersonProperties.id = uniqueCounter;
+                uniqueCounter += 1;
                 regions.get(r).residents.get(i).shamilPersonProperties.name = rands();
                 regions.get(r).residents.get(i).shamilPersonProperties.age = age;
                 if (family_size_counter > 0) {

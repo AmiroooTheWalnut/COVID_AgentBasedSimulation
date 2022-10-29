@@ -6,8 +6,6 @@
 package COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization;
 
 import COVID_AgentBasedSimulation.GUI.MainFrame;
-import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MapSourse;
-import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MapSources;
 import COVID_AgentBasedSimulation.Model.Structure.Marker;
 import com.jogamp.newt.awt.NewtCanvasAWT;
 import com.jogamp.newt.opengl.GLWindow;
@@ -16,13 +14,8 @@ import de.fhpotsdam.unfolding.geo.Location;
 import de.fhpotsdam.unfolding.marker.SimplePointMarker;
 import de.fhpotsdam.unfolding.utils.MapUtils;
 import de.fhpotsdam.unfolding.utils.ScreenPosition;
-import java.awt.Frame;
-import java.awt.event.WindowEvent;
 import java.util.ArrayList;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
-import processing.awt.PSurfaceAWT;
-import processing.awt.PSurfaceAWT.SmoothCanvas;
 import processing.core.PApplet;
 import processing.core.PImage;
 import processing.core.PSurface;
@@ -387,9 +380,11 @@ public class ProcessingMapRenderer extends PApplet {
         if (isShowRegionIndexText == true) {
             if (regionNames != null && regionCenters != null) {
                 for (int i = 0; i < regionNames.size(); i++) {
+                    int cBGIndex=regionImageLayer.getCellOfLatLon(regionCenters.get(i).getLat(),regionCenters.get(i).getLon());
                     SimplePointMarker locSM = new SimplePointMarker(regionCenters.get(i));
                     ScreenPosition scLocPos = locSM.getScreenPosition(this.map);
-                    text(regionNames.get(i), scLocPos.x - textWidth(regionNames.get(i)) / 2.0F, scLocPos.y);
+//                    text(regionNames.get(i), scLocPos.x - textWidth(regionNames.get(i)) / 2.0F, scLocPos.y);
+                    text(cBGIndex, scLocPos.x - textWidth(regionNames.get(i)) / 2.0F, scLocPos.y);
                 }
             }
         }

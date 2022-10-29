@@ -38,6 +38,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Random;
 import java.util.concurrent.CyclicBarrier;
 import java.util.logging.Level;
@@ -79,7 +80,7 @@ public class Root extends Agent {
     public ArrayList<Region> regions;
     public RegionImageLayer regionsLayer=new RegionImageLayer();
     int sumRegionsPopulation = 0;
-    HashMap<String, POI> pOIs;
+    LinkedHashMap<String, POI> pOIs;
 
     public int counter;
     public int numAgents;
@@ -297,7 +298,7 @@ public class Root extends Agent {
     public void generateSchedules(MainModel modelRoot, String type, ArrayList<Region> regions) {
         ArrayList<PatternsRecordProcessed> patternRecords = new ArrayList();
         if (pOIs == null) {
-            pOIs = new HashMap();
+            pOIs = new LinkedHashMap();
         }
         for (int i = 0; i < modelRoot.safegraph.allPatterns.monthlyPatternsList.size(); i++) {
             ArrayList<PatternsRecordProcessed> patternRecordsTemp = modelRoot.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords;

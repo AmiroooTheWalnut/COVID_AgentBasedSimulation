@@ -84,6 +84,9 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         jButton2 = new javax.swing.JButton();
+        jLabel6 = new javax.swing.JLabel();
+        jCheckBox9 = new javax.swing.JCheckBox();
+        jSpinner4 = new javax.swing.JSpinner();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -287,6 +290,13 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
             }
         });
 
+        jLabel6.setText("Num no tessellation agents:");
+
+        jCheckBox9.setSelected(true);
+        jCheckBox9.setText("Full-scale no tessellation?");
+
+        jSpinner4.setModel(new javax.swing.SpinnerNumberModel(5000, 1, null, 1));
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -304,6 +314,18 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel2Layout.createSequentialGroup()
                                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jCheckBox4)
+                                    .addComponent(jCheckBox3)
+                                    .addComponent(jCheckBox1))
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel2Layout.createSequentialGroup()
+                                        .addComponent(jCheckBox2)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jLabel1)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                     .addComponent(jCheckBox5)
                                     .addComponent(jCheckBox6)
                                     .addComponent(jCheckBox7)
@@ -311,26 +333,18 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
                                         .addComponent(jLabel2)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(jSpinner2, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(jPanel2Layout.createSequentialGroup()
-                                        .addComponent(jCheckBox2)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jLabel1)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(jToggleButton1)
+                                    .addComponent(jButton1)
                                     .addComponent(jCheckBox8)
-                                    .addComponent(jButton1))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jCheckBox4)
-                                    .addComponent(jCheckBox3)
-                                    .addComponent(jCheckBox1))
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(jToggleButton1)
+                                    .addComponent(jCheckBox9)
+                                    .addGroup(jPanel2Layout.createSequentialGroup()
+                                        .addComponent(jLabel6)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jSpinner4, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jButton2)))))
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(jButton2))))))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -343,6 +357,12 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
                             .addComponent(jLabel2)
                             .addComponent(jSpinner2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jCheckBox9)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel6)
+                            .addComponent(jSpinner4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jCheckBox2)
                             .addComponent(jLabel1)
@@ -354,30 +374,29 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jCheckBox7)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jCheckBox8)
-                        .addGap(18, 18, 18)
-                        .addComponent(jButton1))
+                        .addComponent(jCheckBox8))
                     .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
-                        .addComponent(jToggleButton1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jCheckBox1)
-                        .addGap(29, 29, 29)
-                        .addComponent(jCheckBox3)
-                        .addGap(27, 27, 27)
-                        .addComponent(jCheckBox4)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 185, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                        .addGap(4, 4, 4)
                         .addComponent(jButton2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel4)
                             .addComponent(jLabel5))
-                        .addContainerGap())))
+                        .addContainerGap())
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jToggleButton1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jCheckBox1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jCheckBox3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jCheckBox4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -418,14 +437,18 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
         } else {
             infectionIndices.add((int) (jSpinner1.getValue()));
         }
+        int noTessellationNumResidents = (int) (jSpinner4.getValue());
+        if (jCheckBox9.isSelected() == true) {
+            noTessellationNumResidents = -1;
+        }
         if (jRadioButton18.isSelected()) {
             myParent.mainModel.scenario.scenarioName = "VDFNC_" + jSpinner3.getValue();
-            myParent.mainModel.initModelArtificial(true, true, jCheckBox1.isSelected(), (int) (jSpinner2.getValue()), (int) (jSpinner3.getValue()), myParent.numProcessors, jRadioButton15.isSelected(), isSpecialScenarioActive, infectionIndices);
+            myParent.mainModel.initModelArtificial(true, true, jCheckBox1.isSelected(), (int) (jSpinner2.getValue()), (int) (jSpinner3.getValue()), myParent.numProcessors, jRadioButton15.isSelected(), isSpecialScenarioActive, infectionIndices, noTessellationNumResidents);
         } else if (jRadioButton6.isSelected()) {
             myParent.mainModel.scenario.scenarioName = "RMCBG_" + jSpinner2.getValue();
-            myParent.mainModel.initModelArtificial(true, true, jCheckBox1.isSelected(), (int) (jSpinner2.getValue()), (int) (jSpinner3.getValue()), myParent.numProcessors, jRadioButton15.isSelected(), isSpecialScenarioActive, infectionIndices);
+            myParent.mainModel.initModelArtificial(true, true, jCheckBox1.isSelected(), (int) (jSpinner2.getValue()), (int) (jSpinner3.getValue()), myParent.numProcessors, jRadioButton15.isSelected(), isSpecialScenarioActive, infectionIndices, noTessellationNumResidents);
         } else {
-            myParent.mainModel.initModelArtificial(true, true, jCheckBox1.isSelected(), (int) (jSpinner2.getValue()), (int) (jSpinner3.getValue()), myParent.numProcessors, jRadioButton15.isSelected(), isSpecialScenarioActive, infectionIndices);
+            myParent.mainModel.initModelArtificial(true, true, jCheckBox1.isSelected(), (int) (jSpinner2.getValue()), (int) (jSpinner3.getValue()), myParent.numProcessors, jRadioButton15.isSelected(), isSpecialScenarioActive, infectionIndices, noTessellationNumResidents);
         }
 
         jLabel5.setText(myParent.mainModel.ABM.startTime.toString());
@@ -528,14 +551,18 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
         } else {
             infectionIndices.add((int) (jSpinner1.getValue()));
         }
+        int noTessellationNumResidents = (int) (jSpinner4.getValue());
+        if (jCheckBox9.isSelected() == true) {
+            noTessellationNumResidents = -1;
+        }
         if (jRadioButton18.isSelected()) {
             myParent.mainModel.scenario.scenarioName = "VDFNC_" + jSpinner3.getValue();
-            myParent.mainModel.initModelArtificial(true, true, jCheckBox1.isSelected(), (int) (jSpinner2.getValue()), (int) (jSpinner3.getValue()), myParent.numProcessors, jRadioButton15.isSelected(), isSpecialScenarioActive, infectionIndices);
+            myParent.mainModel.initModelArtificial(true, true, jCheckBox1.isSelected(), (int) (jSpinner2.getValue()), (int) (jSpinner3.getValue()), myParent.numProcessors, jRadioButton15.isSelected(), isSpecialScenarioActive, infectionIndices, noTessellationNumResidents);
         } else if (jRadioButton6.isSelected()) {
             myParent.mainModel.scenario.scenarioName = "RMCBG_" + jSpinner2.getValue();
-            myParent.mainModel.initModelArtificial(true, true, jCheckBox1.isSelected(), (int) (jSpinner2.getValue()), (int) (jSpinner3.getValue()), myParent.numProcessors, jRadioButton15.isSelected(), isSpecialScenarioActive, infectionIndices);
+            myParent.mainModel.initModelArtificial(true, true, jCheckBox1.isSelected(), (int) (jSpinner2.getValue()), (int) (jSpinner3.getValue()), myParent.numProcessors, jRadioButton15.isSelected(), isSpecialScenarioActive, infectionIndices, noTessellationNumResidents);
         } else {
-            myParent.mainModel.initModelArtificial(true, true, jCheckBox1.isSelected(), (int) (jSpinner2.getValue()), (int) (jSpinner3.getValue()), myParent.numProcessors, jRadioButton15.isSelected(), isSpecialScenarioActive, infectionIndices);
+            myParent.mainModel.initModelArtificial(true, true, jCheckBox1.isSelected(), (int) (jSpinner2.getValue()), (int) (jSpinner3.getValue()), myParent.numProcessors, jRadioButton15.isSelected(), isSpecialScenarioActive, infectionIndices, noTessellationNumResidents);
         }
 
         jLabel5.setText(myParent.mainModel.ABM.startTime.toString());
@@ -599,11 +626,13 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
     private javax.swing.JCheckBox jCheckBox6;
     private javax.swing.JCheckBox jCheckBox7;
     private javax.swing.JCheckBox jCheckBox8;
+    private javax.swing.JCheckBox jCheckBox9;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -629,6 +658,7 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
     private javax.swing.JSpinner jSpinner1;
     private javax.swing.JSpinner jSpinner2;
     private javax.swing.JSpinner jSpinner3;
+    private javax.swing.JSpinner jSpinner4;
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JToggleButton jToggleButton1;
     // End of variables declaration//GEN-END:variables

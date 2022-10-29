@@ -27,12 +27,15 @@ public class RegionImageLayer implements Serializable {
     public double startLon;
     public double endLon;
     
-    public int getCellOfAgent(PersonExactProperties person){
-        double lat = person.exactHomeLocation.lat;
-        double lon = person.exactHomeLocation.lon;
+    public int getCellOfLatLon(double lat, double lon){
+//        double lat = person.exactHomeLocation.lat;
+//        double lon = person.exactHomeLocation.lon;
         int indX=(int)Math.round(((double)(endLat-lon)/(double)(endLat-startLat))*indexedImage.length);
         int indY=(int)Math.round(((double)(endLon-lat)/(double)(endLon-startLon))*indexedImage[0].length);
-        return indexedImage[indX][indY];
+        if(indX<1 || indY<1 || indX>indexedImage.length-1 || indY>indexedImage[0].length-1){
+            return -1;
+        }
+        return indexedImage[indexedImage.length-indX][indexedImage[0].length-indY]-1;
     }
 
     public static boolean[][] getImageBoundaries(int[][] input) {

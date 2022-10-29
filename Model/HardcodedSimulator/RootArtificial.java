@@ -10,6 +10,7 @@ import COVID_AgentBasedSimulation.Model.Data.Safegraph.PatternsRecordProcessed;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilSimulatorController;
 import COVID_AgentBasedSimulation.Model.MainModel;
 import COVID_AgentBasedSimulation.Model.Structure.City;
+import COVID_AgentBasedSimulation.Model.Structure.Marker;
 import COVID_AgentBasedSimulation.Model.Structure.Scope;
 import COVID_AgentBasedSimulation.Model.Structure.TessellationCell;
 import esmaieeli.gisFastLocationOptimization.GIS3D.LayerDefinition;
@@ -19,6 +20,7 @@ import esmaieeli.gisFastLocationOptimization.Simulation.Routing;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  *
@@ -36,6 +38,11 @@ public class RootArtificial extends Root {
 
     public boolean isTest = false;
 
+    public int numNoTessellation = -1;//MUST BE ASSIGNED BEFORE CONSTRUCTOR IS CALLED!
+
+    public ArrayList<ScheduleListExact> scheduleListExactArray;
+
+//    public LinkedHashMap<String, POI> pOIsLHM = new LinkedHashMap();
     public RootArtificial(MainModel modelRoot) {
         super(modelRoot);
     }
@@ -134,13 +141,20 @@ public class RootArtificial extends Root {
         generatePOIs(myModelRoot);
 
         preprocessNodesInRegions(cBGregions);
+
         if (isTessellationBuilt == false) {
             generateAgentsRaw(myModelRoot, passed_numAgents, cBGregions, isTessellationBuilt, isTest);
             selectExactLocations(people);
             generatePeopleSchedulesForHome(myModelRoot, people);
             generatePeopleSchedulesForWork(myModelRoot, people);
         } else {
-            generateAgentsRaw(myModelRoot, passed_numAgents, cBGregions, isTessellationBuilt, isTest);
+            int numNoTessellationV;
+            if (numNoTessellation > 0) {
+                numNoTessellationV = numNoTessellation;
+            } else {
+                numNoTessellationV = ((Marker) (myModelRoot.ABM.studyScopeGeography)).population;
+            }
+            generateAgentsRaw(myModelRoot, numNoTessellationV, cBGregions, isTessellationBuilt, isTest);
             selectExactLocations(peopleNoTessellation);
             generatePeopleSchedulesForHome(myModelRoot, peopleNoTessellation);
             generatePeopleSchedulesForWork(myModelRoot, peopleNoTessellation);
@@ -148,8 +162,54 @@ public class RootArtificial extends Root {
     }
 
     public void generatePostProcessPeople(int passed_numAgents) {
-        generateAgentsRaw(myModelRoot, passed_numAgents, cBGregions, false, isTest);
+        calculateRegionSchedules();
+        generateAgentsRaw(myModelRoot, passed_numAgents, regions, false, isTest);
         postGeneratePeopleSchedulesForHome();
+        postGeneratePeopleSchedulesForWork();
+    }
+
+    public void calculateRegionSchedules() {
+        scheduleListExactArray = new ArrayList();
+        for (int i = 0; i < regions.size(); i++) {
+            ScheduleListExact scheduleListExact = new ScheduleListExact();
+            scheduleListExact.regionIndex = i;
+            for (int m = 0; m < peopleNoTessellation.get(0).exactProperties.pOIs.size(); m++) {
+                scheduleListExact.fromHomeFreqs.add(0d);
+                scheduleListExact.fromWorkFreqs.add(0d);
+            }
+            scheduleListExact.pOIs = peopleNoTessellation.get(0).exactProperties.pOIs;
+            scheduleListExactArray.add(scheduleListExact);
+        }
+
+        for (int i = 0; i < peopleNoTessellation.size(); i++) {
+            int cellIndexHome = regionsLayer.getCellOfLatLon(peopleNoTessellation.get(i).exactProperties.exactHomeLocation.lat, peopleNoTessellation.get(i).exactProperties.exactHomeLocation.lon);
+            if (cellIndexHome != -1) {
+                for (int k = 0; k < peopleNoTessellation.get(i).exactProperties.fromHomeFreqs.size(); k++) {
+                    Double newValue = scheduleListExactArray.get(cellIndexHome).fromHomeFreqs.get(k) + peopleNoTessellation.get(i).exactProperties.fromHomeFreqs.get(k);
+                    scheduleListExactArray.get(cellIndexHome).fromHomeFreqs.set(k, newValue);
+                }
+            }
+            int cellIndexWork = regionsLayer.getCellOfLatLon(peopleNoTessellation.get(i).exactProperties.exactWorkLocation.lat, peopleNoTessellation.get(i).exactProperties.exactWorkLocation.lon);
+            if (cellIndexWork != -1) {
+                for (int k = 0; k < peopleNoTessellation.get(i).exactProperties.fromWorkFreqs.size(); k++) {
+                    Double newValue = scheduleListExactArray.get(cellIndexWork).fromWorkFreqs.get(k) + peopleNoTessellation.get(i).exactProperties.fromWorkFreqs.get(k);
+                    scheduleListExactArray.get(cellIndexWork).fromWorkFreqs.set(k, newValue);
+                }
+            }
+        }
+
+        for (int i = 0; i < regions.size(); i++) {
+            double sumPH = 0;
+            double sumPW = 0;
+            for (int j = 0; j < scheduleListExactArray.get(i).fromHomeFreqs.size(); j++) {
+//                POI key = mapElement.getKey();
+                sumPH = sumPH + scheduleListExactArray.get(i).fromHomeFreqs.get(j);
+                sumPW = sumPW + scheduleListExactArray.get(i).fromWorkFreqs.get(j);
+            }
+            scheduleListExactArray.get(i).sumHomeFreqs = sumPH;
+            scheduleListExactArray.get(i).sumWorkFreqs = sumPW;
+        }
+
     }
 
     public void generateAgentsRaw(MainModel modelRoot, int passed_numAgents, ArrayList<Region> regions, boolean isTessellationBuilt, boolean isTest) {
@@ -226,7 +286,7 @@ public class RootArtificial extends Root {
     public void generatePOIs(MainModel modelRoot) {
 //        ArrayList<PatternsRecordProcessed> patternRecords = new ArrayList();
         if (pOIs == null) {
-            pOIs = new HashMap();
+            pOIs = new LinkedHashMap();
         }
         for (int i = 0; i < modelRoot.safegraph.allPatterns.monthlyPatternsList.size(); i++) {
             ArrayList<PatternsRecordProcessed> patternRecordsTemp = modelRoot.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords;
@@ -271,19 +331,22 @@ public class RootArtificial extends Root {
                 }
                 avg = avg + dist;
                 avgCounter = avgCounter + 1;
-                people.get(i).exactProperties.pOIHomeProbabilities.put(value, dist);
+                people.get(i).exactProperties.pOIs.add(value);
+                people.get(i).exactProperties.fromHomeFreqs.add(dist);
+//                people.get(i).exactProperties.pOIHomeProbabilities.put(value, dist);
             }
             avg = avg / (double) avgCounter;
-            for (HashMap.Entry<String, POI> mapElement : pOIs.entrySet()) {
-                POI value = mapElement.getValue();
-                Double pO = people.get(i).exactProperties.pOIHomeProbabilities.get(value);
+            for (int m = 0; m < people.get(i).exactProperties.pOIs.size(); m++) {
+//                POI value = mapElement.getValue();
+                Double pO = people.get(i).exactProperties.fromHomeFreqs.get(m);
                 if (pO > -1) {
                     Double newP = (pO - minDist + 0.1) / (maxDist + 0.1);
-                    people.get(i).exactProperties.pOIHomeProbabilities.put(value, newP);
+                    people.get(i).exactProperties.fromHomeFreqs.set(m, newP);
                     people.get(i).exactProperties.sumHomeFreqs = people.get(i).exactProperties.sumHomeFreqs + newP;
                 } else {
                     Double newP = (avg - minDist + 0.1) / (maxDist + 0.1);
-                    people.get(i).exactProperties.pOIHomeProbabilities.put(value, newP);
+                    people.get(i).exactProperties.fromHomeFreqs.set(m, newP);
+                    people.get(i).exactProperties.sumHomeFreqs = people.get(i).exactProperties.sumHomeFreqs + newP;
                     System.out.println("ROUTING FAILED! AVERAGE DISTANCE IS USED!");
                 }
             }
@@ -293,17 +356,118 @@ public class RootArtificial extends Root {
     }
 
     public void postGeneratePeopleSchedulesForHome() {
+//        ArrayList<POI> pOIArray = new ArrayList();
+//        for (HashMap.Entry<String, POI> mapElement : pOIs.entrySet()) {
+//            pOIArray.add(mapElement.getValue());
+//        }
+//        ArrayList<Boolean> isCheckedPeopleNoTessellation = new ArrayList();
+//        for (int m = 0; m < peopleNoTessellation.size(); m++) {
+//            isCheckedPeopleNoTessellation.add(false);
+//        }
         for (int m = 0; m < people.size(); m++) {
-            for (int i = 0; i < peopleNoTessellation.size(); i++) {
-                int cBGIndex = cBGRegionsLayer.getCellOfAgent(peopleNoTessellation.get(i).exactProperties);
-                if (people.get(m).properties.homeRegion.myIndex == cBGIndex) {
-                    for (HashMap.Entry<String, POI> mapElement : pOIs.entrySet()) {
-                        POI value = mapElement.getValue();
-                        Double prob = peopleNoTessellation.get(i).exactProperties.pOIHomeProbabilities.get(value);
-                    }
-                }
-            }
+            ScheduleListExact schedule = scheduleListExactArray.get(people.get(m).properties.homeRegion.myIndex);
+            people.get(m).exactProperties.fromHomeFreqs = schedule.fromHomeFreqs;
+            people.get(m).exactProperties.pOIs = schedule.pOIs;
+//            double sumP = 0;
+//            for (int j = 0; j < people.get(m).exactProperties.fromHomeFreqs.size(); j++) {
+////                POI key = mapElement.getKey();
+//                sumP = sumP + people.get(m).exactProperties.fromHomeFreqs.get(j);
+//            }
+            people.get(m).exactProperties.sumHomeFreqs = schedule.sumHomeFreqs;
+
+//            people.get(m).exactProperties.pOIs = pOIArray;
+//            ArrayList<Double> stackedFreqs = new ArrayList();
+//            for (int j = 0; j < peopleNoTessellation.get(0).exactProperties.pOIs.size(); j++) {
+//                stackedFreqs.add(0d);
+//            }
+//            for (int i = 0; i < peopleNoTessellation.size(); i++) {
+//                if (isCheckedPeopleNoTessellation.get(i) == false) {
+//                    int index = regionsLayer.getCellOfLatLon(peopleNoTessellation.get(i).exactProperties.exactHomeLocation.lat, peopleNoTessellation.get(i).exactProperties.exactHomeLocation.lon);
+//                    if (people.get(m).properties.homeRegion.myIndex == index) {
+//                        for (int j = 0; j < peopleNoTessellation.get(i).exactProperties.pOIs.size(); j++) {
+////                    for (HashMap.Entry<String, POI> mapElement : pOIsLHM.entrySet()) {
+////                        POI value = mapElement.getValue();
+//                            Double prob = peopleNoTessellation.get(i).exactProperties.fromHomeFreqs.get(j);
+//                            Double prev = stackedFreqs.get(j);
+//                            stackedFreqs.set(index, prev + prob);
+////                        if (stackedHash.containsKey(value) == true) {
+////                            double previousStackedProb = stackedHash.get(value);
+////                            stackedHash.put(value, previousStackedProb + prob);
+////                        }else{
+////                            stackedHash.put(value, prob);
+////                        }
+//                        }
+//                        isCheckedPeopleNoTessellation.set(i, true);
+////                    peopleNoTessellation.remove(i);
+//                    }
+//                }
+//            }
+//            people.get(m).exactProperties.fromHomeFreqs = stackedFreqs;
+//            double sumP = 0;
+//            for (int j = 0; j < stackedFreqs.size(); j++) {
+////                POI key = mapElement.getKey();
+//                sumP = sumP + stackedFreqs.get(j);
+//            }
+//            people.get(m).exactProperties.sumHomeFreqs = sumP;
+//            people.get(m).properties.homeRegion.scheduleList.originalFrequencies=new ArrayList();
+//            for (HashMap.Entry<POI, Double> mapElement : stackedHash.entrySet()) {
+//                Double value = mapElement.getValue();
+//                POI key = mapElement.getKey();
+//                people.get(m).exactProperties.pOIHomeProbabilities.put(key, value);
+////                people.get(m).properties.homeRegion.scheduleList.originalFrequencies.add(value);//SHOULD NOT NEED NORMALIZATION BUT NORMALIZER IS REQUIRED
+//            }
         }
+//        for (int m = 0; m < regions.size(); m++) {
+//            double sum=0;
+//            for(int n=0;n<regions.get(m).scheduleList.originalFrequencies.size();n++){
+//                sum=sum+regions.get(m).scheduleList.originalFrequencies.get(n);
+//            }
+//            regions.get(m).scheduleList.originalSumFrequencies=sum;
+//        }
+    }
+
+    public void postGeneratePeopleSchedulesForWork() {
+        for (int m = 0; m < people.size(); m++) {
+            ScheduleListExact schedule = scheduleListExactArray.get(people.get(m).properties.workRegion.myIndex);
+            people.get(m).exactProperties.fromWorkFreqs = schedule.fromWorkFreqs;
+            people.get(m).exactProperties.pOIs = schedule.pOIs;
+//            double sumP = 0;
+//            for (int j = 0; j < people.get(m).exactProperties.fromWorkFreqs.size(); j++) {
+////                POI key = mapElement.getKey();
+//                sumP = sumP + people.get(m).exactProperties.fromWorkFreqs.get(j);
+//            }
+            people.get(m).exactProperties.sumWorkFreqs = schedule.sumWorkFreqs;
+        }
+//        ArrayList<Boolean> isCheckedPeopleNoTessellation = new ArrayList();
+//        for (int m = 0; m < peopleNoTessellation.size(); m++) {
+//            isCheckedPeopleNoTessellation.add(false);
+//        }
+//        for (int m = 0; m < people.size(); m++) {
+//            ArrayList<Double> stackedFreqs = new ArrayList();
+//            for (int j = 0; j < peopleNoTessellation.get(0).exactProperties.pOIs.size(); j++) {
+//                stackedFreqs.add(0d);
+//            }
+//            for (int i = 0; i < peopleNoTessellation.size(); i++) {
+//                if (isCheckedPeopleNoTessellation.get(i) == false) {
+//                    int index = regionsLayer.getCellOfLatLon(peopleNoTessellation.get(i).exactProperties.exactWorkLocation.lat, peopleNoTessellation.get(i).exactProperties.exactWorkLocation.lon);
+//                    if (people.get(m).properties.homeRegion.myIndex == index) {
+//                        for (int j = 0; j < peopleNoTessellation.get(i).exactProperties.pOIs.size(); j++) {
+//                            Double prob = peopleNoTessellation.get(i).exactProperties.fromWorkFreqs.get(j);
+//                            Double prev = stackedFreqs.get(j);
+//                            stackedFreqs.set(j, prev + prob);
+//                        }
+//                        isCheckedPeopleNoTessellation.set(i, true);
+////                    peopleNoTessellation.remove(i);
+//                    }
+//                }
+//            }
+//            people.get(m).exactProperties.fromWorkFreqs = stackedFreqs;
+//            double sumP = 0;
+//            for (int j = 0; j < stackedFreqs.size(); j++) {
+//                sumP = sumP + stackedFreqs.get(j);
+//            }
+//            people.get(m).exactProperties.sumWorkFreqs = sumP;
+//        }
     }
 
     public void initiallyInfect(boolean isCompleteInfection, boolean isInfectCBGOnly, boolean isExactInfection, ArrayList<Integer> initialInfectionRegionIndex) {
@@ -373,7 +537,8 @@ public class RootArtificial extends Root {
                 }
                 avg = avg + dist;
                 avgCounter = avgCounter + 1;
-                people.get(i).exactProperties.pOIWorkProbabilities.put(value, dist);
+                people.get(i).exactProperties.fromWorkFreqs.add(dist);
+//                people.get(i).exactProperties.pOIWorkProbabilities.put(value, dist);
 
 //                LocationNode nodePOI = GISLocationDialog.getNearestNode(mainFParent, latPOI, lonPOI, null);
 //                LocationNode nodeHome = GISLocationDialog.getNearestNode(mainFParent, (float) (people.get(i).exactProperties.exactWorkLocation.lat), (float) (people.get(i).exactProperties.exactWorkLocation.lon), null);
@@ -395,18 +560,18 @@ public class RootArtificial extends Root {
             }
             avg = avg / (double) avgCounter;
 //            System.out.println("****");
-            for (HashMap.Entry<String, POI> mapElement : pOIs.entrySet()) {
+            for (int m = 0; m < people.get(i).exactProperties.pOIs.size(); m++) {
 //                String key = mapElement.getKey();
 //                System.out.println(key);
-                POI value = mapElement.getValue();
-                Double pO = people.get(i).exactProperties.pOIWorkProbabilities.get(value);
+//                POI value = mapElement.getValue();
+                Double pO = people.get(i).exactProperties.fromWorkFreqs.get(m);
                 if (pO > -1) {
                     Double newP = (pO - minDist + 0.1) / (maxDist + 0.1);
-                    people.get(i).exactProperties.pOIWorkProbabilities.put(value, newP);
+                    people.get(i).exactProperties.fromWorkFreqs.set(m, newP);
                     people.get(i).exactProperties.sumWorkFreqs = people.get(i).exactProperties.sumWorkFreqs + newP;
                 } else {
                     Double newP = (avg - minDist + 0.1) / (maxDist + 0.1);
-                    people.get(i).exactProperties.pOIWorkProbabilities.put(value, newP);
+                    people.get(i).exactProperties.fromWorkFreqs.set(m, newP);
                     System.out.println("ROUTING FAILED! AVERAGE DISTANCE IS USED!");
                 }
             }

@@ -399,7 +399,7 @@ public class MainModel extends Dataset {
         resetTimerTask(isRunFromGUI, passingNumCPU, true, isInfectCBGOnly);
     }
 
-    public void initModelArtificial(boolean isRunFromGUI, boolean isParallelLoadingData, boolean isParallelBehaviorEvaluation, int numResidents, int numRegions, int numCPUs, boolean isCompleteInfection, boolean isInfectCBGOnly, ArrayList<Integer> initialInfectionRegionIndex) {
+    public void initModelArtificial(boolean isRunFromGUI, boolean isParallelLoadingData, boolean isParallelBehaviorEvaluation, int numResidents, int numRegions, int numCPUs, boolean isCompleteInfection, boolean isInfectCBGOnly, ArrayList<Integer> initialInfectionRegionIndex, int numNoTessellation) {
         isResultSavedAtTheEnd = false;
         int month = ABM.startTime.getMonthValue();
         currentMonth = month;
@@ -432,6 +432,7 @@ public class MainModel extends Dataset {
         //^^^
 
         ABM.root.numAgents = numResidents;
+        ((RootArtificial)(ABM.root)).numNoTessellation=numNoTessellation;
 
         if (scenario.scenarioName.equals("CBG")) {
             ABM.root.constructor(this, numResidents, "CBG", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);

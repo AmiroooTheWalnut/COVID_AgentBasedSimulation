@@ -4,22 +4,17 @@
  */
 package COVID_AgentBasedSimulation.Model.HardcodedSimulator;
 
-import esmaieeli.gisFastLocationOptimization.GIS3D.LocationNode;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  *
  * @author user
  */
-public class PersonExactProperties {
-    public LocationNode exactHomeLocation;
-    public LocationNode exactWorkLocation;
+public class ScheduleListExact {
+    public int regionIndex=-1;
     public ArrayList<POI> pOIs=new ArrayList();
     public ArrayList<Double> fromHomeFreqs=new ArrayList();
     public ArrayList<Double> fromWorkFreqs=new ArrayList();
-//    public HashMap<POI, Double> pOIHomeProbabilities=new HashMap();
-//    public HashMap<POI, Double> pOIWorkProbabilities=new HashMap();
-    public double sumHomeFreqs;
-    public double sumWorkFreqs;
+    public double sumHomeFreqs=0;
+    public double sumWorkFreqs=0;
 }
