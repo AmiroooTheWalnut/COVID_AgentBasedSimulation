@@ -86,7 +86,11 @@ public class AdvancedParallelTest extends ParallelProcessor {
                     numRegions = Integer.parseInt(values[1]);
                 }
                 mainModel.simulationDelayTime = -1;
-                mainModel.initModelHardCoded(false, true, runConfig.isParallelBehaviorEvaluation, runConfig.numResidents, numRegions, runConfig.numCPUsInModel, !runConfig.isSpecificRegionInfected, runConfig.isSpecialScenarioActive, infectionIndices);
+                if (runConfig.isArtificial == false) {
+                    mainModel.initModelHardCoded(false, true, runConfig.isParallelBehaviorEvaluation, runConfig.numResidents, numRegions, runConfig.numCPUsInModel, !runConfig.isSpecificRegionInfected, runConfig.isSpecialScenarioActive, infectionIndices);
+                } else {
+                    mainModel.initModelArtificial(false, true, runConfig.isParallelBehaviorEvaluation, runConfig.numResidents, numRegions, runConfig.numCPUsInModel, !runConfig.isSpecificRegionInfected, runConfig.isSpecialScenarioActive, infectionIndices, runConfig.noTessellationNumResidents);
+                }
                 mainModel.startTimeNanoSecond = System.nanoTime();
                 mainModel.resume(false, runConfig.isParallelBehaviorEvaluation, runConfig.numCPUsInModel, true, runConfig.isSpecialScenarioActive);
             }
