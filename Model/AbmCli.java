@@ -47,13 +47,13 @@ public class AbmCli {
             String[] pairs = input.split(":");
             for (int i = 0; i < pairs.length; i++) {
                 String[] varValRaw = pairs[i].split("_");
-                String[] varVal=new String[2];
-                varVal[0]=varValRaw[0];
-                varVal[1]="";
-                for(int m=1;m<varValRaw.length;m++){
-                    varVal[1]=varVal[1]+varValRaw[m];
-                    if(m!=varValRaw.length-1){
-                        varVal[1]=varVal[1]+"_";
+                String[] varVal = new String[2];
+                varVal[0] = varValRaw[0];
+                varVal[1] = "";
+                for (int m = 1; m < varValRaw.length; m++) {
+                    varVal[1] = varVal[1] + varValRaw[m];
+                    if (m != varValRaw.length - 1) {
+                        varVal[1] = varVal[1] + "_";
                     }
                 }
                 try {
@@ -197,7 +197,11 @@ public class AbmCli {
             numRegions = Integer.parseInt(values[1]);
         }
         mainModel.simulationDelayTime = -1;
-        mainModel.initModelHardCoded(false, true, runConfig.isParallelBehaviorEvaluation, runConfig.numResidents, numRegions, runConfig.numCPUsInModel, !runConfig.isSpecificRegionInfected, runConfig.isSpecialScenarioActive, infectionIndices);
+        if (runConfig.isArtificial == false) {
+            mainModel.initModelHardCoded(false, true, runConfig.isParallelBehaviorEvaluation, runConfig.numResidents, numRegions, runConfig.numCPUsInModel, !runConfig.isSpecificRegionInfected, runConfig.isSpecialScenarioActive, infectionIndices);
+        } else {
+            mainModel.initModelArtificial(false, true, runConfig.isParallelBehaviorEvaluation, runConfig.numResidents, numRegions, runConfig.numCPUsInModel, !runConfig.isSpecificRegionInfected, runConfig.isSpecialScenarioActive, infectionIndices, runConfig.noTessellationNumResidents);
+        }
         mainModel.startTimeNanoSecond = System.nanoTime();
         mainModel.resume(false, runConfig.isParallelBehaviorEvaluation, runConfig.numCPUsInModel, true, runConfig.isSpecialScenarioActive);
     }

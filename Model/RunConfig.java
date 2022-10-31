@@ -37,6 +37,9 @@ public class RunConfig {
     public boolean isParallelBehaviorEvaluation;
     public int numResidents;
     public int numCPUsInModel;
+    public boolean isArtificial;
+    
+    public int noTessellationNumResidents;
     
     public static RunConfig loadModel(String path){
         Gson gson = new GsonBuilder().setPrettyPrinting().create();

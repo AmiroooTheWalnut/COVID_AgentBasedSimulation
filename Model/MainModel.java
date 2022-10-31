@@ -105,7 +105,7 @@ public class MainModel extends Dataset {
 
     public ExecutorService agentEvalPool;
 
-    public String datasetDirectory = "./datasets";
+    public String datasetDirectory = "."+File.separator+"datasets";
 
     public boolean isDebugging = true;
 

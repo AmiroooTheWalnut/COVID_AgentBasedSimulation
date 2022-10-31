@@ -837,7 +837,8 @@ public class SimulatorSettingsDialog extends javax.swing.JDialog {
         fcLoad.setAcceptAllFileFilterUsed(false);
         int returnVal = fcLoad.showOpenDialog(this);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            String loadFilePath = fcLoad.getSelectedFile().getAbsolutePath();
+            String loadFilePath = fcLoad.getSelectedFile().getName();
+//            System.out.println(loadFilePath);
             myMainModel.ABM.exactSimGeoData=loadFilePath;
         }
     }//GEN-LAST:event_jButton4ActionPerformed
