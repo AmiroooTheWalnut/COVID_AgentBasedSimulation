@@ -1607,7 +1607,7 @@ public class Root extends Agent {
 
     public void writeSimulationSummary(String filePath) {
         ArrayList<String[]> rows = new ArrayList();
-        String[] header = new String[12];
+        String[] header = new String[13];
         header[0] = "Start Date";
         header[1] = "End Date";
         header[2] = "Scope";
@@ -1620,6 +1620,7 @@ public class Root extends Agent {
         header[9] = "Sum Contacts";
         header[10] = "Average Contacts";
         header[11] = "Variance Contacts";
+        header[12] = "Runtime";
         rows.add(header);
         int sumInfected = 0;
         int sumDeaths = 0;
@@ -1647,7 +1648,7 @@ public class Root extends Agent {
 
             varContacts = (double) varContacts / (double) (agentPairContact.length * agentPairContact[0].length);
         }
-        String[] row = new String[12];
+        String[] row = new String[13];
         row[0] = myModelRoot.ABM.startTime.format(DateTimeFormatter.ISO_DATE);
         row[1] = myModelRoot.ABM.endTime.format(DateTimeFormatter.ISO_DATE);
         row[2] = myModelRoot.ABM.studyScope;
@@ -1665,6 +1666,7 @@ public class Root extends Agent {
             row[10] = "NA";
             row[11] = "NA";
         }
+        row[12] = String.valueOf(myModelRoot.elapsed);
         rows.add(row);
         try {
             CsvWriter writer = new CsvWriter();

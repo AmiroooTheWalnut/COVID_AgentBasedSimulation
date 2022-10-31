@@ -496,6 +496,7 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
     private void jToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
         if (jToggleButton1.getText().equals("Run")) {
             myParent.mainModel.isPause = false;
+            myParent.mainModel.startTimeNanoSecond = System.nanoTime();
             myParent.mainModel.resume(true, jCheckBox2.isSelected(), myParent.numProcessors, true, isSpecialScenarioActive);
             jToggleButton1.setText("Pause");
 //            jButton4.setEnabled(false);

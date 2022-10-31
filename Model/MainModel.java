@@ -108,7 +108,9 @@ public class MainModel extends Dataset {
     public String datasetDirectory = "."+File.separator+"datasets";
 
     public boolean isDebugging = true;
-
+    
+    public transient double elapsed;
+    
     public void startScriptEngines() {
         javaEvaluationEngine = new JavaEvaluationEngine(this);
         pythonEvaluationEngine = new PythonEvaluationEngine(this);//MAY NEED TO BE STOPPED BECAUSE OF LOCAL SERVER STRUGGLE WITH PROFILER
@@ -598,7 +600,7 @@ public class MainModel extends Dataset {
             if (ABM.currentTime.isEqual(ABM.endTime) || ABM.currentTime.isAfter(ABM.endTime)) {
                 isRunning = false;
                 long endTimeNanoSecond = System.nanoTime();
-                double elapsed = ((endTimeNanoSecond - startTimeNanoSecond) / 1000000000);
+                elapsed = ((endTimeNanoSecond - startTimeNanoSecond) / 1000000000);
                 System.out.println("ABM runtime (seconds): " + elapsed);
                 System.out.println("Num real travels: " + ABM.root.numRealTravels);
                 for (int i = 0; i < ABM.root.people.size(); i++) {
