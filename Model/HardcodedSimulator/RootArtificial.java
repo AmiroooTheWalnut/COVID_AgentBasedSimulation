@@ -55,7 +55,7 @@ public class RootArtificial extends Root {
         regionType = passed_regionType;
 
         switch (regionType) {
-            case "no tessellation":
+            case "noTessellation":
                 isTessellationBuilt = false;
                 break;
             case "CBG":

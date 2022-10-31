@@ -452,8 +452,8 @@ public class MainModel extends Dataset {
             ABM.root.constructor(this, numResidents, "VDFNC", numCells, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
         } else if (scenario.scenarioName.equals("OVD")) {
             ABM.root.constructor(this, numResidents, "OVD", numRegions, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
-        } else if (scenario.scenarioName.equals("no tessellation")) {
-            ABM.root.constructor(this, numResidents, "no tessellation", numRegions, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
+        } else if (scenario.scenarioName.equals("noTessellation")) {
+            ABM.root.constructor(this, numResidents, "noTessellation", numRegions, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
         }
 
 //        if (scenario.equals("CBG")) {

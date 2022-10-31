@@ -27,7 +27,7 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
         initComponents();
 
         myParent = (MainFrame) parent;
-        myParent.mainModel.scenario.scenarioName = "no tessellation";
+        myParent.mainModel.scenario.scenarioName = "noTessellation";
     }
 
     /**
@@ -609,7 +609,7 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jRadioButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton1ActionPerformed
-        myParent.mainModel.scenario.scenarioName = "no tessellation";
+        myParent.mainModel.scenario.scenarioName = "noTessellation";
     }//GEN-LAST:event_jRadioButton1ActionPerformed
 
 
