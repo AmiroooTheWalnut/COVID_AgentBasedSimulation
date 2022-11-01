@@ -350,7 +350,7 @@ public class RootArtificial extends Root {
                     System.out.println("ROUTING FAILED! AVERAGE DISTANCE IS USED!");
                 }
             }
-            System.out.println("total _ i: " + people.size() + " _ " + i);
+            //System.out.println("total _ i: " + people.size() + " _ " + i);
         }
         System.out.println("DONE SCHEDULES!");
     }
