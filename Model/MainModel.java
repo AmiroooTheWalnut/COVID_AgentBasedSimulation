@@ -348,7 +348,8 @@ public class MainModel extends Dataset {
         safegraph.clearPatternsPlaces();
         System.gc();
         safegraph.loadPatternsPlacesSet(datasetDirectory, dateName, allGISData, ABM.studyScope, isParallelLoadingData, numCPUs);
-        ABM.agents = new CopyOnWriteArrayList();
+//        ABM.agents = new CopyOnWriteArrayList();
+        ABM.agentsRaw = new ArrayList(numResidents);
 
         ABM.currentTime = ABM.startTime;
 
@@ -413,7 +414,8 @@ public class MainModel extends Dataset {
         safegraph.clearPatternsPlaces();
         System.gc();
         safegraph.loadPatternsPlacesSet(datasetDirectory, dateName, allGISData, ABM.studyScope, isParallelLoadingData, numCPUs);
-        ABM.agents = new CopyOnWriteArrayList();
+        //ABM.agents = new CopyOnWriteArrayList();
+        ABM.agentsRaw = new ArrayList(numResidents);
         ABM.currentTime = ABM.startTime;
 
 //        ABM.rootAgent = ABM.makeRootAgentHardCoded();
@@ -491,7 +493,8 @@ public class MainModel extends Dataset {
         System.gc();
         safegraph.loadPatternsPlacesSet(datasetDirectory, dateName, allGISData, ABM.studyScope, isParallelLoadingData, numCPUs);
 
-        ABM.agents = new CopyOnWriteArrayList();
+        //ABM.agents = new CopyOnWriteArrayList();
+        ABM.agentsRaw = new ArrayList();
 
         ABM.currentTime = ABM.startTime;
 

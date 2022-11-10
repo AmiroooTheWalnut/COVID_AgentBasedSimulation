@@ -354,7 +354,8 @@ public class Root extends Agent {
                     person.insidePeople.add(new FuzzyPerson());
                 }
             }
-            modelRoot.ABM.agents.add(person);
+            //modelRoot.ABM.agents.add(person);
+            modelRoot.ABM.agentsRaw.add(person);
             person.constructor(modelRoot);
             people.add(person);
         }

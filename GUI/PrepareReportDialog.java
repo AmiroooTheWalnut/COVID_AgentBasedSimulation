@@ -13,8 +13,12 @@ import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -132,10 +136,11 @@ public class PrepareReportDialog extends javax.swing.JDialog {
         jList2 = new javax.swing.JList<>();
         jScrollPane3 = new javax.swing.JScrollPane();
         jList3 = new javax.swing.JList<>();
+        jButton2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        jButton1.setText("Save");
+        jButton1.setText("Save IPR");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -174,14 +179,23 @@ public class PrepareReportDialog extends javax.swing.JDialog {
 
         jPanel3.add(jPanel1, java.awt.BorderLayout.CENTER);
 
+        jButton2.setText("Save runtime");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 1011, Short.MAX_VALUE)
+                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 984, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton1))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jButton2)
+                    .addComponent(jButton1)))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -190,6 +204,8 @@ public class PrepareReportDialog extends javax.swing.JDialog {
                     .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 526, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton1)))
                 .addContainerGap())
         );
@@ -228,10 +244,10 @@ public class PrepareReportDialog extends javax.swing.JDialog {
                         csvReader.close();
                     } catch (IOException ex) {
                         Logger.getLogger(PrepareReportDialog.class.getName()).log(Level.SEVERE, null, ex);
-                        System.out.println("TRAVEL DISTANCES FAILED TO READ");
+                        System.out.println("FAILED TO WRITE");
                     } catch (CsvException ex) {
                         Logger.getLogger(PrepareReportDialog.class.getName()).log(Level.SEVERE, null, ex);
-                        System.out.println("TRAVEL DISTANCES FAILED TO READ");
+                        System.out.println("FAILED TO WRITE");
                     }
                 }
             }
@@ -254,6 +270,71 @@ public class PrepareReportDialog extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        String selectedTessellation = jList2.getSelectedValue();
+//        String selectedNumAgent = jList3.getSelectedValue();
+        boolean isRealRead = false;
+        ArrayList<ArrayList<String>> finalData = new ArrayList();
+        ArrayList<String> header = new ArrayList();
+        int numAgentsNumber = 0;
+        LinkedHashSet<Integer> agentsNumbers = new LinkedHashSet();
+        for (int i = 0; i < directories.length; i++) {
+            String[] numTess = getNumTess(directories[i]);
+            if (agentsNumbers.contains(Integer.valueOf(numTess[0])) == false) {
+                agentsNumbers.add(Integer.parseInt(numTess[0]));
+            }
+        }
+        ArrayList<Integer> headerD = new ArrayList<>(agentsNumbers);
+        Collections.sort(headerD);
+        numAgentsNumber = agentsNumbers.size();
+        ArrayList<String> dRow = new ArrayList(numAgentsNumber);
+        for (int m = 0; m < headerD.size(); m++) {
+            header.add(String.valueOf(headerD.get(m)));
+            int counter = 0;
+            double avgRuntime = 0;
+            for (int i = 0; i < directories.length; i++) {
+                String[] numTess = getNumTess(directories[i]);
+                if (selectedTessellation.equals(numTess[1])) {
+                    if (headerD.get(m).equals(Integer.valueOf(numTess[0]))) {
+                        try {
+                            CSVReader csvReader = new CSVReader(new FileReader(directoryPath + File.separator + directories[i] + File.separator + "simulationSummary.csv"));
+                            List<String[]> list;
+                            list = csvReader.readAll();
+                            avgRuntime = avgRuntime + Double.valueOf(list.get(1)[12]);
+                            counter = counter + 1;
+                            csvReader.close();
+                        } catch (IOException ex) {
+                            Logger.getLogger(PrepareReportDialog.class.getName()).log(Level.SEVERE, null, ex);
+                            System.out.println("FAILED TO WRITE");
+                        } catch (CsvException ex) {
+                            Logger.getLogger(PrepareReportDialog.class.getName()).log(Level.SEVERE, null, ex);
+                            System.out.println("FAILED TO WRITE");
+                        }
+                    }
+                }
+            }
+            dRow.add(String.valueOf(avgRuntime / counter));
+        }
+        finalData.add(header);
+        finalData.add(dRow);
+        ArrayList<String[]> finalDataConverted = new ArrayList();
+        for (int i = 0; i < finalData.get(0).size(); i++) {
+            String[] row = new String[finalData.size()];
+            for (int j = 0; j < finalData.size(); j++) {
+                row[j] = finalData.get(j).get(i);
+            }
+            finalDataConverted.add(row);
+        }
+        try {
+            CSVWriter writer = new CSVWriter(new FileWriter(directoryPath + File.separator + "runtimeReport.csv"));
+            writer.writeAll(finalDataConverted);
+            writer.close();
+            System.out.println("SUMMARY RUNTIME SUCCESSFULLY WRITTEN");
+        } catch (IOException ex) {
+            Logger.getLogger(PrepareReportDialog.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton2ActionPerformed
+
     public String[] getNumTess(String input) {
         String[] output = new String[2];
         String[] raw = input.split("_");
@@ -273,6 +354,7 @@ public class PrepareReportDialog extends javax.swing.JDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

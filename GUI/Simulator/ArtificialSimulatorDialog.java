@@ -8,6 +8,7 @@ import COVID_AgentBasedSimulation.GUI.MainFrame;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  *
@@ -450,6 +451,7 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
         } else {
             myParent.mainModel.initModelArtificial(true, true, jCheckBox1.isSelected(), (int) (jSpinner2.getValue()), (int) (jSpinner3.getValue()), myParent.numProcessors, jRadioButton15.isSelected(), isSpecialScenarioActive, infectionIndices, noTessellationNumResidents);
         }
+        myParent.mainModel.ABM.agents= new CopyOnWriteArrayList(myParent.mainModel.ABM.agentsRaw);
 
         jLabel5.setText(myParent.mainModel.ABM.startTime.toString());
 

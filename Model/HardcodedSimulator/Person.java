@@ -352,12 +352,12 @@ public class Person extends Agent {
 
     public boolean decideToTravelExact(ZonedDateTime currentTime) {
         int hourInDay = currentTime.getHour();
-        if (hourInDay > 8 && hourInDay < 20) {
-            if (myModelRoot.ABM.root.rnd.nextDouble() < 0.008) {
+        if (hourInDay > 8 && hourInDay < 21) {
+            if (myModelRoot.ABM.root.rnd.nextDouble() < 0.05) {
                 return true;
             }
         } else {
-            if (myModelRoot.ABM.root.rnd.nextDouble() < 0.0008) {
+            if (myModelRoot.ABM.root.rnd.nextDouble() < 0.005) {
                 return true;
             }
         }

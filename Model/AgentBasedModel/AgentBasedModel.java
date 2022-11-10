@@ -47,6 +47,7 @@ public class AgentBasedModel {
 //    public transient RootArtificial rootArtificial;
     public transient Agent rootAgent;
     public transient CopyOnWriteArrayList<Agent> agents;
+    public transient ArrayList<Agent> agentsRaw;
 
     public String startTimeString;
     public String endTimeString;
@@ -324,8 +325,8 @@ public class AgentBasedModel {
                 copiedTemplate.statusNames = template.statusNames;
                 copiedTemplate.statusValues = template.statusValues;
                 Agent output = new Agent(copiedTemplate);
-                output.myIndex = agents.size();
-                agents.add(output);
+                output.myIndex = agentsRaw.size();
+                agentsRaw.add(output);
 //                oldCurrentEvaluatingAgent[0] = self;
 //                currentEvaluatingAgent = new Agent[1];
 //                currentEvaluatingAgent[0] = output;
@@ -386,10 +387,10 @@ public class AgentBasedModel {
                 return null;
             } else {
                 Root output = new Root(myMainModel);
-                output.myIndex = agents.size();
+                output.myIndex = agentsRaw.size();
                 output.statusNames = template.statusNames;
                 output.statusValues = template.statusValues;
-                agents.add(output);
+                agentsRaw.add(output);
 
                 return output;
             }
@@ -423,8 +424,8 @@ public class AgentBasedModel {
                 copiedTemplate.statusNames = template.statusNames;
                 copiedTemplate.statusValues = template.statusValues;
                 Agent output = new Agent(copiedTemplate);
-                output.myIndex = agents.size();
-                agents.add(output);
+                output.myIndex = agentsRaw.size();
+                agentsRaw.add(output);
 //                oldCurrentEvaluatingAgent[0] = self;
 //                currentEvaluatingAgent = new Agent[1];
 //                currentEvaluatingAgent[0] = output;

@@ -18,6 +18,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  *
@@ -1638,6 +1639,7 @@ public class SimulatorDialog extends javax.swing.JDialog {
         } else {
             myParent.mainModel.initModelHardCoded(true, true, jCheckBox1.isSelected(), (int) (jSpinner1.getValue()), (int) (jSpinner2.getValue()), myParent.numProcessors, jRadioButton21.isSelected(), isSpecialScenarioActive, infectionIndices);
         }
+        myParent.mainModel.ABM.agents= new CopyOnWriteArrayList(myParent.mainModel.ABM.agentsRaw);
 
         jLabel2.setText(myParent.mainModel.ABM.startTime.toString());
 

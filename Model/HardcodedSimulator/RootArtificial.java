@@ -21,6 +21,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  *
@@ -93,6 +94,8 @@ public class RootArtificial extends Root {
         header[9] = "IPR_S_SIM";
 
         infectionPoll.add(header);
+        
+//        myModelRoot.ABM.agents=new CopyOnWriteArrayList(passed_numAgents);
 
         generateRegions(modelRoot, passed_regionType, passed_numRandomRegions);
 //        if (isInfectCBGOnly == true) {
@@ -237,7 +240,8 @@ public class RootArtificial extends Root {
                         person.insidePeople.add(new FuzzyPerson());
                     }
                 }
-                modelRoot.ABM.agents.add(person);
+                //modelRoot.ABM.agents.add(person);
+                modelRoot.ABM.agentsRaw.add(person);
                 person.constructor(modelRoot);
                 if (isTessellationBuilt == false) {
                     people.add(person);
@@ -259,7 +263,8 @@ public class RootArtificial extends Root {
                     person.insidePeople.add(new FuzzyPerson());
                 }
             }
-            modelRoot.ABM.agents.add(person);
+            //modelRoot.ABM.agents.add(person);
+            modelRoot.ABM.agentsRaw.add(person);
             person.constructor(modelRoot);
             people.add(person);
         }
