@@ -18,6 +18,8 @@ public class PersonExactProperties {
     public ArrayList<POI> pOIs=new ArrayList();
     public ArrayList<Double> fromHomeFreqs=new ArrayList();
     public ArrayList<Double> fromWorkFreqs=new ArrayList();
+    public ArrayList<Double> fromHomeFreqsCDF=new ArrayList();
+    public ArrayList<Double> fromWorkFreqsCDF=new ArrayList();
 //    public HashMap<POI, Double> pOIHomeProbabilities=new HashMap();
 //    public HashMap<POI, Double> pOIWorkProbabilities=new HashMap();
     public double sumHomeFreqs;

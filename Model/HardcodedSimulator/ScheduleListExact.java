@@ -15,6 +15,8 @@ public class ScheduleListExact {
     public ArrayList<POI> pOIs=new ArrayList();
     public ArrayList<Double> fromHomeFreqs=new ArrayList();
     public ArrayList<Double> fromWorkFreqs=new ArrayList();
+    public ArrayList<Double> fromHomeFreqsCDF=new ArrayList();
+    public ArrayList<Double> fromWorkFreqsCDF=new ArrayList();
     public double sumHomeFreqs=0;
     public double sumWorkFreqs=0;
 }

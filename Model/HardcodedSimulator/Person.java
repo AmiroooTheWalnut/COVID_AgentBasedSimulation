@@ -422,28 +422,28 @@ public class Person extends Agent {
     public POI chooseDestinationExact(boolean isFromHome) {
         if (isFromHome == true) {
             double selectedDestFreq = (Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * this.exactProperties.sumHomeFreqs));
-            double cumulativeDestFreqs = 0;
-            for (int i = 0; i < exactProperties.fromHomeFreqs.size(); i++) {
-//                POI key = mapElement.getKey();
-//                Double value = mapElement.getValue();
-                cumulativeDestFreqs = cumulativeDestFreqs + exactProperties.fromHomeFreqs.get(i);
-                if (cumulativeDestFreqs > selectedDestFreq) {
-                    return exactProperties.pOIs.get(i);
-                }
-            }
-            return null;
+            int index=MainModel.binarySearchCumulative(selectedDestFreq,exactProperties.fromHomeFreqsCDF);
+//            double cumulativeDestFreqs = 0;
+//            for (int i = 0; i < exactProperties.fromHomeFreqs.size(); i++) {
+//                cumulativeDestFreqs = cumulativeDestFreqs + exactProperties.fromHomeFreqs.get(i);
+//                if (cumulativeDestFreqs > selectedDestFreq) {
+//                    return exactProperties.pOIs.get(i);
+//                }
+//            }
+            return exactProperties.pOIs.get(index);
+//            return null;
         } else {
             double selectedDestFreq = (Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * this.exactProperties.sumWorkFreqs));
-            double cumulativeDestFreqs = 0;
-            for (int i = 0; i < exactProperties.fromWorkFreqs.size(); i++) {
-//                POI key = mapElement.getKey();
-//                Double value = mapElement.getValue();
-                cumulativeDestFreqs = cumulativeDestFreqs + exactProperties.fromWorkFreqs.get(i);
-                if (cumulativeDestFreqs > selectedDestFreq) {
-                    return exactProperties.pOIs.get(i);
-                }
-            }
-            return null;
+            int index=MainModel.binarySearchCumulative(selectedDestFreq,exactProperties.fromWorkFreqsCDF);
+//            double cumulativeDestFreqs = 0;
+//            for (int i = 0; i < exactProperties.fromWorkFreqs.size(); i++) {
+//                cumulativeDestFreqs = cumulativeDestFreqs + exactProperties.fromWorkFreqs.get(i);
+//                if (cumulativeDestFreqs > selectedDestFreq) {
+//                    return exactProperties.pOIs.get(i);
+//                }
+//            }
+            return exactProperties.pOIs.get(index);
+//            return null;
         }
     }
 

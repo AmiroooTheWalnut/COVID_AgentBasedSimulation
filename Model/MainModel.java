@@ -866,5 +866,26 @@ public class MainModel extends Dataset {
         safegraph.initAllPatternsAllPlaces();
         safegraph.setDatasetTemplate();
     }
+    
+    public static int binarySearchCumulative(double value, ArrayList<Double> input){
+        int stepSize=input.size()/2;
+        int index=stepSize;
+        if(stepSize<5){
+            for(int i=0;i<input.size();i++){
+                if(input.get(i)>value){
+                    return i;
+                }
+            }
+        }
+        while(stepSize>1){
+            stepSize=stepSize/2;
+            if(value<input.get(index)){
+                index=index-stepSize;
+            }else{
+                index=index+stepSize;
+            }
+        }
+        return index;
+    }
 
 }

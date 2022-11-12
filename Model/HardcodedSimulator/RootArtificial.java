@@ -5,7 +5,6 @@
 package COVID_AgentBasedSimulation.Model.HardcodedSimulator;
 
 import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.RegionImageLayer;
-import COVID_AgentBasedSimulation.GUI.VoronoiGIS.GISLocationDialog;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.PatternsRecordProcessed;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilSimulatorController;
 import COVID_AgentBasedSimulation.Model.MainModel;
@@ -14,14 +13,11 @@ import COVID_AgentBasedSimulation.Model.Structure.Marker;
 import COVID_AgentBasedSimulation.Model.Structure.Scope;
 import COVID_AgentBasedSimulation.Model.Structure.TessellationCell;
 import esmaieeli.gisFastLocationOptimization.GIS3D.LayerDefinition;
-import esmaieeli.gisFastLocationOptimization.GIS3D.LocationNode;
 import esmaieeli.gisFastLocationOptimization.GUI.MainFramePanel;
-import esmaieeli.gisFastLocationOptimization.Simulation.Routing;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  *
@@ -207,7 +203,9 @@ public class RootArtificial extends Root {
             for (int j = 0; j < scheduleListExactArray.get(i).fromHomeFreqs.size(); j++) {
 //                POI key = mapElement.getKey();
                 sumPH = sumPH + scheduleListExactArray.get(i).fromHomeFreqs.get(j);
+                scheduleListExactArray.get(i).fromHomeFreqsCDF.add(sumPH);
                 sumPW = sumPW + scheduleListExactArray.get(i).fromWorkFreqs.get(j);
+                scheduleListExactArray.get(i).fromWorkFreqsCDF.add(sumPW);
             }
             scheduleListExactArray.get(i).sumHomeFreqs = sumPH;
             scheduleListExactArray.get(i).sumWorkFreqs = sumPW;
@@ -348,10 +346,12 @@ public class RootArtificial extends Root {
                     Double newP = (pO - minDist + 0.1) / (maxDist + 0.1);
                     people.get(i).exactProperties.fromHomeFreqs.set(m, newP);
                     people.get(i).exactProperties.sumHomeFreqs = people.get(i).exactProperties.sumHomeFreqs + newP;
+                    people.get(i).exactProperties.fromHomeFreqsCDF.add(people.get(i).exactProperties.sumHomeFreqs);
                 } else {
                     Double newP = (avg - minDist + 0.1) / (maxDist + 0.1);
                     people.get(i).exactProperties.fromHomeFreqs.set(m, newP);
                     people.get(i).exactProperties.sumHomeFreqs = people.get(i).exactProperties.sumHomeFreqs + newP;
+                    people.get(i).exactProperties.fromHomeFreqsCDF.add(people.get(i).exactProperties.sumHomeFreqs);
                     System.out.println("ROUTING FAILED! AVERAGE DISTANCE IS USED!");
                 }
             }
@@ -372,13 +372,16 @@ public class RootArtificial extends Root {
         for (int m = 0; m < people.size(); m++) {
             ScheduleListExact schedule = scheduleListExactArray.get(people.get(m).properties.homeRegion.myIndex);
             people.get(m).exactProperties.fromHomeFreqs = schedule.fromHomeFreqs;
+            people.get(m).exactProperties.fromHomeFreqsCDF = schedule.fromHomeFreqsCDF;
             people.get(m).exactProperties.pOIs = schedule.pOIs;
+            people.get(m).exactProperties.fromWorkFreqsCDF = schedule.fromWorkFreqsCDF;
 //            double sumP = 0;
 //            for (int j = 0; j < people.get(m).exactProperties.fromHomeFreqs.size(); j++) {
 ////                POI key = mapElement.getKey();
 //                sumP = sumP + people.get(m).exactProperties.fromHomeFreqs.get(j);
 //            }
             people.get(m).exactProperties.sumHomeFreqs = schedule.sumHomeFreqs;
+            people.get(m).exactProperties.sumWorkFreqs = schedule.sumWorkFreqs;
 
 //            people.get(m).exactProperties.pOIs = pOIArray;
 //            ArrayList<Double> stackedFreqs = new ArrayList();
@@ -573,9 +576,11 @@ public class RootArtificial extends Root {
                 if (pO > -1) {
                     Double newP = (pO - minDist + 0.1) / (maxDist + 0.1);
                     people.get(i).exactProperties.fromWorkFreqs.set(m, newP);
+                    people.get(i).exactProperties.fromWorkFreqs.add(newP);
                     people.get(i).exactProperties.sumWorkFreqs = people.get(i).exactProperties.sumWorkFreqs + newP;
                 } else {
                     Double newP = (avg - minDist + 0.1) / (maxDist + 0.1);
+                    people.get(i).exactProperties.fromWorkFreqs.add(newP);
                     people.get(i).exactProperties.fromWorkFreqs.set(m, newP);
                     System.out.println("ROUTING FAILED! AVERAGE DISTANCE IS USED!");
                 }

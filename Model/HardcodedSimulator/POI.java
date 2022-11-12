@@ -119,7 +119,8 @@ public class POI {
             for (int m = 0; m < person.insidePeople.size(); m++) {
                 if (mainModel.ABM.root.rnd.nextDouble() < CONTACT_RATE*0.05) {
                     double r = mainModel.ABM.root.rnd.nextDouble();
-                    if (r < (1 - person.shamilPersonProperties.protectionLevel) * 0.00085) {
+                    if (r < (1 - person.shamilPersonProperties.protectionLevel) * 0.00004) {
+//                    if (r < (1 - person.shamilPersonProperties.protectionLevel) * 0.00085) {
                         if (person.insidePeople.get(m).fpp.status == statusEnum.SUSCEPTIBLE.ordinal()) {
 //                      System.out.println("ENV INFECTION");
                             if (mainModel.ABM.root.rnd.nextDouble() > 0.7) {

@@ -10,6 +10,7 @@ import esmaieeli.utilities.taskThreading.ParallelProcessor;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 
 /**
@@ -91,6 +92,7 @@ public class AdvancedParallelTest extends ParallelProcessor {
                 } else {
                     mainModel.initModelArtificial(false, true, runConfig.isParallelBehaviorEvaluation, runConfig.numResidents, numRegions, runConfig.numCPUsInModel, !runConfig.isSpecificRegionInfected, runConfig.isSpecialScenarioActive, infectionIndices, runConfig.noTessellationNumResidents);
                 }
+                mainModel.ABM.agents= new CopyOnWriteArrayList(mainModel.ABM.agentsRaw);
                 mainModel.startTimeNanoSecond = System.nanoTime();
                 mainModel.resume(false, runConfig.isParallelBehaviorEvaluation, runConfig.numCPUsInModel, true, runConfig.isSpecialScenarioActive);
             }
