@@ -191,6 +191,14 @@ public class RootArtificial extends Root {
             int cellIndexWork = regionsLayer.getCellOfLatLon(peopleNoTessellation.get(i).exactProperties.exactWorkLocation.lat, peopleNoTessellation.get(i).exactProperties.exactWorkLocation.lon);
             if (cellIndexWork != -1) {
                 for (int k = 0; k < peopleNoTessellation.get(i).exactProperties.fromWorkFreqs.size(); k++) {
+//                for (int k = 0; k < 2000; k++) {
+//                    System.out.println("### "+peopleNoTessellation.get(i).exactProperties.fromWorkFreqs.size());
+//                    System.out.println("!!! "+k);
+//                    System.out.println("1_1_4_2 *"+cellIndexWork);
+//                    System.out.println("FFFFFFFFFFFF");
+//                    System.out.println("GGGGGG");
+//                    System.out.println("1_1_4_2 **"+scheduleListExactArray.get(cellIndexWork).fromWorkFreqs.get(k));
+//                    System.out.println("1_1_4_2 ***"+peopleNoTessellation.get(i).exactProperties.fromWorkFreqs.get(k));
                     Double newValue = scheduleListExactArray.get(cellIndexWork).fromWorkFreqs.get(k) + peopleNoTessellation.get(i).exactProperties.fromWorkFreqs.get(k);
                     scheduleListExactArray.get(cellIndexWork).fromWorkFreqs.set(k, newValue);
                 }
@@ -569,19 +577,18 @@ public class RootArtificial extends Root {
             avg = avg / (double) avgCounter;
 //            System.out.println("****");
             for (int m = 0; m < people.get(i).exactProperties.pOIs.size(); m++) {
-//                String key = mapElement.getKey();
-//                System.out.println(key);
 //                POI value = mapElement.getValue();
                 Double pO = people.get(i).exactProperties.fromWorkFreqs.get(m);
                 if (pO > -1) {
                     Double newP = (pO - minDist + 0.1) / (maxDist + 0.1);
                     people.get(i).exactProperties.fromWorkFreqs.set(m, newP);
-                    people.get(i).exactProperties.fromWorkFreqs.add(newP);
                     people.get(i).exactProperties.sumWorkFreqs = people.get(i).exactProperties.sumWorkFreqs + newP;
+                    people.get(i).exactProperties.fromWorkFreqsCDF.add(people.get(i).exactProperties.sumWorkFreqs);
                 } else {
                     Double newP = (avg - minDist + 0.1) / (maxDist + 0.1);
-                    people.get(i).exactProperties.fromWorkFreqs.add(newP);
                     people.get(i).exactProperties.fromWorkFreqs.set(m, newP);
+                    people.get(i).exactProperties.sumWorkFreqs = people.get(i).exactProperties.sumWorkFreqs + newP;
+                    people.get(i).exactProperties.fromWorkFreqsCDF.add(people.get(i).exactProperties.sumWorkFreqs);
                     System.out.println("ROUTING FAILED! AVERAGE DISTANCE IS USED!");
                 }
             }

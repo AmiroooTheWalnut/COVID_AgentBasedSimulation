@@ -130,6 +130,7 @@ public class AbmCli {
 
                 testThreadPool.invokeAll(calls);
             } catch (InterruptedException ex) {
+                System.out.println("ERROR IN RUNNING AdvancedParallelTest");
                 Logger.getLogger(AbmCli.class.getName()).log(Level.SEVERE, null, ex);
             }
         }

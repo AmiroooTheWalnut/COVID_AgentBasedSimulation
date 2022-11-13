@@ -402,7 +402,8 @@ public class ShamilGroupManager {
                 group_id = "F-" + region.residents.get(i).shamilPersonProperties.familyId;
 //                group_id = "F-{}".format(prsn.family_id)
             } else if (region.residents.get(i).shamilPersonProperties.currentTask.name.equals("Go to Work") || region.residents.get(i).shamilPersonProperties.currentTask.name.equals("Returns Home")) {
-                int selected_transport_index = (int) (mainModel.ABM.root.rnd.nextDouble() * transport_free_seats_size);
+//                int selected_transport_index = (int) (mainModel.ABM.root.rnd.nextDouble() * transport_free_seats_size);
+                int selected_transport_index = (int) (mainModel.ABM.root.rnd.nextDouble() * transport_free_seats.size());
                 int selected_transport = transport_free_seats.get(selected_transport_index);
 //                selected_transport = random.choice(transport_free_seats)
 
