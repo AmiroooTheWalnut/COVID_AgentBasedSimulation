@@ -117,7 +117,7 @@ public class ShamilGroupManager {
             }
 
             if (!groupDict.containsKey(group_id) && group_id.length() > 0) {//group_id not in groupDict):
-                groupDict.put(group_id, new ShamilGroup(group_id,false));
+                groupDict.put(group_id, new ShamilGroup(group_id, false));
 //                groupDict[group_id] = Group(group_id);
             }
             groupDict.get(group_id).persons.add(persons.get(i));
@@ -298,7 +298,6 @@ public class ShamilGroupManager {
 ////                }
 //            }
 //        }
-        
         ArrayList<String> groupDictKeySet = new ArrayList<>(groupDict.keySet());
         for (int i = 0; i < groupDictKeySet.size(); i++) { // grpid in groupDict:
             ShamilGroup grouparr = groupDict.get(groupDictKeySet.get(i));
@@ -380,7 +379,7 @@ public class ShamilGroupManager {
     }
 
     public static void createGroupRegion(MainModel mainModel, Region region, List<Integer> transport_free_seats, int n_events, ConcurrentHashMap<String, ShamilGroup> groupDict) {
-        int transport_free_seats_size=transport_free_seats.size();
+//        int transport_free_seats_size=transport_free_seats.size();
         for (int i = 0; i < region.residents.size(); i++) {
 //        for prsn in persons:
             boolean isAlive = false;
@@ -403,14 +402,16 @@ public class ShamilGroupManager {
 //                group_id = "F-{}".format(prsn.family_id)
             } else if (region.residents.get(i).shamilPersonProperties.currentTask.name.equals("Go to Work") || region.residents.get(i).shamilPersonProperties.currentTask.name.equals("Returns Home")) {
 //                int selected_transport_index = (int) (mainModel.ABM.root.rnd.nextDouble() * transport_free_seats_size);
-                int selected_transport_index = (int) (mainModel.ABM.root.rnd.nextDouble() * transport_free_seats.size());
-                int selected_transport = transport_free_seats.get(selected_transport_index);
+                synchronized (transport_free_seats) {
+                    int selected_transport_index = (int) (mainModel.ABM.root.rnd.nextDouble() * transport_free_seats.size());
+                    int selected_transport = transport_free_seats.get(selected_transport_index);
 //                selected_transport = random.choice(transport_free_seats)
 
-                transport_free_seats.remove(selected_transport);
+                    transport_free_seats.remove(selected_transport);
 //                transport_free_seats.remove(selected_transport)
 
-                group_id = "T-" + selected_transport;
+                    group_id = "T-" + selected_transport;
+                }
 //                group_id = "T-{}".format(selected_transport);
             } else if (region.residents.get(i).shamilPersonProperties.currentTask.name.equals("Work")) {
                 group_id = "W-" + region.residents.get(i).shamilPersonProperties.professionGroupId;
@@ -445,7 +446,7 @@ public class ShamilGroupManager {
 
 //                if (group_id.length() > 0) {//if (!groupDict.containsKey(group_id) && group_id.length() > 0) {//group_id not in groupDict):
             if (!groupDict.containsKey(group_id) && group_id.length() > 0) {
-                groupDict.put(group_id, new ShamilGroup(group_id,true));
+                groupDict.put(group_id, new ShamilGroup(group_id, true));
 //                groupDict[group_id] = Group(group_id);
             }
             groupDict.get(group_id).persons.add(region.residents.get(i));
@@ -519,7 +520,7 @@ public class ShamilGroupManager {
 
 //                if (group_id.length() > 0) {//if (!groupDict.containsKey(group_id) && group_id.length() > 0) {//group_id not in groupDict):
                 if (!groupDict.containsKey(group_id) && group_id.length() > 0) {
-                    groupDict.put(group_id, new ShamilGroup(group_id,true));
+                    groupDict.put(group_id, new ShamilGroup(group_id, true));
 //                groupDict[group_id] = Group(group_id);
                 }
                 groupDict.get(group_id).persons.add(regions.get(r).residents.get(i));

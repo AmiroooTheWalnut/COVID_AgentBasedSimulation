@@ -8,12 +8,18 @@ import COVID_AgentBasedSimulation.Model.Data.Safegraph.AllPatterns;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.PatternsRecordProcessed;
 import COVID_AgentBasedSimulation.Model.Engines.SimplePair;
 import COVID_AgentBasedSimulation.Model.MainModel;
+import com.opencsv.CSVWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -112,6 +118,7 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
         jLabel29 = new javax.swing.JLabel();
         jLabel30 = new javax.swing.JLabel();
         jLabel31 = new javax.swing.JLabel();
+        jButton2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -414,6 +421,13 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        jButton2.setText("Save after 12_2020 (filter)");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -432,10 +446,16 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
                         .addContainerGap())
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(18, 18, 18)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jButton2)
+                                .addContainerGap())))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -453,7 +473,10 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton2)
+                        .addContainerGap())))
         );
 
         pack();
@@ -562,15 +585,37 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
             jLabel19.setText(String.valueOf(M240));
             jLabel23.setText(String.valueOf(B5_20));
             jLabel25.setText(String.valueOf(B61_240));
+            double avg=(L5*2.5+B5_10*7.5+B11_20*15+B21_60*40+B61_120*90+B121_240*180+M240*240+B5_20*12.5+B61_240*150)/(L5+B5_10+B11_20+B21_60+B61_120+B121_240+M240+B5_20+B61_240);
+            jLabel21.setText(String.valueOf(avg));
             jLabel29.setText(String.valueOf(((PatternsRecordProcessed) (finalBrands.get(jList4.getSelectedIndex()).getValue())).raw_visit_counts));
             jLabel28.setText(String.valueOf(((PatternsRecordProcessed) (finalBrands.get(jList4.getSelectedIndex()).getValue())).raw_visitor_counts));
             jLabel31.setText(String.valueOf(((PatternsRecordProcessed) (finalBrands.get(jList4.getSelectedIndex()).getValue())).distance_from_home));
         }
     }//GEN-LAST:event_jList4ValueChanged
 
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+//        ArrayList<String[]> data = new ArrayList();
+//        for (int i = 0; i < finalData.get(0).size(); i++) {
+//            String[] row = new String[finalData.size()];
+//            for (int j = 0; j < finalData.size(); j++) {
+//                row[j] = finalData.get(j).get(i);
+//            }
+//            finalDataConverted.add(row);
+//        }
+//        try {
+//            CSVWriter writer = new CSVWriter(new FileWriter("stayDuration.csv"));
+//            writer.writeAll(data);
+//            writer.close();
+//            System.out.println("SUMMARY RUNTIME SUCCESSFULLY WRITTEN");
+//        } catch (IOException ex) {
+//            Logger.getLogger(SpecificPOIAnalysisDialog.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+    }//GEN-LAST:event_jButton2ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
