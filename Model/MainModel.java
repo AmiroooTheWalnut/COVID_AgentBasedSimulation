@@ -420,7 +420,7 @@ public class MainModel extends Dataset {
 
 //        ABM.rootAgent = ABM.makeRootAgentHardCoded();
         ABM.root = new RootArtificial(this);
-        
+//        System.out.println(ABM.agentsRaw.get(2314235));//TEST AN ERROR!
         if(ABM.exactSimGeoData.length()==0){
             System.out.println("EXACT GEOGRAPHY IS MISSING!");
             System.out.println("SIMULATION STOPPED!");

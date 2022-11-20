@@ -5,12 +5,15 @@ import COVID_AgentBasedSimulation.Model.Structure.AllGISData;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -115,6 +118,7 @@ public class AbmCli {
                 numProcessorsInTests = Runtime.getRuntime().availableProcessors() / 2;
             }
             testThreadPool = Executors.newFixedThreadPool(numProcessorsInTests);
+            List<Future<Object>> futures=null;
             try {
                 AdvancedParallelTest[] parallelTest = new AdvancedParallelTest[runConfig.numRuns];
 
@@ -129,12 +133,24 @@ public class AbmCli {
                     parallelTest[i].addRunnableToQueue(calls);
                 }
 
-                testThreadPool.invokeAll(calls);
+                futures = testThreadPool.invokeAll(calls);
             } catch (InterruptedException ex) {
                 System.out.println("ERROR IN RUNNING AdvancedParallelTest");
                 Logger.getLogger(AbmCli.class.getName()).log(Level.SEVERE, null, ex);
             }
+            for (int i = 0; i < futures.size(); i++) {
+                Future<Object> a = futures.get(i);
+                try {
+                    a.get();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(AbmCli.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (ExecutionException ex) {
+//                    ex.getCause().printStackTrace();
+                    Logger.getLogger(AbmCli.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
         }
+
         testThreadPool.shutdown();
     }
 
@@ -205,7 +221,7 @@ public class AbmCli {
         } else {
             mainModel.initModelArtificial(false, true, runConfig.isParallelBehaviorEvaluation, runConfig.numResidents, numRegions, runConfig.numCPUsInModel, !runConfig.isSpecificRegionInfected, runConfig.isSpecialScenarioActive, infectionIndices, runConfig.noTessellationNumResidents);
         }
-        mainModel.ABM.agents= new CopyOnWriteArrayList(mainModel.ABM.agentsRaw);
+        mainModel.ABM.agents = new CopyOnWriteArrayList(mainModel.ABM.agentsRaw);
         mainModel.startTimeNanoSecond = System.nanoTime();
         mainModel.resume(false, runConfig.isParallelBehaviorEvaluation, runConfig.numCPUsInModel, true, runConfig.isSpecialScenarioActive);
     }
