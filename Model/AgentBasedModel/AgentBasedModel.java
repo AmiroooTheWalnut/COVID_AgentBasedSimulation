@@ -628,7 +628,7 @@ public class AgentBasedModel {
 
     public void loadExactGeoData(RootArtificial root) {
         File file = new File(myMainModel.datasetDirectory+File.separator+"GIS-FAST-LOCATION-OPTIMIZATION"+File.separator+exactSimGeoData);
-        preProcessor=new PreProcessor(root.mainFParent);
+        preProcessor=new PreProcessor();
         String properFileName=file.getName().substring(0, file.getName().lastIndexOf("."));
         allData = preProcessor.read_allData_kryo(allData, file.getParent(), properFileName, "data");
         allData.myScale = new Scaling(allData.all_Nodes);

@@ -35,6 +35,9 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
     ArrayList<SimplePair<String, PatternsRecordProcessed>> filteredBrands;
     ArrayList<SimplePair<String, PatternsRecordProcessed>> finalBrands;
 
+    ArrayList<SimplePair<String, PatternsRecordProcessed>> finalBrandsBehind;
+    ArrayList<SimplePair<String, PatternsRecordProcessed>> filteredBrandsBehind;
+
     /**
      * Creates new form SpecificPOIAnalysisDialog
      */
@@ -532,7 +535,7 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
 
                 @Override
                 public Object getElementAt(int index) {
-                    return filteredBrands.get(index).getKey()+((PatternsRecordProcessed)(filteredBrands.get(index).getValue())).placeKey;
+                    return filteredBrands.get(index).getKey() + ((PatternsRecordProcessed) (filteredBrands.get(index).getValue())).placeKey;
                 }
             });
             finalBrands = brands;
@@ -549,11 +552,11 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
         int B5_20 = 0;
         int B61_240 = 0;
         int M240 = 0;
-        if (finalBrands != null && jList4.getSelectedIndex()!=-1) {
+        if (finalBrands != null && jList4.getSelectedIndex() != -1) {
             for (int i = 0; i < ((PatternsRecordProcessed) (finalBrands.get(jList4.getSelectedIndex()).getValue())).bucketed_dwell_times.size(); i++) {
                 short d1 = ((PatternsRecordProcessed) (finalBrands.get(jList4.getSelectedIndex()).getValue())).bucketed_dwell_times.get(i).dwellDuration[0];
                 short d2 = ((PatternsRecordProcessed) (finalBrands.get(jList4.getSelectedIndex()).getValue())).bucketed_dwell_times.get(i).dwellDuration[1];
-                int value=((PatternsRecordProcessed) (finalBrands.get(jList4.getSelectedIndex()).getValue())).bucketed_dwell_times.get(i).number;
+                int value = ((PatternsRecordProcessed) (finalBrands.get(jList4.getSelectedIndex()).getValue())).bucketed_dwell_times.get(i).number;
                 if (d1 == 0 && d2 == 5) {
                     L5 = L5 + value;
                 } else if (d1 == 5 && d2 == 20) {
@@ -585,7 +588,7 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
             jLabel19.setText(String.valueOf(M240));
             jLabel23.setText(String.valueOf(B5_20));
             jLabel25.setText(String.valueOf(B61_240));
-            double avg=(L5*2.5+B5_10*7.5+B11_20*15+B21_60*40+B61_120*90+B121_240*180+M240*240+B5_20*12.5+B61_240*150)/(L5+B5_10+B11_20+B21_60+B61_120+B121_240+M240+B5_20+B61_240);
+            double avg = (L5 * 2.5 + B5_10 * 7.5 + B11_20 * 15 + B21_60 * 40 + B61_120 * 90 + B121_240 * 180 + M240 * 240 + B5_20 * 12.5 + B61_240 * 150) / (L5 + B5_10 + B11_20 + B21_60 + B61_120 + B121_240 + M240 + B5_20 + B61_240);
             jLabel21.setText(String.valueOf(avg));
             jLabel29.setText(String.valueOf(((PatternsRecordProcessed) (finalBrands.get(jList4.getSelectedIndex()).getValue())).raw_visit_counts));
             jLabel28.setText(String.valueOf(((PatternsRecordProcessed) (finalBrands.get(jList4.getSelectedIndex()).getValue())).raw_visitor_counts));
@@ -594,23 +597,131 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jList4ValueChanged
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-//        ArrayList<String[]> data = new ArrayList();
-//        for (int i = 0; i < finalData.get(0).size(); i++) {
-//            String[] row = new String[finalData.size()];
-//            for (int j = 0; j < finalData.size(); j++) {
-//                row[j] = finalData.get(j).get(i);
-//            }
-//            finalDataConverted.add(row);
-//        }
-//        try {
-//            CSVWriter writer = new CSVWriter(new FileWriter("stayDuration.csv"));
-//            writer.writeAll(data);
-//            writer.close();
-//            System.out.println("SUMMARY RUNTIME SUCCESSFULLY WRITTEN");
-//        } catch (IOException ex) {
-//            Logger.getLogger(SpecificPOIAnalysisDialog.class.getName()).log(Level.SEVERE, null, ex);
-//        }
+        ArrayList<String[]> data = new ArrayList();
+        int L5 = 0;
+        int B5_10 = 0;
+        int B11_20 = 0;
+        int B21_60 = 0;
+        int B61_120 = 0;
+        int B121_240 = 0;
+        int B5_20 = 0;
+        int B61_240 = 0;
+        int M240 = 0;
+        double avg = 0;
+        for (int m = 0; m < patternsList.length; m++) {
+            boolean isLoaded=loadPatterns(patternsList[m]);
+            if(isLoaded==false){
+                continue;
+            }
+            applyFilter(jTextField1.getText());
+            for (int j = 0; j < filteredBrandsBehind.size(); j++) {
+                for (int i = 0; i < ((PatternsRecordProcessed) (filteredBrandsBehind.get(j).getValue())).bucketed_dwell_times.size(); i++) {
+                    short d1 = ((PatternsRecordProcessed) (filteredBrandsBehind.get(j).getValue())).bucketed_dwell_times.get(i).dwellDuration[0];
+                    short d2 = ((PatternsRecordProcessed) (filteredBrandsBehind.get(j).getValue())).bucketed_dwell_times.get(i).dwellDuration[1];
+                    int value = ((PatternsRecordProcessed) (filteredBrandsBehind.get(j).getValue())).bucketed_dwell_times.get(i).number;
+                    if (d1 == 0 && d2 == 5) {
+                        L5 = L5 + value;
+                    } else if (d1 == 5 && d2 == 20) {
+                        B5_20 = B5_20 + value;
+                    } else if (d1 == 21 && d2 == 60) {
+                        B21_60 = B21_60 + value;
+                    } else if (d1 == 61 && d2 == 240) {
+                        B61_240 = B61_240 + value;
+                    } else if (d1 == 240 && d2 == 1440) {
+                        M240 = M240 + value;
+                    } else if (d1 == 5 && d2 == 10) {
+                        B5_10 = B5_10 + value;
+                    } else if (d1 == 11 && d2 == 20) {
+                        B11_20 = B11_20 + value;
+                    } else if (d1 == 21 && d2 == 60) {
+                        B21_60 = B21_60 + value;
+                    } else if (d1 == 61 && d2 == 120) {
+                        B61_120 = B61_120 + value;
+                    } else if (d1 == 121 && d2 == 240) {
+                        B121_240 = B121_240 + value;
+                    }
+                }
+            }
+        }
+        avg = (L5 * 2.5 + B5_10 * 7.5 + B11_20 * 15 + B21_60 * 40 + B61_120 * 90 + B121_240 * 180 + M240 * 240 + B5_20 * 12.5 + B61_240 * 150) / (L5 + B5_10 + B11_20 + B21_60 + B61_120 + B121_240 + M240 + B5_20 + B61_240);
+        String[] nStrs = {"<5", "5-10", "11-20", "21-60", "61-120", "121-240", ">240"};
+        String[] row1 = new String[2];
+        row1[0] = nStrs[0];
+        row1[1] = String.valueOf(L5);
+        data.add(row1);
+        String[] row2 = new String[2];
+        row2[0] = nStrs[1];
+        row2[1] = String.valueOf(B5_10);
+        data.add(row2);
+        String[] row3 = new String[2];
+        row3[0] = nStrs[2];
+        row3[1] = String.valueOf(B11_20);
+        data.add(row3);
+        String[] row4 = new String[2];
+        row4[0] = nStrs[3];
+        row4[1] = String.valueOf(B21_60);
+        data.add(row4);
+        String[] row5 = new String[2];
+        row5[0] = nStrs[4];
+        row5[1] = String.valueOf(B61_120);
+        data.add(row5);
+        String[] row6 = new String[2];
+        row6[0] = nStrs[5];
+        row6[1] = String.valueOf(B121_240);
+        data.add(row6);
+        String[] row7 = new String[2];
+        row7[0] = nStrs[6];
+        row7[1] = String.valueOf(M240);
+        data.add(row7);
+
+        try {
+            CSVWriter writer = new CSVWriter(new FileWriter("stayDuration_" + myParent.mainModel.ABM.studyScope + "_" + jTextField1.getText() + ".csv"));
+            writer.writeAll(data);
+            writer.close();
+            System.out.println("SUMMARY VISITS SUCCESSFULLY WRITTEN");
+        } catch (IOException ex) {
+            Logger.getLogger(SpecificPOIAnalysisDialog.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    public void applyFilter(String filterName) {
+        filteredBrandsBehind = new ArrayList();
+        for (int i = 0; i < finalBrandsBehind.size(); i++) {
+            if (((String) finalBrandsBehind.get(i).getKey()).toLowerCase().contains(filterName)) {
+                filteredBrandsBehind.add(finalBrandsBehind.get(i));
+            }
+        }
+    }
+
+    public boolean loadPatterns(String patternName) {
+        myParent.mainModel.safegraph.clearPatternsPlaces();
+        String temp[] = patternName.split("_");
+        if(temp[0].equals("2020") && !(temp[1].equals("12"))){
+            return false;
+        }
+        myParent.mainModel.safegraph.loadPatternsPlacesSet(myParent.mainModel.datasetDirectory, temp[1] + "_" + temp[2], myParent.mainModel.allGISData, loadScope, true, myParent.numProcessors);
+        if(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList==null){
+            return false;
+        }
+        brands = new ArrayList();
+        for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.size(); i++) {
+            for (int j = 0; j < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.size(); j++) {
+                if (myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place != null) {
+                    if (myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.brands != null) {
+                        for (int k = 0; k < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.brands.size(); k++) {
+//                            if (myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.brands.get(k).name.toLowerCase().contains("target")) {
+                            brands.add(new SimplePair(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.brands.get(k).name, myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j)));
+//                                System.out.println("!!!!!!");
+//                            }
+                        }
+                    }
+                }
+            }
+        }
+        Collections.sort(brands);
+        finalBrandsBehind = brands;
+        return true;
+    }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

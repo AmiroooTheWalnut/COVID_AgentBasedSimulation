@@ -12,7 +12,10 @@ import COVID_AgentBasedSimulation.Model.Structure.City;
 import COVID_AgentBasedSimulation.Model.Structure.Marker;
 import COVID_AgentBasedSimulation.Model.Structure.Scope;
 import COVID_AgentBasedSimulation.Model.Structure.TessellationCell;
+import esmaieeli.gisFastLocationOptimization.GIS3D.AllData;
 import esmaieeli.gisFastLocationOptimization.GIS3D.LayerDefinition;
+import esmaieeli.gisFastLocationOptimization.GIS3D.LocationNode;
+import esmaieeli.gisFastLocationOptimization.GIS3D.NumericLayer;
 import esmaieeli.gisFastLocationOptimization.GUI.MainFramePanel;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -24,8 +27,10 @@ import java.util.LinkedHashMap;
  * @author user
  */
 public class RootArtificial extends Root {
+    
+    public AllData allDataGIS;
 
-    public MainFramePanel mainFParent = new esmaieeli.gisFastLocationOptimization.GUI.MainFramePanel();
+//    public MainFramePanel mainFParent = new esmaieeli.gisFastLocationOptimization.GUI.MainFramePanel();
 
     public ArrayList<Person> peopleNoTessellation = new ArrayList();
 
@@ -48,7 +53,7 @@ public class RootArtificial extends Root {
     public void constructor(MainModel modelRoot, int passed_numAgents, String passed_regionType, int passed_numRandomRegions, boolean isCompleteInfection, boolean isInfectCBGOnly, ArrayList<Integer> initialInfectionRegionIndex) {
         myModelRoot = modelRoot;
         myModelRoot.isArtificialExact = true;
-        mainFParent.allData = myModelRoot.ABM.allData;
+        allDataGIS = myModelRoot.ABM.allData;
         regionType = passed_regionType;
 
         switch (regionType) {
@@ -597,8 +602,8 @@ public class RootArtificial extends Root {
 
     public void preprocessNodesInRegions(ArrayList<Region> regions) {
 //        MainFramePanel mainFParent = new esmaieeli.gisFastLocationOptimization.GUI.MainFramePanel();
-        int cbgLayerIndex = mainFParent.findLayerExactNotCaseSensitive("cbg");
-        int baseLayerIndex = mainFParent.findLayerExactNotCaseSensitive("base");
+        int cbgLayerIndex = findLayerExactNotCaseSensitive("cbg");
+        int baseLayerIndex = findLayerExactNotCaseSensitive("base");
         LayerDefinition cbgLayer = (LayerDefinition) (myModelRoot.ABM.allData.all_Layers.get(cbgLayerIndex));
         LayerDefinition baseLayer = (LayerDefinition) (myModelRoot.ABM.allData.all_Layers.get(baseLayerIndex));
         for (int r = 0; r < regions.size(); r++) {
@@ -726,6 +731,29 @@ public class RootArtificial extends Root {
         }
         cBGRegionsLayer = scope.tessellations.get(tessellationIndex).regionImageLayer;
         return regionsList;
+    }
+    
+    public int findLayerExactNotCaseSensitive(String layerName) {
+        for (int i = 0; i < allDataGIS.all_Layers.size(); i++) {
+            if (((LayerDefinition) allDataGIS.all_Layers.get(i)).layerName.toLowerCase().equals(layerName.toLowerCase())) {
+                return i;
+            }
+        }
+        System.out.println("Layer not found!: " + layerName);
+        return -1;
+    }
+
+    public double getLayerValue(LocationNode node, int layerIndex) {
+        double output = Double.NEGATIVE_INFINITY;
+        if (((LayerDefinition) allDataGIS.all_Layers.get(layerIndex)) instanceof NumericLayer) {
+            if (node.layers == null) {
+                System.out.println(node.id);
+            }
+            output = (double) node.layers.get(layerIndex);
+        } else {
+            output = ((LayerDefinition) allDataGIS.all_Layers.get(layerIndex)).values[((short[]) node.layers.get(layerIndex))[0] - 1];
+        }
+        return output;
     }
 
 }
