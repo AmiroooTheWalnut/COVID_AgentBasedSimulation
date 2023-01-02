@@ -61,8 +61,8 @@ public class MainModel extends Dataset {
     public static final long softwareVersion = 1L;
     static final long serialVersionUID = softwareVersion;
 
-    public boolean isArtificialExact=false;
-    
+    public boolean isArtificialExact = false;
+
     public Safegraph safegraph;
     public AllGISData allGISData;
     public SupplementaryCaseStudyData supplementaryCaseStudyData;
@@ -76,7 +76,7 @@ public class MainModel extends Dataset {
 
     public Timer simulationTimer;
     public TimerTask runTask;
-    public int simulationDelayTime = 5000;
+    public int simulationDelayTime = -1;
     public boolean isFastForward = false;
 
     public int currentMonth = -1;
@@ -105,12 +105,12 @@ public class MainModel extends Dataset {
 
     public ExecutorService agentEvalPool;
 
-    public String datasetDirectory = "."+File.separator+"datasets";
+    public String datasetDirectory = "." + File.separator + "datasets";
 
     public boolean isDebugging = true;
-    
+
     public transient double elapsed;
-    
+
     public void startScriptEngines() {
         javaEvaluationEngine = new JavaEvaluationEngine(this);
         pythonEvaluationEngine = new PythonEvaluationEngine(this);//MAY NEED TO BE STOPPED BECAUSE OF LOCAL SERVER STRUGGLE WITH PROFILER
@@ -421,12 +421,12 @@ public class MainModel extends Dataset {
 //        ABM.rootAgent = ABM.makeRootAgentHardCoded();
         ABM.root = new RootArtificial(this);
 //        System.out.println(ABM.agentsRaw.get(2314235));//TEST AN ERROR!
-        if(ABM.exactSimGeoData.length()==0){
+        if (ABM.exactSimGeoData.length() == 0) {
             System.out.println("EXACT GEOGRAPHY IS MISSING!");
             System.out.println("SIMULATION STOPPED!");
             return;
         }
-        ABM.loadExactGeoData((RootArtificial)(ABM.root));
+        ABM.loadExactGeoData((RootArtificial) (ABM.root));
 
         //\/\/\/ get the total travels for the month from SafeGraph
         for (int i = 0; i < safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.size(); i++) {
@@ -436,7 +436,7 @@ public class MainModel extends Dataset {
         //^^^
 
         ABM.root.numAgents = numResidents;
-        ((RootArtificial)(ABM.root)).numNoTessellation=numNoTessellation;
+        ((RootArtificial) (ABM.root)).numNoTessellation = numNoTessellation;
 
         if (scenario.scenarioName.equals("CBG")) {
             ABM.root.constructor(this, numResidents, "CBG", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
@@ -853,11 +853,21 @@ public class MainModel extends Dataset {
 //            }
 //        }
         ABM.root.writeDailyInfection(testPath + File.separator + "infectionReport");
+        ABM.root.writeDailyMobility(testPath + File.separator + "mobilityReport");
         ABM.root.writeSimulationSummary(testPath + File.separator + "simulationSummary");
 //        if (isInfectCBGOnly == true) {
         ABM.root.writeConvertedToCBGInfection(testPath + File.separator + "CBGInf");
+        ABM.root.writeAllMobilityCounts(testPath + File.separator + "travelToAllPOIs");
 //        }
         ABM.root.writeTotalContacts(testPath + File.separator + "rawContactData");
+        if (ABM.root instanceof RootArtificial) {
+            RootArtificial root = (RootArtificial) (ABM.root);
+            if (root.isTessellationBuilt == true) {
+                root.writeScheduleSimilarityArtifitial(testPath + File.separator + "regionMobilitySimilarity");
+//                root.writeScheduleSimilarityArtifitialDebug(root.scheduleListExactArray,root.peopleNoTessellation);
+            }
+            root.runClusterers(testPath);
+        }
         isResultSavedAtTheEnd = true;
     }
 
@@ -866,25 +876,50 @@ public class MainModel extends Dataset {
         safegraph.initAllPatternsAllPlaces();
         safegraph.setDatasetTemplate();
     }
-    
-    public static int binarySearchCumulative(double value, ArrayList<Double> input){
-        int stepSize=input.size()/2;
-        int index=stepSize;
-        if(stepSize<5){
-            for(int i=0;i<input.size();i++){
-                if(input.get(i)>value){
+
+    public static int binarySearchCumulative(double value, ArrayList<Double> input) {
+        int stepSize = input.size() / 2;
+        int index = stepSize;
+        if (stepSize < 8) {
+            for (int i = 0; i < input.size(); i++) {
+                if (input.get(i) > value) {
                     return i;
                 }
             }
-        }
-        while(stepSize>1){
-            stepSize=stepSize/2;
-            if(value<input.get(index)){
-                index=index-stepSize;
-            }else{
-                index=index+stepSize;
+        } else {
+            while (stepSize > 1) {
+                stepSize = stepSize / 2;
+                if (value < input.get(index)) {
+                    index = index - stepSize;
+                } else {
+                    index = index + stepSize;
+                }
             }
+            if (index < 6) {
+                for (int i = 0; i < 7; i++) {
+                    if (value < input.get(i)) {
+                        index = i;
+                        break;
+                    }
+                }
+            } else if (index > input.size() - 6) {
+                for (int i = input.size() - 7; i < input.size(); i++) {
+                    if (value < input.get(i)) {
+                        index = i;
+                        break;
+                    }
+                }
+            } else {
+                for (int i = 0; i < 6; i++) {
+                    if (value < input.get(index - 3 + i)) {
+                        index = index - 3 + i;
+                        break;
+                    }
+                }
+            }
+
         }
+
         return index;
     }
 

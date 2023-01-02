@@ -1014,7 +1014,7 @@ public class SimulatorDialog extends javax.swing.JDialog {
                 .addComponent(jCheckBox7)
                 .addGap(18, 18, 18)
                 .addComponent(jCheckBox8)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 48, Short.MAX_VALUE)
                 .addComponent(jButton5)
                 .addContainerGap())
         );
@@ -1023,7 +1023,6 @@ public class SimulatorDialog extends javax.swing.JDialog {
         jPanel6.setLayout(new javax.swing.BoxLayout(jPanel6, javax.swing.BoxLayout.Y_AXIS));
 
         buttonGroup1.add(jRadioButton1);
-        jRadioButton1.setSelected(true);
         jRadioButton1.setText("1 tick per 5 seconds");
         jRadioButton1.setToolTipText("");
         jRadioButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -1088,6 +1087,7 @@ public class SimulatorDialog extends javax.swing.JDialog {
         jPanel6.add(jRadioButton8);
 
         buttonGroup1.add(jRadioButton6);
+        jRadioButton6.setSelected(true);
         jRadioButton6.setText("Fastforward");
         jRadioButton6.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1104,10 +1104,11 @@ public class SimulatorDialog extends javax.swing.JDialog {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jTabbedPane1)
                     .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel25, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jPanel25, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1615,6 +1616,7 @@ public class SimulatorDialog extends javax.swing.JDialog {
         myParent.mainModel.ABM.isReportContactRate = jCheckBox3.isSelected();
         myParent.mainModel.ABM.isFuzzyStatus = jCheckBox8.isSelected();
         myParent.mainModel.ABM.isSaveHistoricalRun = jCheckBox9.isSelected();
+//        myParent.mainModel.ABM.isSimpleTransmissionModel = jCheckBox10.isSelected();
 //        myParent.mainModel.javaEvaluationEngine.connectToConsole(jTextArea1);
 //        myParent.mainModel.pythonEvaluationEngine.connectToConsole(jTextArea2);
         myParent.mainModel.loadAndConnectSupplementaryCaseStudyDataKryo("./datasets/Safegraph/" + myParent.mainModel.ABM.studyScope + "/supplementaryGIS.bin");
@@ -1639,7 +1641,7 @@ public class SimulatorDialog extends javax.swing.JDialog {
         } else {
             myParent.mainModel.initModelHardCoded(true, true, jCheckBox1.isSelected(), (int) (jSpinner1.getValue()), (int) (jSpinner2.getValue()), myParent.numProcessors, jRadioButton21.isSelected(), isSpecialScenarioActive, infectionIndices);
         }
-        myParent.mainModel.ABM.agents= new CopyOnWriteArrayList(myParent.mainModel.ABM.agentsRaw);
+        myParent.mainModel.ABM.agents = new CopyOnWriteArrayList(myParent.mainModel.ABM.agentsRaw);
 
         jLabel2.setText(myParent.mainModel.ABM.startTime.toString());
 

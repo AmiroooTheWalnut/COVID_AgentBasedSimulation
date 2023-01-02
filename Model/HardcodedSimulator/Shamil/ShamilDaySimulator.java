@@ -240,5 +240,9 @@ public class ShamilDaySimulator {
         }
         avgTravelsPerDay = avgTravelsPerDay / (double) (persons.size());
         System.out.println("Average travels per day per agent: " + avgTravelsPerDay);
+        
+        String[] row=new String[1];
+        row[0]=String.valueOf(avgTravelsPerDay);
+        mainModel.ABM.root.mobilityPoll.add(row);
     }
 }

@@ -63,6 +63,8 @@ public class AgentBasedModel {
     public boolean isOurABMActive = false;
     public boolean isShamilABMActive = false;
     public boolean isAirQualityActive = false;
+    
+//    public boolean isSimpleTransmissionModel = true;
 
     public boolean isFuzzyStatus = false;
 

@@ -17,12 +17,18 @@ import COVID_AgentBasedSimulation.Model.Data.Safegraph.Patterns;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.Safegraph;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.SafegraphPlaces;
 import COVID_AgentBasedSimulation.Model.MainModel;
+import de.siegmar.fastcsv.writer.CsvWriter;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -100,6 +106,7 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
         jScrollPane3 = new javax.swing.JScrollPane();
         jList3 = new javax.swing.JList<>();
         jButton11 = new javax.swing.JButton();
+        jButton12 = new javax.swing.JButton();
 
         jLabel2.setText("jLabel2");
 
@@ -502,6 +509,13 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
             }
         });
 
+        jButton12.setText("Exhaustive NAICS frequencies");
+        jButton12.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton12ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -517,6 +531,8 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
                 .addComponent(jCheckBox1)
                 .addGap(18, 18, 18)
                 .addComponent(jButton11)
+                .addGap(18, 18, 18)
+                .addComponent(jButton12)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
@@ -530,7 +546,8 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
                     .addComponent(jCheckBox1)
                     .addComponent(jButton18)
                     .addComponent(jButton19)
-                    .addComponent(jButton11))
+                    .addComponent(jButton11)
+                    .addComponent(jButton12))
                 .addContainerGap())
         );
 
@@ -710,7 +727,7 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
 
     private void jButton11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton11ActionPerformed
         if (jList1.getSelectedIndex() > -1) {
-            String businessNames[] = new String[]{"Agriculture", "Mining", "Utilities", "Construction", "Manufacturing", "WholesaleTrade", "RetailTrade", "TransportationWarehousing", "Information", "FinanceInsurance", "RealestateRentalLeasing", "ProfessionalScientificTechnicalServices", "ManagementCompaniesEnterprises", "AdministrativeSupportWasteManagementRemediationServices", "EducationalServices", "HealthCareSocialAssistance", "ArtsEntertainmentRecreation", "AccommodationFoodServices", "OtherServicesExceptPublicAdministration", "PublicAdministration","Extra: Food and groceries","Extra: Religious organizations","Extra: Schools"};
+            String businessNames[] = new String[]{"Agriculture", "Mining", "Utilities", "Construction", "Manufacturing", "WholesaleTrade", "RetailTrade", "TransportationWarehousing", "Information", "FinanceInsurance", "RealestateRentalLeasing", "ProfessionalScientificTechnicalServices", "ManagementCompaniesEnterprises", "AdministrativeSupportWasteManagementRemediationServices", "EducationalServices", "HealthCareSocialAssistance", "ArtsEntertainmentRecreation", "AccommodationFoodServices", "OtherServicesExceptPublicAdministration", "PublicAdministration", "Extra: Food and groceries", "Extra: Religious organizations", "Extra: Schools"};
             int businessTravelsCount[] = new int[businessNames.length];
             for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.size(); i++) {
 //                System.out.println(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).place.naics_code);
@@ -785,7 +802,7 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
                     businessTravelsCount[22] += myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(jList1.getSelectedIndex()).patternRecords.get(i).raw_visit_counts;
 //                    System.out.println("PublicAdministration: "+businessTravelsCount[19]);
                 }
-                
+
             }
             try {
                 String header = new String();
@@ -804,7 +821,7 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
                     }
                 }
                 data += "\n";
-                File f1 = new File("./"+jList1.getSelectedValue()+"_NAICSReport.csv");
+                File f1 = new File("./" + jList1.getSelectedValue() + "_NAICSReport.csv");
                 if (!f1.exists()) {
                     f1.createNewFile();
                 }
@@ -821,6 +838,44 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_jButton11ActionPerformed
 
+    private void jButton12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton12ActionPerformed
+//        if (jList1.getSelectedIndex() > -1) {
+        String[] monthsToProcess = new String[]{"2020_06", "2020_07", "2020_08", "2020_09", "2020_10", "2020_11", "2020_12", "2021_01", "2021_02", "2021_03", "2021_04", "2021_05"};
+        for (int m = 0; m < monthsToProcess.length; m++) {
+            myParent.mainModel.safegraph.clearPatternsPlaces();
+            System.out.println("Loading data "+monthsToProcess[m]);
+            myParent.mainModel.safegraph.loadPatternsPlacesSet(myParent.mainModel.datasetDirectory, monthsToProcess[m], myParent.mainModel.allGISData, "FullData", true, myParent.numProcessors);
+            HashMap<Integer, Long> nAICSMap = new HashMap();
+            for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.size(); i++) {
+                Integer key = myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).place.naics_code;
+                Long val = (long)(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).raw_visit_counts);
+                if (nAICSMap.containsKey(key)) {
+                    Long oldVal = nAICSMap.get(key);
+                    Long newVal = oldVal + val;
+                    nAICSMap.put(key, newVal);
+                } else {
+                    nAICSMap.put(key, val);
+                }
+            }
+            ArrayList<String[]> rows = new ArrayList();
+            for (Map.Entry<Integer, Long> entry : nAICSMap.entrySet()) {
+                Integer key = entry.getKey();
+                Long value = entry.getValue();
+                String[] row = new String[2];
+                row[0] = String.valueOf(key);
+                row[1] = String.valueOf(value);
+                rows.add(row);
+            }
+            CsvWriter writer = new CsvWriter();
+            try {
+                writer.write(new File("FullScale" + "_exhaustiveNAICS.csv"), Charset.forName("US-ASCII"), rows);
+            } catch (IOException ex) {
+                Logger.getLogger(SafeGraphPreprocessDialog.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+//        }
+    }//GEN-LAST:event_jButton12ActionPerformed
+
     public boolean isReligiousOrganization(int naicsCode) {
         String naicsString = String.valueOf(naicsCode);
         if (naicsString.startsWith("8131")) {
@@ -828,7 +883,7 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
         }
         return false;
     }
-    
+
     public boolean isFoodAndGrocery(int naicsCode) {
         String naicsString = String.valueOf(naicsCode);
         if ((naicsString.startsWith("44") || naicsString.startsWith("45")) && !naicsString.startsWith("4411") && !naicsString.startsWith("4412") && !naicsString.startsWith("4413")) {
@@ -836,7 +891,7 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
         }
         return false;
     }
-    
+
     public boolean isAgriculture(int naicsCode) {
         String naicsString = String.valueOf(naicsCode);
         if (naicsString.startsWith("11")) {
@@ -1044,6 +1099,7 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton10;
     private javax.swing.JButton jButton11;
+    private javax.swing.JButton jButton12;
     private javax.swing.JButton jButton17;
     private javax.swing.JButton jButton18;
     private javax.swing.JButton jButton19;
