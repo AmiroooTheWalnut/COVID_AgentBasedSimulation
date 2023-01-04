@@ -1,5 +1,6 @@
 package COVID_AgentBasedSimulation.GUI;
 
+import COVID_AgentBasedSimulation.GUI.GraphicalModel.GraphicalModelDialog;
 import COVID_AgentBasedSimulation.GUI.Settings.SimulatorSettingsDialog;
 import COVID_AgentBasedSimulation.GUI.VoronoiGIS.GISLocationDialog;
 import COVID_AgentBasedSimulation.GUI.Simulator.SimulatorDialog;
@@ -44,8 +45,8 @@ public class MainFrame extends javax.swing.JFrame {
     public MainFrame() {
         initComponents();
 
-        projectManager=new ProjectManager();
-        
+        projectManager = new ProjectManager();
+
         jSpinner1.setModel(new javax.swing.SpinnerNumberModel(Runtime.getRuntime().availableProcessors() / 2, 1, 1000, 1));
 
         numProcessors = (int) jSpinner1.getValue();
@@ -89,8 +90,6 @@ public class MainFrame extends javax.swing.JFrame {
         }
     }
 
-    
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -126,8 +125,11 @@ public class MainFrame extends javax.swing.JFrame {
         jSpinner1 = new javax.swing.JSpinner();
         jButton6 = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
+        jPanel11 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jButton20 = new javax.swing.JButton();
+        jPanel15 = new javax.swing.JPanel();
+        jButton18 = new javax.swing.JButton();
         jPanel13 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         jButton5 = new javax.swing.JButton();
@@ -406,6 +408,8 @@ public class MainFrame extends javax.swing.JFrame {
 
         jPanel3.setLayout(new java.awt.GridLayout(1, 0));
 
+        jPanel11.setLayout(new java.awt.GridLayout(2, 0));
+
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Safegraph"));
 
         jButton20.setText("Preprocess");
@@ -432,7 +436,37 @@ public class MainFrame extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
-        jPanel3.add(jPanel1);
+        jPanel11.add(jPanel1);
+
+        jPanel15.setBorder(javax.swing.BorderFactory.createTitledBorder("Graphical model"));
+
+        jButton18.setText("Mobility sequence");
+        jButton18.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton18ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel15Layout = new javax.swing.GroupLayout(jPanel15);
+        jPanel15.setLayout(jPanel15Layout);
+        jPanel15Layout.setHorizontalGroup(
+            jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel15Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jButton18)
+                .addContainerGap(40, Short.MAX_VALUE))
+        );
+        jPanel15Layout.setVerticalGroup(
+            jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel15Layout.createSequentialGroup()
+                .addContainerGap(43, Short.MAX_VALUE)
+                .addComponent(jButton18)
+                .addContainerGap())
+        );
+
+        jPanel11.add(jPanel15);
+
+        jPanel3.add(jPanel11);
 
         jPanel13.setBorder(javax.swing.BorderFactory.createTitledBorder("Geography"));
 
@@ -759,16 +793,16 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        
+
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
-        ContactRateDialog contactRateDialog=new ContactRateDialog(this,false);
+        ContactRateDialog contactRateDialog = new ContactRateDialog(this, false);
         contactRateDialog.setVisible(true);
     }//GEN-LAST:event_jButton6ActionPerformed
 
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
-        PreviousRunsDialog previousRunsDialog=new PreviousRunsDialog(this,false);
+        PreviousRunsDialog previousRunsDialog = new PreviousRunsDialog(this, false);
         previousRunsDialog.setVisible(true);
     }//GEN-LAST:event_jButton7ActionPerformed
 
@@ -778,7 +812,7 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton8ActionPerformed
 
     private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
-        
+
     }//GEN-LAST:event_jButton9ActionPerformed
 
     private void jButton13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton13ActionPerformed
@@ -787,7 +821,7 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton13ActionPerformed
 
     private void jButton14ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton14ActionPerformed
-        PrepareReportDialog prepareReport=new PrepareReportDialog(this,false);
+        PrepareReportDialog prepareReport = new PrepareReportDialog(this, false);
         prepareReport.setVisible(true);
     }//GEN-LAST:event_jButton14ActionPerformed
 
@@ -801,8 +835,11 @@ public class MainFrame extends javax.swing.JFrame {
         specificPOIAnalysisDialog.setVisible(true);
     }//GEN-LAST:event_jButton16ActionPerformed
 
-    
-    
+    private void jButton18ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton18ActionPerformed
+        GraphicalModelDialog graphicalModelDialog = new GraphicalModelDialog(this, false);
+        graphicalModelDialog.setVisible(true);
+    }//GEN-LAST:event_jButton18ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -848,6 +885,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JButton jButton15;
     private javax.swing.JButton jButton16;
     private javax.swing.JButton jButton17;
+    private javax.swing.JButton jButton18;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton20;
     private javax.swing.JButton jButton3;
@@ -866,9 +904,11 @@ public class MainFrame extends javax.swing.JFrame {
     public javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel14;
+    private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel16;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;

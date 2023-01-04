@@ -342,7 +342,7 @@ public class Root extends Agent {
         for (int i = 0; i < regions.size(); i++) {
             cumulativePopulation = cumulativePopulation + regions.get(i).population;
         }
-        pTSFraction = Math.round((double) ((City) (modelRoot.ABM.studyScopeGeography)).population / (double) passed_numAgents);
+        pTSFraction = (double) ((City) (modelRoot.ABM.studyScopeGeography)).population / (double) passed_numAgents;
         if (pTSFraction < 1) {
             System.out.println("THE NUMBER OF AGENTS IS MORE THAN REAL NUMBER OF PEOPLE!!!");
         }
@@ -901,7 +901,7 @@ public class Root extends Agent {
                 initialRecovered(expectedInfectionPercentage);
                 double currentInfections = 0;
                 double currentInfectionPercentage = 0;
-                int maxRetry = 200;
+                int maxRetry = 2000;
                 int tryCounter = 0;
                 while (currentInfectionPercentage < expectedInfectionPercentage) {
 //            System.out.println("S currentInfectionPercentage: "+currentInfectionPercentage +" expectedInfectionPercentage: "+expectedInfectionPercentage);
@@ -965,7 +965,7 @@ public class Root extends Agent {
                 }
             }
             int numInfected = 0;
-            int maxRetry = 200;
+            int maxRetry = 2000;
             int tryCounter = 0;
             while (numInfected < aBMRegionPopulation) {
                 for (int i = 0; i < regions.size(); i++) {

@@ -331,7 +331,7 @@ public class RootArtificial extends Root {
         for (int i = 0; i < regions.size(); i++) {
             cumulativePopulation = cumulativePopulation + regions.get(i).population;
         }
-        pTSFraction = Math.round((double) ((City) (modelRoot.ABM.studyScopeGeography)).population / (double) passed_numAgents);
+        pTSFraction = (double) ((City) (modelRoot.ABM.studyScopeGeography)).population / (double) passed_numAgents;
         if (pTSFraction < 1) {
             System.out.println("THE NUMBER OF AGENTS IS MORE THAN REAL NUMBER OF PEOPLE!!!");
         }
