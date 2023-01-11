@@ -370,10 +370,10 @@
                               <Component id="jRadioButton18" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="jRadioButton19" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace max="32767" attributes="0"/>
-                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="jSpinner2" pref="76" max="32767" attributes="0"/>
                               <Component id="jSpinner3" max="32767" attributes="0"/>
-                              <Component id="jSpinner2" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                   </Group>
@@ -1273,7 +1273,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jScrollPane6" pref="174" max="32767" attributes="0"/>
+                      <Component id="jScrollPane6" pref="184" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -1320,7 +1320,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jScrollPane7" pref="174" max="32767" attributes="0"/>
+                      <Component id="jScrollPane7" pref="184" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -1362,7 +1362,7 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jPanel14" pref="516" max="32767" attributes="0"/>
+                  <Component id="jPanel14" pref="504" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>

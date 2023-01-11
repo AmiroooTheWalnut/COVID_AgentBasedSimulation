@@ -57,7 +57,8 @@ public class Root extends Agent {
         SUSCEPTIBLE, INFECTED_SYM, INFECTED_ASYM, RECOVERED, DEAD;
     }
 
-    public Random rnd = new Random(System.currentTimeMillis());
+//    public Random rnd = new Random(System.currentTimeMillis());
+    public Random rnd = new Random(1);
 
     Root currentAgent = this;
 
@@ -86,6 +87,14 @@ public class Root extends Agent {
     public boolean isLocalAllowed = true;
     public int agentPairContact[][];
     public String regionType;
+
+    public ArrayList<ScheduleListExact> scheduleListArray;
+    public ArrayList<ScheduleListExact> scheduleListArrayClustering;
+
+    public ArrayList<Double> sumHomeScheduleDifferences = new ArrayList();
+    public ArrayList<Double> sumHomeScheduleDifferencesClustering = new ArrayList();
+    public ArrayList<Double> sumWorkScheduleDifferences = new ArrayList();
+    public ArrayList<Double> sumWorkScheduleDifferencesClustering = new ArrayList();
 
     public LinkedHashMap<String, Long> travelsToAllPOIsFreqs = new LinkedHashMap();
 
@@ -303,15 +312,16 @@ public class Root extends Agent {
         for (int i = 0; i < modelRoot.safegraph.allPatterns.monthlyPatternsList.size(); i++) {
             ArrayList<PatternsRecordProcessed> patternRecordsTemp = modelRoot.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords;
             for (int j = 0; j < patternRecordsTemp.size(); j++) {
-                patternRecords.add(patternRecordsTemp.get(j));
-                if (pOIs.containsKey(patternRecordsTemp.get(j).placeKey)) {
-                    pOIs.get(patternRecordsTemp.get(j).placeKey).patternsRecord = patternRecordsTemp.get(j);
-                } else {
-                    POI tempPOI = new POI();
-                    tempPOI.patternsRecord = patternRecordsTemp.get(j);
-                    pOIs.put(patternRecordsTemp.get(j).placeKey, tempPOI);
+                if (isFoodAndGrocery(patternRecordsTemp.get(j).place.naics_code) == true) {//FOR NOW ONLY GROCERIES ARE IMPLEMENTED
+                    patternRecords.add(patternRecordsTemp.get(j));
+                    if (pOIs.containsKey(patternRecordsTemp.get(j).placeKey)) {
+                        pOIs.get(patternRecordsTemp.get(j).placeKey).patternsRecord = patternRecordsTemp.get(j);
+                    } else {
+                        POI tempPOI = new POI();
+                        tempPOI.patternsRecord = patternRecordsTemp.get(j);
+                        pOIs.put(patternRecordsTemp.get(j).placeKey, tempPOI);
+                    }
                 }
-
             }
         }
 
@@ -394,11 +404,13 @@ public class Root extends Agent {
     public void selectWorkRegion(Person person, Region homeRegion) {
         ScheduleList scheduleList = homeRegion.scheduleList;
         Region workRegion;
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 30; i++) {
             workRegion = sampleWorkRegion(scheduleList, person, homeRegion);
             if (workRegion != null) {
-                person.properties.workRegion = workRegion;
-                break;
+                if (workRegion.sumWorkFreqs > 0) {
+                    person.properties.workRegion = workRegion;
+                    break;
+                }
             }
         }
         if (person.properties.workRegion == null) {
@@ -1737,18 +1749,18 @@ public class Root extends Agent {
         header[0] = "POI";
         header[1] = "Num visits";
         rows.add(header);
-        int counter=0;
+        int counter = 0;
         for (HashMap.Entry<String, Long> entry : travelsToAllPOIsFreqs.entrySet()) {
 //            POI key = entry.getKey();
             Long value = entry.getValue();
             String[] row = new String[2];
             row[0] = String.valueOf(counter);
             row[1] = String.valueOf(value);
-            counter=counter+1;
+            counter = counter + 1;
             rows.add(row);
         }
         CsvWriter writer = new CsvWriter();
-        
+
         try {
             writer.write(new File(filePath + ".csv"), Charset.forName("US-ASCII"), rows);
         } catch (IOException ex) {
