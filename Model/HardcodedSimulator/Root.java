@@ -57,8 +57,8 @@ public class Root extends Agent {
         SUSCEPTIBLE, INFECTED_SYM, INFECTED_ASYM, RECOVERED, DEAD;
     }
 
-//    public Random rnd = new Random(System.currentTimeMillis());
-    public Random rnd = new Random(1);
+    public Random rnd = new Random(System.currentTimeMillis());
+//    public Random rnd = new Random(1);
 
     Root currentAgent = this;
 

@@ -184,7 +184,7 @@ public class RootArtificial extends Root {
         System.out.println("FINISHED PROCESS NODES!");
 
         if (isTessellationBuilt == false) {
-            generateAgentsRaw(myModelRoot, passed_numAgents, cBGregions, isTessellationBuilt, isTest);
+            generateAgentsRaw(myModelRoot, passed_numAgents, cBGregions, isTessellationBuilt,false, isTest);
             System.out.println("FINISHED AGENTS RAW!");
             selectExactLocations(people);
             System.out.println("FINISHED SELECT EXACT LOCATION!");
@@ -198,7 +198,7 @@ public class RootArtificial extends Root {
             } else {
                 numNoTessellationV = ((Marker) (myModelRoot.ABM.studyScopeGeography)).population;
             }
-            generateAgentsRaw(myModelRoot, numNoTessellationV, cBGregions, isTessellationBuilt, isTest);
+            generateAgentsRaw(myModelRoot, numNoTessellationV, cBGregions, isTessellationBuilt, false, isTest);
             System.out.println("FINISHED AGENTS RAW!");
             selectExactLocations(peopleNoTessellation);
             System.out.println("FINISHED SELECT EXACT LOCATION!");
@@ -211,7 +211,7 @@ public class RootArtificial extends Root {
     public void generatePostProcessPeople(int passed_numAgents) {
         calculateRegionSchedules();
         System.out.println("FINISHED REGION SCHEDULES!");
-        generateAgentsRaw(myModelRoot, passed_numAgents, regions, false, isTest);
+        generateAgentsRaw(myModelRoot, passed_numAgents, regions, false, true,isTest);
         System.out.println("FINISHED GENERATE AGENTS RAW!");
         postGeneratePeopleSchedulesForHome();
         postGeneratePeopleSchedulesForWork();
@@ -339,7 +339,7 @@ public class RootArtificial extends Root {
 
     }
 
-    public void generateAgentsRaw(MainModel modelRoot, int passed_numAgents, ArrayList<Region> regions, boolean isTessellationBuilt, boolean isTest) {
+    public void generateAgentsRaw(MainModel modelRoot, int passed_numAgents, ArrayList<Region> regions, boolean isTessellationBuilt,boolean isPost, boolean isTest) {
         int cumulativePopulation = 0;
         for (int i = 0; i < regions.size(); i++) {
             cumulativePopulation = cumulativePopulation + regions.get(i).population;
@@ -352,7 +352,7 @@ public class RootArtificial extends Root {
         if (isTest == false) {
             for (int i = 0; i < passed_numAgents; i++) {
                 Person person = new Person(i);
-                selectHomeRegionScheduleLess(person, sumRegionsPopulation, regions, isTest);
+                selectHomeRegionScheduleLess(person, sumRegionsPopulation, regions,isPost, isTest);
                 selectWorkRegion(person, person.properties.homeRegion);
                 if (modelRoot.ABM.isFuzzyStatus == false) {
                     person.insidePeople = new ArrayList();
@@ -375,7 +375,7 @@ public class RootArtificial extends Root {
             }
         } else {
             Person person = new Person(0);
-            selectHomeRegionScheduleLess(person, sumRegionsPopulation, regions, isTest);
+            selectHomeRegionScheduleLess(person, sumRegionsPopulation, regions,isPost, isTest);
             selectWorkRegion(person, person.properties.homeRegion);
             if (modelRoot.ABM.isFuzzyStatus == false) {
                 person.insidePeople = new ArrayList();
@@ -394,14 +394,20 @@ public class RootArtificial extends Root {
         }
     }
 
-    public void selectHomeRegionScheduleLess(Person person, int cumulativePopulation, ArrayList<Region> regions, boolean isTest) {
+    public void selectHomeRegionScheduleLess(Person person, int cumulativePopulation, ArrayList<Region> regions, boolean isPost, boolean isTest) {
         if (isTest == false) {
             int indexCumulativePopulation = (int) ((rnd.nextDouble() * (cumulativePopulation - 1)));
             int cumulativePopulationRun = 0;
             for (int j = 0; j < regions.size(); j++) {
                 cumulativePopulationRun = cumulativePopulationRun + regions.get(j).population;
                 if (cumulativePopulationRun > indexCumulativePopulation) {
-                    if (regions.get(j).sumHomeFreqs > 0 ) {
+                    if (isPost == false) {
+                        if (regions.get(j).sumHomeFreqs > 0) {
+                            person.properties.homeRegion = regions.get(j);
+                            regions.get(j).residents.add(person);
+                            break;
+                        }
+                    } else {
                         person.properties.homeRegion = regions.get(j);
                         regions.get(j).residents.add(person);
                         break;
