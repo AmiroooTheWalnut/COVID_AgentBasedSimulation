@@ -696,25 +696,37 @@ public class Root extends Agent {
             group.add(m);
             groups.add(group);
         }
+        int maxTry=100;
+        int tryCounter=0;
         int currentNumRegions = groups.size();
         while (currentNumRegions > numRegions) {
             int selectedGroup = (int) (Math.floor(rnd.nextDouble() * groups.size()));
             int selectedRegion = (int) (Math.floor(rnd.nextDouble() * groups.get(selectedGroup).size()));
             int selectedRegionToMergeInHashMap = (int) (Math.floor(rnd.nextDouble() * tempRegionsList.get(groups.get(selectedGroup).get(selectedRegion)).neighbors.size()));
             ArrayList<Integer> keys = new ArrayList(tempRegionsList.get(groups.get(selectedGroup).get(selectedRegion)).neighbors.keySet());
-            int key = keys.get(selectedRegionToMergeInHashMap);
-            int selectedGroupToMerge = findGroupIndexOfRegionIndex(groups, key);
-            if (selectedGroupToMerge == -1) {
-                System.out.println("SEVERE ERROR: REGION ID IS NOT FOUND IN ALL GROUPS");
-                throw (new ArithmeticException("REGION ID IS NOT FOUND IN ALL GROUPS"));
-            }
-            if (selectedGroupToMerge != selectedGroup) {
-                for (int i = 0; i < groups.get(selectedGroupToMerge).size(); i++) {
-                    groups.get(selectedGroup).add(groups.get(selectedGroupToMerge).get(i));
+            if (!keys.isEmpty()) {
+                int key = keys.get(selectedRegionToMergeInHashMap);
+                int selectedGroupToMerge = findGroupIndexOfRegionIndex(groups, key);
+                if (selectedGroupToMerge == -1) {
+                    System.out.println("SEVERE ERROR: REGION ID IS NOT FOUND IN ALL GROUPS");
+                    throw (new ArithmeticException("REGION ID IS NOT FOUND IN ALL GROUPS"));
                 }
-                groups.remove(selectedGroupToMerge);
+                if (selectedGroupToMerge != selectedGroup) {
+                    for (int i = 0; i < groups.get(selectedGroupToMerge).size(); i++) {
+                        groups.get(selectedGroup).add(groups.get(selectedGroupToMerge).get(i));
+                    }
+                    groups.remove(selectedGroupToMerge);
+                }
+                currentNumRegions = groups.size();
+                tryCounter=0;
+            } else {
+                tryCounter=tryCounter+1;
+                if(tryCounter>maxTry){
+                    System.out.println("Failed to reach the number of regions");
+                    break;
+                }
             }
-            currentNumRegions = groups.size();
+
         }
         return groups;
     }
