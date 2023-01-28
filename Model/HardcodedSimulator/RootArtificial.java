@@ -5,12 +5,15 @@
 package COVID_AgentBasedSimulation.Model.HardcodedSimulator;
 
 import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.RegionImageLayer;
+import COVID_AgentBasedSimulation.GUI.VoronoiGIS.GISLocationDialog;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.PatternsRecordProcessed;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilSimulatorController;
 import COVID_AgentBasedSimulation.Model.MainModel;
+import COVID_AgentBasedSimulation.Model.Structure.CensusBlockGroup;
 import COVID_AgentBasedSimulation.Model.Structure.City;
 import COVID_AgentBasedSimulation.Model.Structure.Marker;
 import COVID_AgentBasedSimulation.Model.Structure.Scope;
+import COVID_AgentBasedSimulation.Model.Structure.Tessellation;
 import COVID_AgentBasedSimulation.Model.Structure.TessellationCell;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
@@ -19,6 +22,8 @@ import esmaieeli.gisFastLocationOptimization.GIS3D.AllData;
 import esmaieeli.gisFastLocationOptimization.GIS3D.LayerDefinition;
 import esmaieeli.gisFastLocationOptimization.GIS3D.LocationNode;
 import esmaieeli.gisFastLocationOptimization.GIS3D.NumericLayer;
+import esmaieeli.gisFastLocationOptimization.GUI.MainFramePanel;
+import esmaieeli.gisFastLocationOptimization.Simulation.VectorToPolygon;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -33,6 +38,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import weka.clusterers.ClusterEvaluation;
@@ -77,6 +83,8 @@ public class RootArtificial extends Root {
     protected Instances m_Instances;
     public ClustererManager clustererManager;
 
+    public Tessellation clusteringTessellation;
+
 //    public LinkedHashMap<String, POI> pOIsLHM = new LinkedHashMap();
     public RootArtificial(MainModel modelRoot) {
         super(modelRoot);
@@ -101,6 +109,15 @@ public class RootArtificial extends Root {
                 isTessellationBuilt = true;
                 break;
             case "CBGVDFMTH":
+                isTessellationBuilt = true;
+                break;
+            case "VD_CBG":
+                isTessellationBuilt = true;
+                break;
+            case "VD_CBGVD":
+                isTessellationBuilt = true;
+                break;
+            case "Xmeans":
                 isTessellationBuilt = true;
                 break;
             case "RMCBG":
@@ -130,13 +147,17 @@ public class RootArtificial extends Root {
 
         infectionPoll.add(header);
 
-//        myModelRoot.ABM.agents=new CopyOnWriteArrayList(passed_numAgents);
-        generateRegions(modelRoot, passed_regionType, passed_numRandomRegions);
-//        if (isInfectCBGOnly == true) {
         int cBGTessellationIndex = getTessellationLayerIndex((Scope) (modelRoot.ABM.studyScopeGeography), "CBG");
         cBGregions = makeByVDTessellationCBG(modelRoot, cBGTessellationIndex);
-//        }
 
+//        myModelRoot.ABM.agents=new CopyOnWriteArrayList(passed_numAgents);
+        generateRegions(modelRoot, passed_regionType, passed_numRandomRegions);
+        if (passed_regionType.equals("Xmeans")) {
+            regions = makeRegionsByClustering(modelRoot, numNoTessellation, passed_numRandomRegions);
+        }
+//        if (isInfectCBGOnly == true) {
+
+//        }
         generateNoTessellationPeople(isTessellationBuilt, passed_numAgents);
         System.out.println("FINISHED NO TESSELLATION!");
         if (isTessellationBuilt == true) {
@@ -184,7 +205,7 @@ public class RootArtificial extends Root {
         System.out.println("FINISHED PROCESS NODES!");
 
         if (isTessellationBuilt == false) {
-            generateAgentsRaw(myModelRoot, passed_numAgents, cBGregions, isTessellationBuilt,false, isTest);
+            generateAgentsRaw(myModelRoot, passed_numAgents, cBGregions, isTessellationBuilt, false, isTest);
             System.out.println("FINISHED AGENTS RAW!");
             selectExactLocations(people);
             System.out.println("FINISHED SELECT EXACT LOCATION!");
@@ -211,7 +232,7 @@ public class RootArtificial extends Root {
     public void generatePostProcessPeople(int passed_numAgents) {
         calculateRegionSchedules();
         System.out.println("FINISHED REGION SCHEDULES!");
-        generateAgentsRaw(myModelRoot, passed_numAgents, regions, false, true,isTest);
+        generateAgentsRaw(myModelRoot, passed_numAgents, regions, false, true, isTest);
         System.out.println("FINISHED GENERATE AGENTS RAW!");
         postGeneratePeopleSchedulesForHome();
         postGeneratePeopleSchedulesForWork();
@@ -339,7 +360,7 @@ public class RootArtificial extends Root {
 
     }
 
-    public void generateAgentsRaw(MainModel modelRoot, int passed_numAgents, ArrayList<Region> regions, boolean isTessellationBuilt,boolean isPost, boolean isTest) {
+    public void generateAgentsRaw(MainModel modelRoot, int passed_numAgents, ArrayList<Region> regions, boolean isTessellationBuilt, boolean isPost, boolean isTest) {
         int cumulativePopulation = 0;
         for (int i = 0; i < regions.size(); i++) {
             cumulativePopulation = cumulativePopulation + regions.get(i).population;
@@ -352,7 +373,7 @@ public class RootArtificial extends Root {
         if (isTest == false) {
             for (int i = 0; i < passed_numAgents; i++) {
                 Person person = new Person(i);
-                selectHomeRegionScheduleLess(person, sumRegionsPopulation, regions,isPost, isTest);
+                selectHomeRegionScheduleLess(person, sumRegionsPopulation, regions, isPost, isTest);
                 selectWorkRegion(person, person.properties.homeRegion);
                 if (modelRoot.ABM.isFuzzyStatus == false) {
                     person.insidePeople = new ArrayList();
@@ -375,7 +396,7 @@ public class RootArtificial extends Root {
             }
         } else {
             Person person = new Person(0);
-            selectHomeRegionScheduleLess(person, sumRegionsPopulation, regions,isPost, isTest);
+            selectHomeRegionScheduleLess(person, sumRegionsPopulation, regions, isPost, isTest);
             selectWorkRegion(person, person.properties.homeRegion);
             if (modelRoot.ABM.isFuzzyStatus == false) {
                 person.insidePeople = new ArrayList();
@@ -664,8 +685,8 @@ public class RootArtificial extends Root {
 
     public void preprocessNodesInRegions(ArrayList<Region> regions) {
 //        MainFramePanel mainFParent = new esmaieeli.gisFastLocationOptimization.GUI.MainFramePanel();
-        int cbgLayerIndex = findLayerExactNotCaseSensitive("cbg");
-        int baseLayerIndex = findLayerExactNotCaseSensitive("base");
+        int cbgLayerIndex = RootArtificial.findLayerExactNotCaseSensitive(allDataGIS, "cbg");
+        int baseLayerIndex = RootArtificial.findLayerExactNotCaseSensitive(allDataGIS, "base");
         LayerDefinition cbgLayer = (LayerDefinition) (myModelRoot.ABM.allData.all_Layers.get(cbgLayerIndex));
         LayerDefinition baseLayer = (LayerDefinition) (myModelRoot.ABM.allData.all_Layers.get(baseLayerIndex));
         for (int r = 0; r < regions.size(); r++) {
@@ -806,9 +827,9 @@ public class RootArtificial extends Root {
         return regionsList;
     }
 
-    public int findLayerExactNotCaseSensitive(String layerName) {
-        for (int i = 0; i < allDataGIS.all_Layers.size(); i++) {
-            if (((LayerDefinition) allDataGIS.all_Layers.get(i)).layerName.toLowerCase().equals(layerName.toLowerCase())) {
+    public static int findLayerExactNotCaseSensitive(AllData allData, String layerName) {
+        for (int i = 0; i < allData.all_Layers.size(); i++) {
+            if (((LayerDefinition) allData.all_Layers.get(i)).layerName.toLowerCase().equals(layerName.toLowerCase())) {
                 return i;
             }
         }
@@ -1243,6 +1264,150 @@ public class RootArtificial extends Root {
             return instances.get(0);
         } catch (IOException | NumberFormatException ex) {
             System.out.println(ex.getMessage());
+        }
+        return null;
+    }
+
+    public ArrayList makeRegionsByClustering(MainModel modelRoot, int passed_numIndividuals, int numClusters) {
+        preprocessNodesInRegions(cBGregions);
+        generateAgentsRaw(modelRoot, passed_numIndividuals, cBGregions, isTessellationBuilt, false, isTest);
+        selectExactLocations(peopleNoTessellation);
+
+        Object[] result = clusterIndividualsForRegions(numClusters);
+
+        int cBGLayerIndex = modelRoot.ABM.findLayerExactNotCaseSensitive("CBG");
+
+        RegionImageLayer cLLayer = new RegionImageLayer();
+
+        VectorToPolygon vp = new VectorToPolygon();
+        int[][] indexedImage = vp.individualClusterToIndexedImage(modelRoot.ABM.allData, (ArrayList<Double>) (result[0]), (ArrayList<Double>) (result[1]), (ArrayList<Integer>) (result[2]), true);
+
+        vp.saveIndexedImageAsPNG(indexedImage, allDataGIS, numClusters, "test.png");
+
+        cLLayer.indexedImage = indexedImage;
+        
+        //SEEMS USELESS
+//        for (int i = 0; i < modelRoot.ABM.allData.all_Layers.size(); i++) {
+//            if (((LayerDefinition) (modelRoot.ABM.allData.all_Layers.get(i))).layerName.toLowerCase().equals("cbg")) {
+//                cLLayer.cBGIndexs = vp.cBGlayerToIndexedIDImage(modelRoot.ABM.allData, cBGLayerIndex, indexedImage);
+//            }
+//        }
+        cLLayer.startLat = vp.scaleOffsetX;
+        cLLayer.startLon = vp.scaleOffsetY;
+        cLLayer.endLat = vp.scaleOffsetX + vp.scaleWidth;
+        cLLayer.endLon = vp.scaleOffsetY + vp.scaleHeight;
+
+        cLLayer.severities = new double[numClusters];
+        cLLayer.imageBoundaries = RegionImageLayer.getImageBoundaries(indexedImage);
+
+        Tessellation tessellation = new Tessellation();
+        tessellation.scenarioName = "Xmeans";
+        for (int vdIndex = 1; vdIndex < numClusters + 1; vdIndex++) {
+            tessellation.cells.add(new TessellationCell());
+            tessellation.cells.get(vdIndex - 1).cBGsInvolved = new ArrayList();
+            tessellation.cells.get(vdIndex - 1).cBGsIDsInvolved = new ArrayList();
+            tessellation.cells.get(vdIndex - 1).cBGsPercentageInvolved = new ArrayList();
+            tessellation.cells.get(vdIndex - 1).myIndex = vdIndex;
+
+            HashMap<CensusBlockGroup, Integer> cBGNumNodesHashMap = null;
+
+//                                if(((LayerDefinition)(mainFParent.allData.all_Layers.get(i))).layerName.equals("CBG")){
+//                                    System.out.println("DEBUG123");
+//                                }
+            cBGNumNodesHashMap = GISLocationDialog.getHashNumNodeForCluster(modelRoot.ABM.allData, modelRoot.allGISData, vdIndex, indexedImage, cBGLayerIndex);
+
+            double sumNodes = 0;
+            for (Map.Entry<CensusBlockGroup, Integer> set : cBGNumNodesHashMap.entrySet()) {
+                sumNodes += set.getValue();
+            }
+            for (Map.Entry<CensusBlockGroup, Integer> set : cBGNumNodesHashMap.entrySet()) {
+                tessellation.cells.get(vdIndex - 1).cBGsInvolved.add(set.getKey());
+                if (set.getKey() != null) {
+                    tessellation.cells.get(vdIndex - 1).cBGsIDsInvolved.add(set.getKey().id);
+                } else {
+                    tessellation.cells.get(vdIndex - 1).cBGsIDsInvolved.add(-1l);
+                }
+                tessellation.cells.get(vdIndex - 1).cBGsPercentageInvolved.add((double) (set.getValue()) / sumNodes);
+            }
+        }
+
+        for (int i = 0; i < tessellation.cells.size(); i++) {
+            for (int j = 0; j < tessellation.cells.get(i).cBGsPercentageInvolved.size(); j++) {
+                tessellation.cells.get(i).population = tessellation.cells.get(i).population + (int) (tessellation.cells.get(i).cBGsPercentageInvolved.get(j) * tessellation.cells.get(i).cBGsInvolved.get(j).population);
+            }
+        }
+
+        tessellation.regionImageLayer = cLLayer;
+        regionsLayer = cLLayer;
+        clusteringTessellation = tessellation;
+//        scsd.tessellations.add(tessellation);
+
+        ArrayList<TessellationCell> vDsListRaw = tessellation.cells;
+        ArrayList regionsList = new ArrayList();
+        Scope scope = (Scope) (modelRoot.ABM.studyScopeGeography);
+        for (int i = 0; i < vDsListRaw.size(); i++) {
+            Region region = new Region(i);
+            region.lat = vDsListRaw.get(i).getLat();
+            region.lon = vDsListRaw.get(i).getLon();
+
+            region.population = vDsListRaw.get(i).population;
+            region.workPopulation = 0;
+            region.cBGsIDsInvolved = vDsListRaw.get(i).cBGsIDsInvolved;
+            region.cBGsInvolved = vDsListRaw.get(i).cBGsInvolved;
+            region.cBGsPercentageInvolved = vDsListRaw.get(i).cBGsPercentageInvolved;
+
+//            region.polygons.add(scope.vDPolygons.get(vDsListRaw.get(i).myIndex));
+            regionsList.add(region);
+        }
+        int cBGTessellationIndex = getTessellationLayerIndex((Scope) (modelRoot.ABM.studyScopeGeography), "CBG");
+        cBGRegionsLayer = scope.tessellations.get(cBGTessellationIndex).regionImageLayer;
+        return regionsList;
+    }
+
+    public Object[] clusterIndividualsForRegions(int numRegions) {
+        try {
+            prepareClusteringData();
+
+            XMeans xMeans = new XMeans();
+            xMeans.setMaxNumClusters(numRegions);
+            xMeans.setMinNumClusters(numRegions);
+            xMeans.setUseKDTree(false);
+            xMeans.setMaxIterations(2000);
+            xMeans.setMaxKMeans(2000);
+            xMeans.setMaxKMeansForChildren(2000);
+            xMeans.setCutOffFactor(0.0);
+            xMeans.buildClusterer(m_Instances);
+
+            ClusterEvaluation eval = new ClusterEvaluation();
+            eval.setClusterer(xMeans);
+            eval.evaluateClusterer(m_Instances);
+
+            double[] assignments = eval.getClusterAssignments();
+            ArrayList<Integer> assignmentsArrayList = new ArrayList();
+
+            ArrayList<Double> lats = new ArrayList();
+            ArrayList<Double> lons = new ArrayList();
+
+            System.out.println("Finished Clustering");
+            ArrayList<Person> activePeople;
+            activePeople = peopleNoTessellation;
+
+            for (int i = 0; i < assignments.length; i++) {
+                assignmentsArrayList.add((int) (assignments[i]) + 1);
+                lats.add(activePeople.get(i).exactProperties.exactHomeLocation.lat);
+                lons.add(activePeople.get(i).exactProperties.exactHomeLocation.lon);
+            }
+
+            Object output[] = new Object[3];
+            output[0] = lats;
+            output[1] = lons;
+            output[2] = assignmentsArrayList;
+
+            return output;
+
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            ex.printStackTrace();
         }
         return null;
     }

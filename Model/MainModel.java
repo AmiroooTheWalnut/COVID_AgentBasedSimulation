@@ -160,7 +160,7 @@ public class MainModel extends Dataset {
                         for (int j = 0; j < scsd.cBGVDCells.get(i).cBGsIDsInvolved.size(); j++) {
                             CensusBlockGroup cbg = allGISData.findCensusBlockGroup(scsd.cBGVDCells.get(i).cBGsIDsInvolved.get(j));
                             if (cbg == null) {
-                                System.out.println("SVERE ERROR WHILE CONNECTING SUPPLEMENTARY DATA: CBG IS NULL!");
+                                System.out.println("SEVERE ERROR WHILE CONNECTING SUPPLEMENTARY DATA: CBG IS NULL!");
                             } else {
                                 avgLat = avgLat + cbg.lat;
                                 avgLon = avgLon + cbg.lon;
@@ -444,10 +444,16 @@ public class MainModel extends Dataset {
             ABM.root.constructor(this, numResidents, "VDFMTH", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
         } else if (scenario.scenarioName.equals("CBGVDFMTH")) {
             ABM.root.constructor(this, numResidents, "CBGVDFMTH", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
+        } else if (scenario.scenarioName.equals("VD_CBG")) {
+            ABM.root.constructor(this, numResidents, "VD_CBG", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
+        } else if (scenario.scenarioName.equals("VD_CBGVD")) {
+            ABM.root.constructor(this, numResidents, "VD_CBGVD", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
         } else if (scenario.scenarioName.equals("AVDFMTH")) {
             ABM.root.constructor(this, numResidents, "AVDFMTH", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
         } else if (scenario.scenarioName.startsWith("RMCBG")) {
             ABM.root.constructor(this, numResidents, "RMCBG", numRegions, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
+        } else if (scenario.scenarioName.startsWith("Xmeans")) {
+            ABM.root.constructor(this, numResidents, "Xmeans", numRegions, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
         } else if (scenario.scenarioName.startsWith("VDFNC")) {
             String[] temp = scenario.scenarioName.split("_");
             int numCells = Integer.valueOf(temp[1]);

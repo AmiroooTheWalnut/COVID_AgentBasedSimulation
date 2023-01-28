@@ -12,11 +12,24 @@ import java.util.ArrayList;
  *
  * @author user
  */
-public class LocationNodeSafegraph {
+public class LocationNodeSafegraph implements Comparable<LocationNodeSafegraph> {
+
     public LocationNode node;
     public String placeKey;
     public ArrayList<String> placeKeys;
     public SafegraphPlace place;
     public ArrayList<SafegraphPlace> places;
+    public int numVisits = -1;
     //public double remainingVisits;
+
+    @Override
+    public int compareTo(LocationNodeSafegraph o) {
+        if (numVisits == o.numVisits) {
+            return 0;
+        } else if (numVisits > o.numVisits) {
+            return 1;
+        } else {
+            return -1;
+        }
+    }
 }

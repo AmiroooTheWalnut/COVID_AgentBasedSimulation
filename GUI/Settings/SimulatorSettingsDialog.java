@@ -150,6 +150,8 @@ public class SimulatorSettingsDialog extends javax.swing.JDialog {
         jCheckBox4.setSelected(myMainModel.ABM.isAirQualityActive);
 
         updateAgentTemplateList();
+        
+        jLabel1.setText(myMainModel.ABM.exactSimGeoData);
     }
 
     public void updateAgentTemplateList() {
@@ -229,6 +231,7 @@ public class SimulatorSettingsDialog extends javax.swing.JDialog {
         jCheckBox3 = new javax.swing.JCheckBox();
         jCheckBox4 = new javax.swing.JCheckBox();
         jButton4 = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         getContentPane().setLayout(new java.awt.GridLayout(1, 3));
@@ -597,6 +600,8 @@ public class SimulatorSettingsDialog extends javax.swing.JDialog {
             }
         });
 
+        jLabel1.setText("Exact geom name");
+
         javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
         jPanel9.setLayout(jPanel9Layout);
         jPanel9Layout.setHorizontalGroup(
@@ -607,7 +612,8 @@ public class SimulatorSettingsDialog extends javax.swing.JDialog {
                     .addComponent(jCheckBox1)
                     .addComponent(jCheckBox3)
                     .addComponent(jCheckBox4)
-                    .addComponent(jButton4))
+                    .addComponent(jButton4)
+                    .addComponent(jLabel1))
                 .addContainerGap(99, Short.MAX_VALUE))
         );
         jPanel9Layout.setVerticalGroup(
@@ -621,7 +627,9 @@ public class SimulatorSettingsDialog extends javax.swing.JDialog {
                 .addComponent(jCheckBox4)
                 .addGap(18, 18, 18)
                 .addComponent(jButton4)
-                .addContainerGap(398, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel1)
+                .addContainerGap(376, Short.MAX_VALUE))
         );
 
         getContentPane().add(jPanel9);
@@ -856,6 +864,7 @@ public class SimulatorSettingsDialog extends javax.swing.JDialog {
     private javax.swing.JCheckBox jCheckBox4;
     private javax.swing.JFormattedTextField jFormattedTextField1;
     private javax.swing.JFormattedTextField jFormattedTextField2;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;

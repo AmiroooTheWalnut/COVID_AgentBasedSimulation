@@ -12,6 +12,7 @@ import COVID_AgentBasedSimulation.Model.MainModel;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import esmaieeli.gisFastLocationOptimization.GIS3D.AllData;
+import esmaieeli.gisFastLocationOptimization.GIS3D.LayerDefinition;
 import esmaieeli.gisFastLocationOptimization.GIS3D.PreProcessor;
 import esmaieeli.gisFastLocationOptimization.GIS3D.Scaling;
 import groovy.lang.Binding;
@@ -635,6 +636,16 @@ public class AgentBasedModel {
         allData = preProcessor.read_allData_kryo(allData, file.getParent(), properFileName, "data");
         allData.myScale = new Scaling(allData.all_Nodes);
         allData.myScale.calculate();
+    }
+    
+    public int findLayerExactNotCaseSensitive(String layerName) {
+        for (int i = 0; i < allData.all_Layers.size(); i++) {
+            if (((LayerDefinition) allData.all_Layers.get(i)).layerName.toLowerCase().equals(layerName.toLowerCase())) {
+                return i;
+            }
+        }
+        System.out.println("Layer not found!: " + layerName);
+        return -1;
     }
 
 }

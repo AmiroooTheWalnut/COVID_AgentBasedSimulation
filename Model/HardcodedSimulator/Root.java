@@ -189,6 +189,16 @@ public class Root extends Agent {
                 tessellationIndex = getTessellationLayerIndex((Scope) (modelRoot.ABM.studyScopeGeography), "CBGVDFMTH");
                 regions = makeByVDTessellation(modelRoot, tessellationIndex, true);
                 break;
+            case "VD_CBG":
+//                regions = makeByCBGVDs(modelRoot);
+                tessellationIndex = getTessellationLayerIndex((Scope) (modelRoot.ABM.studyScopeGeography), "VD_CBG_num_cells");
+                regions = makeByVDTessellation(modelRoot, tessellationIndex, true);
+                break;
+            case "VD_CBGVD":
+//                regions = makeByCBGVDs(modelRoot);
+                tessellationIndex = getTessellationLayerIndex((Scope) (modelRoot.ABM.studyScopeGeography), "VD_CBGVD_num_cells");
+                regions = makeByVDTessellation(modelRoot, tessellationIndex, true);
+                break;
             case "RMCBG":
                 regions = makeByRandomCBGs(modelRoot, n);
 //                tessellationIndex = getTessellationLayerIndex((Scope) (modelRoot.ABM.studyScopeGeography), "RMCBG_"+n);
@@ -494,7 +504,7 @@ public class Root extends Agent {
         return regionsList;
     }
 
-    ArrayList makeByVDTessellation(MainModel modelRoot, int tessellationIndex, boolean isSetRegionLayer) {
+    public ArrayList makeByVDTessellation(MainModel modelRoot, int tessellationIndex, boolean isSetRegionLayer) {
         ArrayList<TessellationCell> vDsListRaw = modelRoot.getSafegraph().getVDTessellationFromCaseStudy(modelRoot.getABM().getStudyScopeGeography(), tessellationIndex);
         ArrayList regionsList = new ArrayList();
         Scope scope = (Scope) (modelRoot.ABM.studyScopeGeography);
@@ -696,8 +706,8 @@ public class Root extends Agent {
             group.add(m);
             groups.add(group);
         }
-        int maxTry=100;
-        int tryCounter=0;
+        int maxTry = 100;
+        int tryCounter = 0;
         int currentNumRegions = groups.size();
         while (currentNumRegions > numRegions) {
             int selectedGroup = (int) (Math.floor(rnd.nextDouble() * groups.size()));
@@ -718,10 +728,10 @@ public class Root extends Agent {
                     groups.remove(selectedGroupToMerge);
                 }
                 currentNumRegions = groups.size();
-                tryCounter=0;
+                tryCounter = 0;
             } else {
-                tryCounter=tryCounter+1;
-                if(tryCounter>maxTry){
+                tryCounter = tryCounter + 1;
+                if (tryCounter > maxTry) {
                     System.out.println("Failed to reach the number of regions");
                     break;
                 }

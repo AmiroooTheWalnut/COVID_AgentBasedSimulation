@@ -12,7 +12,9 @@ import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MyPolygons;
 import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.RegionImageLayer;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.LocationNodeSafegraph;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.PatternsRecordProcessed;
+import COVID_AgentBasedSimulation.Model.HardcodedSimulator.RootArtificial;
 import COVID_AgentBasedSimulation.Model.MainModel;
+import COVID_AgentBasedSimulation.Model.Structure.AllGISData;
 import COVID_AgentBasedSimulation.Model.Structure.CBGVDCell;
 import COVID_AgentBasedSimulation.Model.Structure.CensusBlockGroup;
 import COVID_AgentBasedSimulation.Model.Structure.City;
@@ -50,6 +52,7 @@ import de.fhpotsdam.unfolding.geo.Location;
 import de.siegmar.fastcsv.reader.CsvContainer;
 import de.siegmar.fastcsv.reader.CsvReader;
 import de.siegmar.fastcsv.writer.CsvWriter;
+import esmaieeli.gisFastLocationOptimization.GIS3D.AllData;
 import esmaieeli.gisFastLocationOptimization.GIS3D.NumericLayer;
 import esmaieeli.gisFastLocationOptimization.GIS3D.StoreProcessedData;
 import esmaieeli.gisFastLocationOptimization.Simulation.SimplePolygons;
@@ -140,6 +143,8 @@ public class GISLocationDialog extends javax.swing.JDialog {
         jSpinner1 = new javax.swing.JSpinner();
         jButton30 = new javax.swing.JButton();
         jButton31 = new javax.swing.JButton();
+        jButton32 = new javax.swing.JButton();
+        jButton33 = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
         jButton24 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
@@ -336,6 +341,20 @@ public class GISLocationDialog extends javax.swing.JDialog {
             }
         });
 
+        jButton32.setText("Generate VD_CBG");
+        jButton32.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton32ActionPerformed(evt);
+            }
+        });
+
+        jButton33.setText("Generate VD_CBGVD");
+        jButton33.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton33ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -365,7 +384,9 @@ public class GISLocationDialog extends javax.swing.JDialog {
                             .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addComponent(jButton11, javax.swing.GroupLayout.Alignment.LEADING))
                     .addComponent(jButton30)
-                    .addComponent(jButton31))
+                    .addComponent(jButton31)
+                    .addComponent(jButton32)
+                    .addComponent(jButton33))
                 .addContainerGap(20, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
@@ -397,11 +418,15 @@ public class GISLocationDialog extends javax.swing.JDialog {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton29)
                     .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton32)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton33)
+                .addGap(22, 22, 22)
                 .addComponent(jButton30)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton31)
-                .addGap(78, 78, 78)
+                .addGap(18, 18, 18)
                 .addComponent(jButton11)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton12)
@@ -2137,7 +2162,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
 
                 HashMap<CensusBlockGroup, Integer> cBGNumNodesHashMap = null;
 
-                cBGNumNodesHashMap = getHashNumNodeForCBG(vdIndex, vDLayerIndex, cBGLayerIndex);
+                cBGNumNodesHashMap = getHashNumNodeForCBG(mainFParent.allData, myParent.mainModel.allGISData, vdIndex, vDLayerIndex, cBGLayerIndex);
 
 //                for (int h = vdIndex + 1; h < ((LayerDefinition) (mainFParent.allData.all_Layers.get(vDLayerIndex))).categories.length; h++) {
 //                    cBGNumNodesHashMap = getHashNumNodeForCBG(vdIndex, vDLayerIndex, cBGLayerIndex);
@@ -2457,7 +2482,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
 //                                if(((LayerDefinition)(mainFParent.allData.all_Layers.get(i))).layerName.equals("CBG")){
 //                                    System.out.println("DEBUG123");
 //                                }
-                                cBGNumNodesHashMap = getHashNumNodeForCBG(vdIndex, i, cBGLayerIndex);
+                                cBGNumNodesHashMap = getHashNumNodeForCBG(mainFParent.allData, myParent.mainModel.allGISData, vdIndex, i, cBGLayerIndex);
 
                                 double sumNodes = 0;
                                 for (Map.Entry<CensusBlockGroup, Integer> set : cBGNumNodesHashMap.entrySet()) {
@@ -2998,6 +3023,214 @@ public class GISLocationDialog extends javax.swing.JDialog {
         temp_VDFNC_70();
     }//GEN-LAST:event_jButton31ActionPerformed
 
+    private void jButton32ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton32ActionPerformed
+        ArrayList<LocationNodeSafegraph> pOILocationNodes = initAllLocations();
+
+        int cbgLayerIndex = RootArtificial.findLayerExactNotCaseSensitive(mainFParent.allData, "cbg");
+        LayerDefinition cbgLayer = (LayerDefinition) (mainFParent.allData.all_Layers.get(cbgLayerIndex));
+        int targetNumCells = cbgLayer.categories.length-1;
+
+        Collections.sort(pOILocationNodes, Collections.reverseOrder());
+
+        int maxTry = 10;
+        int cellRange = 3;
+        int counter = 0;
+        ArrayList<Integer> observedFacilities;
+        FacilityLocation pOIFacilities[]=new FacilityLocation[1];
+        for (int m = 0; m < maxTry; m++) {
+            int numFacilities = targetNumCells + counter;
+            pOIFacilities = new FacilityLocation[numFacilities];
+            Color colors[] = new Color[numFacilities];
+            for (int i = 0; i < numFacilities; i++) {
+                colors[i] = new Color(Color.HSBtoRGB((float) i / (float) numFacilities - 1, 1, 1));
+            }
+            for (int i = 0; i < numFacilities; i++) {
+                pOIFacilities[i] = new FacilityLocation(mainFParent, pOILocationNodes.get(i).node, pOILocationNodes.get(i).node.myWays[0], 20d);
+                pOIFacilities[i].color = colors[i];
+                pOIFacilities[i].isDecoyable = true;
+                pOIFacilities[i].tollOff = 0.5;//IMP
+            }
+            System.out.println("POIs generated: " + pOIFacilities.length);
+
+            observedFacilities = new ArrayList();
+            mainFParent.flowControl.tollOff = 5;
+//        System.out.println("VD CONSTRUCTION START!");
+            mainFParent.flowControl.simulateOneLayerCompetingFacilityBased(pOIFacilities, mainFParent.findLayerContains("traffic"), myParent.numProcessors, -1, false);
+//        System.out.println("SIMULATION DONE!");
+            mainFParent.flowControl.correctFacilityLava(mainFParent.findLayerContains("traffic"), myParent.numProcessors);
+//        System.out.println("SIMULATION CORRECTION DONE!");
+
+            for (int i = 0; i < mainFParent.allData.all_Nodes.length; i++) {
+                short[] val = new short[1];
+                if (mainFParent.allData.all_Nodes[i].isBurned == true) {
+                    for (int k = 0; k < mainFParent.allData.all_Nodes[i].burntBy.length; k++) {
+                        for (int j = 0; j < pOIFacilities.length; j++) {
+                            if (mainFParent.allData.all_Nodes[i].burntBy[k] == pOIFacilities[j]) {
+                                observedFacilities.add(j);
+                            }
+                        }
+                    }
+                }
+            }
+            LinkedHashSet<Integer> uniqueObservedFacilities = new LinkedHashSet(observedFacilities);
+            if (uniqueObservedFacilities.size() > targetNumCells - cellRange && uniqueObservedFacilities.size() < targetNumCells + cellRange) {
+                System.out.println("FOUND ALMOST SAME NUMBER OF CELLS");
+                break;
+            }
+        }
+
+        observedFacilities = new ArrayList();
+        for (int i = 0; i < mainFParent.allData.all_Nodes.length; i++) {
+            short[] val = new short[1];
+            if (mainFParent.allData.all_Nodes[i].isBurned == true) {
+                for (int k = 0; k < mainFParent.allData.all_Nodes[i].burntBy.length; k++) {
+                    for (int j = 0; j < pOIFacilities.length; j++) {
+                        if (mainFParent.allData.all_Nodes[i].burntBy[k] == pOIFacilities[j]) {
+                            observedFacilities.add(j);
+                            val[0] = (short) (j + 1 + 1);
+                        }
+                    }
+                }
+                mainFParent.allData.all_Nodes[i].layers.add(val);
+            } else {
+                val[0] = 1;
+                mainFParent.allData.all_Nodes[i].layers.add(val);
+            }
+        }
+
+        LinkedHashSet<Integer> uniqueObservedFacilities = new LinkedHashSet(observedFacilities);
+
+        String outputLayerName = "VD_CBG_num_cells";
+
+        LayerDefinition tempLayer = new LayerDefinition("category", outputLayerName);
+        int numShops = uniqueObservedFacilities.size();
+        tempLayer.categories = new String[numShops + 1];
+        tempLayer.colors = new Color[numShops + 1];
+        tempLayer.values = new double[numShops + 1];
+
+        tempLayer.categories[0] = "NOT ASSIGNED";
+        tempLayer.colors[0] = new Color(2, 2, 2);
+        tempLayer.values[0] = Double.valueOf(0);
+        for (int i = 1; i < numShops + 1; i++) {
+            tempLayer.categories[i] = outputLayerName + " " + String.valueOf(i);
+            tempLayer.colors[i] = new Color(Color.HSBtoRGB((float) i / (float) numShops + 1 - 1, 1, 1));
+            tempLayer.values[i] = Double.valueOf(i);
+        }
+
+        for (int i = 0; i < mainFParent.allData.all_Nodes.length; i++) {
+            if (((short[]) mainFParent.allData.all_Nodes[i].layers.get(mainFParent.allData.all_Nodes[i].layers.size() - 1))[0] < 1) {
+                ((short[]) mainFParent.allData.all_Nodes[i].layers.get(mainFParent.allData.all_Nodes[i].layers.size() - 1))[0] = 1;
+            }
+        }
+
+        mainFParent.allData.all_Layers.add(tempLayer);
+        mainFParent.refreshLayersList();
+    }//GEN-LAST:event_jButton32ActionPerformed
+
+    private void jButton33ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton33ActionPerformed
+        ArrayList<LocationNodeSafegraph> pOILocationNodes = initAllLocations();
+
+        int cbgvdLayerIndex = RootArtificial.findLayerExactNotCaseSensitive(mainFParent.allData, "cbgvdfmth");
+        LayerDefinition cbgLayer = (LayerDefinition) (mainFParent.allData.all_Layers.get(cbgvdLayerIndex));
+        int targetNumCells = cbgLayer.categories.length-1;
+
+        Collections.sort(pOILocationNodes, Collections.reverseOrder());
+
+        int maxTry = 10;
+        int cellRange = 3;
+        int counter = 0;
+        ArrayList<Integer> observedFacilities;
+        FacilityLocation pOIFacilities[]=new FacilityLocation[1];
+        for (int m = 0; m < maxTry; m++) {
+            int numFacilities = targetNumCells + counter;
+            pOIFacilities = new FacilityLocation[numFacilities];
+            Color colors[] = new Color[numFacilities];
+            for (int i = 0; i < numFacilities; i++) {
+                colors[i] = new Color(Color.HSBtoRGB((float) i / (float) numFacilities - 1, 1, 1));
+            }
+            for (int i = 0; i < numFacilities; i++) {
+                pOIFacilities[i] = new FacilityLocation(mainFParent, pOILocationNodes.get(i).node, pOILocationNodes.get(i).node.myWays[0], 20d);
+                pOIFacilities[i].color = colors[i];
+                pOIFacilities[i].isDecoyable = true;
+                pOIFacilities[i].tollOff = 0.5;//IMP
+            }
+            System.out.println("POIs generated: " + pOIFacilities.length);
+
+            observedFacilities = new ArrayList();
+            mainFParent.flowControl.tollOff = 5;
+//        System.out.println("VD CONSTRUCTION START!");
+            mainFParent.flowControl.simulateOneLayerCompetingFacilityBased(pOIFacilities, mainFParent.findLayerContains("traffic"), myParent.numProcessors, -1, false);
+//        System.out.println("SIMULATION DONE!");
+            mainFParent.flowControl.correctFacilityLava(mainFParent.findLayerContains("traffic"), myParent.numProcessors);
+//        System.out.println("SIMULATION CORRECTION DONE!");
+
+            for (int i = 0; i < mainFParent.allData.all_Nodes.length; i++) {
+                short[] val = new short[1];
+                if (mainFParent.allData.all_Nodes[i].isBurned == true) {
+                    for (int k = 0; k < mainFParent.allData.all_Nodes[i].burntBy.length; k++) {
+                        for (int j = 0; j < pOIFacilities.length; j++) {
+                            if (mainFParent.allData.all_Nodes[i].burntBy[k] == pOIFacilities[j]) {
+                                observedFacilities.add(j);
+                            }
+                        }
+                    }
+                }
+            }
+            LinkedHashSet<Integer> uniqueObservedFacilities = new LinkedHashSet(observedFacilities);
+            if (uniqueObservedFacilities.size() > targetNumCells - cellRange && uniqueObservedFacilities.size() < targetNumCells + cellRange) {
+                System.out.println("FOUND ALMOST SAME NUMBER OF CELLS");
+                break;
+            }
+        }
+
+        observedFacilities = new ArrayList();
+        for (int i = 0; i < mainFParent.allData.all_Nodes.length; i++) {
+            short[] val = new short[1];
+            if (mainFParent.allData.all_Nodes[i].isBurned == true) {
+                for (int k = 0; k < mainFParent.allData.all_Nodes[i].burntBy.length; k++) {
+                    for (int j = 0; j < pOIFacilities.length; j++) {
+                        if (mainFParent.allData.all_Nodes[i].burntBy[k] == pOIFacilities[j]) {
+                            observedFacilities.add(j);
+                            val[0] = (short) (j + 1 + 1);
+                        }
+                    }
+                }
+                mainFParent.allData.all_Nodes[i].layers.add(val);
+            } else {
+                val[0] = 1;
+                mainFParent.allData.all_Nodes[i].layers.add(val);
+            }
+        }
+
+        LinkedHashSet<Integer> uniqueObservedFacilities = new LinkedHashSet(observedFacilities);
+
+        String outputLayerName = "VD_CBGVD_num_cells";
+
+        LayerDefinition tempLayer = new LayerDefinition("category", outputLayerName);
+        int numShops = uniqueObservedFacilities.size();
+        tempLayer.categories = new String[numShops + 1];
+        tempLayer.colors = new Color[numShops + 1];
+        tempLayer.values = new double[numShops + 1];
+
+        tempLayer.categories[0] = "NOT ASSIGNED";
+        tempLayer.colors[0] = new Color(2, 2, 2);
+        tempLayer.values[0] = Double.valueOf(0);
+        for (int i = 1; i < numShops + 1; i++) {
+            tempLayer.categories[i] = outputLayerName + " " + String.valueOf(i);
+            tempLayer.colors[i] = new Color(Color.HSBtoRGB((float) i / (float) numShops + 1 - 1, 1, 1));
+            tempLayer.values[i] = Double.valueOf(i);
+        }
+
+        for (int i = 0; i < mainFParent.allData.all_Nodes.length; i++) {
+            if (((short[]) mainFParent.allData.all_Nodes[i].layers.get(mainFParent.allData.all_Nodes[i].layers.size() - 1))[0] < 1) {
+                ((short[]) mainFParent.allData.all_Nodes[i].layers.get(mainFParent.allData.all_Nodes[i].layers.size() - 1))[0] = 1;
+            }
+        }
+
+        mainFParent.allData.all_Layers.add(tempLayer);
+        mainFParent.refreshLayersList();
+    }//GEN-LAST:event_jButton33ActionPerformed
+
     public void temp_VDFNC_70() {
         float currentShopMergeThreshold = 0.01072975f;
         float currentSchoolMergeThreshold = 0.009574889f;
@@ -3288,6 +3521,30 @@ public class GISLocationDialog extends javax.swing.JDialog {
             }
         }
         return shops;
+    }
+
+    public ArrayList<LocationNodeSafegraph> initAllLocations() {
+        ArrayList<LocationNodeSafegraph> pOILocationNodes = new ArrayList();
+        for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.size(); i++) {
+            for (int j = 0; j < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.size(); j++) {
+                if (myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.censusBlock != null) {
+//                    if (isFoodAndGrocery(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).naics_code) == true) {
+                    LocationNode node = getNearestNode(mainFParent, myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.lat, myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.lon, null);
+                    if (node != null) {
+                        if (isUniqueLocationNode(pOILocationNodes, node)) {
+                            LocationNodeSafegraph nodeSafegraph = new LocationNodeSafegraph();
+                            nodeSafegraph.node = node;
+                            nodeSafegraph.place = myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place;
+                            nodeSafegraph.placeKey = myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).placeKey;
+                            nodeSafegraph.numVisits = myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).raw_visit_counts;
+                            pOILocationNodes.add(nodeSafegraph);
+                        }
+                    }
+//                    }
+                }
+            }
+        }
+        return pOILocationNodes;
     }
 
     public ArrayList<LocationNodeSafegraph> initSchoolLocations() {
@@ -3919,12 +4176,36 @@ public class GISLocationDialog extends javax.swing.JDialog {
         }
     }
 
-    private HashMap<CensusBlockGroup, Integer> getHashNumNodeForCBG(int vdIndex, int vDLayerIndex, int cBGLayerIndex) {
+    public static HashMap<CensusBlockGroup, Integer> getHashNumNodeForCBG(AllData allData, AllGISData allGISData, int vdIndex, int vDLayerIndex, int cBGLayerIndex) {
         HashMap<CensusBlockGroup, Integer> cBGNumNodesHashMap = new HashMap();
-        for (int i = 0; i < mainFParent.allData.all_Nodes.length; i++) {
-            if (((short[]) (mainFParent.allData.all_Nodes[i].layers.get(vDLayerIndex)))[0] - 1 == vdIndex) {
-                Double value = Double.valueOf(Math.round(((LayerDefinition) (mainFParent.allData.all_Layers.get(cBGLayerIndex))).values[((short[]) (mainFParent.allData.all_Nodes[i].layers.get(cBGLayerIndex)))[0] - 1]));
-                CensusBlockGroup cBG = myParent.mainModel.allGISData.findCensusBlockGroup(value.longValue());
+        for (int i = 0; i < allData.all_Nodes.length; i++) {
+            if (((short[]) (allData.all_Nodes[i].layers.get(vDLayerIndex)))[0] - 1 == vdIndex) {
+                Double value = Double.valueOf(Math.round(((LayerDefinition) (allData.all_Layers.get(cBGLayerIndex))).values[((short[]) (allData.all_Nodes[i].layers.get(cBGLayerIndex)))[0] - 1]));
+                CensusBlockGroup cBG = allGISData.findCensusBlockGroup(value.longValue());
+                if (cBG != null) {
+                    if (cBGNumNodesHashMap.containsKey(cBG)) {
+                        cBGNumNodesHashMap.put(cBG, cBGNumNodesHashMap.get(cBG) + 1);
+                    } else {
+                        cBGNumNodesHashMap.put(cBG, 1);
+                    }
+                }
+            }
+        }
+        return cBGNumNodesHashMap;
+    }
+    
+    public static HashMap<CensusBlockGroup, Integer> getHashNumNodeForCluster(AllData allData, AllGISData allGISData, int vdIndex, int[][] clustImg, int cBGLayerIndex) {
+        VectorToPolygon vp=new VectorToPolygon();
+        vp.setScaleFactors(allData);
+        vp.imgWidth=clustImg[0].length;
+        vp.imgHeight=clustImg.length;
+        HashMap<CensusBlockGroup, Integer> cBGNumNodesHashMap = new HashMap();
+        for (int i = 0; i < allData.all_Nodes.length; i++) {
+            int[] imgPCl = vp.vectorToImage(allData.all_Nodes[i].lon, allData.all_Nodes[i].lat, clustImg[0].length, clustImg.length);
+            int cLIndex=clustImg[imgPCl[1]][imgPCl[0]];
+            if (cLIndex == vdIndex) {
+                Double value = Double.valueOf(Math.round(((LayerDefinition) (allData.all_Layers.get(cBGLayerIndex))).values[((short[]) (allData.all_Nodes[i].layers.get(cBGLayerIndex)))[0] - 1]));
+                CensusBlockGroup cBG = allGISData.findCensusBlockGroup(value.longValue());
                 if (cBG != null) {
                     if (cBGNumNodesHashMap.containsKey(cBG)) {
                         cBGNumNodesHashMap.put(cBG, cBGNumNodesHashMap.get(cBG) + 1);
@@ -4120,6 +4401,8 @@ public class GISLocationDialog extends javax.swing.JDialog {
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton30;
     private javax.swing.JButton jButton31;
+    private javax.swing.JButton jButton32;
+    private javax.swing.JButton jButton33;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;

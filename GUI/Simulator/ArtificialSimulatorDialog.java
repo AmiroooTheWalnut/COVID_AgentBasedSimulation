@@ -52,6 +52,9 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
         jRadioButton3 = new javax.swing.JRadioButton();
         jRadioButton5 = new javax.swing.JRadioButton();
         jRadioButton17 = new javax.swing.JRadioButton();
+        jRadioButton4 = new javax.swing.JRadioButton();
+        jRadioButton19 = new javax.swing.JRadioButton();
+        jRadioButton20 = new javax.swing.JRadioButton();
         jRadioButton18 = new javax.swing.JRadioButton();
         jRadioButton6 = new javax.swing.JRadioButton();
         jLabel3 = new javax.swing.JLabel();
@@ -150,6 +153,33 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
         });
         jPanel1.add(jRadioButton17);
 
+        buttonGroup1.add(jRadioButton4);
+        jRadioButton4.setText("VD_CBG");
+        jRadioButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton4ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jRadioButton4);
+
+        buttonGroup1.add(jRadioButton19);
+        jRadioButton19.setText("VD_CBGVD");
+        jRadioButton19.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton19ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jRadioButton19);
+
+        buttonGroup1.add(jRadioButton20);
+        jRadioButton20.setText("Xmeans");
+        jRadioButton20.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton20ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jRadioButton20);
+
         buttonGroup1.add(jRadioButton18);
         jRadioButton18.setText("VD fixed num cells");
         jRadioButton18.addActionListener(new java.awt.event.ActionListener() {
@@ -195,6 +225,7 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
         jCheckBox3.setSelected(true);
         jCheckBox3.setText("POI building logic");
 
+        jCheckBox4.setSelected(true);
         jCheckBox4.setText("Is fuzzy status?");
 
         jPanel3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -473,7 +504,7 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jCheckBox4)
                         .addGap(18, 18, 18)
-                        .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 213, Short.MAX_VALUE))))
+                        .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 258, Short.MAX_VALUE))))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -592,7 +623,7 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jRadioButton17ActionPerformed
 
     private void jRadioButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton3ActionPerformed
-
+        myParent.mainModel.scenario.scenarioName = "CBGVD_CUT";
     }//GEN-LAST:event_jRadioButton3ActionPerformed
 
     private void jRadioButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton5ActionPerformed
@@ -699,6 +730,18 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_jToggleButton2ActionPerformed
 
+    private void jRadioButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton4ActionPerformed
+        myParent.mainModel.scenario.scenarioName = "VD_CBG";
+    }//GEN-LAST:event_jRadioButton4ActionPerformed
+
+    private void jRadioButton19ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton19ActionPerformed
+        myParent.mainModel.scenario.scenarioName = "VD_CBGVD";
+    }//GEN-LAST:event_jRadioButton19ActionPerformed
+
+    private void jRadioButton20ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton20ActionPerformed
+        myParent.mainModel.scenario.scenarioName = "Xmeans";
+    }//GEN-LAST:event_jRadioButton20ActionPerformed
+
     
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -740,8 +783,11 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
     private javax.swing.JRadioButton jRadioButton16;
     private javax.swing.JRadioButton jRadioButton17;
     private javax.swing.JRadioButton jRadioButton18;
+    private javax.swing.JRadioButton jRadioButton19;
     private javax.swing.JRadioButton jRadioButton2;
+    private javax.swing.JRadioButton jRadioButton20;
     private javax.swing.JRadioButton jRadioButton3;
+    private javax.swing.JRadioButton jRadioButton4;
     private javax.swing.JRadioButton jRadioButton5;
     private javax.swing.JRadioButton jRadioButton6;
     private javax.swing.JRadioButton jRadioButton7;
