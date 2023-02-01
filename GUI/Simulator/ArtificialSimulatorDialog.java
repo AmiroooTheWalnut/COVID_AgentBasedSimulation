@@ -670,7 +670,7 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
             myParent.mainModel.scenario.scenarioName = "VDFNC_" + jSpinner3.getValue();
             myParent.mainModel.initModelArtificial(true, true, jCheckBox1.isSelected(), (int) (jSpinner2.getValue()), (int) (jSpinner3.getValue()), myParent.numProcessors, jRadioButton15.isSelected(), isSpecialScenarioActive, infectionIndices, noTessellationNumResidents);
         } else if (jRadioButton6.isSelected()) {
-            myParent.mainModel.scenario.scenarioName = "RMCBG_" + jSpinner2.getValue();
+            myParent.mainModel.scenario.scenarioName = "RMCBG_" + jSpinner3.getValue();
             myParent.mainModel.initModelArtificial(true, true, jCheckBox1.isSelected(), (int) (jSpinner2.getValue()), (int) (jSpinner3.getValue()), myParent.numProcessors, jRadioButton15.isSelected(), isSpecialScenarioActive, infectionIndices, noTessellationNumResidents);
         } else {
             myParent.mainModel.initModelArtificial(true, true, jCheckBox1.isSelected(), (int) (jSpinner2.getValue()), (int) (jSpinner3.getValue()), myParent.numProcessors, jRadioButton15.isSelected(), isSpecialScenarioActive, infectionIndices, noTessellationNumResidents);

@@ -1722,38 +1722,40 @@ public class Root extends Agent {
         String[] row1 = new String[cBGregions.size()];
         String[] row2 = new String[cBGregions.size()];
         for (int i = 0; i < cBGregions.size(); i++) {
-            row1[i] = String.valueOf(cBGregions.get(i).cBGsIDsInvolved.get(0));
-            double infection = 0;
-            for (int j = 0; j < regions.size(); j++) {
-                for (int m = 0; m < regions.get(j).cBGsPercentageInvolved.size(); m++) {
-                    if (regions.get(j).cBGsIDsInvolved.get(m).equals(cBGregions.get(i).cBGsIDsInvolved.get(0))) {
-                        double addedInfection = 0;
-                        for (int k = 0; k < regions.get(j).residents.size(); k++) {
-                            for (int g = 0; g < regions.get(j).residents.get(k).insidePeople.size(); g++) {
-                                switch (regions.get(j).residents.get(k).insidePeople.get(g).fpp.status) {
-                                    case 0:
-                                        break;
-                                    case 1:
-                                        addedInfection += 1;
-                                        break;
-                                    case 2:
-                                        addedInfection += 1;
-                                        break;
-                                    case 3:
-                                        break;
-                                    case 4:
-                                        break;
-                                    default:
-                                        break;
+            if (!cBGregions.get(i).cBGsIDsInvolved.isEmpty()) {
+                row1[i] = String.valueOf(cBGregions.get(i).cBGsIDsInvolved.get(0));
+                double infection = 0;
+                for (int j = 0; j < regions.size(); j++) {
+                    for (int m = 0; m < regions.get(j).cBGsPercentageInvolved.size(); m++) {
+                        if (regions.get(j).cBGsIDsInvolved.get(m).equals(cBGregions.get(i).cBGsIDsInvolved.get(0))) {
+                            double addedInfection = 0;
+                            for (int k = 0; k < regions.get(j).residents.size(); k++) {
+                                for (int g = 0; g < regions.get(j).residents.get(k).insidePeople.size(); g++) {
+                                    switch (regions.get(j).residents.get(k).insidePeople.get(g).fpp.status) {
+                                        case 0:
+                                            break;
+                                        case 1:
+                                            addedInfection += 1;
+                                            break;
+                                        case 2:
+                                            addedInfection += 1;
+                                            break;
+                                        case 3:
+                                            break;
+                                        case 4:
+                                            break;
+                                        default:
+                                            break;
+                                    }
                                 }
                             }
+                            addedInfection = addedInfection * regions.get(j).cBGsPercentageInvolved.get(m);
+                            infection += addedInfection;
                         }
-                        addedInfection = addedInfection * regions.get(j).cBGsPercentageInvolved.get(m);
-                        infection += addedInfection;
                     }
                 }
+                row2[i] = String.valueOf(infection);
             }
-            row2[i] = String.valueOf(infection);
         }
         rows.add(row1);
         rows.add(row2);

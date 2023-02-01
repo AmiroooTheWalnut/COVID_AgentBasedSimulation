@@ -827,6 +827,9 @@ public class MainModel extends Dataset {
         }
         SimpleDateFormat formatter = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss_SSS");
         Date date = new Date();
+        if (scenario.scenarioName.contains("Xmeans")) {
+            scenario.scenarioName=scenario.scenarioName+"_"+regions.size();
+        }
         String testPath = "projects" + File.separator + ABM.filePath.substring(ABM.filePath.lastIndexOf(File.separator) + 1, ABM.filePath.length()) + File.separator + formatter.format(date) + "_NumPeople_" + ABM.root.people.size() + "_" + scenario.scenarioName;
         File testDirectory = new File(testPath);
         if (!testDirectory.exists()) {
