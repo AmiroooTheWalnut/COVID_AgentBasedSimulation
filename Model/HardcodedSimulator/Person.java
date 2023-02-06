@@ -435,9 +435,9 @@ public class Person extends Agent {
 //            }
 
 
-            double selectedDestFreq = (Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * this.exactProperties.sumHomeFreqs));
+            float selectedDestFreq = (float)(Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * this.exactProperties.sumHomeFreqs));
             int index = MainModel.binarySearchCumulative(selectedDestFreq, exactProperties.fromHomeFreqsCDF);
-            return exactProperties.pOIs.get(index);
+            return exactProperties.pOIs[index];
 //            return null;
         } else {
 //            double selectedDestFreq = (Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * this.exactProperties.sumWorkFreqs));
@@ -449,9 +449,9 @@ public class Person extends Agent {
 //                }
 //            }
             
-            double selectedDestFreq = (Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * this.exactProperties.sumWorkFreqs));
+            float selectedDestFreq = (float)(Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * this.exactProperties.sumWorkFreqs));
             int index = MainModel.binarySearchCumulative(selectedDestFreq, exactProperties.fromWorkFreqsCDF);
-            return exactProperties.pOIs.get(index);
+            return exactProperties.pOIs[index];
 //            return null;
         }
     }

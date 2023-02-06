@@ -104,6 +104,10 @@ public class MainModel extends Dataset {
     public ExecutorService fastForwardPool = Executors.newSingleThreadExecutor();
 
     public ExecutorService agentEvalPool;
+    
+    public ExecutorService preprocessEvalPool;
+    
+    public ExecutorService groupInteractionEvalPool;
 
     public String datasetDirectory = "." + File.separator + "datasets";
 
@@ -660,6 +664,9 @@ public class MainModel extends Dataset {
         if (agentEvalPool == null) {
             agentEvalPool = Executors.newFixedThreadPool(numCPUs);
         }
+        if (groupInteractionEvalPool == null) {
+            groupInteractionEvalPool = Executors.newFixedThreadPool(numCPUs);
+        }
         if (isHardCoded == true) {
             if (simulationDelayTime > -1) {
                 simulationTimer = new Timer();
@@ -927,6 +934,97 @@ public class MainModel extends Dataset {
                 }
             }
 
+        }
+
+        return index;
+    }
+    
+    public static int binarySearchCumulative(float value, ArrayList<Float> input) {
+        int stepSize = input.size() / 2;
+        int index = stepSize;
+        if (stepSize < 8) {
+            for (int i = 0; i < input.size(); i++) {
+                if (input.get(i) > value) {
+                    return i;
+                }
+            }
+        } else {
+            while (stepSize > 1) {
+                stepSize = stepSize / 2;
+                if (value < input.get(index)) {
+                    index = index - stepSize;
+                } else {
+                    index = index + stepSize;
+                }
+            }
+            if (index < 6) {
+                for (int i = 0; i < 7; i++) {
+                    if (value < input.get(i)) {
+                        index = i;
+                        break;
+                    }
+                }
+            } else if (index > input.size() - 6) {
+                for (int i = input.size() - 7; i < input.size(); i++) {
+                    if (value < input.get(i)) {
+                        index = i;
+                        break;
+                    }
+                }
+            } else {
+                for (int i = 0; i < 6; i++) {
+                    if (value < input.get(index - 3 + i)) {
+                        index = index - 3 + i;
+                        break;
+                    }
+                }
+            }
+
+        }
+
+        return index;
+    }
+    
+    public static int binarySearchCumulative(float value, float[] input) {
+        int stepSize = input.length / 2;
+        int index = stepSize;
+        if (stepSize < 8) {
+            for (int i = 0; i < input.length; i++) {
+                if (input[i] > value) {
+                    return i;
+                }
+            }
+        } else {
+            while (stepSize > 1) {
+                stepSize = stepSize / 2;
+                if (value < input[index]) {
+                    index = index - stepSize;
+                } else {
+                    index = index + stepSize;
+                }
+            }
+            if (index < 6) {
+                for (int i = 0; i < 7; i++) {
+                    if (value < input[i]) {
+                        index = i;
+                        break;
+                    }
+                }
+            } else if (index > input.length - 6) {
+                for (int i = input.length - 7; i < input.length; i++) {
+                    if (value < input[i]) {
+                        index = i;
+                        break;
+                    }
+                }
+            } else {
+                for (int i = 0; i < 6; i++) {
+                    if (value < input[index - 3 + i]) {
+                        index = index - 3 + i;
+                        break;
+                    }
+                }
+            }
         }
 
         return index;

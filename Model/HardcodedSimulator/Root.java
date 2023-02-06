@@ -91,10 +91,10 @@ public class Root extends Agent {
     public ArrayList<ScheduleListExact> scheduleListArray;
     public ArrayList<ScheduleListExact> scheduleListArrayClustering;
 
-    public ArrayList<Double> sumHomeScheduleDifferences = new ArrayList();
-    public ArrayList<Double> sumHomeScheduleDifferencesClustering = new ArrayList();
-    public ArrayList<Double> sumWorkScheduleDifferences = new ArrayList();
-    public ArrayList<Double> sumWorkScheduleDifferencesClustering = new ArrayList();
+    public float[] sumHomeScheduleDifferences;
+    public float[] sumHomeScheduleDifferencesClustering;
+    public float[] sumWorkScheduleDifferences;
+    public float[] sumWorkScheduleDifferencesClustering;
 
     public LinkedHashMap<String, Long> travelsToAllPOIsFreqs = new LinkedHashMap();
 
@@ -263,12 +263,12 @@ public class Root extends Agent {
                         int naics_code = patternRecords.get(j).place.naics_code;
                         if (!isShop(naics_code) && !isSchool(naics_code) && !isReligiousOrganization(naics_code)) {
                             ArrayList<Region> selectedSourceRegions = new ArrayList();
-                            ArrayList<Double> selectSourceRegionsPercentages = new ArrayList();
+                            ArrayList<Float> selectSourceRegionsPercentages = new ArrayList();
                             for (int o = 0; o < regions.size(); o++) {
                                 for (int p = 0; p < regions.get(o).cBGsInvolved.size(); p++) {
                                     if (regions.get(o).cBGsInvolved.get(p).id == patternRecords.get(j).visitor_home_cbgs_place.get(k).key.id) {
                                         selectedSourceRegions.add(regions.get(o));
-                                        selectSourceRegionsPercentages.add(regions.get(o).cBGsPercentageInvolved.get(p));
+                                        selectSourceRegionsPercentages.add(regions.get(o).cBGsPercentageInvolved.get(p).floatValue());
                                         //CAN'T BREAK HERE BECAUSE THERE IS A CHANCE THAT THE PLACE'S CBG IS REPEATED IN ANOTHER REGION
                                     }
                                 }
@@ -282,12 +282,12 @@ public class Root extends Agent {
                         }
                     } else {
                         ArrayList<Region> selectedSourceRegions = new ArrayList();
-                        ArrayList<Double> selectSourceRegionsPercentages = new ArrayList();
+                        ArrayList<Float> selectSourceRegionsPercentages = new ArrayList();
                         for (int o = 0; o < regions.size(); o++) {
                             for (int p = 0; p < regions.get(o).cBGsInvolved.size(); p++) {
                                 if (regions.get(o).cBGsInvolved.get(p).id == patternRecords.get(j).visitor_home_cbgs_place.get(k).key.id) {
                                     selectedSourceRegions.add(regions.get(o));
-                                    selectSourceRegionsPercentages.add(regions.get(o).cBGsPercentageInvolved.get(p));
+                                    selectSourceRegionsPercentages.add(regions.get(o).cBGsPercentageInvolved.get(p).floatValue());
                                     //CAN'T BREAK HERE BECAUSE THERE IS A CHANCE THAT THE PLACE'S CBG IS REPEATED IN ANOTHER REGION
                                 }
                             }
@@ -1216,9 +1216,9 @@ public class Root extends Agent {
                 myModelRoot.ABM.infectedByPOIEnvDaily = 0;
                 myModelRoot.ABM.infectedByShamilDaily = 0;
                 myModelRoot.ABM.infectedPOIDaily = 0;
-                myModelRoot.ABM.shamilInf1 = 0;
-                myModelRoot.ABM.shamilInf2 = 0;
-                myModelRoot.ABM.shamilInf3 = 0;
+                myModelRoot.ABM.shamilInf1.set(0);// = 0;
+                myModelRoot.ABM.shamilInf2.set(0);// = 0;
+                myModelRoot.ABM.shamilInf3.set(0);// = 0;
             }
             pollDailyInfection();
         }

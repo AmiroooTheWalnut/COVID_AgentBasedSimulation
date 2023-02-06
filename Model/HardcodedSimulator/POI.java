@@ -25,11 +25,11 @@ public class POI {
     public static double CHANCE_OF_ENV_CONTAMINATION = 0.0001;//0.00055;//0.00015;
 
     public PatternsRecordProcessed patternsRecord;
-    public double contaminatedTime = 0;
+    public float contaminatedTime = 0;
 //    public int numInfectedPeopleInPOI=0;
     public List<Person> peopleInPOI = Collections.synchronizedList(new ArrayList());
 
-    double numInfected = 0;
+    public float numInfected = 0;
     //double numInfectedFuzzy = 0;
 
     final double fixedTransmissionRate = 0.0002;

@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import lombok.Getter;
@@ -81,9 +82,9 @@ public class AgentBasedModel {
     public transient int infectedByPOIEnvDaily = 0;
     public transient int infectedByShamilDaily = 0;
     public transient int infectedPOIDaily = 0;
-    public transient int shamilInf1 = 0;
-    public transient int shamilInf2 = 0;
-    public transient int shamilInf3 = 0;
+    public transient AtomicInteger shamilInf1 = new AtomicInteger();
+    public transient AtomicInteger shamilInf2 = new AtomicInteger();
+    public transient AtomicInteger shamilInf3 = new AtomicInteger();
 
     public Map<Integer, Double> travelProbabilityInHourAdjustmentForNumAgent;
 

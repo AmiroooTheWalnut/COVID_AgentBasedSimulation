@@ -39,6 +39,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import weka.clusterers.ClusterEvaluation;
@@ -69,14 +71,14 @@ public class RootArtificial extends Root {
     public ArrayList<ScheduleListExact> scheduleListExactArray;
     public ArrayList<ScheduleListExact> scheduleListExactArrayClustering;
 
-    public ArrayList<Double> sumHomeScheduleDifferences = new ArrayList();
-    public ArrayList<Double> sumHomeScheduleDifferencesClustering = new ArrayList();
-    public ArrayList<Double> sumWorkScheduleDifferences = new ArrayList();
-    public ArrayList<Double> sumWorkScheduleDifferencesClustering = new ArrayList();
-    public ArrayList<Integer> isFoundHomeRegion = new ArrayList();
-    public ArrayList<Integer> isFoundWorkRegion = new ArrayList();
+//    public ArrayList<Float> sumHomeScheduleDifferences = new ArrayList();
+//    public ArrayList<Float> sumHomeScheduleDifferencesClustering = new ArrayList();
+//    public ArrayList<Float> sumWorkScheduleDifferences = new ArrayList();
+//    public ArrayList<Float> sumWorkScheduleDifferencesClustering = new ArrayList();
+    public boolean[] isFoundHomeRegion;
+    public boolean[] isFoundWorkRegion;
 
-    HashMap<String, Double> pOIProbs = new HashMap();
+    HashMap<String, Float> pOIProbs = new HashMap();
 
     HashMap<Integer, Long> exhaustiveNAICSFreqs = new HashMap();
 
@@ -162,6 +164,8 @@ public class RootArtificial extends Root {
         System.out.println("FINISHED NO TESSELLATION!");
         if (isTessellationBuilt == true) {
             generatePostProcessPeople(passed_numAgents);
+            peopleNoTessellation.clear();
+            peopleNoTessellation=null;
             System.out.println("FINISHED POST AGENTS!");
         } else {
             regions = cBGregions;
@@ -201,7 +205,8 @@ public class RootArtificial extends Root {
         generatePOIs(myModelRoot);
         System.out.println("FINISHED GENERATE POIS!");
 
-        preprocessNodesInRegions(cBGregions);
+//        preprocessNodesInRegions(cBGregions);
+        preprocessNodesInRegionsParallel(cBGregions);
         System.out.println("FINISHED PROCESS NODES!");
 
         if (isTessellationBuilt == false) {
@@ -246,63 +251,70 @@ public class RootArtificial extends Root {
         for (int i = 0; i < regions.size(); i++) {
             ScheduleListExact scheduleListExact = new ScheduleListExact();
             scheduleListExact.regionIndex = i;
-            for (int m = 0; m < peopleNoTessellation.get(0).exactProperties.pOIs.size(); m++) {
-                scheduleListExact.fromHomeFreqs.add(0d);
-                scheduleListExact.fromWorkFreqs.add(0d);
-            }
+            scheduleListExact.fromHomeFreqs=new float[peopleNoTessellation.get(0).exactProperties.pOIs.length];
+            scheduleListExact.fromWorkFreqs=new float[peopleNoTessellation.get(0).exactProperties.pOIs.length];
+//            for (int m = 0; m < peopleNoTessellation.get(0).exactProperties.pOIs.size(); m++) {
+//                scheduleListExact.fromHomeFreqs.add(0f);
+//                scheduleListExact.fromWorkFreqs.add(0f);
+//            }
             avgCounterHomeArray.add(0);
             avgCounterWorkArray.add(0);
             scheduleListExact.pOIs = peopleNoTessellation.get(0).exactProperties.pOIs;
             scheduleListExactArray.add(scheduleListExact);
+//            System.out.println("DEBUG1: " + i);
         }
 
         for (int i = 0; i < peopleNoTessellation.size(); i++) {
             int cellIndexHome = regionsLayer.getCellOfLatLon(peopleNoTessellation.get(i).exactProperties.exactHomeLocation.lat, peopleNoTessellation.get(i).exactProperties.exactHomeLocation.lon);
             if (cellIndexHome != -1) {
-                for (int k = 0; k < peopleNoTessellation.get(i).exactProperties.fromHomeFreqs.size(); k++) {
-                    Double newValue = scheduleListExactArray.get(cellIndexHome).fromHomeFreqs.get(k) + peopleNoTessellation.get(i).exactProperties.fromHomeFreqs.get(k);
-                    scheduleListExactArray.get(cellIndexHome).fromHomeFreqs.set(k, newValue);
+                for (int k = 0; k < peopleNoTessellation.get(i).exactProperties.fromHomeFreqs.length; k++) {
+                    float newValue = scheduleListExactArray.get(cellIndexHome).fromHomeFreqs[k] + peopleNoTessellation.get(i).exactProperties.fromHomeFreqs[k];
+                    scheduleListExactArray.get(cellIndexHome).fromHomeFreqs[k]= newValue;
                 }
                 avgCounterHomeArray.set(cellIndexHome, avgCounterHomeArray.get(cellIndexHome) + 1);
             }
             int cellIndexWork = regionsLayer.getCellOfLatLon(peopleNoTessellation.get(i).exactProperties.exactWorkLocation.lat, peopleNoTessellation.get(i).exactProperties.exactWorkLocation.lon);
             if (cellIndexWork != -1) {
-                for (int k = 0; k < peopleNoTessellation.get(i).exactProperties.fromWorkFreqs.size(); k++) {
-                    Double newValue = scheduleListExactArray.get(cellIndexWork).fromWorkFreqs.get(k) + peopleNoTessellation.get(i).exactProperties.fromWorkFreqs.get(k);
-                    scheduleListExactArray.get(cellIndexWork).fromWorkFreqs.set(k, newValue);
+                for (int k = 0; k < peopleNoTessellation.get(i).exactProperties.fromWorkFreqs.length; k++) {
+                    Float newValue = scheduleListExactArray.get(cellIndexWork).fromWorkFreqs[k] + peopleNoTessellation.get(i).exactProperties.fromWorkFreqs[k];
+                    scheduleListExactArray.get(cellIndexWork).fromWorkFreqs[k]= newValue;
                 }
                 avgCounterWorkArray.set(cellIndexWork, avgCounterWorkArray.get(cellIndexWork) + 1);
             }
+//            System.out.println("DEBUG2: " + i);
         }
 
         for (int i = 0; i < regions.size(); i++) {
-            for (int j = 0; j < scheduleListExactArray.get(i).fromHomeFreqs.size(); j++) {
-                scheduleListExactArray.get(i).fromHomeFreqs.set(j, scheduleListExactArray.get(i).fromHomeFreqs.get(j) / avgCounterHomeArray.get(i));
+            for (int j = 0; j < scheduleListExactArray.get(i).fromHomeFreqs.length; j++) {
+                scheduleListExactArray.get(i).fromHomeFreqs[j]= scheduleListExactArray.get(i).fromHomeFreqs[j] / avgCounterHomeArray.get(i);
             }
-            for (int j = 0; j < scheduleListExactArray.get(i).fromWorkFreqs.size(); j++) {
-                scheduleListExactArray.get(i).fromWorkFreqs.set(j, scheduleListExactArray.get(i).fromWorkFreqs.get(j) / avgCounterWorkArray.get(i));
+            for (int j = 0; j < scheduleListExactArray.get(i).fromWorkFreqs.length; j++) {
+                scheduleListExactArray.get(i).fromWorkFreqs[j]=scheduleListExactArray.get(i).fromWorkFreqs[j] / avgCounterWorkArray.get(i);
             }
         }
 
         for (int i = 0; i < scheduleListExactArray.size(); i++) {
-            double SH = 0;
-            for (int j = 0; j < scheduleListExactArray.get(i).fromHomeFreqs.size(); j++) {
-                SH = SH + scheduleListExactArray.get(i).fromHomeFreqs.get(j);
-                scheduleListExactArray.get(i).fromHomeFreqsCDF.add(SH);
+            float SH = 0;
+            scheduleListExactArray.get(i).fromHomeFreqsCDF=new float[scheduleListExactArray.get(i).fromHomeFreqs.length];
+            for (int j = 0; j < scheduleListExactArray.get(i).fromHomeFreqs.length; j++) {
+                SH = SH + scheduleListExactArray.get(i).fromHomeFreqs[j];
+                scheduleListExactArray.get(i).fromHomeFreqsCDF[j]=SH;
             }
             scheduleListExactArray.get(i).sumHomeFreqs = SH;
-            double SW = 0;
-            for (int j = 0; j < scheduleListExactArray.get(i).fromWorkFreqs.size(); j++) {
-                SW = SW + scheduleListExactArray.get(i).fromWorkFreqs.get(j);
-                scheduleListExactArray.get(i).fromWorkFreqsCDF.add(SW);
+            float SW = 0;
+            scheduleListExactArray.get(i).fromWorkFreqsCDF=new float[scheduleListExactArray.get(i).fromWorkFreqs.length];
+            for (int j = 0; j < scheduleListExactArray.get(i).fromWorkFreqs.length; j++) {
+                SW = SW + scheduleListExactArray.get(i).fromWorkFreqs[j];
+                scheduleListExactArray.get(i).fromWorkFreqsCDF[j]=SW;
             }
             scheduleListExactArray.get(i).sumWorkFreqs = SW;
+//            System.out.println("DEBUG3: " + i);
         }
 
-        sumHomeScheduleDifferences = new ArrayList<Double>(Collections.nCopies(regions.size(), 0.0));
-        sumWorkScheduleDifferences = new ArrayList<Double>(Collections.nCopies(regions.size(), 0.0));
-        isFoundHomeRegion = new ArrayList<Integer>(Collections.nCopies(regions.size(), 0));
-        isFoundWorkRegion = new ArrayList<Integer>(Collections.nCopies(regions.size(), 0));
+        sumHomeScheduleDifferences = new float[regions.size()];
+        sumWorkScheduleDifferences = new float[regions.size()];
+        isFoundHomeRegion = new boolean[regions.size()];
+        isFoundWorkRegion = new boolean[regions.size()];
 
         ArrayList<PsudoRegion> psudoHomeRegions = new ArrayList(regions.size());
         for (int i = 0; i < regions.size(); i++) {
@@ -312,7 +324,7 @@ public class RootArtificial extends Root {
             int cellIndexHome = regionsLayer.getCellOfLatLon(peopleNoTessellation.get(i).exactProperties.exactHomeLocation.lat, peopleNoTessellation.get(i).exactProperties.exactHomeLocation.lon);
             if (cellIndexHome != -1) {
                 psudoHomeRegions.get(cellIndexHome).people.add(peopleNoTessellation.get(i));
-                isFoundHomeRegion.set(cellIndexHome, 1);
+                isFoundHomeRegion[cellIndexHome]= true;
             }
         }
 
@@ -324,38 +336,39 @@ public class RootArtificial extends Root {
             int cellIndexWork = regionsLayer.getCellOfLatLon(peopleNoTessellation.get(i).exactProperties.exactWorkLocation.lat, peopleNoTessellation.get(i).exactProperties.exactWorkLocation.lon);
             if (cellIndexWork != -1) {
                 psudoWorkRegions.get(cellIndexWork).people.add(peopleNoTessellation.get(i));
-                isFoundWorkRegion.set(cellIndexWork, 1);
+                isFoundWorkRegion[cellIndexWork]=true;
             }
         }
 
         for (int i = 0; i < psudoHomeRegions.size(); i++) {
-            double varReg = 0;
-            for (int k = 0; k < scheduleListExactArray.get(i).fromHomeFreqs.size(); k++) {
-                double varPOI = 0;
+            float varReg = 0;
+            for (int k = 0; k < scheduleListExactArray.get(i).fromHomeFreqs.length; k++) {
+                float varPOI = 0;
                 for (int j = 0; j < psudoHomeRegions.get(i).people.size(); j++) {
-                    varPOI = varPOI + Math.pow(scheduleListExactArray.get(i).fromHomeFreqs.get(k) - psudoHomeRegions.get(i).people.get(j).exactProperties.fromHomeFreqs.get(k), 2);
+                    varPOI = varPOI + (float)(Math.pow(scheduleListExactArray.get(i).fromHomeFreqs[k] - psudoHomeRegions.get(i).people.get(j).exactProperties.fromHomeFreqs[k], 2));
                 }
                 varPOI = varPOI / avgCounterHomeArray.get(i);
                 varReg = varReg + varPOI;
             }
-            if (Double.isNaN(varReg) == true) {
+            if (Float.isNaN(varReg) == true) {
                 varReg = 0;
             }
-            sumHomeScheduleDifferences.set(i, varReg);
+            sumHomeScheduleDifferences[i]=varReg;
 
             varReg = 0;
-            for (int k = 0; k < scheduleListExactArray.get(i).fromWorkFreqs.size(); k++) {
-                double varPOI = 0;
+            for (int k = 0; k < scheduleListExactArray.get(i).fromWorkFreqs.length; k++) {
+                float varPOI = 0;
                 for (int j = 0; j < psudoWorkRegions.get(i).people.size(); j++) {
-                    varPOI = varPOI + Math.pow(scheduleListExactArray.get(i).fromWorkFreqs.get(k) - psudoWorkRegions.get(i).people.get(j).exactProperties.fromWorkFreqs.get(k), 2);
+                    varPOI = varPOI + (float)(Math.pow(scheduleListExactArray.get(i).fromWorkFreqs[k] - psudoWorkRegions.get(i).people.get(j).exactProperties.fromWorkFreqs[k], 2));
                 }
                 varPOI = varPOI / avgCounterWorkArray.get(i);
                 varReg = varReg + varPOI;
             }
-            if (Double.isNaN(varReg) == true) {
+            if (Float.isNaN(varReg) == true) {
                 varReg = 0;
             }
-            sumWorkScheduleDifferences.set(i, varReg);
+            sumWorkScheduleDifferences[i]=varReg;
+//            System.out.println("DEBUG: " + i);
         }
 
     }
@@ -493,7 +506,7 @@ public class RootArtificial extends Root {
             }
         }
         for (int i = 0; i < freqs.size(); i++) {
-            pOIProbs.put(pOIIds.get(i), (double) (freqs.get(i)) / (double) sum);
+            pOIProbs.put(pOIIds.get(i), (float) (freqs.get(i)) / (float) sum);
         }
 
 //        generateRegionSchedules(modelRoot, regions, patternRecords, type);
@@ -502,17 +515,19 @@ public class RootArtificial extends Root {
     public void generatePeopleSchedulesForHome(MainModel modelRoot, ArrayList<Person> people) {
 //        int trafficeLayerIndex = mainFParent.findLayerContains("traffic");
         for (int i = 0; i < people.size(); i++) {
-            double maxDist = Double.NEGATIVE_INFINITY;
-            double minDist = Double.POSITIVE_INFINITY;
-            double avg = 0;
+            float maxDist = Float.NEGATIVE_INFINITY;
+            float minDist = Float.POSITIVE_INFINITY;
+            float avg = 0;
             int avgCounter = 0;
+            people.get(i).exactProperties.fromHomeFreqs=new float[pOIs.size()];
+            people.get(i).exactProperties.pOIs=new POI[pOIs.size()];
             for (HashMap.Entry<String, POI> mapElement : pOIs.entrySet()) {
                 String key = mapElement.getKey();
                 POI value = mapElement.getValue();
                 float latPOI = value.patternsRecord.place.lat;
                 float lonPOI = value.patternsRecord.place.lon;
 
-                double dist = Math.sqrt(Math.pow(latPOI - (float) (people.get(i).exactProperties.exactHomeLocation.lat), 2) + Math.pow(lonPOI - (float) (people.get(i).exactProperties.exactHomeLocation.lon), 2));
+                float dist = (float)(Math.sqrt(Math.pow(latPOI - (float) (people.get(i).exactProperties.exactHomeLocation.lat), 2) + Math.pow(lonPOI - (float) (people.get(i).exactProperties.exactHomeLocation.lon), 2)));
                 dist = dist * pOIProbs.get(key);
                 if (maxDist < dist) {
                     maxDist = dist;
@@ -521,25 +536,27 @@ public class RootArtificial extends Root {
                     minDist = dist;
                 }
                 avg = avg + dist;
+                
+                people.get(i).exactProperties.pOIs[avgCounter]=value;
+                people.get(i).exactProperties.fromHomeFreqs[avgCounter]=dist;
                 avgCounter = avgCounter + 1;
-                people.get(i).exactProperties.pOIs.add(value);
-                people.get(i).exactProperties.fromHomeFreqs.add(dist);
 //                people.get(i).exactProperties.pOIHomeProbabilities.put(value, dist);
             }
-            avg = avg / (double) avgCounter;
-            for (int m = 0; m < people.get(i).exactProperties.pOIs.size(); m++) {
+            avg = avg / (float) avgCounter;
+            people.get(i).exactProperties.fromHomeFreqsCDF=new float[people.get(i).exactProperties.pOIs.length];
+            for (int m = 0; m < people.get(i).exactProperties.pOIs.length; m++) {
 //                POI value = mapElement.getValue();
-                Double pO = people.get(i).exactProperties.fromHomeFreqs.get(m);
+                Float pO = people.get(i).exactProperties.fromHomeFreqs[m];
                 if (pO > -1) {
-                    Double newP = (pO - minDist + 0.001) / (maxDist + 0.001);
-                    people.get(i).exactProperties.fromHomeFreqs.set(m, newP);
+                    Float newP = (pO - minDist + 0.001f) / (maxDist + 0.001f);
+                    people.get(i).exactProperties.fromHomeFreqs[m]= newP;
                     people.get(i).exactProperties.sumHomeFreqs = people.get(i).exactProperties.sumHomeFreqs + newP;
-                    people.get(i).exactProperties.fromHomeFreqsCDF.add(people.get(i).exactProperties.sumHomeFreqs);
+                    people.get(i).exactProperties.fromHomeFreqsCDF[m]=people.get(i).exactProperties.sumHomeFreqs;
                 } else {
-                    Double newP = (avg - minDist + 0.1) / (maxDist + 0.1);
-                    people.get(i).exactProperties.fromHomeFreqs.set(m, newP);
+                    Float newP = (avg - minDist + 0.1f) / (maxDist + 0.1f);
+                    people.get(i).exactProperties.fromHomeFreqs[m]= newP;
                     people.get(i).exactProperties.sumHomeFreqs = people.get(i).exactProperties.sumHomeFreqs + newP;
-                    people.get(i).exactProperties.fromHomeFreqsCDF.add(people.get(i).exactProperties.sumHomeFreqs);
+                    people.get(i).exactProperties.fromHomeFreqsCDF[m]=people.get(i).exactProperties.sumHomeFreqs;
                     System.out.println("ROUTING FAILED! AVERAGE DISTANCE IS USED!");
                 }
             }
@@ -621,17 +638,18 @@ public class RootArtificial extends Root {
 //        MainFramePanel mainFParent = new esmaieeli.gisFastLocationOptimization.GUI.MainFramePanel();
 //        int trafficeLayerIndex = mainFParent.findLayerContains("traffic");
         for (int i = 0; i < people.size(); i++) {
-            double maxDist = Double.NEGATIVE_INFINITY;
-            double minDist = Double.POSITIVE_INFINITY;
-            double avg = 0;
+            float maxDist = Float.NEGATIVE_INFINITY;
+            float minDist = Float.POSITIVE_INFINITY;
+            float avg = 0;
             int avgCounter = 0;
+            people.get(i).exactProperties.fromWorkFreqs=new float[pOIs.size()];
             for (HashMap.Entry<String, POI> mapElement : pOIs.entrySet()) {
                 String key = mapElement.getKey();
                 POI value = mapElement.getValue();
                 float latPOI = value.patternsRecord.place.lat;
                 float lonPOI = value.patternsRecord.place.lon;
 
-                double dist = Math.sqrt(Math.pow(latPOI - (float) (people.get(i).exactProperties.exactWorkLocation.lat), 2) + Math.pow(lonPOI - (float) (people.get(i).exactProperties.exactWorkLocation.lon), 2));
+                float dist = (float)(Math.sqrt(Math.pow(latPOI - (float) (people.get(i).exactProperties.exactWorkLocation.lat), 2) + Math.pow(lonPOI - (float) (people.get(i).exactProperties.exactWorkLocation.lon), 2)));
                 dist = dist * pOIProbs.get(key);
                 if (maxDist < dist) {
                     maxDist = dist;
@@ -640,8 +658,9 @@ public class RootArtificial extends Root {
                     minDist = dist;
                 }
                 avg = avg + dist;
+                
+                people.get(i).exactProperties.fromWorkFreqs[avgCounter]=dist;
                 avgCounter = avgCounter + 1;
-                people.get(i).exactProperties.fromWorkFreqs.add(dist);
 //                people.get(i).exactProperties.pOIWorkProbabilities.put(value, dist);
 
 //                LocationNode nodePOI = GISLocationDialog.getNearestNode(mainFParent, latPOI, lonPOI, null);
@@ -662,25 +681,61 @@ public class RootArtificial extends Root {
 //                    people.get(i).exactProperties.pOIWorkProbabilities.put(value, -1.0);
 //                }
             }
-            avg = avg / (double) avgCounter;
+            avg = avg / (float) avgCounter;
+            people.get(i).exactProperties.fromWorkFreqsCDF=new float[people.get(i).exactProperties.pOIs.length];
 //            System.out.println("****");
-            for (int m = 0; m < people.get(i).exactProperties.pOIs.size(); m++) {
+            for (int m = 0; m < people.get(i).exactProperties.pOIs.length; m++) {
 //                POI value = mapElement.getValue();
-                Double pO = people.get(i).exactProperties.fromWorkFreqs.get(m);
+                Float pO = people.get(i).exactProperties.fromWorkFreqs[m];
                 if (pO > -1) {
-                    Double newP = (pO - minDist + 0.1) / (maxDist + 0.1);
-                    people.get(i).exactProperties.fromWorkFreqs.set(m, newP);
+                    Float newP = (pO - minDist + 0.1f) / (maxDist + 0.1f);
+                    people.get(i).exactProperties.fromWorkFreqs[m]=newP;
                     people.get(i).exactProperties.sumWorkFreqs = people.get(i).exactProperties.sumWorkFreqs + newP;
-                    people.get(i).exactProperties.fromWorkFreqsCDF.add(people.get(i).exactProperties.sumWorkFreqs);
+                    people.get(i).exactProperties.fromWorkFreqsCDF[m]=people.get(i).exactProperties.sumWorkFreqs;
                 } else {
-                    Double newP = (avg - minDist + 0.1) / (maxDist + 0.1);
-                    people.get(i).exactProperties.fromWorkFreqs.set(m, newP);
+                    Float newP = (avg - minDist + 0.1f) / (maxDist + 0.1f);
+                    people.get(i).exactProperties.fromWorkFreqs[m]=newP;
                     people.get(i).exactProperties.sumWorkFreqs = people.get(i).exactProperties.sumWorkFreqs + newP;
-                    people.get(i).exactProperties.fromWorkFreqsCDF.add(people.get(i).exactProperties.sumWorkFreqs);
+                    people.get(i).exactProperties.fromWorkFreqsCDF[m]=people.get(i).exactProperties.sumWorkFreqs;
                     System.out.println("ROUTING FAILED! AVERAGE DISTANCE IS USED!");
                 }
             }
         }
+    }
+    
+    public void preprocessNodesInRegionsParallel(ArrayList<Region> regions){
+        int cbgLayerIndex = RootArtificial.findLayerExactNotCaseSensitive(allDataGIS, "cbg");
+        int baseLayerIndex = RootArtificial.findLayerExactNotCaseSensitive(allDataGIS, "base");
+        LayerDefinition cbgLayer = (LayerDefinition) (myModelRoot.ABM.allData.all_Layers.get(cbgLayerIndex));
+        LayerDefinition baseLayer = (LayerDefinition) (myModelRoot.ABM.allData.all_Layers.get(baseLayerIndex));
+        
+        int numProcessors = myModelRoot.numCPUs;
+        
+        if (myModelRoot.preprocessEvalPool == null) {
+            myModelRoot.preprocessEvalPool = Executors.newFixedThreadPool(numProcessors);
+        }
+        
+        try {
+            AdvancedParallelPreprocessNodesInRegion parallelPreprocessNodesInRegion[] = new AdvancedParallelPreprocessNodesInRegion[numProcessors];
+
+            for (int i = 0; i < numProcessors - 1; i++) {
+                parallelPreprocessNodesInRegion[i] = new AdvancedParallelPreprocessNodesInRegion(this, regions, cbgLayerIndex, baseLayerIndex, cbgLayer, baseLayer, (int) Math.floor(i * ((regions.size()) / numProcessors)), (int) Math.floor((i + 1) * ((regions.size()) / numProcessors)));
+            }
+            parallelPreprocessNodesInRegion[numProcessors - 1] = new AdvancedParallelPreprocessNodesInRegion(this, regions, cbgLayerIndex, baseLayerIndex, cbgLayer, baseLayer, (int) Math.floor((numProcessors - 1) * ((regions.size()) / numProcessors)), regions.size());
+
+            ArrayList<Callable<Object>> calls = new ArrayList<>();
+
+            for (int i = 0; i < numProcessors; i++) {
+                parallelPreprocessNodesInRegion[i].addRunnableToQueue(calls);
+            }
+
+            //myMainModel.agentEvalPool.invokeAny(calls);
+            myModelRoot.preprocessEvalPool.invokeAll(calls);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(ShamilSimulatorController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        myModelRoot.preprocessEvalPool.shutdown();
     }
 
     public void preprocessNodesInRegions(ArrayList<Region> regions) {
@@ -689,10 +744,8 @@ public class RootArtificial extends Root {
         int baseLayerIndex = RootArtificial.findLayerExactNotCaseSensitive(allDataGIS, "base");
         LayerDefinition cbgLayer = (LayerDefinition) (myModelRoot.ABM.allData.all_Layers.get(cbgLayerIndex));
         LayerDefinition baseLayer = (LayerDefinition) (myModelRoot.ABM.allData.all_Layers.get(baseLayerIndex));
+        
         for (int r = 0; r < regions.size(); r++) {
-//            if(r==3374){
-//                System.out.println("Super mysterious error!");
-//            }
             for (int c = 0; c < regions.get(r).cBGsIDsInvolved.size(); c++) {
                 for (int i = 0; i < cbgLayer.values.length; i++) {
                     if (regions.get(r).cBGsIDsInvolved.get(c) == cbgLayer.values[i]) {
@@ -763,6 +816,84 @@ public class RootArtificial extends Root {
                                         regions.get(r).sumHomeFreqs = regions.get(r).sumHomeFreqs + 1;
                                         regions.get(r).sumWorkFreqs = regions.get(r).sumWorkFreqs + 1;
                                 }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public void preprocessNodesInRegion(Region region, int cbgLayerIndex, int baseLayerIndex, LayerDefinition cbgLayer, LayerDefinition baseLayer) {
+        for (int c = 0; c < region.cBGsIDsInvolved.size(); c++) {
+            for (int i = 0; i < cbgLayer.values.length; i++) {
+                if (region.cBGsIDsInvolved.get(c) == cbgLayer.values[i]) {
+                    for (int m = 0; m < myModelRoot.ABM.allData.all_Nodes.length; m++) {
+                        if (((short[]) (myModelRoot.ABM.allData.all_Nodes[m].layers.get(cbgLayerIndex)))[0] - 1 == i) {
+                            region.locationNodes.add(myModelRoot.ABM.allData.all_Nodes[m]);
+                            //ADD FREQS HERE!
+                            int nodeType = ((short[]) (myModelRoot.ABM.allData.all_Nodes[m].layers.get(baseLayerIndex)))[0] - 1;
+                            String nodeTypeStr = baseLayer.categories[nodeType];
+                            switch (nodeTypeStr) {
+                                case "motorway":
+                                    region.locationNodeHomeFreqs.add(1);
+                                    region.locationNodeWorkFreqs.add(5);
+                                    region.sumHomeFreqs = region.sumHomeFreqs + 1;
+                                    region.sumWorkFreqs = region.sumWorkFreqs + 5;
+                                    break;
+                                case "trunk":
+                                    region.locationNodeHomeFreqs.add(2);
+                                    region.locationNodeWorkFreqs.add(8);
+                                    region.sumHomeFreqs = region.sumHomeFreqs + 2;
+                                    region.sumWorkFreqs = region.sumWorkFreqs + 8;
+                                    break;
+                                case "primary":
+                                    region.locationNodeHomeFreqs.add(4);
+                                    region.locationNodeWorkFreqs.add(20);
+                                    region.sumHomeFreqs = region.sumHomeFreqs + 4;
+                                    region.sumWorkFreqs = region.sumWorkFreqs + 20;
+                                    break;
+                                case "secondary":
+                                    region.locationNodeHomeFreqs.add(5);
+                                    region.locationNodeWorkFreqs.add(20);
+                                    region.sumHomeFreqs = region.sumHomeFreqs + 5;
+                                    region.sumWorkFreqs = region.sumWorkFreqs + 20;
+                                    break;
+                                case "tertiary":
+                                    region.locationNodeHomeFreqs.add(5);
+                                    region.locationNodeWorkFreqs.add(18);
+                                    region.sumHomeFreqs = region.sumHomeFreqs + 5;
+                                    region.sumWorkFreqs = region.sumWorkFreqs + 18;
+                                    break;
+                                case "unclassified":
+                                    region.locationNodeHomeFreqs.add(3);
+                                    region.locationNodeWorkFreqs.add(6);
+                                    region.sumHomeFreqs = region.sumHomeFreqs + 3;
+                                    region.sumWorkFreqs = region.sumWorkFreqs + 6;
+                                    break;
+                                case "residential":
+                                    region.locationNodeHomeFreqs.add(60);
+                                    region.locationNodeWorkFreqs.add(5);
+                                    region.sumHomeFreqs = region.sumHomeFreqs + 60;
+                                    region.sumWorkFreqs = region.sumWorkFreqs + 5;
+                                    break;
+                                case "service":
+                                    region.locationNodeHomeFreqs.add(17);
+                                    region.locationNodeWorkFreqs.add(10);
+                                    region.sumHomeFreqs = region.sumHomeFreqs + 17;
+                                    region.sumWorkFreqs = region.sumWorkFreqs + 10;
+                                    break;
+                                case "foot":
+                                    region.locationNodeHomeFreqs.add(3);
+                                    region.locationNodeWorkFreqs.add(8);
+                                    region.sumHomeFreqs = region.sumHomeFreqs + 3;
+                                    region.sumWorkFreqs = region.sumWorkFreqs + 8;
+                                    break;
+                                default:
+                                    region.locationNodeHomeFreqs.add(1);
+                                    region.locationNodeWorkFreqs.add(1);
+                                    region.sumHomeFreqs = region.sumHomeFreqs + 1;
+                                    region.sumWorkFreqs = region.sumWorkFreqs + 1;
                             }
                         }
                     }
@@ -852,17 +983,17 @@ public class RootArtificial extends Root {
 
     public void writeScheduleSimilarityArtifitialDebug(ArrayList<ScheduleListExact> regionAvgs, ArrayList<Person> people) {
         ArrayList<String[]> rows = new ArrayList();
-        String[] header = new String[regionAvgs.get(0).fromHomeFreqs.size() + 1];
+        String[] header = new String[regionAvgs.get(0).fromHomeFreqs.length + 1];
         header[0] = "Region index";
-        for (int i = 0; i < regionAvgs.get(0).fromHomeFreqs.size(); i++) {
+        for (int i = 0; i < regionAvgs.get(0).fromHomeFreqs.length; i++) {
             header[i + 1] = "POI " + i;
         }
         rows.add(header);
         for (int i = 0; i < regionAvgs.size(); i++) {
-            String[] row = new String[regionAvgs.get(i).fromHomeFreqs.size() + 1];
+            String[] row = new String[regionAvgs.get(i).fromHomeFreqs.length + 1];
             row[0] = String.valueOf(i);
-            for (int j = 0; j < regionAvgs.get(i).fromHomeFreqs.size(); j++) {
-                row[j + 1] = String.valueOf(regionAvgs.get(i).fromHomeFreqs.get(j));
+            for (int j = 0; j < regionAvgs.get(i).fromHomeFreqs.length; j++) {
+                row[j + 1] = String.valueOf(regionAvgs.get(i).fromHomeFreqs[j]);
             }
             rows.add(row);
         }
@@ -886,20 +1017,20 @@ public class RootArtificial extends Root {
         }
 
         rows = new ArrayList();
-        header = new String[people.get(0).exactProperties.fromHomeFreqs.size() + 2];
+        header = new String[people.get(0).exactProperties.fromHomeFreqs.length + 2];
         header[0] = "Region index";
         header[1] = "Person index";
-        for (int i = 0; i < people.get(0).exactProperties.fromHomeFreqs.size(); i++) {
+        for (int i = 0; i < people.get(0).exactProperties.fromHomeFreqs.length; i++) {
             header[i + 2] = "POI " + i;
         }
         rows.add(header);
         for (int i = 0; i < psudoRegions.size(); i++) {
             for (int j = 0; j < psudoRegions.get(i).people.size(); j++) {
-                String[] row = new String[regionAvgs.get(i).fromHomeFreqs.size() + 2];
+                String[] row = new String[regionAvgs.get(i).fromHomeFreqs.length + 2];
                 row[0] = String.valueOf(i);
                 row[1] = String.valueOf(j);
-                for (int k = 0; k < psudoRegions.get(i).people.get(j).exactProperties.fromHomeFreqs.size(); k++) {
-                    row[k + 2] = String.valueOf(psudoRegions.get(i).people.get(j).exactProperties.fromHomeFreqs.get(k));
+                for (int k = 0; k < psudoRegions.get(i).people.get(j).exactProperties.fromHomeFreqs.length; k++) {
+                    row[k + 2] = String.valueOf(psudoRegions.get(i).people.get(j).exactProperties.fromHomeFreqs[k]);
                 }
                 rows.add(row);
             }
@@ -923,13 +1054,23 @@ public class RootArtificial extends Root {
         header[3] = "is home region found";
         header[4] = "is work region found";
         rows.add(header);
-        for (int i = 0; i < sumHomeScheduleDifferences.size(); i++) {
+        for (int i = 0; i < sumHomeScheduleDifferences.length; i++) {
             String[] row = new String[5];
             row[0] = String.valueOf(i);
-            row[1] = String.valueOf(sumHomeScheduleDifferences.get(i));
-            row[2] = String.valueOf(sumWorkScheduleDifferences.get(i));
-            row[3] = String.valueOf(isFoundHomeRegion.get(i));
-            row[4] = String.valueOf(isFoundWorkRegion.get(i));
+            row[1] = String.valueOf(sumHomeScheduleDifferences[i]);
+            row[2] = String.valueOf(sumWorkScheduleDifferences[i]);
+            if(isFoundHomeRegion[i]==true){
+                row[3]=String.valueOf(1);
+            }else{
+                row[3]=String.valueOf(0);
+            }
+            if(isFoundWorkRegion[i]==true){
+                row[4]=String.valueOf(1);
+            }else{
+                row[4]=String.valueOf(0);
+            }
+//            row[3] = String.valueOf(isFoundHomeRegion.get(i));
+//            row[4] = String.valueOf(isFoundWorkRegion.get(i));
             rows.add(row);
         }
         CsvWriter writer = new CsvWriter();
@@ -949,15 +1090,15 @@ public class RootArtificial extends Root {
         int numW = 0;
         double sumH = 0;
         double sumW = 0;
-        for (int i = 0; i < sumHomeScheduleDifferences.size(); i++) {
-            if (isFoundHomeRegion.get(i) == 1) {
+        for (int i = 0; i < sumHomeScheduleDifferences.length; i++) {
+            if (isFoundHomeRegion[i] == true) {
                 numH = numH + 1;
             }
-            if (isFoundWorkRegion.get(i) == 1) {
+            if (isFoundWorkRegion[i] == true) {
                 numW = numW + 1;
             }
-            sumH = sumH + sumHomeScheduleDifferences.get(i);
-            sumW = sumW + sumWorkScheduleDifferences.get(i);
+            sumH = sumH + sumHomeScheduleDifferences[i];
+            sumW = sumW + sumWorkScheduleDifferences[i];
         }
         String[] row = new String[2];
         row[0] = String.valueOf(sumH / numH);
@@ -1004,10 +1145,12 @@ public class RootArtificial extends Root {
             for (int i = 0; i < eval.getNumClusters(); i++) {
                 ScheduleListExact scheduleListExact = new ScheduleListExact();
                 scheduleListExact.regionIndex = i;
-                for (int m = 0; m < activePeople.get(0).exactProperties.pOIs.size(); m++) {
-                    scheduleListExact.fromHomeFreqs.add(0d);
-                    scheduleListExact.fromWorkFreqs.add(0d);
-                }
+                scheduleListExact.fromHomeFreqs=new float[activePeople.get(0).exactProperties.pOIs.length];
+                scheduleListExact.fromWorkFreqs=new float[activePeople.get(0).exactProperties.pOIs.length];
+//                for (int m = 0; m < activePeople.get(0).exactProperties.pOIs.size(); m++) {
+//                    scheduleListExact.fromHomeFreqs.add(0f);
+//                    scheduleListExact.fromWorkFreqs.add(0f);
+//                }
                 avgCounterArray.add(0);
                 scheduleListExact.pOIs = activePeople.get(0).exactProperties.pOIs;
                 scheduleListExactArrayClustering.add(scheduleListExact);
@@ -1016,42 +1159,42 @@ public class RootArtificial extends Root {
             for (int i = 0; i < activePeople.size(); i++) {
                 int cellIndexHome = (int) (assignments[i]);
                 if (cellIndexHome != -1) {
-                    for (int k = 0; k < activePeople.get(i).exactProperties.fromHomeFreqs.size(); k++) {
-                        Double newValue = scheduleListExactArrayClustering.get(cellIndexHome).fromHomeFreqs.get(k) + activePeople.get(i).exactProperties.fromHomeFreqs.get(k);
-                        scheduleListExactArrayClustering.get(cellIndexHome).fromHomeFreqs.set(k, newValue);
+                    for (int k = 0; k < activePeople.get(i).exactProperties.fromHomeFreqs.length; k++) {
+                        Float newValue = scheduleListExactArrayClustering.get(cellIndexHome).fromHomeFreqs[k] + activePeople.get(i).exactProperties.fromHomeFreqs[k];
+                        scheduleListExactArrayClustering.get(cellIndexHome).fromHomeFreqs[k]= newValue;
                     }
                     avgCounterArray.set(cellIndexHome, avgCounterArray.get(cellIndexHome) + 1);
                 }
                 Instance inst = prepareOneInstance(activePeople.get(i).exactProperties.exactWorkLocation.lat, activePeople.get(i).exactProperties.exactWorkLocation.lon);
                 double[] distOfCluster = xMeans.distributionForInstance(inst);
                 int cellIndexWork = -1;
-                double maxVal = Double.NEGATIVE_INFINITY;
+                float maxVal = Float.NEGATIVE_INFINITY;
                 for (int h = 0; h < distOfCluster.length; h++) {
                     if (distOfCluster[h] > maxVal) {
-                        maxVal = distOfCluster[h];
+                        maxVal = (float)(distOfCluster[h]);
                         cellIndexWork = h;
                     }
                 }
                 if (cellIndexWork != -1) {
-                    for (int k = 0; k < activePeople.get(i).exactProperties.fromWorkFreqs.size(); k++) {
-                        Double newValue = scheduleListExactArrayClustering.get(cellIndexWork).fromWorkFreqs.get(k) + activePeople.get(i).exactProperties.fromWorkFreqs.get(k);
-                        scheduleListExactArrayClustering.get(cellIndexWork).fromWorkFreqs.set(k, newValue);
+                    for (int k = 0; k < activePeople.get(i).exactProperties.fromWorkFreqs.length; k++) {
+                        Float newValue = scheduleListExactArrayClustering.get(cellIndexWork).fromWorkFreqs[k] + activePeople.get(i).exactProperties.fromWorkFreqs[k];
+                        scheduleListExactArrayClustering.get(cellIndexWork).fromWorkFreqs[k]= newValue;
                     }
                     avgCounterArray.set(cellIndexWork, avgCounterArray.get(cellIndexWork) + 1);
                 }
             }
 
             for (int i = 0; i < eval.getNumClusters(); i++) {
-                for (int j = 0; j < scheduleListExactArrayClustering.get(i).fromHomeFreqs.size(); j++) {
-                    scheduleListExactArrayClustering.get(i).fromHomeFreqs.set(j, scheduleListExactArrayClustering.get(i).fromHomeFreqs.get(j) / avgCounterArray.get(i));
+                for (int j = 0; j < scheduleListExactArrayClustering.get(i).fromHomeFreqs.length; j++) {
+                    scheduleListExactArrayClustering.get(i).fromHomeFreqs[j]= scheduleListExactArrayClustering.get(i).fromHomeFreqs[j] / avgCounterArray.get(i);
                 }
-                for (int j = 0; j < scheduleListExactArrayClustering.get(i).fromWorkFreqs.size(); j++) {
-                    scheduleListExactArrayClustering.get(i).fromWorkFreqs.set(j, scheduleListExactArrayClustering.get(i).fromWorkFreqs.get(j) / avgCounterArray.get(i));
+                for (int j = 0; j < scheduleListExactArrayClustering.get(i).fromWorkFreqs.length; j++) {
+                    scheduleListExactArrayClustering.get(i).fromWorkFreqs[j]= scheduleListExactArrayClustering.get(i).fromWorkFreqs[j] / avgCounterArray.get(i);
                 }
             }
 
-            sumHomeScheduleDifferencesClustering = new ArrayList<Double>(Collections.nCopies(eval.getNumClusters(), 0.0));
-            sumWorkScheduleDifferencesClustering = new ArrayList<Double>(Collections.nCopies(eval.getNumClusters(), 0.0));
+            sumHomeScheduleDifferencesClustering = new float[eval.getNumClusters()];
+            sumWorkScheduleDifferencesClustering = new float[eval.getNumClusters()];
 
             ArrayList<PsudoRegion> psudoHomeRegions = new ArrayList(eval.getNumClusters());
             for (int i = 0; i < eval.getNumClusters(); i++) {
@@ -1061,7 +1204,7 @@ public class RootArtificial extends Root {
                 int cellIndexHome = (int) (assignments[i]);
                 if (cellIndexHome != -1) {
                     psudoHomeRegions.get(cellIndexHome).people.add(activePeople.get(i));
-                    isFoundHomeRegion.set(cellIndexHome, 1);
+                    isFoundHomeRegion[cellIndexHome]=true;
                 }
             }
 
@@ -1073,49 +1216,49 @@ public class RootArtificial extends Root {
                 Instance inst = prepareOneInstance(activePeople.get(i).exactProperties.exactWorkLocation.lat, activePeople.get(i).exactProperties.exactWorkLocation.lon);
                 double[] distOfCluster = xMeans.distributionForInstance(inst);
                 int cellIndexWork = -1;
-                double maxVal = Double.NEGATIVE_INFINITY;
+                float maxVal = Float.NEGATIVE_INFINITY;
                 for (int h = 0; h < distOfCluster.length; h++) {
                     if (distOfCluster[h] > maxVal) {
-                        maxVal = distOfCluster[h];
+                        maxVal = (float)(distOfCluster[h]);
                         cellIndexWork = h;
                     }
                 }
                 if (cellIndexWork != -1) {
                     psudoWorkRegions.get(cellIndexWork).people.add(activePeople.get(i));
-                    isFoundWorkRegion.set(cellIndexWork, 1);
+                    isFoundWorkRegion[cellIndexWork]=true;
                 }
             }
 
             for (int i = 0; i < psudoHomeRegions.size(); i++) {
-                double varReg = 0;
-                for (int k = 0; k < scheduleListExactArrayClustering.get(i).fromHomeFreqs.size(); k++) {
-                    double varPOI = 0;
+                float varReg = 0;
+                for (int k = 0; k < scheduleListExactArrayClustering.get(i).fromHomeFreqs.length; k++) {
+                    float varPOI = 0;
                     for (int j = 0; j < psudoHomeRegions.get(i).people.size(); j++) {
-                        varPOI = varPOI + Math.pow(scheduleListExactArrayClustering.get(i).fromHomeFreqs.get(k) - psudoHomeRegions.get(i).people.get(j).exactProperties.fromHomeFreqs.get(k), 2);
+                        varPOI = varPOI + (float)(Math.pow(scheduleListExactArrayClustering.get(i).fromHomeFreqs[k] - psudoHomeRegions.get(i).people.get(j).exactProperties.fromHomeFreqs[k], 2));
                     }
                     varPOI = varPOI / avgCounterArray.get(i);
                     varReg = varReg + varPOI;
                 }
-                if (Double.isNaN(varReg) == true) {
+                if (Float.isNaN(varReg) == true) {
                     varReg = 0;
                 }
-                sumHomeScheduleDifferencesClustering.set(i, varReg);
+                sumHomeScheduleDifferencesClustering[i]=varReg;
             }
 
             for (int i = 0; i < psudoWorkRegions.size(); i++) {
-                double varReg = 0;
-                for (int k = 0; k < scheduleListExactArrayClustering.get(i).fromWorkFreqs.size(); k++) {
-                    double varPOI = 0;
+                float varReg = 0;
+                for (int k = 0; k < scheduleListExactArrayClustering.get(i).fromWorkFreqs.length; k++) {
+                    float varPOI = 0;
                     for (int j = 0; j < psudoWorkRegions.get(i).people.size(); j++) {
-                        varPOI = varPOI + Math.pow(scheduleListExactArrayClustering.get(i).fromWorkFreqs.get(k) - psudoWorkRegions.get(i).people.get(j).exactProperties.fromWorkFreqs.get(k), 2);
+                        varPOI = varPOI + (float)(Math.pow(scheduleListExactArrayClustering.get(i).fromWorkFreqs[k] - psudoWorkRegions.get(i).people.get(j).exactProperties.fromWorkFreqs[k], 2));
                     }
                     varPOI = varPOI / avgCounterArray.get(i);
                     varReg = varReg + varPOI;
                 }
-                if (Double.isNaN(varReg) == true) {
+                if (Float.isNaN(varReg) == true) {
                     varReg = 0;
                 }
-                sumWorkScheduleDifferencesClustering.set(i, varReg);
+                sumWorkScheduleDifferencesClustering[i]=varReg;
             }
 
             writeScheduleSimilarityArtificialClustering(filePath + File.separator + "Xmeans");
@@ -1143,13 +1286,23 @@ public class RootArtificial extends Root {
         header[3] = "is home region found";
         header[4] = "is work region found";
         rows.add(header);
-        for (int i = 0; i < sumHomeScheduleDifferencesClustering.size(); i++) {
+        for (int i = 0; i < sumHomeScheduleDifferencesClustering.length; i++) {
             String[] row = new String[5];
             row[0] = String.valueOf(i);
-            row[1] = String.valueOf(sumHomeScheduleDifferencesClustering.get(i));
-            row[2] = String.valueOf(sumWorkScheduleDifferencesClustering.get(i));
-            row[3] = String.valueOf(isFoundHomeRegion.get(i));
-            row[4] = String.valueOf(isFoundWorkRegion.get(i));
+            row[1] = String.valueOf(sumHomeScheduleDifferencesClustering[i]);
+            row[2] = String.valueOf(sumWorkScheduleDifferencesClustering[i]);
+            if(isFoundHomeRegion[i]==true){
+                row[3]=String.valueOf(1);
+            }else{
+                row[3]=String.valueOf(0);
+            }
+            if(isFoundWorkRegion[i]==true){
+                row[4]=String.valueOf(1);
+            }else{
+                row[4]=String.valueOf(0);
+            }
+//            row[3] = String.valueOf(isFoundHomeRegion.get(i));
+//            row[4] = String.valueOf(isFoundWorkRegion.get(i));
             rows.add(row);
         }
         CsvWriter writer = new CsvWriter();
@@ -1169,15 +1322,15 @@ public class RootArtificial extends Root {
         int numW = 0;
         double sumH = 0;
         double sumW = 0;
-        for (int i = 0; i < sumHomeScheduleDifferencesClustering.size(); i++) {
-            if (isFoundHomeRegion.get(i) == 1) {
+        for (int i = 0; i < sumHomeScheduleDifferencesClustering.length; i++) {
+            if (isFoundHomeRegion[i] == true) {
                 numH = numH + 1;
             }
-            if (isFoundWorkRegion.get(i) == 1) {
+            if (isFoundWorkRegion[i] == true) {
                 numW = numW + 1;
             }
-            sumH = sumH + sumHomeScheduleDifferencesClustering.get(i);
-            sumW = sumW + sumWorkScheduleDifferencesClustering.get(i);
+            sumH = sumH + sumHomeScheduleDifferencesClustering[i];
+            sumW = sumW + sumWorkScheduleDifferencesClustering[i];
         }
         String[] row = new String[2];
         row[0] = String.valueOf(sumH / numH);
@@ -1269,7 +1422,8 @@ public class RootArtificial extends Root {
     }
 
     public ArrayList makeRegionsByClustering(MainModel modelRoot, int passed_numIndividuals, int numClusters) {
-        preprocessNodesInRegions(cBGregions);
+//        preprocessNodesInRegions(cBGregions);
+        preprocessNodesInRegionsParallel(cBGregions);
         generateAgentsRaw(modelRoot, passed_numIndividuals, cBGregions, isTessellationBuilt, false, isTest);
         selectExactLocations(peopleNoTessellation);
 
@@ -1285,7 +1439,7 @@ public class RootArtificial extends Root {
         vp.saveIndexedImageAsPNG(indexedImage, allDataGIS, numClusters, "test.png");
 
         cLLayer.indexedImage = indexedImage;
-        
+
         //SEEMS USELESS
 //        for (int i = 0; i < modelRoot.ABM.allData.all_Layers.size(); i++) {
 //            if (((LayerDefinition) (modelRoot.ABM.allData.all_Layers.get(i))).layerName.toLowerCase().equals("cbg")) {
