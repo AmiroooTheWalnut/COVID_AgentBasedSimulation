@@ -11,10 +11,10 @@ package COVID_AgentBasedSimulation.Model.HardcodedSimulator;
 public class ScheduleListExact {
     public int regionIndex=-1;
     public POI[] pOIs;
-    public float[] fromHomeFreqs;
-    public float[] fromWorkFreqs;
-    public float[] fromHomeFreqsCDF;
-    public float[] fromWorkFreqsCDF;
+    public short[] fromHomeFreqs;
+    public short[] fromWorkFreqs;
+    public short[] fromHomeFreqsCDF;
+    public short[] fromWorkFreqsCDF;
     public float sumHomeFreqs=0;
     public float sumWorkFreqs=0;
 }

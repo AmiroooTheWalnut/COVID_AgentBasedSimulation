@@ -14,10 +14,10 @@ public class PersonExactProperties {
     public LocationNode exactHomeLocation;
     public LocationNode exactWorkLocation;
     public POI[] pOIs;
-    public float[] fromHomeFreqs;
-    public float[] fromWorkFreqs;
-    public float[] fromHomeFreqsCDF;
-    public float[] fromWorkFreqsCDF;
+    public short[] fromHomeFreqs;
+    public short[] fromWorkFreqs;
+    public short[] fromHomeFreqsCDF;
+    public short[] fromWorkFreqsCDF;
 //    public HashMap<POI, Double> pOIHomeProbabilities=new HashMap();
 //    public HashMap<POI, Double> pOIWorkProbabilities=new HashMap();
     public float sumHomeFreqs;

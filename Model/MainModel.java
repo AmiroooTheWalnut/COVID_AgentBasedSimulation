@@ -882,7 +882,9 @@ public class MainModel extends Dataset {
                 root.writeScheduleSimilarityArtifitial(testPath + File.separator + "regionMobilitySimilarity");
 //                root.writeScheduleSimilarityArtifitialDebug(root.scheduleListExactArray,root.peopleNoTessellation);
             }
-            root.runClusterers(testPath);
+            //BROKEN FOR NOW, THIS FEATURE WILL BE REMOVED
+//            root.runClusterers(testPath);
+
         }
         isResultSavedAtTheEnd = true;
     }

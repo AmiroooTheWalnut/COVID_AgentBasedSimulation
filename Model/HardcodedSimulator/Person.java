@@ -4,6 +4,7 @@
  */
 package COVID_AgentBasedSimulation.Model.HardcodedSimulator;
 
+import COVID_AgentBasedSimulation.DJL.ai.djl.util.Float16Utils;
 import COVID_AgentBasedSimulation.Model.AgentBasedModel.Agent;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.DwellTime;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.PatternsRecordProcessed;
@@ -436,7 +437,7 @@ public class Person extends Agent {
 
 
             float selectedDestFreq = (float)(Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * this.exactProperties.sumHomeFreqs));
-            int index = MainModel.binarySearchCumulative(selectedDestFreq, exactProperties.fromHomeFreqsCDF);
+            int index = MainModel.binarySearchCumulative(selectedDestFreq, Float16Utils.halfArrayToFloatArray(exactProperties.fromHomeFreqsCDF));
             return exactProperties.pOIs[index];
 //            return null;
         } else {
@@ -450,7 +451,7 @@ public class Person extends Agent {
 //            }
             
             float selectedDestFreq = (float)(Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * this.exactProperties.sumWorkFreqs));
-            int index = MainModel.binarySearchCumulative(selectedDestFreq, exactProperties.fromWorkFreqsCDF);
+            int index = MainModel.binarySearchCumulative(selectedDestFreq, Float16Utils.halfArrayToFloatArray(exactProperties.fromWorkFreqsCDF));
             return exactProperties.pOIs[index];
 //            return null;
         }
