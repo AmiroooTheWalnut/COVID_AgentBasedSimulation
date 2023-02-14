@@ -42,7 +42,7 @@ public class SimulatorDialog extends javax.swing.JDialog {
 
         refreshLists();
 
-        ProcessingMapRenderer sketch = new ProcessingMapRenderer(myParent, jPanel14);
+        ProcessingMapRenderer sketch = new ProcessingMapRenderer(myParent, jPanel14, null);
         sketch.startRendering();
     }
 

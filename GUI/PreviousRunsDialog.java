@@ -64,7 +64,7 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
         initComponents();
         myParent = (MainFrame) parent;
 
-        sketch = new ProcessingMapRenderer(myParent, jPanel2);
+        sketch = new ProcessingMapRenderer(myParent, jPanel2, null);
         sketch.startRendering();
 
         zoomTimer = new Timer();

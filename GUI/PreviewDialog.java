@@ -40,8 +40,8 @@ public class PreviewDialog extends javax.swing.JDialog {
                 return result.get(index);
             }
         });
-        
-        ProcessingMapRenderer pt = new ProcessingMapRenderer(myParent,jPanel7);
+
+        ProcessingMapRenderer pt = new ProcessingMapRenderer(myParent, jPanel7, null);
         pt.startRendering();
     }
 
@@ -545,14 +545,14 @@ public class PreviewDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jList5ValueChanged
 
     private void jList7ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList7ValueChanged
-        if (jList1.getSelectedIndex() > -1 && jList2.getSelectedIndex() > -1 && jList3.getSelectedIndex() > -1 && jList7.getSelectedIndex()>-1) {
+        if (jList1.getSelectedIndex() > -1 && jList2.getSelectedIndex() > -1 && jList3.getSelectedIndex() > -1 && jList7.getSelectedIndex() > -1) {
             jList4.clearSelection();
             jList5.clearSelection();
 
             jList4.setModel(new javax.swing.AbstractListModel() {
                 @Override
                 public int getSize() {
-                    if (jList1.getSelectedIndex() > -1 && jList2.getSelectedIndex() > -1 && jList3.getSelectedIndex() > -1 && jList7.getSelectedIndex()>-1) {
+                    if (jList1.getSelectedIndex() > -1 && jList2.getSelectedIndex() > -1 && jList3.getSelectedIndex() > -1 && jList7.getSelectedIndex() > -1) {
                         return myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList7.getSelectedIndex()).censusTracts.size();
                     } else {
                         return 0;
@@ -561,7 +561,7 @@ public class PreviewDialog extends javax.swing.JDialog {
 
                 @Override
                 public Object getElementAt(int index) {
-                    if (jList1.getSelectedIndex() > -1 && jList2.getSelectedIndex() > -1 && jList3.getSelectedIndex() > -1 && jList7.getSelectedIndex()>-1) {
+                    if (jList1.getSelectedIndex() > -1 && jList2.getSelectedIndex() > -1 && jList3.getSelectedIndex() > -1 && jList7.getSelectedIndex() > -1) {
                         return myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList7.getSelectedIndex()).censusTracts.get(index).id;
                     } else {
                         return null;

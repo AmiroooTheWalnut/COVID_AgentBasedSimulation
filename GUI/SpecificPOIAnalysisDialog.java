@@ -4,10 +4,12 @@
  */
 package COVID_AgentBasedSimulation.GUI;
 
+import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.ProcessingMapRenderer;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.AllPatterns;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.PatternsRecordProcessed;
 import COVID_AgentBasedSimulation.Model.Engines.SimplePair;
 import COVID_AgentBasedSimulation.Model.MainModel;
+import COVID_AgentBasedSimulation.Model.Structure.Marker;
 import com.opencsv.CSVWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -26,7 +28,7 @@ import java.util.logging.Logger;
  * @author user
  */
 public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
-
+    
     public MainFrame myParent;
     public MainModel mainModel;
     public String[] patternsList;
@@ -34,7 +36,7 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
     ArrayList<SimplePair<String, PatternsRecordProcessed>> brands;
     ArrayList<SimplePair<String, PatternsRecordProcessed>> filteredBrands;
     ArrayList<SimplePair<String, PatternsRecordProcessed>> finalBrands;
-
+    
     ArrayList<SimplePair<String, PatternsRecordProcessed>> finalBrandsBehind;
     ArrayList<SimplePair<String, PatternsRecordProcessed>> filteredBrandsBehind;
 
@@ -47,10 +49,13 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
         myParent = (MainFrame) parent;
         mainModel = myParent.mainModel;
         loadScope = passed_loadScope;
-
+        
         refreshYearMonthList();
+        
+        ProcessingMapRenderer sketch = new ProcessingMapRenderer(myParent, jPanel8, this);
+        sketch.startRendering();
     }
-
+    
     public void refreshYearMonthList() {
         patternsList = AllPatterns.detectAllPatterns("./datasets/Safegraph/" + loadScope);
         jList3.setModel(new javax.swing.AbstractListModel() {
@@ -58,7 +63,7 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
             public int getSize() {
                 return patternsList.length;
             }
-
+            
             @Override
             public Object getElementAt(int index) {
                 return patternsList[index];
@@ -75,6 +80,7 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPanel12 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
@@ -84,6 +90,7 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
         jLabel4 = new javax.swing.JLabel();
         jScrollPane4 = new javax.swing.JScrollPane();
         jList4 = new javax.swing.JList<>();
+        jPanel10 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
@@ -92,6 +99,7 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
         jLabel2 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jList1 = new javax.swing.JList<>();
+        jPanel11 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
@@ -122,8 +130,14 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
         jLabel30 = new javax.swing.JLabel();
         jLabel31 = new javax.swing.JLabel();
         jButton2 = new javax.swing.JButton();
+        jLabel32 = new javax.swing.JLabel();
+        jLabel33 = new javax.swing.JLabel();
+        jPanel8 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        getContentPane().setLayout(new java.awt.GridLayout(1, 4));
+
+        jPanel12.setLayout(new java.awt.GridLayout(1, 3));
 
         jPanel1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jPanel1.setLayout(new java.awt.GridLayout(1, 0));
@@ -144,7 +158,7 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel3)
-                .addContainerGap(140, Short.MAX_VALUE))
+                .addContainerGap(54, Short.MAX_VALUE))
             .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
         );
         jPanel4Layout.setVerticalGroup(
@@ -153,7 +167,7 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
                 .addContainerGap()
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3))
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE))
         );
 
         jPanel1.add(jPanel4);
@@ -174,7 +188,7 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel4)
-                .addContainerGap(157, Short.MAX_VALUE))
+                .addContainerGap(71, Short.MAX_VALUE))
             .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
         );
         jPanel5Layout.setVerticalGroup(
@@ -183,10 +197,14 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
                 .addContainerGap()
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane4))
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE))
         );
 
         jPanel1.add(jPanel5);
+
+        jPanel12.add(jPanel1);
+
+        jPanel10.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
         jLabel1.setText("Filter:");
 
@@ -200,7 +218,6 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
         });
 
         jPanel2.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        jPanel2.setLayout(new java.awt.GridLayout(1, 0));
 
         jLabel2.setText("CBG homes");
 
@@ -213,7 +230,7 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel2)
-                .addContainerGap(87, Short.MAX_VALUE))
+                .addContainerGap(99, Short.MAX_VALUE))
             .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
         );
         jPanel3Layout.setVerticalGroup(
@@ -222,10 +239,64 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
                 .addContainerGap()
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 417, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 397, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
-        jPanel2.add(jPanel3);
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(9, Short.MAX_VALUE))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        javax.swing.GroupLayout jPanel10Layout = new javax.swing.GroupLayout(jPanel10);
+        jPanel10.setLayout(jPanel10Layout);
+        jPanel10Layout.setHorizontalGroup(
+            jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel10Layout.createSequentialGroup()
+                .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel10Layout.createSequentialGroup()
+                        .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel10Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jLabel1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel10Layout.createSequentialGroup()
+                                .addGap(20, 20, 20)
+                                .addComponent(jButton1)))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(jPanel10Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+        jPanel10Layout.setVerticalGroup(
+            jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel10Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addComponent(jButton1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanel12.add(jPanel10);
+
+        jPanel11.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
         jPanel6.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
@@ -394,7 +465,7 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
                 .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel7Layout.createSequentialGroup()
                         .addComponent(jLabel30)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
                         .addComponent(jLabel31))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
                         .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -431,56 +502,49 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
             }
         });
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 368, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(jButton1))
-                        .addContainerGap())
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(18, 18, 18)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jButton2)
-                                .addContainerGap())))))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(layout.createSequentialGroup()
+        jLabel32.setText("Total month mobility:");
+
+        jLabel33.setText("Select a month");
+
+        javax.swing.GroupLayout jPanel11Layout = new javax.swing.GroupLayout(jPanel11);
+        jPanel11.setLayout(jPanel11Layout);
+        jPanel11Layout.setHorizontalGroup(
+            jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel11Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton2)
-                        .addContainerGap())))
+                .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel11Layout.createSequentialGroup()
+                        .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jButton2)
+                            .addComponent(jLabel32)
+                            .addComponent(jLabel33))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
+        jPanel11Layout.setVerticalGroup(
+            jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel11Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel32)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel33)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 109, Short.MAX_VALUE)
+                .addComponent(jButton2)
+                .addContainerGap())
+        );
+
+        jPanel12.add(jPanel11);
+
+        getContentPane().add(jPanel12);
+
+        jPanel8.setLayout(new java.awt.GridLayout(1, 0));
+        getContentPane().add(jPanel8);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -490,6 +554,7 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
         String temp[] = jList3.getSelectedValue().split("_");
         myParent.mainModel.safegraph.loadPatternsPlacesSet(myParent.mainModel.datasetDirectory, temp[1] + "_" + temp[2], myParent.mainModel.allGISData, loadScope, true, myParent.numProcessors);
         brands = new ArrayList();
+        int totalMobility = 0;
         for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.size(); i++) {
             for (int j = 0; j < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.size(); j++) {
                 if (myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place != null) {
@@ -502,6 +567,7 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
                         }
                     }
                 }
+                totalMobility = totalMobility + myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).raw_visit_counts;
             }
         }
         Collections.sort(brands);
@@ -510,13 +576,14 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
             public int getSize() {
                 return brands.size();
             }
-
+            
             @Override
             public Object getElementAt(int index) {
                 return brands.get(index).getKey();
             }
         });
         finalBrands = brands;
+        jLabel33.setText(String.valueOf(totalMobility));
     }//GEN-LAST:event_jList3ValueChanged
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -532,7 +599,7 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
                 public int getSize() {
                     return filteredBrands.size();
                 }
-
+                
                 @Override
                 public Object getElementAt(int index) {
                     return filteredBrands.get(index).getKey() + ((PatternsRecordProcessed) (filteredBrands.get(index).getValue())).placeKey;
@@ -593,6 +660,13 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
             jLabel29.setText(String.valueOf(((PatternsRecordProcessed) (finalBrands.get(jList4.getSelectedIndex()).getValue())).raw_visit_counts));
             jLabel28.setText(String.valueOf(((PatternsRecordProcessed) (finalBrands.get(jList4.getSelectedIndex()).getValue())).raw_visitor_counts));
             jLabel31.setText(String.valueOf(((PatternsRecordProcessed) (finalBrands.get(jList4.getSelectedIndex()).getValue())).distance_from_home));
+            Marker temp = new Marker();
+            temp.lat = ((PatternsRecordProcessed) (finalBrands.get(jList4.getSelectedIndex()).getValue())).place.lat;
+            temp.lon = ((PatternsRecordProcessed) (finalBrands.get(jList4.getSelectedIndex()).getValue())).place.lon;
+            myParent.child.setDrawingSimpleGISMarker(temp);
+            myParent.child.isShowSimpleMarker = true;
+            System.out.println("temp.lat: " + temp.lat);
+            System.out.println("temp.lon: " + temp.lon);
         }
     }//GEN-LAST:event_jList4ValueChanged
 
@@ -609,8 +683,8 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
         int M240 = 0;
         double avg = 0;
         for (int m = 0; m < patternsList.length; m++) {
-            boolean isLoaded=loadPatterns(patternsList[m]);
-            if(isLoaded==false){
+            boolean isLoaded = loadPatterns(patternsList[m]);
+            if (isLoaded == false) {
                 continue;
             }
             applyFilter(jTextField1.getText());
@@ -673,7 +747,7 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
         row7[0] = nStrs[6];
         row7[1] = String.valueOf(M240);
         data.add(row7);
-
+        
         try {
             CSVWriter writer = new CSVWriter(new FileWriter("stayDuration_" + myParent.mainModel.ABM.studyScope + "_" + jTextField1.getText() + ".csv"));
             writer.writeAll(data);
@@ -683,7 +757,7 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
             Logger.getLogger(SpecificPOIAnalysisDialog.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButton2ActionPerformed
-
+    
     public void applyFilter(String filterName) {
         filteredBrandsBehind = new ArrayList();
         for (int i = 0; i < finalBrandsBehind.size(); i++) {
@@ -692,15 +766,15 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
             }
         }
     }
-
+    
     public boolean loadPatterns(String patternName) {
         myParent.mainModel.safegraph.clearPatternsPlaces();
         String temp[] = patternName.split("_");
-        if(temp[0].equals("2020") && !(temp[1].equals("12"))){
+        if (temp[0].equals("2020") && !(temp[1].equals("12"))) {
             return false;
         }
         myParent.mainModel.safegraph.loadPatternsPlacesSet(myParent.mainModel.datasetDirectory, temp[1] + "_" + temp[2], myParent.mainModel.allGISData, loadScope, true, myParent.numProcessors);
-        if(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList==null){
+        if (myParent.mainModel.safegraph.allPatterns.monthlyPatternsList == null) {
             return false;
         }
         brands = new ArrayList();
@@ -752,6 +826,8 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel30;
     private javax.swing.JLabel jLabel31;
+    private javax.swing.JLabel jLabel32;
+    private javax.swing.JLabel jLabel33;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
@@ -762,12 +838,16 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
     private javax.swing.JList<String> jList3;
     private javax.swing.JList<String> jList4;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
+    private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;

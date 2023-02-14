@@ -2,6 +2,7 @@ package COVID_AgentBasedSimulation.GUI.GraphicalModel;
 
 import COVID_AgentBasedSimulation.GUI.MainFrame;
 import COVID_AgentBasedSimulation.GUI.VoronoiGIS.GISLocationDialog;
+import COVID_AgentBasedSimulation.Model.Data.Safegraph.AllPatterns;
 import COVID_AgentBasedSimulation.Model.GraphicalModel.GraphicalModel;
 import COVID_AgentBasedSimulation.Model.Structure.CensusBlockGroup;
 import COVID_AgentBasedSimulation.Model.Structure.City;
@@ -9,6 +10,8 @@ import de.siegmar.fastcsv.writer.CsvWriter;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,15 +23,31 @@ import java.util.logging.Logger;
 public class GraphicalModelDialog extends javax.swing.JDialog {
 
     public MainFrame myParent;
+    String[] patternsList;
+    String loadScope;
 
     /**
      * Creates new form GraphicalModelDialog
      */
-    public GraphicalModelDialog(java.awt.Frame parent, boolean modal) {
+    public GraphicalModelDialog(java.awt.Frame parent, boolean modal, String passed_loadScope) {
         super(parent, modal);
         initComponents();
         myParent = (MainFrame) parent;
+        loadScope = passed_loadScope;
 
+        patternsList = AllPatterns.detectAllPatterns("./datasets/Safegraph/" + loadScope);
+        jList1.setModel(new javax.swing.AbstractListModel() {
+            @Override
+            public int getSize() {
+                return patternsList.length;
+            }
+
+            @Override
+            public Object getElementAt(int index) {
+                String[] strs = patternsList[index].split("_");
+                return strs[1] + "_" + strs[2];
+            }
+        });
     }
 
     /**
@@ -51,8 +70,10 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
-        jTextField1 = new javax.swing.JTextField();
         jButton11 = new javax.swing.JButton();
+        jPanel2 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jList1 = new javax.swing.JList<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -141,7 +162,7 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jButton4)
                     .addComponent(jButton3))
-                .addContainerGap(130, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -157,8 +178,6 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
                 .addContainerGap(44, Short.MAX_VALUE))
         );
 
-        jTextField1.setText("2021_06");
-
         jButton11.setText("Save CBG population probability");
         jButton11.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -166,50 +185,74 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
             }
         });
 
+        jPanel2.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+
+        jScrollPane1.setViewportView(jList1);
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 224, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1)
+                .addContainerGap())
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButton6)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jButton6)
                             .addComponent(jButton7)
                             .addComponent(jButton8)
                             .addComponent(jButton9)
                             .addComponent(jButton10)
                             .addComponent(jButton5)
                             .addComponent(jButton11))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton6)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton5)
-                .addGap(18, 18, 18)
-                .addComponent(jButton7)
-                .addGap(18, 18, 18)
-                .addComponent(jButton8)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton9)
-                .addGap(18, 18, 18)
-                .addComponent(jButton10)
-                .addGap(18, 18, 18)
-                .addComponent(jButton11)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 55, Short.MAX_VALUE)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jButton6)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton5)
+                        .addGap(18, 18, 18)
+                        .addComponent(jButton7)
+                        .addGap(18, 18, 18)
+                        .addComponent(jButton8)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton9)
+                        .addGap(18, 18, 18)
+                        .addComponent(jButton10)
+                        .addGap(18, 18, 18)
+                        .addComponent(jButton11)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 55, Short.MAX_VALUE)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addContainerGap())))
         );
 
         pack();
@@ -232,40 +275,42 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-        myParent.mainModel.safegraph.clearPatternsPlaces();
-        myParent.mainModel.safegraph.loadPatternsPlacesSet(myParent.mainModel.datasetDirectory, "2021_06", myParent.mainModel.allGISData, myParent.mainModel.ABM.studyScope, true, myParent.numProcessors);
-        ArrayList<String[]> data = new ArrayList();
-        //for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.size(); i++) {
-        for (int i = 0; i < 500; i++) {
-            String[] row = new String[2];
-            if (GISLocationDialog.isShop(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).place.naics_code) == true) {
-                row[0] = "shop";
-                row[1] = String.valueOf(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).raw_visit_counts);
-                data.add(row);
-            }
-            if (GISLocationDialog.isSchool(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).place.naics_code) == true) {
-                row[0] = "school";
-                row[1] = String.valueOf(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).raw_visit_counts);
-                data.add(row);
-            }
-            if (GISLocationDialog.isReligiousOrganization(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).place.naics_code) == true) {
-                row[0] = "religion";
-                row[1] = String.valueOf(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).raw_visit_counts);
-                data.add(row);
-            }
+        if (jList1.getSelectedIndex() != -1) {
+            myParent.mainModel.safegraph.clearPatternsPlaces();
+            myParent.mainModel.safegraph.loadPatternsPlacesSet(myParent.mainModel.datasetDirectory, jList1.getSelectedValue(), myParent.mainModel.allGISData, myParent.mainModel.ABM.studyScope, true, myParent.numProcessors);
+            ArrayList<String[]> data = new ArrayList();
+            //for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.size(); i++) {
+            for (int i = 0; i < 500; i++) {
+                String[] row = new String[2];
+                if (GISLocationDialog.isShop(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).place.naics_code) == true) {
+                    row[0] = "shop";
+                    row[1] = String.valueOf(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).raw_visit_counts);
+                    data.add(row);
+                }
+                if (GISLocationDialog.isSchool(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).place.naics_code) == true) {
+                    row[0] = "school";
+                    row[1] = String.valueOf(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).raw_visit_counts);
+                    data.add(row);
+                }
+                if (GISLocationDialog.isReligiousOrganization(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).place.naics_code) == true) {
+                    row[0] = "religion";
+                    row[1] = String.valueOf(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).raw_visit_counts);
+                    data.add(row);
+                }
 
-        }
-        CsvWriter writer = new CsvWriter();
-        try {
-            writer.write(new File("smallSample.csv"), Charset.forName("US-ASCII"), data);
-        } catch (IOException ex) {
-            Logger.getLogger(GraphicalModelDialog.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            CsvWriter writer = new CsvWriter();
+            try {
+                writer.write(new File("mobilityInference" + File.separator + "smallSample_" + jList1.getSelectedValue() + ".csv"), Charset.forName("US-ASCII"), data);
+            } catch (IOException ex) {
+                Logger.getLogger(GraphicalModelDialog.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
         myParent.mainModel.safegraph.clearPatternsPlaces();
-        myParent.mainModel.safegraph.loadPatternsPlacesSet(myParent.mainModel.datasetDirectory, "2021_06", myParent.mainModel.allGISData, myParent.mainModel.ABM.studyScope, true, myParent.numProcessors);
+        myParent.mainModel.safegraph.loadPatternsPlacesSet(myParent.mainModel.datasetDirectory, jList1.getSelectedValue(), myParent.mainModel.allGISData, myParent.mainModel.ABM.studyScope, true, myParent.numProcessors);
         ArrayList<String[]> data = new ArrayList();
         //for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.size(); i++) {
         int shop = 0;
@@ -296,7 +341,7 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
         data.add(row);
         CsvWriter writer = new CsvWriter();
         try {
-            writer.write(new File("smallSampleSimple.csv"), Charset.forName("US-ASCII"), data);
+            writer.write(new File("mobilityInference" + File.separator + "smallSampleSimple_" + jList1.getSelectedValue() + ".csv"), Charset.forName("US-ASCII"), data);
         } catch (IOException ex) {
             Logger.getLogger(GraphicalModelDialog.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -304,7 +349,7 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
 
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
         myParent.mainModel.safegraph.clearPatternsPlaces();
-        myParent.mainModel.safegraph.loadPatternsPlacesSet(myParent.mainModel.datasetDirectory, "2021_06", myParent.mainModel.allGISData, myParent.mainModel.ABM.studyScope, true, myParent.numProcessors);
+        myParent.mainModel.safegraph.loadPatternsPlacesSet(myParent.mainModel.datasetDirectory, jList1.getSelectedValue(), myParent.mainModel.allGISData, myParent.mainModel.ABM.studyScope, true, myParent.numProcessors);
         ArrayList<String[]> data = new ArrayList();
         //for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.size(); i++) {
         int shop = 0;
@@ -335,7 +380,8 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
         data.add(row);
         CsvWriter writer = new CsvWriter();
         try {
-            writer.write(new File(myParent.mainModel.ABM.studyScope + "_FullSimple.csv"), Charset.forName("US-ASCII"), data);
+            Files.createDirectories(Paths.get("mobilityInference" + File.separator + myParent.mainModel.ABM.studyScope));
+            writer.write(new File("mobilityInference" + File.separator + myParent.mainModel.ABM.studyScope + File.separator + "FullSimple_" + jList1.getSelectedValue() + ".csv"), Charset.forName("US-ASCII"), data);
         } catch (IOException ex) {
             Logger.getLogger(GraphicalModelDialog.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -343,7 +389,7 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
 
     private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
         myParent.mainModel.safegraph.clearPatternsPlaces();
-        myParent.mainModel.safegraph.loadPatternsPlacesSet(myParent.mainModel.datasetDirectory, "2021_06", myParent.mainModel.allGISData, myParent.mainModel.ABM.studyScope, true, myParent.numProcessors);
+        myParent.mainModel.safegraph.loadPatternsPlacesSet(myParent.mainModel.datasetDirectory, jList1.getSelectedValue(), myParent.mainModel.allGISData, myParent.mainModel.ABM.studyScope, true, myParent.numProcessors);
         ArrayList<String[]> dataShops = new ArrayList();
         ArrayList<String[]> dataSchools = new ArrayList();
         ArrayList<String[]> dataReligiousLocations = new ArrayList();
@@ -375,17 +421,20 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
         }
         CsvWriter writer = new CsvWriter();
         try {
-            writer.write(new File(myParent.mainModel.ABM.studyScope + "_shopLocVis.csv"), Charset.forName("US-ASCII"), dataShops);
+            Files.createDirectories(Paths.get("mobilityInference" + File.separator + myParent.mainModel.ABM.studyScope));
+            writer.write(new File("mobilityInference" + File.separator + myParent.mainModel.ABM.studyScope + File.separator + "shopLocVis_" + jList1.getSelectedValue() + ".csv"), Charset.forName("US-ASCII"), dataShops);
         } catch (IOException ex) {
             Logger.getLogger(GraphicalModelDialog.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
-            writer.write(new File(myParent.mainModel.ABM.studyScope + "_schoolLocVis.csv"), Charset.forName("US-ASCII"), dataSchools);
+            Files.createDirectories(Paths.get("mobilityInference" + File.separator + myParent.mainModel.ABM.studyScope));
+            writer.write(new File("mobilityInference" + File.separator + myParent.mainModel.ABM.studyScope + File.separator + "schoolLocVis_" + jList1.getSelectedValue() + ".csv"), Charset.forName("US-ASCII"), dataSchools);
         } catch (IOException ex) {
             Logger.getLogger(GraphicalModelDialog.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
-            writer.write(new File(myParent.mainModel.ABM.studyScope + "_religionLocVis.csv"), Charset.forName("US-ASCII"), dataReligiousLocations);
+            Files.createDirectories(Paths.get("mobilityInference" + File.separator + myParent.mainModel.ABM.studyScope));
+            writer.write(new File("mobilityInference" + File.separator + myParent.mainModel.ABM.studyScope + File.separator + "religionLocVis_" + jList1.getSelectedValue() + ".csv"), Charset.forName("US-ASCII"), dataReligiousLocations);
         } catch (IOException ex) {
             Logger.getLogger(GraphicalModelDialog.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -393,7 +442,7 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
 
     private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
         myParent.mainModel.safegraph.clearPatternsPlaces();
-        myParent.mainModel.safegraph.loadPatternsPlacesSet(myParent.mainModel.datasetDirectory, "2021_06", myParent.mainModel.allGISData, myParent.mainModel.ABM.studyScope, true, myParent.numProcessors);
+        myParent.mainModel.safegraph.loadPatternsPlacesSet(myParent.mainModel.datasetDirectory, jList1.getSelectedValue(), myParent.mainModel.allGISData, myParent.mainModel.ABM.studyScope, true, myParent.numProcessors);
         ArrayList<String[]> dataShops = new ArrayList();
         ArrayList<String[]> dataSchools = new ArrayList();
         ArrayList<String[]> dataReligiousLocations = new ArrayList();
@@ -431,17 +480,17 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
         }
         CsvWriter writer = new CsvWriter();
         try {
-            writer.write(new File(myParent.mainModel.ABM.studyScope + "_shopLocVisDaily.csv"), Charset.forName("US-ASCII"), dataShops);
+            writer.write(new File("mobilityInference" + File.separator + myParent.mainModel.ABM.studyScope + File.separator + "shopLocVisDaily_" + jList1.getSelectedValue() + ".csv"), Charset.forName("US-ASCII"), dataShops);
         } catch (IOException ex) {
             Logger.getLogger(GraphicalModelDialog.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
-            writer.write(new File(myParent.mainModel.ABM.studyScope + "_schoolLocVisDaily.csv"), Charset.forName("US-ASCII"), dataSchools);
+            writer.write(new File("mobilityInference" + File.separator + myParent.mainModel.ABM.studyScope + File.separator + "schoolLocVisDaily_" + jList1.getSelectedValue() + ".csv"), Charset.forName("US-ASCII"), dataSchools);
         } catch (IOException ex) {
             Logger.getLogger(GraphicalModelDialog.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
-            writer.write(new File(myParent.mainModel.ABM.studyScope + "_religionLocVisDaily.csv"), Charset.forName("US-ASCII"), dataReligiousLocations);
+            writer.write(new File("mobilityInference" + File.separator + myParent.mainModel.ABM.studyScope + File.separator + "religionLocVisDaily_" + jList1.getSelectedValue() + ".csv"), Charset.forName("US-ASCII"), dataReligiousLocations);
         } catch (IOException ex) {
             Logger.getLogger(GraphicalModelDialog.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -449,7 +498,7 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
 
     private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
         myParent.mainModel.safegraph.clearPatternsPlaces();
-        myParent.mainModel.safegraph.loadPatternsPlacesSet(myParent.mainModel.datasetDirectory, jTextField1.getText(), myParent.mainModel.allGISData, myParent.mainModel.ABM.studyScope, true, myParent.numProcessors);
+        myParent.mainModel.safegraph.loadPatternsPlacesSet(myParent.mainModel.datasetDirectory, jList1.getSelectedValue(), myParent.mainModel.allGISData, myParent.mainModel.ABM.studyScope, true, myParent.numProcessors);
         ArrayList<CensusBlockGroup> shopCBGs = new ArrayList();
         ArrayList<CensusBlockGroup> schoolCBGs = new ArrayList();
         ArrayList<CensusBlockGroup> religionCBGs = new ArrayList();
@@ -542,17 +591,17 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
         }
         CsvWriter writer = new CsvWriter();
         try {
-            writer.write(new File(myParent.mainModel.ABM.studyScope + "_CBGShopDists.csv"), Charset.forName("US-ASCII"), cBGShopDistancesStr);
+            writer.write(new File("mobilityInference" + File.separator + myParent.mainModel.ABM.studyScope + File.separator + "CBGShopDists_" + jList1.getSelectedValue() + ".csv"), Charset.forName("US-ASCII"), cBGShopDistancesStr);
         } catch (IOException ex) {
             Logger.getLogger(GraphicalModelDialog.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
-            writer.write(new File(myParent.mainModel.ABM.studyScope + "_CBGSchoolDists.csv"), Charset.forName("US-ASCII"), cBGSchoolDistancesStr);
+            writer.write(new File("mobilityInference" + File.separator + myParent.mainModel.ABM.studyScope + File.separator + "CBGSchoolDists_" + jList1.getSelectedValue() + ".csv"), Charset.forName("US-ASCII"), cBGSchoolDistancesStr);
         } catch (IOException ex) {
             Logger.getLogger(GraphicalModelDialog.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
-            writer.write(new File(myParent.mainModel.ABM.studyScope + "_CBGReligionDists.csv"), Charset.forName("US-ASCII"), cBGReligionDistancesStr);
+            writer.write(new File("mobilityInference" + File.separator + myParent.mainModel.ABM.studyScope + File.separator + "CBGReligionDists_" + jList1.getSelectedValue() + ".csv"), Charset.forName("US-ASCII"), cBGReligionDistancesStr);
         } catch (IOException ex) {
             Logger.getLogger(GraphicalModelDialog.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -583,7 +632,12 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
         }
         CsvWriter writer = new CsvWriter();
         try {
-            writer.write(new File(myParent.mainModel.ABM.studyScope + "_CBGPopProb.csv"), Charset.forName("US-ASCII"), cBGPopProb);
+            writer.write(new File("mobilityInference_fixed" + File.separator + myParent.mainModel.ABM.studyScope + "_CBGPopProb" + ".csv"), Charset.forName("US-ASCII"), cBGPopProb);
+            ArrayList<String[]> pop = new ArrayList();
+            String[] row = new String[1];
+            row[0] = String.valueOf(((City) (myParent.mainModel.ABM.studyScopeGeography)).population);
+            pop.add(row);
+            writer.write(new File("mobilityInference_fixed" + File.separator + myParent.mainModel.ABM.studyScope + "_population" + ".csv"), Charset.forName("US-ASCII"), pop);
         } catch (IOException ex) {
             Logger.getLogger(GraphicalModelDialog.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -601,7 +655,9 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
     private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton8;
     private javax.swing.JButton jButton9;
+    private javax.swing.JList<String> jList1;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JTextField jTextField1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
 }

@@ -26,11 +26,11 @@ public class ShamilGroup {
 
     public ShamilGroup(String passed_group_name, boolean isParallel) {
         group_name = passed_group_name;
-        if(isParallel==true){
-            persons = Collections.synchronizedList(new ArrayList());
-        }else{
+//        if(isParallel==true){
+//            persons = Collections.synchronizedList(new ArrayList());
+//        }else{
             persons = new ArrayList();
-        }
+//        }
         person_mapper = new HashMap();
         actions = new ArrayList();
 //        proximity = null;

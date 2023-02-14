@@ -107,6 +107,8 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
         jList3 = new javax.swing.JList<>();
         jButton11 = new javax.swing.JButton();
         jButton12 = new javax.swing.JButton();
+        jButton13 = new javax.swing.JButton();
+        jLabel6 = new javax.swing.JLabel();
 
         jLabel2.setText("jLabel2");
 
@@ -516,6 +518,15 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
             }
         });
 
+        jButton13.setText("Total mobility");
+        jButton13.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton13ActionPerformed(evt);
+            }
+        });
+
+        jLabel6.setText("Select month and press the button");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -533,6 +544,10 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
                 .addComponent(jButton11)
                 .addGap(18, 18, 18)
                 .addComponent(jButton12)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton13)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel6)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
@@ -547,7 +562,9 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
                     .addComponent(jButton18)
                     .addComponent(jButton19)
                     .addComponent(jButton11)
-                    .addComponent(jButton12))
+                    .addComponent(jButton12)
+                    .addComponent(jButton13)
+                    .addComponent(jLabel6))
                 .addContainerGap())
         );
 
@@ -843,12 +860,12 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
         String[] monthsToProcess = new String[]{"2020_06", "2020_07", "2020_08", "2020_09", "2020_10", "2020_11", "2020_12", "2021_01", "2021_02", "2021_03", "2021_04", "2021_05"};
         for (int m = 0; m < monthsToProcess.length; m++) {
             myParent.mainModel.safegraph.clearPatternsPlaces();
-            System.out.println("Loading data "+monthsToProcess[m]);
+            System.out.println("Loading data " + monthsToProcess[m]);
             myParent.mainModel.safegraph.loadPatternsPlacesSet(myParent.mainModel.datasetDirectory, monthsToProcess[m], myParent.mainModel.allGISData, "FullData", true, myParent.numProcessors);
             HashMap<Integer, Long> nAICSMap = new HashMap();
             for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.size(); i++) {
                 Integer key = myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).place.naics_code;
-                Long val = (long)(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).raw_visit_counts);
+                Long val = (long) (myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).raw_visit_counts);
                 if (nAICSMap.containsKey(key)) {
                     Long oldVal = nAICSMap.get(key);
                     Long newVal = oldVal + val;
@@ -875,6 +892,18 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
         }
 //        }
     }//GEN-LAST:event_jButton12ActionPerformed
+
+    private void jButton13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton13ActionPerformed
+        if (jList1.getSelectedIndex() != -1) {
+            int totalMobility = 0;
+            for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.size(); i++) {
+                for (int j = 0; j < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.size(); j++) {
+                    totalMobility = totalMobility + myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).raw_visit_counts;
+                }
+            }
+            jLabel6.setText(String.valueOf(totalMobility));
+        }
+    }//GEN-LAST:event_jButton13ActionPerformed
 
     public boolean isReligiousOrganization(int naicsCode) {
         String naicsString = String.valueOf(naicsCode);
@@ -1100,6 +1129,7 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
     private javax.swing.JButton jButton10;
     private javax.swing.JButton jButton11;
     private javax.swing.JButton jButton12;
+    private javax.swing.JButton jButton13;
     private javax.swing.JButton jButton17;
     private javax.swing.JButton jButton18;
     private javax.swing.JButton jButton19;
@@ -1117,6 +1147,7 @@ public class SafeGraphPreprocessDialog extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JList<String> jList1;
     private javax.swing.JList<String> jList2;
     private javax.swing.JList<String> jList3;

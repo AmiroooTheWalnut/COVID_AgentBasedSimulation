@@ -14,8 +14,14 @@ import de.fhpotsdam.unfolding.geo.Location;
 import de.fhpotsdam.unfolding.marker.SimplePointMarker;
 import de.fhpotsdam.unfolding.utils.MapUtils;
 import de.fhpotsdam.unfolding.utils.ScreenPosition;
+import java.awt.event.ActionEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.util.ArrayList;
+import javax.swing.JDialog;
 import javax.swing.JPanel;
+import processing.awt.PSurfaceAWT.SmoothCanvas;
 import processing.core.PApplet;
 import processing.core.PImage;
 import processing.core.PSurface;
@@ -29,8 +35,10 @@ public class ProcessingMapRenderer extends PApplet {
     public UnfoldingMap map;
     MainFrame parentMainFrame;
     JPanel parentPanel;
+    JDialog superParentDialog;
     PSurface mySurface;
     MapSources mapSources;
+    ProcessingMapRenderer thisProcessingMapRenderer;
 
     //FOR GIS STUFF
     Location drawingItemLocation;
@@ -38,6 +46,10 @@ public class ProcessingMapRenderer extends PApplet {
     String drawingName;
     String[] drawingChildrenNames;
     //FOR GIS STUFF
+
+    //FOR ONE POI
+    Location drawingLocation;
+    //FOR ONE POI
 
     //FOR AGENT_TEMPLATE STUFF
     ArrayList<Location> drawingAgentTemplateLocations;
@@ -60,6 +72,7 @@ public class ProcessingMapRenderer extends PApplet {
 
     public boolean isShowGISMarkers = true;
     public boolean isShowAgentMarkers = true;
+    public boolean isShowSimpleMarker = false;
 
     public ArrayList<String> regionNames = new ArrayList();
     public ArrayList<Location> regionCenters = new ArrayList();
@@ -69,9 +82,10 @@ public class ProcessingMapRenderer extends PApplet {
     public ProcessingMapRenderer() {
     }
 
-    public ProcessingMapRenderer(MainFrame mainFrame, JPanel parent) {
+    public ProcessingMapRenderer(MainFrame mainFrame, JPanel parent, JDialog superParent) {
         parentMainFrame = mainFrame;
         parentPanel = parent;
+        superParentDialog = superParent;
     }
 
     @Override
@@ -81,24 +95,58 @@ public class ProcessingMapRenderer extends PApplet {
     }
 
     @Override
+    public void frameResized(int w, int h) {
+
+        System.out.println("PANEL RESIZED!");
+    }
+
+    @Override
     public void setup() {
+        thisProcessingMapRenderer = this;
         mySurface = surface;
 //        frame.setResizable(true);
 //        surface.setResizable(true);
         //get the SmoothCanvas that holds the PSurface
 //        SmoothCanvas smoothCanvas = (SmoothCanvas) surface.getNative();
+//        smoothCanvas.set
 
         GLWindow glWindow = (GLWindow) surface.getNative();
         glWindow.setPosition(0, 0);
+//        glWindow.setSize(10, 10);
 
         NewtCanvasAWT newtCanvasAWT = new NewtCanvasAWT(glWindow);
 //        newtCanvasAWT.setLocation(0, 0);
-//        newtCanvasAWT.setBounds(0, 0, 200, 200);
+//        newtCanvasAWT.setBounds(0, 0, 20, 20);
         parentPanel.add(newtCanvasAWT);
 
         parentPanel.invalidate();
         parentPanel.revalidate();
 
+//        ComponentListener resizeListener = new ComponentAdapter() {
+//            public void componentResized(ActionEvent e) {
+//                parentPanel.invalidate();
+//                parentPanel.revalidate();
+//
+//                System.out.println("PANEL RESIZED!");
+//            }
+//        };
+        if (superParentDialog != null) {
+            superParentDialog.addComponentListener(new ComponentAdapter() {
+                @Override
+                public void componentResized(ComponentEvent e) {
+                    surface.setSize((superParentDialog.getWidth() / 2), superParentDialog.getHeight());
+                    if (map != null) {
+                        mapSources = new MapSources(thisProcessingMapRenderer, (superParentDialog.getWidth() / 2), superParentDialog.getHeight());
+                        map = ((MapSourse) mapSources.maps.get(3)).map;
+                        MapUtils.createDefaultEventDispatcher(thisProcessingMapRenderer, new UnfoldingMap[]{thisProcessingMapRenderer.map});
+//                    map.mapDisplay.resize((superParentDialog.getWidth()/2)-5, superParentDialog.getHeight()-5);
+                    }
+                }
+            });
+        }
+
+//        parentPanel.addComponentListener(resizeListener);
+//        parentPanel
         //SmoothCanvas can be used as a Component
 //        parentPanel.add(smoothCanvas);
 //        glWindow.destroy();
@@ -107,7 +155,11 @@ public class ProcessingMapRenderer extends PApplet {
 //        a.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 //        removeExitEvent(getSurface());
 //        a.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
-        mapSources = new MapSources(this);
+        if (superParentDialog == null) {
+            mapSources = new MapSources(this);
+        } else {
+            mapSources = new MapSources(this, (superParentDialog.getWidth() / 2), superParentDialog.getHeight());
+        }
 
 //        for (int i = 0; i < mapSources.maps.size(); i++) {
 //            if (((MapSourse) mapSources.maps.get(i)).map != null) {
@@ -135,6 +187,9 @@ public class ProcessingMapRenderer extends PApplet {
             drawIndividualMarker();
             drawAgentTemplatesMarker();
         }
+        if (isShowSimpleMarker == true) {
+            drawSimpleMarker();
+        }
 
 //        drawPolygons();
         drawIndexImageShades();
@@ -157,6 +212,10 @@ public class ProcessingMapRenderer extends PApplet {
     public void panZoomTo(Location loc, float size) {
         map.panTo(loc);
         map.zoomTo(getZoomConverted(size));
+    }
+
+    public void setDrawingSimpleGISMarker(Marker input) {
+        drawingLocation = new Location(input.lat, input.lon);
     }
 
     public void setDrawingGISMarkers(Marker input, ArrayList<Marker> children, String inputName, String[] childrenNames) {
@@ -192,6 +251,15 @@ public class ProcessingMapRenderer extends PApplet {
 
     public void setDrawingAgetnMarker(float lat, float lon) {
         drawingIndividualAgent = new Location(lat, lon);
+    }
+
+    public void drawSimpleMarker() {
+        if (drawingLocation != null) {
+            SimplePointMarker locSM = new SimplePointMarker(drawingLocation);
+            ScreenPosition scLocPos = locSM.getScreenPosition(map);
+            fill(200.0F, 20.0F, 0.0F, 100.0F);
+            ellipse(scLocPos.x, scLocPos.y, 30, 30);
+        }
     }
 
     public void drawGISMarkers() {
@@ -380,7 +448,7 @@ public class ProcessingMapRenderer extends PApplet {
         if (isShowRegionIndexText == true) {
             if (regionNames != null && regionCenters != null) {
                 for (int i = 0; i < regionNames.size(); i++) {
-                    int cBGIndex=regionImageLayer.getCellOfLatLon(regionCenters.get(i).getLat(),regionCenters.get(i).getLon());
+                    int cBGIndex = regionImageLayer.getCellOfLatLon(regionCenters.get(i).getLat(), regionCenters.get(i).getLon());
                     SimplePointMarker locSM = new SimplePointMarker(regionCenters.get(i));
                     ScreenPosition scLocPos = locSM.getScreenPosition(this.map);
 //                    text(regionNames.get(i), scLocPos.x - textWidth(regionNames.get(i)) / 2.0F, scLocPos.y);

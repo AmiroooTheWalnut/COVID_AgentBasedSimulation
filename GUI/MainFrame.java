@@ -836,7 +836,7 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton16ActionPerformed
 
     private void jButton18ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton18ActionPerformed
-        GraphicalModelDialog graphicalModelDialog = new GraphicalModelDialog(this, false);
+        GraphicalModelDialog graphicalModelDialog = new GraphicalModelDialog(this, false, mainModel.ABM.studyScope);
         graphicalModelDialog.setVisible(true);
     }//GEN-LAST:event_jButton18ActionPerformed
 
