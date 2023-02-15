@@ -32,7 +32,7 @@ public class MobilityGenerator {
             City scope=((City)(mainModel.ABM.studyScopeGeography));
             int population=scope.population;
             for(int i=0;i<numPopulation;i++){
-                int selectedPop=(int)(Math.floor(Math.random()*population));
+                int selectedPop=(int)(Math.floor(mainModel.ABM.root.rnd.nextDouble()*population));
                 int sumPop=0;
                 for(int j=0;j<scope.censusTracts.size();j++){
                     sumPop=sumPop+scope.censusTracts.get(j).population;

@@ -37,7 +37,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Random;
+//import java.util.Random;
+import java.util.SplittableRandom;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -57,7 +58,7 @@ public class Root extends Agent {
         SUSCEPTIBLE, INFECTED_SYM, INFECTED_ASYM, RECOVERED, DEAD;
     }
 
-    public Random rnd = new Random(System.currentTimeMillis());
+    public SplittableRandom rnd = new SplittableRandom(System.currentTimeMillis());
 //    public Random rnd = new Random(1);
 
     Root currentAgent = this;

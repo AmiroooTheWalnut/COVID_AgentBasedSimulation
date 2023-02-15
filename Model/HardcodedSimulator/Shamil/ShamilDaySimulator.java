@@ -74,7 +74,7 @@ public class ShamilDaySimulator {
         for (int i = 0; i < people.size(); i++) {
             ShamilProfession prof_pers = people.get(i).shamilPersonProperties.profession;
             if (prof_pers.name.equals("Unemployed")) {
-                double prob = Math.random();
+                double prob = mainModel.ABM.root.rnd.nextDouble();
                 if (lockdown_started == true && prob < 0.7) {
                     people.get(i).shamilPersonProperties.tasks = ShamilTaskManager.generateTasks(mainModel, new ShamilProfession("NoOutingAllowed", 0, 0, 0));
                 } else {
@@ -170,15 +170,15 @@ public class ShamilDaySimulator {
                         if (prsn.insidePeople.get(O).sfpp.isAlive == false) {
                             prsn.insidePeople.get(O).sfpp.state = "Dead";
                             prsn.insidePeople.get(O).sfpp.isInfected = false;//ADDED BY AMIROOO
-                        } else if (prsn.insidePeople.get(O).sfpp.infectedDays >= Math.round(Math.max(50, 50 + 15 * Math.random())) && prsn.insidePeople.get(O).sfpp.state.equals("recovered")) {//ADDED BY AMIROOO WAS 60
+                        } else if (prsn.insidePeople.get(O).sfpp.infectedDays >= Math.round(Math.max(50, 50 + 15 * mainModel.ABM.root.rnd.nextDouble())) && prsn.insidePeople.get(O).sfpp.state.equals("recovered")) {//ADDED BY AMIROOO WAS 60
                             prsn.insidePeople.get(O).sfpp.state = "Not_infected";
                             prsn.insidePeople.get(O).sfpp.isInfected = false;
                             prsn.shamilPersonProperties.quarantinedDay = -1;
-                        } else if (prsn.insidePeople.get(O).sfpp.infectedDays >= Math.round(Math.max(14, 14 + 10 * Math.random())) && (prsn.insidePeople.get(O).sfpp.state.equals("contagious_symptomatic") || prsn.insidePeople.get(O).sfpp.state.equals("contagious_asymptomatic"))) {//ADDED BY AMIROOO WAS 18
+                        } else if (prsn.insidePeople.get(O).sfpp.infectedDays >= Math.round(Math.max(14, 14 + 10 * mainModel.ABM.root.rnd.nextDouble())) && (prsn.insidePeople.get(O).sfpp.state.equals("contagious_symptomatic") || prsn.insidePeople.get(O).sfpp.state.equals("contagious_asymptomatic"))) {//ADDED BY AMIROOO WAS 18
                             prsn.insidePeople.get(O).sfpp.state = "recovered";//ADDED BY AMIROOO
                             prsn.insidePeople.get(O).sfpp.isInfected = false;//ADDED BY AMIROOO
-                        } else if (prsn.insidePeople.get(O).sfpp.infectedDays >= Math.round(Math.max(5, 5 + 2 * Math.random())) && prsn.insidePeople.get(O).sfpp.state.equals("contagious_asymptomatic")) {//EDITTED BY AMIROOO IT WAS 6
-                            if (Math.random() > 0.5) {//ADDED BY AMIROOO
+                        } else if (prsn.insidePeople.get(O).sfpp.infectedDays >= Math.round(Math.max(5, 5 + 2 * mainModel.ABM.root.rnd.nextDouble())) && prsn.insidePeople.get(O).sfpp.state.equals("contagious_asymptomatic")) {//EDITTED BY AMIROOO IT WAS 6
+                            if (mainModel.ABM.root.rnd.nextDouble() > 0.5) {//ADDED BY AMIROOO
                                 prsn.insidePeople.get(O).sfpp.state = "contagious_symptomatic";
                                 prsn.insidePeople.get(O).sfpp.isInfected = true;
                                 // # elif(prsn.infected_days==1):
@@ -196,7 +196,7 @@ public class ShamilDaySimulator {
 //                                    groupfile.close()
 
                                             for (int k = 0; k < groupdetails.size(); k++) { // hourgroup in groupdetails:
-                                                double record_found_prob = Math.random();
+                                                double record_found_prob = mainModel.ABM.root.rnd.nextDouble();
                                                 double PROBABILITY_OF_RECORD_EXISTING = 0.9;
 
 //                                        record_found_prob = np.random.rand()
@@ -209,7 +209,7 @@ public class ShamilDaySimulator {
 
                                                             // #contactperson.initial_profession = contactperson.profession
                                                             Person contactperson = persons.get(contactperson_id); //[contactperson_id]
-                                                            double isolated_prob = Math.random();
+                                                            double isolated_prob = mainModel.ABM.root.rnd.nextDouble();
                                                             if (isolated_prob < 0.5) {
                                                                 contactperson.shamilPersonProperties.profession.name = "Isolated";
                                                             } else {
@@ -225,7 +225,7 @@ public class ShamilDaySimulator {
                                     }
                                 }
                             }
-                        } else if (prsn.insidePeople.get(O).sfpp.infectedDays >= Math.round(Math.max(3, 3 + 2 * Math.random())) && prsn.insidePeople.get(O).sfpp.isGoingToBeInfected == true) {// && prsn.insidePeople.get(O).sfpp.state.equals("Infected_notContagious")) {//EDITTED BY AMIROOO IT WAS 4
+                        } else if (prsn.insidePeople.get(O).sfpp.infectedDays >= Math.round(Math.max(3, 3 + 2 * mainModel.ABM.root.rnd.nextDouble())) && prsn.insidePeople.get(O).sfpp.isGoingToBeInfected == true) {// && prsn.insidePeople.get(O).sfpp.state.equals("Infected_notContagious")) {//EDITTED BY AMIROOO IT WAS 4
                             prsn.insidePeople.get(O).sfpp.state = "contagious_asymptomatic";
                             prsn.insidePeople.get(O).sfpp.isInfected = true;
                             prsn.insidePeople.get(O).sfpp.isGoingToBeInfected = false;
