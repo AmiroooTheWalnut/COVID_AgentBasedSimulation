@@ -24,6 +24,7 @@ public class Region extends Marker implements Serializable {
     static final long serialVersionUID = softwareVersion;
     
     public transient ScheduleList scheduleList=new ScheduleList();
+    public transient ScheduleListExact scheduleListExact=new ScheduleListExact();
     public transient double workPopulation;
     
     public ArrayList<Long> cBGsIDsInvolved = new ArrayList();

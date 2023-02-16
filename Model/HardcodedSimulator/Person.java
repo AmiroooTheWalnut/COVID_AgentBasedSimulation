@@ -55,10 +55,18 @@ public class Person extends Agent {
                 if (insidePeople.get(m).fpp.status != Root.statusEnum.DEAD.ordinal()) {
                     isPolled = false;
                     if (properties.isAtHome == true) {
-                        travelFromHome(myModelRoot.ABM.currentTime, myModelRoot.isArtificialExact);
+                        if (myModelRoot.isArtificialExact == true) {
+                            travelFromHome(myModelRoot.ABM.currentTime, myModelRoot.isArtificialExact, ((RootArtificial) (myModelRoot.ABM.root)).isTessellationBuilt);
+                        }else{
+                            travelFromHome(myModelRoot.ABM.currentTime, myModelRoot.isArtificialExact, true);
+                        }
                     }
                     if (properties.isAtWork == true) {
-                        travelFromWork(myModelRoot.ABM.currentTime, myModelRoot.isArtificialExact);
+                        if (myModelRoot.isArtificialExact == true) {
+                            travelFromWork(myModelRoot.ABM.currentTime, myModelRoot.isArtificialExact, ((RootArtificial) (myModelRoot.ABM.root)).isTessellationBuilt);
+                        }else{
+                            travelFromWork(myModelRoot.ABM.currentTime, myModelRoot.isArtificialExact, true);
+                        }
                     }
                     if (properties.isInTravel == true) {
                         properties.minutesStayed += 1;
@@ -116,8 +124,8 @@ public class Person extends Agent {
         properties.currentPattern = null;
     }
 
-    public void travelFromWork(ZonedDateTime currentTime, boolean isExact) {
-        if (isExact == false) {
+    public void travelFromWork(ZonedDateTime currentTime, boolean isArtifical, boolean isTessellationBuilt) {
+        if (isArtifical == false) {
             PatternsRecordProcessed dest = chooseDestination(properties.workRegion);
             boolean decision = decideToTravel(dest, currentTime);
             if (decision == true) {
@@ -178,7 +186,12 @@ public class Person extends Agent {
                 }
             }
         } else {
-            POI dest = chooseDestinationExact(false);
+            POI dest;
+            if(isTessellationBuilt==true){
+                dest = chooseDestinationExact(properties.workRegion, false);
+            }else{
+                dest = chooseDestinationExact(false);
+            }
             if (dest == null) {
 //                System.out.println("SEVERE ERROR! POTENTIALLY THE REGION HAD NO NO-TESSELLATION AGENTS AND SCHEDULE IS EMPTY");
             } else {
@@ -233,8 +246,8 @@ public class Person extends Agent {
         }
     }
 
-    public void travelFromHome(ZonedDateTime currentTime, boolean isExact) {
-        if (isExact == false) {
+    public void travelFromHome(ZonedDateTime currentTime, boolean isArtifical, boolean isTessellationBuilt) {
+        if (isArtifical == false) {
             PatternsRecordProcessed dest = chooseDestination(properties.homeRegion);
             boolean decision = decideToTravel(dest, currentTime);
             if (decision == true) {
@@ -286,7 +299,12 @@ public class Person extends Agent {
                 myModelRoot.ABM.root.travelsToAllPOIsFreqs.put(pOI.patternsRecord.placeKey, oldVal + 1);
             }
         } else {
-            POI dest = chooseDestinationExact(true);
+            POI dest;
+            if(isTessellationBuilt==true){
+                dest = chooseDestinationExact(properties.homeRegion, true);
+            }else{
+                dest = chooseDestinationExact(true);
+            }
             if (dest == null) {
 //                System.out.println("SEVERE ERROR! POTENTIALLY THE REGION HAD NO NO-TESSELLATION AGENTS AND SCHEDULE IS EMPTY");
             } else {
@@ -435,9 +453,8 @@ public class Person extends Agent {
 //                }
 //            }
 
-
-            float selectedDestFreq = (float)(Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * this.exactProperties.sumHomeFreqs));
-            int index = MainModel.binarySearchCumulative(selectedDestFreq, Float16Utils.halfArrayToFloatArray(exactProperties.fromHomeFreqsCDF));
+            float selectedDestFreq = (float) (Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * this.exactProperties.sumHomeFreqs));
+            int index = MainModel.binarySearchCumulative(selectedDestFreq, exactProperties.fromHomeFreqsCDF);
             return exactProperties.pOIs[index];
 //            return null;
         } else {
@@ -449,11 +466,23 @@ public class Person extends Agent {
 //                    return exactProperties.pOIs.get(i);
 //                }
 //            }
-            
-            float selectedDestFreq = (float)(Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * this.exactProperties.sumWorkFreqs));
-            int index = MainModel.binarySearchCumulative(selectedDestFreq, Float16Utils.halfArrayToFloatArray(exactProperties.fromWorkFreqsCDF));
+
+            float selectedDestFreq = (float) (Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * this.exactProperties.sumWorkFreqs));
+            int index = MainModel.binarySearchCumulative(selectedDestFreq, exactProperties.fromWorkFreqsCDF);
             return exactProperties.pOIs[index];
 //            return null;
+        }
+    }
+    
+    public POI chooseDestinationExact(Region region, boolean isFromHome) {
+        if (isFromHome == true) {
+            float selectedDestFreq = (float) (Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * region.scheduleListExact.sumHomeFreqs));
+            int index = MainModel.binarySearchCumulative(selectedDestFreq, region.scheduleListExact.fromHomeFreqsCDF);
+            return region.scheduleListExact.pOIs[index];
+        } else {
+            float selectedDestFreq = (float) (Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * region.scheduleListExact.sumWorkFreqs));
+            int index = MainModel.binarySearchCumulative(selectedDestFreq, region.scheduleListExact.fromWorkFreqsCDF);
+            return region.scheduleListExact.pOIs[index];
         }
     }
 

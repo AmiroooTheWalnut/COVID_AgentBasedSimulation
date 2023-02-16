@@ -16,8 +16,8 @@ public class PersonExactProperties {
     public POI[] pOIs;
     public short[] fromHomeFreqs;
     public short[] fromWorkFreqs;
-    public short[] fromHomeFreqsCDF;
-    public short[] fromWorkFreqsCDF;
+    public float[] fromHomeFreqsCDF;
+    public float[] fromWorkFreqsCDF;
 //    public HashMap<POI, Double> pOIHomeProbabilities=new HashMap();
 //    public HashMap<POI, Double> pOIWorkProbabilities=new HashMap();
     public float sumHomeFreqs;

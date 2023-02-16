@@ -258,8 +258,9 @@ public class RootArtificial extends Root {
         System.out.println("FINISHED REGION SCHEDULES!");
         generateAgentsRaw(myModelRoot, passed_numAgents, regions, false, true, isTest);
         System.out.println("FINISHED GENERATE AGENTS RAW!");
-        postGeneratePeopleSchedulesForHome();
-        postGeneratePeopleSchedulesForWork();
+        postGenerateRegionSchedules();
+//        postGeneratePeopleSchedulesForHome();
+//        postGeneratePeopleSchedulesForWork();
         System.out.println("FINISHED POST SCHEDULES!");
     }
 
@@ -282,21 +283,30 @@ public class RootArtificial extends Root {
             scheduleListExactArray.add(scheduleListExact);
 //            System.out.println("DEBUG1: " + i);
         }
+        
+        float[][] tempHomeFreqs=new float[scheduleListExactArray.size()][peopleNoTessellation.get(0).exactProperties.pOIs.length];
+        float[][] tempWorkFreqs=new float[scheduleListExactArray.size()][peopleNoTessellation.get(0).exactProperties.pOIs.length];
 
         for (int i = 0; i < peopleNoTessellation.size(); i++) {
             int cellIndexHome = regionsLayer.getCellOfLatLon(peopleNoTessellation.get(i).exactProperties.exactHomeLocation.lat, peopleNoTessellation.get(i).exactProperties.exactHomeLocation.lon);
             if (cellIndexHome != -1) {
                 for (int k = 0; k < peopleNoTessellation.get(i).exactProperties.fromHomeFreqs.length; k++) {
-                    float newValue = scheduleListExactArray.get(cellIndexHome).fromHomeFreqs[k] + peopleNoTessellation.get(i).exactProperties.fromHomeFreqs[k];
-                    scheduleListExactArray.get(cellIndexHome).fromHomeFreqs[k] = Float16Utils.floatToHalf(newValue);
+                    float newValue=tempHomeFreqs[cellIndexHome][k] + Float16Utils.halfToFloat(peopleNoTessellation.get(i).exactProperties.fromHomeFreqs[k]);
+//                    float newValue = Float16Utils.halfToFloat(scheduleListExactArray.get(cellIndexHome).fromHomeFreqs[k]) + Float16Utils.halfToFloat(peopleNoTessellation.get(i).exactProperties.fromHomeFreqs[k]);
+                    tempHomeFreqs[cellIndexHome][k]=newValue;
+//                    scheduleListExactArray.get(cellIndexHome).fromHomeFreqs[k] = Float16Utils.floatToHalf(newValue);
+//                    System.out.println("newValue 1: "+newValue);
                 }
                 avgCounterHomeArray.set(cellIndexHome, avgCounterHomeArray.get(cellIndexHome) + 1);
             }
             int cellIndexWork = regionsLayer.getCellOfLatLon(peopleNoTessellation.get(i).exactProperties.exactWorkLocation.lat, peopleNoTessellation.get(i).exactProperties.exactWorkLocation.lon);
             if (cellIndexWork != -1) {
                 for (int k = 0; k < peopleNoTessellation.get(i).exactProperties.fromWorkFreqs.length; k++) {
-                    float newValue = scheduleListExactArray.get(cellIndexWork).fromWorkFreqs[k] + peopleNoTessellation.get(i).exactProperties.fromWorkFreqs[k];
-                    scheduleListExactArray.get(cellIndexWork).fromWorkFreqs[k] = Float16Utils.floatToHalf(newValue);
+                    float newValue=tempWorkFreqs[cellIndexWork][k] + Float16Utils.halfToFloat(peopleNoTessellation.get(i).exactProperties.fromWorkFreqs[k]);
+//                    float newValue = Float16Utils.halfToFloat(scheduleListExactArray.get(cellIndexWork).fromWorkFreqs[k]) + Float16Utils.halfToFloat(peopleNoTessellation.get(i).exactProperties.fromWorkFreqs[k]);
+//                    scheduleListExactArray.get(cellIndexWork).fromWorkFreqs[k] = Float16Utils.floatToHalf(newValue);
+                    tempWorkFreqs[cellIndexWork][k]=newValue;
+//                    System.out.println("newValue 2: "+newValue);
                 }
                 avgCounterWorkArray.set(cellIndexWork, avgCounterWorkArray.get(cellIndexWork) + 1);
             }
@@ -306,29 +316,32 @@ public class RootArtificial extends Root {
         for (int i = 0; i < regions.size(); i++) {
             if (avgCounterHomeArray.get(i) > 0) {
                 for (int j = 0; j < scheduleListExactArray.get(i).fromHomeFreqs.length; j++) {
-                    scheduleListExactArray.get(i).fromHomeFreqs[j] = Float16Utils.floatToHalf(scheduleListExactArray.get(i).fromHomeFreqs[j] / avgCounterHomeArray.get(i));
+                    tempHomeFreqs[i][j]= tempHomeFreqs[i][j]/ (float)avgCounterHomeArray.get(i);
+                    scheduleListExactArray.get(i).fromHomeFreqs[j] = Float16Utils.floatToHalf(tempHomeFreqs[i][j] / (float)avgCounterHomeArray.get(i));
                 }
             }
             if (avgCounterWorkArray.get(i) > 0) {
                 for (int j = 0; j < scheduleListExactArray.get(i).fromWorkFreqs.length; j++) {
-                    scheduleListExactArray.get(i).fromWorkFreqs[j] = Float16Utils.floatToHalf(scheduleListExactArray.get(i).fromWorkFreqs[j] / avgCounterWorkArray.get(i));
+                    tempWorkFreqs[i][j]= tempWorkFreqs[i][j]/ (float)avgCounterWorkArray.get(i);
+                    scheduleListExactArray.get(i).fromWorkFreqs[j] = Float16Utils.floatToHalf(tempWorkFreqs[i][j] / (float)avgCounterWorkArray.get(i));
                 }
             }
         }
 
         for (int i = 0; i < scheduleListExactArray.size(); i++) {
             float SH = 0;
-            scheduleListExactArray.get(i).fromHomeFreqsCDF = new short[scheduleListExactArray.get(i).fromHomeFreqs.length];
+            scheduleListExactArray.get(i).fromHomeFreqsCDF = new float[scheduleListExactArray.get(i).fromHomeFreqs.length];
             for (int j = 0; j < scheduleListExactArray.get(i).fromHomeFreqs.length; j++) {
-                SH = SH + scheduleListExactArray.get(i).fromHomeFreqs[j];
-                scheduleListExactArray.get(i).fromHomeFreqsCDF[j] = Float16Utils.floatToHalf(SH);
+                SH = SH + tempHomeFreqs[i][j];
+                scheduleListExactArray.get(i).fromHomeFreqsCDF[j] = SH;
+//                System.out.println(Float16Utils.floatToHalf(SH));
             }
             scheduleListExactArray.get(i).sumHomeFreqs = SH;
             float SW = 0;
-            scheduleListExactArray.get(i).fromWorkFreqsCDF = new short[scheduleListExactArray.get(i).fromWorkFreqs.length];
+            scheduleListExactArray.get(i).fromWorkFreqsCDF = new float[scheduleListExactArray.get(i).fromWorkFreqs.length];
             for (int j = 0; j < scheduleListExactArray.get(i).fromWorkFreqs.length; j++) {
-                SW = SW + scheduleListExactArray.get(i).fromWorkFreqs[j];
-                scheduleListExactArray.get(i).fromWorkFreqsCDF[j] = Float16Utils.floatToHalf(SW);
+                SW = SW + tempWorkFreqs[i][j];
+                scheduleListExactArray.get(i).fromWorkFreqsCDF[j] = SW;
             }
             scheduleListExactArray.get(i).sumWorkFreqs = SW;
 //            System.out.println("DEBUG3: " + i);
@@ -613,7 +626,7 @@ public class RootArtificial extends Root {
 //                people.get(i).exactProperties.pOIHomeProbabilities.put(value, dist);
             }
             avg = avg / (float) avgCounter;
-            people.get(i).exactProperties.fromHomeFreqsCDF = new short[people.get(i).exactProperties.pOIs.length];
+            people.get(i).exactProperties.fromHomeFreqsCDF = new float[people.get(i).exactProperties.pOIs.length];
             people.get(i).exactProperties.fromHomeFreqs = new short[pOIs.size()];
             for (int m = 0; m < people.get(i).exactProperties.pOIs.length; m++) {
 //                POI value = mapElement.getValue();
@@ -622,12 +635,12 @@ public class RootArtificial extends Root {
                     float newP = ((pO - minDist + 1f) / (maxDist + 1f))/1000f;
                     people.get(i).exactProperties.fromHomeFreqs[m] = Float16Utils.floatToHalf(newP);
                     people.get(i).exactProperties.sumHomeFreqs = people.get(i).exactProperties.sumHomeFreqs + newP;
-                    people.get(i).exactProperties.fromHomeFreqsCDF[m] = Float16Utils.floatToHalf(people.get(i).exactProperties.sumHomeFreqs);
+                    people.get(i).exactProperties.fromHomeFreqsCDF[m] = people.get(i).exactProperties.sumHomeFreqs;
                 } else {
                     Float newP = ((avg - minDist + 1f) / (maxDist + 1f))/1000f;
                     people.get(i).exactProperties.fromHomeFreqs[m] = Float16Utils.floatToHalf(newP);
                     people.get(i).exactProperties.sumHomeFreqs = people.get(i).exactProperties.sumHomeFreqs + newP;
-                    people.get(i).exactProperties.fromHomeFreqsCDF[m] = Float16Utils.floatToHalf(people.get(i).exactProperties.sumHomeFreqs);
+                    people.get(i).exactProperties.fromHomeFreqsCDF[m] = people.get(i).exactProperties.sumHomeFreqs;
                     System.out.println("ROUTING FAILED! AVERAGE DISTANCE IS USED!");
                 }
             }
@@ -664,7 +677,7 @@ public class RootArtificial extends Root {
 //                people.get(i).exactProperties.pOIHomeProbabilities.put(value, dist);
         }
         avg = avg / (float) avgCounter;
-        person.exactProperties.fromHomeFreqsCDF = new short[person.exactProperties.pOIs.length];
+        person.exactProperties.fromHomeFreqsCDF = new float[person.exactProperties.pOIs.length];
         for (int m = 0; m < person.exactProperties.pOIs.length; m++) {
 //                POI value = mapElement.getValue();
             float pO = person.exactProperties.fromHomeFreqs[m];
@@ -672,19 +685,27 @@ public class RootArtificial extends Root {
                 float newP = ((pO - minDist + 1f) / (maxDist + 1f))/1000f;
                 person.exactProperties.fromHomeFreqs[m] = Float16Utils.floatToHalf(newP);
                 person.exactProperties.sumHomeFreqs = person.exactProperties.sumHomeFreqs + newP;
-                person.exactProperties.fromHomeFreqsCDF[m] = Float16Utils.floatToHalf(person.exactProperties.sumHomeFreqs);
+                person.exactProperties.fromHomeFreqsCDF[m] = person.exactProperties.sumHomeFreqs;
             } else {
                 Float newP = ((avg - minDist + 1f) / (maxDist + 1f))/1000f;
                 person.exactProperties.fromHomeFreqs[m] = Float16Utils.floatToHalf(newP);
                 person.exactProperties.sumHomeFreqs = person.exactProperties.sumHomeFreqs + newP;
-                person.exactProperties.fromHomeFreqsCDF[m] = Float16Utils.floatToHalf(person.exactProperties.sumHomeFreqs);
+                person.exactProperties.fromHomeFreqsCDF[m] = person.exactProperties.sumHomeFreqs;
                 System.out.println("ROUTING FAILED! AVERAGE DISTANCE IS USED!");
             }
         }
     }
+    
+    public void postGenerateRegionSchedules(){
+        for(int r=0;r<regions.size();r++){
+            regions.get(r).scheduleListExact=scheduleListExactArray.get(r);
+        }
+    }
 
     public void postGeneratePeopleSchedulesForHome() {
-
+//        for(int r=0;r<regions.size();r++){
+//            regions.get(r).scheduleListExact=scheduleListExactArray.get(r);
+//        }
         for (int m = 0; m < people.size(); m++) {
             ScheduleListExact schedule = scheduleListExactArray.get(people.get(m).properties.homeRegion.myIndex);
             people.get(m).exactProperties.fromHomeFreqs = schedule.fromHomeFreqs;
@@ -832,7 +853,7 @@ public class RootArtificial extends Root {
 //                }
             }
             avg = avg / (float) avgCounter;
-            people.get(i).exactProperties.fromWorkFreqsCDF = new short[people.get(i).exactProperties.pOIs.length];
+            people.get(i).exactProperties.fromWorkFreqsCDF = new float[people.get(i).exactProperties.pOIs.length];
             people.get(i).exactProperties.fromWorkFreqs = new short[pOIs.size()];
 //            System.out.println("****");
             for (int m = 0; m < people.get(i).exactProperties.pOIs.length; m++) {
@@ -842,12 +863,12 @@ public class RootArtificial extends Root {
                     float newP = ((pO - minDist + 1f) / (maxDist + 1f))*1000-995;
                     people.get(i).exactProperties.fromWorkFreqs[m] = Float16Utils.floatToHalf(newP);
                     people.get(i).exactProperties.sumWorkFreqs = people.get(i).exactProperties.sumWorkFreqs + newP;
-                    people.get(i).exactProperties.fromWorkFreqsCDF[m] = Float16Utils.floatToHalf(people.get(i).exactProperties.sumWorkFreqs);
+                    people.get(i).exactProperties.fromWorkFreqsCDF[m] = people.get(i).exactProperties.sumWorkFreqs;
                 } else {
                     float newP = ((avg - minDist + 1f) / (maxDist + 1f))*1000-995;
                     people.get(i).exactProperties.fromWorkFreqs[m] = Float16Utils.floatToHalf(newP);
                     people.get(i).exactProperties.sumWorkFreqs = people.get(i).exactProperties.sumWorkFreqs + newP;
-                    people.get(i).exactProperties.fromWorkFreqsCDF[m] = Float16Utils.floatToHalf(people.get(i).exactProperties.sumWorkFreqs);
+                    people.get(i).exactProperties.fromWorkFreqsCDF[m] = people.get(i).exactProperties.sumWorkFreqs;
                     System.out.println("ROUTING FAILED! AVERAGE DISTANCE IS USED!");
                 }
             }
@@ -881,7 +902,7 @@ public class RootArtificial extends Root {
         }
         avg = avg / (float) avgCounter;
         person.exactProperties.fromWorkFreqs = new short[pOIs.size()];
-        person.exactProperties.fromWorkFreqsCDF = new short[person.exactProperties.pOIs.length];
+        person.exactProperties.fromWorkFreqsCDF = new float[person.exactProperties.pOIs.length];
 //            System.out.println("****");
         for (int m = 0; m < person.exactProperties.pOIs.length; m++) {
 //                POI value = mapElement.getValue();
@@ -890,12 +911,12 @@ public class RootArtificial extends Root {
                 float newP = ((pO - minDist + 1f) / (maxDist + 1f))*1000-995;
                 person.exactProperties.fromWorkFreqs[m] = Float16Utils.floatToHalf(newP);
                 person.exactProperties.sumWorkFreqs = person.exactProperties.sumWorkFreqs + newP;
-                person.exactProperties.fromWorkFreqsCDF[m] = Float16Utils.floatToHalf(person.exactProperties.sumWorkFreqs);
+                person.exactProperties.fromWorkFreqsCDF[m] = person.exactProperties.sumWorkFreqs;
             } else {
                 float newP = ((avg - minDist + 1f) / (maxDist + 1f))*1000-995;
                 person.exactProperties.fromWorkFreqs[m] = Float16Utils.floatToHalf(newP);
                 person.exactProperties.sumWorkFreqs = person.exactProperties.sumWorkFreqs + newP;
-                person.exactProperties.fromWorkFreqsCDF[m] = Float16Utils.floatToHalf(person.exactProperties.sumWorkFreqs);
+                person.exactProperties.fromWorkFreqsCDF[m] = person.exactProperties.sumWorkFreqs;
                 System.out.println("ROUTING FAILED! AVERAGE DISTANCE IS USED!");
             }
         }
