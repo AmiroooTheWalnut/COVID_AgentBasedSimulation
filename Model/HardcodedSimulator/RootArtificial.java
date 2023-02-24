@@ -317,13 +317,13 @@ public class RootArtificial extends Root {
             if (avgCounterHomeArray.get(i) > 0) {
                 for (int j = 0; j < scheduleListExactArray.get(i).fromHomeFreqs.length; j++) {
                     tempHomeFreqs[i][j]= tempHomeFreqs[i][j]/ (float)avgCounterHomeArray.get(i);
-                    scheduleListExactArray.get(i).fromHomeFreqs[j] = Float16Utils.floatToHalf(tempHomeFreqs[i][j] / (float)avgCounterHomeArray.get(i));
+                    scheduleListExactArray.get(i).fromHomeFreqs[j] = Float16Utils.floatToHalf(tempHomeFreqs[i][j]);
                 }
             }
             if (avgCounterWorkArray.get(i) > 0) {
                 for (int j = 0; j < scheduleListExactArray.get(i).fromWorkFreqs.length; j++) {
                     tempWorkFreqs[i][j]= tempWorkFreqs[i][j]/ (float)avgCounterWorkArray.get(i);
-                    scheduleListExactArray.get(i).fromWorkFreqs[j] = Float16Utils.floatToHalf(tempWorkFreqs[i][j] / (float)avgCounterWorkArray.get(i));
+                    scheduleListExactArray.get(i).fromWorkFreqs[j] = Float16Utils.floatToHalf(tempWorkFreqs[i][j]);
                 }
             }
         }
@@ -381,7 +381,7 @@ public class RootArtificial extends Root {
             for (int k = 0; k < scheduleListExactArray.get(i).fromHomeFreqs.length; k++) {
                 float varPOI = 0;
                 for (int j = 0; j < psudoHomeRegions.get(i).people.size(); j++) {
-                    varPOI = varPOI + (float) (Math.pow(scheduleListExactArray.get(i).fromHomeFreqs[k] - psudoHomeRegions.get(i).people.get(j).exactProperties.fromHomeFreqs[k], 2));
+                    varPOI = varPOI + (float) (Math.pow(Float16Utils.halfToFloat(scheduleListExactArray.get(i).fromHomeFreqs[k]) - Float16Utils.halfToFloat(psudoHomeRegions.get(i).people.get(j).exactProperties.fromHomeFreqs[k]), 2));
                 }
                 varPOI = varPOI / avgCounterHomeArray.get(i);
                 varReg = varReg + varPOI;
@@ -395,7 +395,7 @@ public class RootArtificial extends Root {
             for (int k = 0; k < scheduleListExactArray.get(i).fromWorkFreqs.length; k++) {
                 float varPOI = 0;
                 for (int j = 0; j < psudoWorkRegions.get(i).people.size(); j++) {
-                    varPOI = varPOI + (float) (Math.pow(scheduleListExactArray.get(i).fromWorkFreqs[k] - psudoWorkRegions.get(i).people.get(j).exactProperties.fromWorkFreqs[k], 2));
+                    varPOI = varPOI + (float) (Math.pow(Float16Utils.halfToFloat(scheduleListExactArray.get(i).fromWorkFreqs[k]) - Float16Utils.halfToFloat(psudoWorkRegions.get(i).people.get(j).exactProperties.fromWorkFreqs[k]), 2));
                 }
                 varPOI = varPOI / avgCounterWorkArray.get(i);
                 varReg = varReg + varPOI;
