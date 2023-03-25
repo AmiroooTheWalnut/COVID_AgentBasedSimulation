@@ -655,8 +655,8 @@ public class RootArtificial extends Root {
         float minDist = Float.POSITIVE_INFINITY;
         float avg = 0;
         int avgCounter = 0;
-        person.exactProperties.fromHomeFreqs = new short[pOIs.size()];
         person.exactProperties.pOIs = pOIs_array;
+        float[] fromHomeFreqs = new float[pOIs.size()];
         for (HashMap.Entry<String, POI> mapElement : pOIs.entrySet()) {
             String key = mapElement.getKey();
             POI value = mapElement.getValue();
@@ -674,15 +674,16 @@ public class RootArtificial extends Root {
             avg = avg + dist;
 
 //                people.get(i).exactProperties.pOIs[avgCounter] = value;
-            person.exactProperties.fromHomeFreqs[avgCounter] = Float16Utils.floatToHalf(dist);
+            fromHomeFreqs[avgCounter] = Float16Utils.floatToHalf(dist);
             avgCounter = avgCounter + 1;
 //                people.get(i).exactProperties.pOIHomeProbabilities.put(value, dist);
         }
         avg = avg / (float) avgCounter;
         person.exactProperties.fromHomeFreqsCDF = new float[person.exactProperties.pOIs.length];
+        person.exactProperties.fromHomeFreqs = new short[pOIs.size()];
         for (int m = 0; m < person.exactProperties.pOIs.length; m++) {
 //                POI value = mapElement.getValue();
-            float pO = Float16Utils.halfToFloat(person.exactProperties.fromHomeFreqs[m]);
+            float pO = fromHomeFreqs[m];
             if (pO > -1) {
                 float newP = ((maxDist -pO + 1f) / (maxDist + 1f))*1000;
                 newP=newP-(float)Math.floor(newP);
@@ -912,7 +913,7 @@ public class RootArtificial extends Root {
 //            System.out.println("****");
         for (int m = 0; m < person.exactProperties.pOIs.length; m++) {
 //                POI value = mapElement.getValue();
-            Float pO = fromWorkFreqs[m];
+            float pO = fromWorkFreqs[m];
             if (pO > -1) {
                 float newP = ((maxDist - pO + 1f) / (maxDist + 1f))*1000;
                 newP=newP-(float)Math.floor(newP);
