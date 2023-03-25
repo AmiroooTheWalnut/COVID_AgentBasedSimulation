@@ -46,6 +46,8 @@ public class Region extends Marker implements Serializable {
     public transient int sumHomeFreqs;
     public transient int sumWorkFreqs;
     
+    public transient int debugNumTravelPTAVSP=0;
+    
     public transient int myIndex;
     
     public Region(int passed_index){

@@ -79,8 +79,8 @@ public class Root extends Agent {
     public ArrayList<Region> cBGregions;
     public ArrayList<Region> regions;
     public RegionImageLayer regionsLayer = new RegionImageLayer();
-    int sumRegionsPopulation = 0;
-    LinkedHashMap<String, POI> pOIs;
+    public int sumRegionsPopulation = 0;
+    public LinkedHashMap<String, POI> pOIs;
 
     public int counter;
     public int numAgents;
@@ -1186,6 +1186,7 @@ public class Root extends Agent {
             if (myModelRoot.ABM.isReportContactRate == true) {
                 pollContactAllPeople();
             }
+            myModelRoot.ABM.measureHolder.handlePTAVSP(myModelRoot);
         } else if (myModelRoot.ABM.isOurABMActive == false && myModelRoot.ABM.isShamilABMActive == true) {
             runShamil(false, false, 0);
 //            ShamilSimulatorController.convertShamilToOur(people);
@@ -1202,6 +1203,7 @@ public class Root extends Agent {
             if (myModelRoot.ABM.isReportContactRate == true) {
                 pollContactAllPeople();
             }
+            myModelRoot.ABM.measureHolder.handlePTAVSP(myModelRoot);
         }
         if (myModelRoot.ABM.currentTime.getHour() == 0 && myModelRoot.ABM.currentTime.getMinute() == 0) {
             if (myModelRoot.isDebugging == true) {

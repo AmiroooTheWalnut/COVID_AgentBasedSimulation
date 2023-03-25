@@ -16,6 +16,7 @@ import COVID_AgentBasedSimulation.Model.HardcodedSimulator.RootArtificial;
 import COVID_AgentBasedSimulation.Model.Structure.AllGISData;
 import COVID_AgentBasedSimulation.Model.Structure.CensusBlockGroup;
 import COVID_AgentBasedSimulation.Model.Structure.City;
+import COVID_AgentBasedSimulation.Model.Structure.Scope;
 import COVID_AgentBasedSimulation.Model.Structure.SupplementaryCaseStudyData;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
@@ -352,6 +353,7 @@ public class MainModel extends Dataset {
         safegraph.clearPatternsPlaces();
         System.gc();
         safegraph.loadPatternsPlacesSet(datasetDirectory, dateName, allGISData, ABM.studyScope, isParallelLoadingData, numCPUs);
+        
 //        ABM.agents = new CopyOnWriteArrayList();
         ABM.agentsRaw = new ArrayList(numResidents);
 
@@ -386,6 +388,7 @@ public class MainModel extends Dataset {
         } else if (scenario.scenarioName.equals("OVD")) {
             ABM.root.constructor(this, numResidents, "OVD", numRegions, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
         }
+        ABM.measureHolder.initializeMeasures((Scope)(ABM.studyScopeGeography), ABM.root.pOIs);
 
 //        if (scenario.equals("CBG")) {
 //            ((Root) (ABM.rootAgent)).constructorCBG(this, sparsifyFraction);
@@ -418,6 +421,7 @@ public class MainModel extends Dataset {
         safegraph.clearPatternsPlaces();
         System.gc();
         safegraph.loadPatternsPlacesSet(datasetDirectory, dateName, allGISData, ABM.studyScope, isParallelLoadingData, numCPUs);
+        
         //ABM.agents = new CopyOnWriteArrayList();
         ABM.agentsRaw = new ArrayList(numResidents);
         ABM.currentTime = ABM.startTime;
@@ -467,6 +471,7 @@ public class MainModel extends Dataset {
         } else if (scenario.scenarioName.equals("noTessellation")) {
             ABM.root.constructor(this, numResidents, "noTessellation", numRegions, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
         }
+        ABM.measureHolder.initializeMeasures((Scope)(ABM.studyScopeGeography), ABM.root.pOIs);
 
 //        if (scenario.equals("CBG")) {
 //            ((Root) (ABM.rootAgent)).constructorCBG(this, sparsifyFraction);
@@ -502,7 +507,7 @@ public class MainModel extends Dataset {
         safegraph.clearPatternsPlaces();
         System.gc();
         safegraph.loadPatternsPlacesSet(datasetDirectory, dateName, allGISData, ABM.studyScope, isParallelLoadingData, numCPUs);
-
+        
         //ABM.agents = new CopyOnWriteArrayList();
         ABM.agentsRaw = new ArrayList();
 
@@ -876,6 +881,7 @@ public class MainModel extends Dataset {
         ABM.root.writeAllMobilityCounts(testPath + File.separator + "travelToAllPOIs");
 //        }
         ABM.root.writeTotalContacts(testPath + File.separator + "rawContactData");
+        ABM.measureHolder.writeReports(testPath + File.separator);
         if (ABM.root instanceof RootArtificial) {
             RootArtificial root = (RootArtificial) (ABM.root);
             if (root.isTessellationBuilt == true) {

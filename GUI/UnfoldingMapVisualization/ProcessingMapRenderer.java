@@ -6,6 +6,7 @@
 package COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization;
 
 import COVID_AgentBasedSimulation.GUI.MainFrame;
+import COVID_AgentBasedSimulation.Model.MainModel;
 import COVID_AgentBasedSimulation.Model.Structure.Marker;
 import com.jogamp.newt.awt.NewtCanvasAWT;
 import com.jogamp.newt.opengl.GLWindow;
@@ -60,6 +61,12 @@ public class ProcessingMapRenderer extends PApplet {
     Location drawingIndividualAgent;
     //FOR INDIVIDUAL AGENT
 
+    //FOR PTAVSPMeasure
+    public boolean isShowTravelsPTAVSP = false;
+    public boolean isShowCBGIDsPTAVSP = false;
+    public boolean isShowPopPTAVSP = false;
+    //FOR PTAVSPMeasure
+
     public ArrayList<MyPolygons> polygons = new ArrayList();
     public RegionImageLayer regionImageLayer;
 
@@ -78,6 +85,8 @@ public class ProcessingMapRenderer extends PApplet {
     public ArrayList<Location> regionCenters = new ArrayList();
 
     ProcessingMapRenderer thisRenderer;
+
+    public MainModel model;
 
     public ProcessingMapRenderer() {
     }
@@ -195,6 +204,10 @@ public class ProcessingMapRenderer extends PApplet {
         drawIndexImageShades();
         drawIndexedImageBoundaries();
         drawRegionTexts();
+
+        if (model != null) {
+            drawPTAVSPMeasure();
+        }
 
 //        if (isPan == true) {
 //            isPan = false;
@@ -454,6 +467,78 @@ public class ProcessingMapRenderer extends PApplet {
 //                    text(regionNames.get(i), scLocPos.x - textWidth(regionNames.get(i)) / 2.0F, scLocPos.y);
                     text(cBGIndex, scLocPos.x - textWidth(regionNames.get(i)) / 2.0F, scLocPos.y);
                 }
+            }
+        }
+    }
+
+    public void drawPTAVSPMeasure() {
+        Location loc = new Location(model.ABM.measureHolder.pTAVSPMeasure.get(0).destination.patternsRecord.poi_cbg_censusBlock.lon, model.ABM.measureHolder.pTAVSPMeasure.get(0).destination.patternsRecord.poi_cbg_censusBlock.lat);
+        SimplePointMarker locSM = new SimplePointMarker(loc);
+        ScreenPosition scLocPos = locSM.getScreenPosition(this.map);
+        fill(180.0F, 0.0F, 0.0F, 80.0F);
+        square(scLocPos.x, scLocPos.y, 10);
+
+        Location locS1 = new Location(model.ABM.measureHolder.pTAVSPMeasure.get(0).source1.lon, model.ABM.measureHolder.pTAVSPMeasure.get(0).source1.lat);
+        SimplePointMarker locSMS1 = new SimplePointMarker(locS1);
+        ScreenPosition scLocPosS1 = locSMS1.getScreenPosition(this.map);
+        fill(0.0F, 180.0F, 0.0F, 80.0F);
+        ellipse(scLocPosS1.x, scLocPosS1.y, 10, 10);
+
+        Location locS2 = new Location(model.ABM.measureHolder.pTAVSPMeasure.get(0).source2.lon, model.ABM.measureHolder.pTAVSPMeasure.get(0).source2.lat);
+        SimplePointMarker locSMS2 = new SimplePointMarker(locS2);
+        ScreenPosition scLocPosS2 = locSMS2.getScreenPosition(this.map);
+        fill(0.0F, 180.0F, 0.0F, 80.0F);
+        ellipse(scLocPosS2.x, scLocPosS2.y, 10, 10);
+
+        if (isShowCBGIDsPTAVSP == true) {
+            for (int i = 0; i < model.ABM.root.regions.size(); i++) {
+                for (int j = 0; j < model.ABM.root.regions.get(i).cBGsIDsInvolved.size(); j++) {
+                    Location locCBG = new Location(model.ABM.root.regions.get(i).cBGsInvolved.get(j).lon, model.ABM.root.regions.get(i).cBGsInvolved.get(j).lat);
+                    SimplePointMarker locSMCBG = new SimplePointMarker(locCBG);
+                    ScreenPosition scLocPosCBG = locSMCBG.getScreenPosition(this.map);
+//                    text(regionNames.get(i), scLocPos.x - textWidth(regionNames.get(i)) / 2.0F, scLocPos.y);
+                    String text = String.valueOf(model.ABM.root.regions.get(i).cBGsIDsInvolved.get(j));
+                    fill(0.0F, 0.0F, 0.0F, 255.0F);
+                    text(text, scLocPosCBG.x - textWidth(text) / 2.0F, scLocPosCBG.y + j);
+                }
+            }
+        }
+        if (isShowTravelsPTAVSP == true) {
+            int maxVal = 0;
+            for (int i = 0; i < model.ABM.root.regions.size(); i++) {
+                if (maxVal < model.ABM.root.regions.get(i).debugNumTravelPTAVSP) {
+                    maxVal = model.ABM.root.regions.get(i).debugNumTravelPTAVSP;
+                }
+            }
+            for (int i = 0; i < model.ABM.root.regions.size(); i++) {
+                Location locR = new Location(model.ABM.root.regions.get(i).lon, model.ABM.root.regions.get(i).lat);
+                SimplePointMarker locSMR = new SimplePointMarker(locR);
+                ScreenPosition scLocPosR = locSMR.getScreenPosition(this.map);
+                fill(0.0F, 0.0F, ((float) (model.ABM.root.regions.get(i).debugNumTravelPTAVSP) / (float) maxVal) * 255, 200.0F);
+                stroke(0, 0, 0, 0);
+                ellipse(scLocPosR.x, scLocPosR.y, 15, 5);
+                String text = String.valueOf(model.ABM.root.regions.get(i).debugNumTravelPTAVSP);
+                fill(0.0F, 0.0F, 0.0F, 255.0F);
+                text(text, scLocPosR.x - textWidth(text) / 2.0F, scLocPosR.y);
+            }
+        }
+        if(isShowPopPTAVSP==true){
+            int maxVal = 0;
+            for (int i = 0; i < model.ABM.root.regions.size(); i++) {
+                if (maxVal < model.ABM.root.regions.get(i).population) {
+                    maxVal = model.ABM.root.regions.get(i).population;
+                }
+            }
+            for (int i = 0; i < model.ABM.root.regions.size(); i++) {
+                Location locR = new Location(model.ABM.root.regions.get(i).lon, model.ABM.root.regions.get(i).lat);
+                SimplePointMarker locSMR = new SimplePointMarker(locR);
+                ScreenPosition scLocPosR = locSMR.getScreenPosition(this.map);
+                fill(0.0F, 0.0F, ((float) (model.ABM.root.regions.get(i).population) / (float) maxVal) * 255, 200.0F);
+                stroke(0, 0, 0, 0);
+                ellipse(scLocPosR.x, scLocPosR.y, 15, 5);
+                String text = String.valueOf(model.ABM.root.regions.get(i).population);
+                fill(0.0F, 0.0F, 0.0F, 255.0F);
+                text(text, scLocPosR.x - textWidth(text) / 2.0F, scLocPosR.y);
             }
         }
     }

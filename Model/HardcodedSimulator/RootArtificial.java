@@ -632,12 +632,14 @@ public class RootArtificial extends Root {
 //                POI value = mapElement.getValue();
                 float pO = fromHomeFreqs[m];
                 if (pO > -1) {
-                    float newP = ((pO - minDist + 1f) / (maxDist + 1f))/1000f;
+                    float newP = ((maxDist - pO + 1f) / (maxDist + 1f))*1000f;
+                    newP=newP-(float)Math.floor(newP);
                     people.get(i).exactProperties.fromHomeFreqs[m] = Float16Utils.floatToHalf(newP);
                     people.get(i).exactProperties.sumHomeFreqs = people.get(i).exactProperties.sumHomeFreqs + newP;
                     people.get(i).exactProperties.fromHomeFreqsCDF[m] = people.get(i).exactProperties.sumHomeFreqs;
                 } else {
-                    Float newP = ((avg - minDist + 1f) / (maxDist + 1f))/1000f;
+                    float newP = ((maxDist - avg + 1f) / (maxDist + 1f))*1000f;
+                    newP=newP-(float)Math.floor(newP);
                     people.get(i).exactProperties.fromHomeFreqs[m] = Float16Utils.floatToHalf(newP);
                     people.get(i).exactProperties.sumHomeFreqs = people.get(i).exactProperties.sumHomeFreqs + newP;
                     people.get(i).exactProperties.fromHomeFreqsCDF[m] = people.get(i).exactProperties.sumHomeFreqs;
@@ -680,14 +682,16 @@ public class RootArtificial extends Root {
         person.exactProperties.fromHomeFreqsCDF = new float[person.exactProperties.pOIs.length];
         for (int m = 0; m < person.exactProperties.pOIs.length; m++) {
 //                POI value = mapElement.getValue();
-            float pO = person.exactProperties.fromHomeFreqs[m];
+            float pO = Float16Utils.halfToFloat(person.exactProperties.fromHomeFreqs[m]);
             if (pO > -1) {
-                float newP = ((pO - minDist + 1f) / (maxDist + 1f))/1000f;
+                float newP = ((maxDist -pO + 1f) / (maxDist + 1f))*1000;
+                newP=newP-(float)Math.floor(newP);
                 person.exactProperties.fromHomeFreqs[m] = Float16Utils.floatToHalf(newP);
                 person.exactProperties.sumHomeFreqs = person.exactProperties.sumHomeFreqs + newP;
                 person.exactProperties.fromHomeFreqsCDF[m] = person.exactProperties.sumHomeFreqs;
             } else {
-                Float newP = ((avg - minDist + 1f) / (maxDist + 1f))/1000f;
+                float newP = ((maxDist - avg + 1f) / (maxDist + 1f))*1000f;
+                newP=newP-(float)Math.floor(newP);
                 person.exactProperties.fromHomeFreqs[m] = Float16Utils.floatToHalf(newP);
                 person.exactProperties.sumHomeFreqs = person.exactProperties.sumHomeFreqs + newP;
                 person.exactProperties.fromHomeFreqsCDF[m] = person.exactProperties.sumHomeFreqs;
@@ -858,14 +862,16 @@ public class RootArtificial extends Root {
 //            System.out.println("****");
             for (int m = 0; m < people.get(i).exactProperties.pOIs.length; m++) {
 //                POI value = mapElement.getValue();
-                Float pO = fromWorkFreqs[m];
+                float pO = fromWorkFreqs[m];
                 if (pO > -1) {
-                    float newP = ((pO - minDist + 1f) / (maxDist + 1f))*1000-995;
+                    float newP = ((maxDist - pO + 1f) / (maxDist + 1f))*1000;
+                    newP=newP-(float)Math.floor(newP);
                     people.get(i).exactProperties.fromWorkFreqs[m] = Float16Utils.floatToHalf(newP);
                     people.get(i).exactProperties.sumWorkFreqs = people.get(i).exactProperties.sumWorkFreqs + newP;
                     people.get(i).exactProperties.fromWorkFreqsCDF[m] = people.get(i).exactProperties.sumWorkFreqs;
                 } else {
-                    float newP = ((avg - minDist + 1f) / (maxDist + 1f))*1000-995;
+                    float newP = ((maxDist - avg + 1f) / (maxDist + 1f))*1000;
+                    newP=newP-(float)Math.floor(newP);
                     people.get(i).exactProperties.fromWorkFreqs[m] = Float16Utils.floatToHalf(newP);
                     people.get(i).exactProperties.sumWorkFreqs = people.get(i).exactProperties.sumWorkFreqs + newP;
                     people.get(i).exactProperties.fromWorkFreqsCDF[m] = people.get(i).exactProperties.sumWorkFreqs;
@@ -908,12 +914,14 @@ public class RootArtificial extends Root {
 //                POI value = mapElement.getValue();
             Float pO = fromWorkFreqs[m];
             if (pO > -1) {
-                float newP = ((pO - minDist + 1f) / (maxDist + 1f))*1000-995;
+                float newP = ((maxDist - pO + 1f) / (maxDist + 1f))*1000;
+                newP=newP-(float)Math.floor(newP);
                 person.exactProperties.fromWorkFreqs[m] = Float16Utils.floatToHalf(newP);
                 person.exactProperties.sumWorkFreqs = person.exactProperties.sumWorkFreqs + newP;
                 person.exactProperties.fromWorkFreqsCDF[m] = person.exactProperties.sumWorkFreqs;
             } else {
-                float newP = ((avg - minDist + 1f) / (maxDist + 1f))*1000-995;
+                float newP = ((maxDist - avg + 1f) / (maxDist + 1f))*1000;
+                newP=newP-(float)Math.floor(newP);
                 person.exactProperties.fromWorkFreqs[m] = Float16Utils.floatToHalf(newP);
                 person.exactProperties.sumWorkFreqs = person.exactProperties.sumWorkFreqs + newP;
                 person.exactProperties.fromWorkFreqsCDF[m] = person.exactProperties.sumWorkFreqs;

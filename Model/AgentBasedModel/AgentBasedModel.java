@@ -6,6 +6,7 @@
 package COVID_AgentBasedSimulation.Model.AgentBasedModel;
 
 import COVID_AgentBasedSimulation.GUI.MainFrame;
+import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Measures.MeasureHolder;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Root;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.RootArtificial;
 import COVID_AgentBasedSimulation.Model.MainModel;
@@ -92,6 +93,7 @@ public class AgentBasedModel {
 
     public transient AllData allData;
     public transient PreProcessor preProcessor;
+    public transient MeasureHolder measureHolder=new MeasureHolder();
 
     public AgentBasedModel(MainModel mainModel) {
         myMainModel = mainModel;
