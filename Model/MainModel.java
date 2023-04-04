@@ -100,14 +100,19 @@ public class MainModel extends Dataset {
     public double sparsifyFraction = 1;
     public int lastMonthLoaded;//NOT USED
     public int lastYearLoaded;//NOT USED
+    
+    public String testPathB;//For BATCH RUNNING
+    public String testPathName;//For BATCH RUNNING
+    public int batchCounter=0;//For BATCH RUNNING
+    public ArrayList<String> runs=new ArrayList();//For BATCH RUNNING
 
 //    private Thread fastForwardthread;
     public ExecutorService fastForwardPool = Executors.newSingleThreadExecutor();
 
     public ExecutorService agentEvalPool;
-    
+
     public ExecutorService preprocessEvalPool;
-    
+
     public ExecutorService groupInteractionEvalPool;
 
     public String datasetDirectory = "." + File.separator + "datasets";
@@ -115,6 +120,8 @@ public class MainModel extends Dataset {
     public boolean isDebugging = true;
 
     public transient double elapsed;
+    
+    public boolean isBatchRun=false;
 
     public void startScriptEngines() {
         javaEvaluationEngine = new JavaEvaluationEngine(this);
@@ -353,7 +360,7 @@ public class MainModel extends Dataset {
         safegraph.clearPatternsPlaces();
         System.gc();
         safegraph.loadPatternsPlacesSet(datasetDirectory, dateName, allGISData, ABM.studyScope, isParallelLoadingData, numCPUs);
-        
+
 //        ABM.agents = new CopyOnWriteArrayList();
         ABM.agentsRaw = new ArrayList(numResidents);
 
@@ -388,7 +395,7 @@ public class MainModel extends Dataset {
         } else if (scenario.scenarioName.equals("OVD")) {
             ABM.root.constructor(this, numResidents, "OVD", numRegions, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
         }
-        ABM.measureHolder.initializeMeasures((Scope)(ABM.studyScopeGeography), ABM.root.pOIs);
+        ABM.measureHolder.initializeMeasures((Scope) (ABM.studyScopeGeography), ABM.root.pOIs);
 
 //        if (scenario.equals("CBG")) {
 //            ((Root) (ABM.rootAgent)).constructorCBG(this, sparsifyFraction);
@@ -421,7 +428,7 @@ public class MainModel extends Dataset {
         safegraph.clearPatternsPlaces();
         System.gc();
         safegraph.loadPatternsPlacesSet(datasetDirectory, dateName, allGISData, ABM.studyScope, isParallelLoadingData, numCPUs);
-        
+
         //ABM.agents = new CopyOnWriteArrayList();
         ABM.agentsRaw = new ArrayList(numResidents);
         ABM.currentTime = ABM.startTime;
@@ -471,7 +478,7 @@ public class MainModel extends Dataset {
         } else if (scenario.scenarioName.equals("noTessellation")) {
             ABM.root.constructor(this, numResidents, "noTessellation", numRegions, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
         }
-        ABM.measureHolder.initializeMeasures((Scope)(ABM.studyScopeGeography), ABM.root.pOIs);
+        ABM.measureHolder.initializeMeasures((Scope) (ABM.studyScopeGeography), ABM.root.pOIs);
 
 //        if (scenario.equals("CBG")) {
 //            ((Root) (ABM.rootAgent)).constructorCBG(this, sparsifyFraction);
@@ -507,7 +514,7 @@ public class MainModel extends Dataset {
         safegraph.clearPatternsPlaces();
         System.gc();
         safegraph.loadPatternsPlacesSet(datasetDirectory, dateName, allGISData, ABM.studyScope, isParallelLoadingData, numCPUs);
-        
+
         //ABM.agents = new CopyOnWriteArrayList();
         ABM.agentsRaw = new ArrayList();
 
@@ -840,13 +847,31 @@ public class MainModel extends Dataset {
         SimpleDateFormat formatter = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss_SSS");
         Date date = new Date();
         if (scenario.scenarioName.contains("Xmeans")) {
-            scenario.scenarioName=scenario.scenarioName+"_"+regions.size();
+            String[] strs = scenario.scenarioName.split("_");
+            String scName = "";
+            try {
+                int v = Integer.parseInt(strs[strs.length - 1]);
+                for (int i = 0; i < strs.length-1; i++) {
+                    scName = scName + strs[i];
+                }
+                scenario.scenarioName=scName;
+            } catch (NumberFormatException nfe) {
+            }
+            scenario.scenarioName = scenario.scenarioName + "_" + regions.size();
         }
         String testPath = "projects" + File.separator + ABM.filePath.substring(ABM.filePath.lastIndexOf(File.separator) + 1, ABM.filePath.length()) + File.separator + formatter.format(date) + "_NumPeople_" + ABM.root.people.size() + "_" + scenario.scenarioName;
+        if(isBatchRun==true){
+            testPathB=testPath;
+            testPathName=formatter.format(date) + "_NumPeople_" + ABM.root.people.size() + "_" + scenario.scenarioName;
+            testPath=testPath+"_B"+batchCounter;
+            batchCounter=batchCounter+1;
+            runs.add(testPath);
+        }
         File testDirectory = new File(testPath);
         if (!testDirectory.exists()) {
             testDirectory.mkdirs();
         }
+        
         if (ABM.isSaveHistoricalRun == true) {
             HistoricalRun historicalRun = new HistoricalRun();
             historicalRun.regions = regions;
@@ -946,7 +971,7 @@ public class MainModel extends Dataset {
 
         return index;
     }
-    
+
     public static int binarySearchCumulative(float value, ArrayList<Float> input) {
         int stepSize = input.size() / 2;
         int index = stepSize;
@@ -992,7 +1017,7 @@ public class MainModel extends Dataset {
 
         return index;
     }
-    
+
     public static int binarySearchCumulative(float value, float[] input) {
         int stepSize = input.length / 2;
         int index = stepSize;

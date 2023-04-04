@@ -22,10 +22,12 @@ import COVID_AgentBasedSimulation.Model.Structure.City;
 import COVID_AgentBasedSimulation.Model.Structure.Scope;
 import COVID_AgentBasedSimulation.Model.Structure.TessellationCell;
 import COVID_AgentBasedSimulation.Model.Structure.VDCell;
+import com.opencsv.CSVWriter;
 import de.siegmar.fastcsv.writer.CsvWriter;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -44,7 +46,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class Root extends Agent {
 
@@ -220,7 +222,7 @@ public class Root extends Agent {
         }
     }
 
-    public int getTessellationLayerIndex(Scope scope, String scenarioName) {
+    public static int getTessellationLayerIndex(Scope scope, String scenarioName) {
         for (int i = 0; i < scope.tessellations.size(); i++) {
             if (scope.tessellations.get(i).scenarioName.toLowerCase().equals(scenarioName.toLowerCase())) {
                 return i;
@@ -1430,9 +1432,12 @@ public class Root extends Agent {
     }
 
     public void writeDailyInfection(String filePath) {
-        CsvWriter writer = new CsvWriter();
+//        CsvWriter writer = new CsvWriter();
         try {
-            writer.write(new File(filePath + ".csv"), Charset.forName("US-ASCII"), infectionPoll);
+            CSVWriter writer = new CSVWriter(new FileWriter(filePath + ".csv"));
+            writer.writeAll(infectionPoll);
+            writer.close();
+//            writer.write(new File(filePath + ".csv"), Charset.forName("US-ASCII"), infectionPoll);
         } catch (IOException ex) {
             Logger.getLogger(Root.class
                     .getName()).log(Level.SEVERE, null, ex);
@@ -1447,9 +1452,12 @@ public class Root extends Agent {
         for (int i = 0; i < mobilityPoll.size(); i++) {
             rows.add(mobilityPoll.get(i));
         }
-        CsvWriter writer = new CsvWriter();
+//        CsvWriter writer = new CsvWriter();
         try {
-            writer.write(new File(filePath + ".csv"), Charset.forName("US-ASCII"), rows);
+            CSVWriter writer = new CSVWriter(new FileWriter(filePath + ".csv"));
+            writer.writeAll(rows);
+            writer.close();
+//            writer.write(new File(filePath + ".csv"), Charset.forName("US-ASCII"), rows);
         } catch (IOException ex) {
             Logger.getLogger(Root.class
                     .getName()).log(Level.SEVERE, null, ex);
@@ -1468,8 +1476,12 @@ public class Root extends Agent {
             }
 
             try {
-                CsvWriter writer = new CsvWriter();
-                writer.write(new File(filePath + ".csv"), Charset.forName("US-ASCII"), rows);
+//                CsvWriter writer = new CsvWriter();
+//                writer.write(new File(filePath + ".csv"), Charset.forName("US-ASCII"), rows);
+
+                CSVWriter writer = new CSVWriter(new FileWriter(filePath + ".csv"));
+                writer.writeAll(rows);
+                writer.close();
             } catch (IOException ex) {
                 Logger.getLogger(Root.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -1540,8 +1552,12 @@ public class Root extends Agent {
         row[12] = String.valueOf(myModelRoot.elapsed);
         rows.add(row);
         try {
-            CsvWriter writer = new CsvWriter();
-            writer.write(new File(filePath + ".csv"), Charset.forName("US-ASCII"), rows);
+//            CsvWriter writer = new CsvWriter();
+//            writer.write(new File(filePath + ".csv"), Charset.forName("US-ASCII"), rows);
+
+            CSVWriter writer = new CSVWriter(new FileWriter(filePath + ".csv"));
+            writer.writeAll(rows);
+            writer.close();
         } catch (IOException ex) {
             Logger.getLogger(Root.class
                     .getName()).log(Level.SEVERE, null, ex);
@@ -1763,8 +1779,12 @@ public class Root extends Agent {
         rows.add(row1);
         rows.add(row2);
         try {
-            CsvWriter writer = new CsvWriter();
-            writer.write(new File(filePath + ".csv"), Charset.forName("US-ASCII"), rows);
+//            CsvWriter writer = new CsvWriter();
+//            writer.write(new File(filePath + ".csv"), Charset.forName("US-ASCII"), rows);
+
+            CSVWriter writer = new CSVWriter(new FileWriter(filePath + ".csv"));
+            writer.writeAll(rows);
+            writer.close();
         } catch (IOException ex) {
             Logger.getLogger(Root.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -1786,10 +1806,13 @@ public class Root extends Agent {
             counter = counter + 1;
             rows.add(row);
         }
-        CsvWriter writer = new CsvWriter();
-
+//        CsvWriter writer = new CsvWriter();
         try {
-            writer.write(new File(filePath + ".csv"), Charset.forName("US-ASCII"), rows);
+//            writer.write(new File(filePath + ".csv"), Charset.forName("US-ASCII"), rows);
+
+            CSVWriter writer = new CSVWriter(new FileWriter(filePath + ".csv"));
+            writer.writeAll(rows);
+            writer.close();
         } catch (IOException ex) {
             Logger.getLogger(RootArtificial.class
                     .getName()).log(Level.SEVERE, null, ex);

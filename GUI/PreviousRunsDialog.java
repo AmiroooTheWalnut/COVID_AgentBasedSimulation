@@ -38,7 +38,7 @@ import javax.swing.tree.TreePath;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class PreviousRunsDialog extends javax.swing.JDialog {
 

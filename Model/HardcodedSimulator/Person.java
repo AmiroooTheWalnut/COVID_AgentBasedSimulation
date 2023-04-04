@@ -315,6 +315,7 @@ public class Person extends Agent {
                 }
                 Long oldVal = myModelRoot.ABM.root.travelsToAllPOIsFreqs.get(pOI.patternsRecord.placeKey);
                 myModelRoot.ABM.root.travelsToAllPOIsFreqs.put(pOI.patternsRecord.placeKey, oldVal + 1);
+                myModelRoot.ABM.measureHolder.handleNOV(myModelRoot, properties);
             }
         } else {
             POI dest;
@@ -374,6 +375,7 @@ public class Person extends Agent {
                     }
                     Long oldVal = myModelRoot.ABM.root.travelsToAllPOIsFreqs.get(pOI.patternsRecord.placeKey);
                     myModelRoot.ABM.root.travelsToAllPOIsFreqs.put(pOI.patternsRecord.placeKey, oldVal + 1);
+                    myModelRoot.ABM.measureHolder.handleNOV(myModelRoot, properties);
                 }
             }
         }

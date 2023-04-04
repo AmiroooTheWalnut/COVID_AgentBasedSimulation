@@ -13,8 +13,10 @@ import COVID_AgentBasedSimulation.Model.MainModel;
 import COVID_AgentBasedSimulation.Model.Structure.CensusBlockGroup;
 import COVID_AgentBasedSimulation.Model.Structure.City;
 import COVID_AgentBasedSimulation.Model.Structure.Scope;
+import com.opencsv.CSVWriter;
 import de.siegmar.fastcsv.writer.CsvWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -278,10 +280,13 @@ public class MeasureHolder {
         row[2] = String.valueOf(aDVMeasure.get(0).averageDurationOfVisits);
         rows.add(row);
 
-        CsvWriter writer = new CsvWriter();
-
+//        CsvWriter writer = new CsvWriter();
         try {
-            writer.write(new File(filePath + "AVD.csv"), Charset.forName("US-ASCII"), rows);
+//            writer.write(new File(filePath + "AVD.csv"), Charset.forName("US-ASCII"), rows);
+            
+            CSVWriter writer = new CSVWriter(new FileWriter(filePath + "AVD.csv"));
+            writer.writeAll(rows);
+            writer.close();
         } catch (IOException ex) {
             Logger.getLogger(RootArtificial.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -300,10 +305,13 @@ public class MeasureHolder {
         row[2] = String.valueOf(nOVMeasure.get(0).numberOfVisits);
         rows.add(row);
 
-        CsvWriter writer = new CsvWriter();
-
+//        CsvWriter writer = new CsvWriter();
         try {
-            writer.write(new File(filePath + "NOV.csv"), Charset.forName("US-ASCII"), rows);
+//            writer.write(new File(filePath + "NOV.csv"), Charset.forName("US-ASCII"), rows);
+            
+            CSVWriter writer = new CSVWriter(new FileWriter(filePath + "NOV.csv"));
+            writer.writeAll(rows);
+            writer.close();
         } catch (IOException ex) {
             Logger.getLogger(RootArtificial.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -330,10 +338,13 @@ public class MeasureHolder {
         row[6] = String.valueOf(pTAVSPMeasure.get(0).prob);
         rows.add(row);
 
-        CsvWriter writer = new CsvWriter();
-
+//        CsvWriter writer = new CsvWriter();
         try {
-            writer.write(new File(filePath + "PTAVSP.csv"), Charset.forName("US-ASCII"), rows);
+//            writer.write(new File(filePath + "PTAVSP.csv"), Charset.forName("US-ASCII"), rows);
+            
+            CSVWriter writer = new CSVWriter(new FileWriter(filePath + "PTAVSP.csv"));
+            writer.writeAll(rows);
+            writer.close();
         } catch (IOException ex) {
             Logger.getLogger(RootArtificial.class.getName()).log(Level.SEVERE, null, ex);
         }

@@ -6,8 +6,10 @@ import COVID_AgentBasedSimulation.Model.Data.Safegraph.AllPatterns;
 import COVID_AgentBasedSimulation.Model.GraphicalModel.GraphicalModel;
 import COVID_AgentBasedSimulation.Model.Structure.CensusBlockGroup;
 import COVID_AgentBasedSimulation.Model.Structure.City;
+import com.opencsv.CSVWriter;
 import de.siegmar.fastcsv.writer.CsvWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -299,9 +301,11 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
                 }
 
             }
-            CsvWriter writer = new CsvWriter();
+
             try {
-                writer.write(new File("mobilityInference" + File.separator + "smallSample_" + jList1.getSelectedValue() + ".csv"), Charset.forName("US-ASCII"), data);
+                CSVWriter writer = new CSVWriter(new FileWriter("mobilityInference" + File.separator + "smallSample_" + jList1.getSelectedValue() + ".csv"));
+                writer.writeAll(data);
+                writer.close();
             } catch (IOException ex) {
                 Logger.getLogger(GraphicalModelDialog.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -339,9 +343,12 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
         row[0] = "3";//RELIGION
         row[1] = String.valueOf(religion);
         data.add(row);
-        CsvWriter writer = new CsvWriter();
+//        CsvWriter writer = new CsvWriter();
         try {
-            writer.write(new File("mobilityInference" + File.separator + "smallSampleSimple_" + jList1.getSelectedValue() + ".csv"), Charset.forName("US-ASCII"), data);
+//            writer.write(new File("mobilityInference" + File.separator + "smallSampleSimple_" + jList1.getSelectedValue() + ".csv"), Charset.forName("US-ASCII"), data);
+            CSVWriter writer = new CSVWriter(new FileWriter("mobilityInference" + File.separator + "smallSampleSimple_" + jList1.getSelectedValue() + ".csv"));
+            writer.writeAll(data);
+            writer.close();
         } catch (IOException ex) {
             Logger.getLogger(GraphicalModelDialog.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -378,10 +385,13 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
         row[0] = "3";//RELIGION
         row[1] = String.valueOf(religion);
         data.add(row);
-        CsvWriter writer = new CsvWriter();
+//        CsvWriter writer = new CsvWriter();
         try {
             Files.createDirectories(Paths.get("mobilityInference" + File.separator + myParent.mainModel.ABM.studyScope));
-            writer.write(new File("mobilityInference" + File.separator + myParent.mainModel.ABM.studyScope + File.separator + "FullSimple_" + jList1.getSelectedValue() + ".csv"), Charset.forName("US-ASCII"), data);
+//            writer.write(new File("mobilityInference" + File.separator + myParent.mainModel.ABM.studyScope + File.separator + "FullSimple_" + jList1.getSelectedValue() + ".csv"), Charset.forName("US-ASCII"), data);
+            CSVWriter writer = new CSVWriter(new FileWriter("mobilityInference" + File.separator + myParent.mainModel.ABM.studyScope + File.separator + "FullSimple_" + jList1.getSelectedValue() + ".csv"));
+            writer.writeAll(data);
+            writer.close();
         } catch (IOException ex) {
             Logger.getLogger(GraphicalModelDialog.class.getName()).log(Level.SEVERE, null, ex);
         }
