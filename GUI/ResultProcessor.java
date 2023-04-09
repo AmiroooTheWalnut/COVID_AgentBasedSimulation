@@ -10,11 +10,21 @@ import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Root;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.RootArtificial;
 import COVID_AgentBasedSimulation.Model.Structure.City;
 import COVID_AgentBasedSimulation.Model.Structure.Scope;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
+import com.opencsv.CSVWriter;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -172,35 +182,156 @@ public class ResultProcessor extends javax.swing.JDialog {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         String[] header = new String[9];
-        ArrayList<String[]> siderHeader;
-        ArrayList<String[]> data;
+        ArrayList<String[]> siderHeader = new ArrayList();
+        ArrayList<String[]> data = new ArrayList();
         header[3] = "1%";
         header[4] = "10%";
         header[5] = "25%";
         header[6] = "50%";
         header[7] = "75%";
         header[8] = "100%";
+        int[] numAgents = new int[6];
+        numAgents[0] = (int) Math.round(((City) (myParent.mainModel.ABM.studyScopeGeography)).population * 0.01);
+        numAgents[1] = (int) Math.round(((City) (myParent.mainModel.ABM.studyScopeGeography)).population * 0.1);
+        numAgents[2] = (int) Math.round(((City) (myParent.mainModel.ABM.studyScopeGeography)).population * 0.25);
+        numAgents[3] = (int) Math.round(((City) (myParent.mainModel.ABM.studyScopeGeography)).population * 0.5);
+        numAgents[4] = (int) Math.round(((City) (myParent.mainModel.ABM.studyScopeGeography)).population * 0.75);
+        numAgents[5] = (int) Math.round(((City) (myParent.mainModel.ABM.studyScopeGeography)).population);
         String[] tessellations = new String[10];
-        tessellations[0] = "NT";
-        tessellations[1] = "VD";
-        tessellations[2] = "XMEANS_VD";
-        tessellations[3] = "RMCBG_VD";
+        tessellations[0] = "noTessellation";
+        tessellations[1] = "VDFMTH";
+        tessellations[2] = "Xmeans_" + String.valueOf((int) (jSpinner1.getValue()));
+        tessellations[3] = "RMCBG_" + String.valueOf((int) (jSpinner1.getValue()));
         tessellations[4] = "CBG";
         tessellations[5] = "VD_CBG";
-        tessellations[6] = "XMEANS_CBG";
-        tessellations[7] = "CBGVD";
+        tessellations[6] = "Xmeans_" + String.valueOf((int) (jSpinner2.getValue()));
+        tessellations[7] = "CBGVDFMTH";
         tessellations[8] = "VD_CBGVD";
-        tessellations[9] = "XMEANS_CBGVD";
-        siderHeader=new ArrayList(tessellations.length*3+1);//Expected number of rows
+        tessellations[9] = "Xmeans_" + String.valueOf((int) (jSpinner3.getValue()));
+        siderHeader = new ArrayList(tessellations.length * 3 + 1);//Expected number of rows
         String root = "projects" + File.separator + myParent.mainModel.ABM.filePath.substring(myParent.mainModel.ABM.filePath.lastIndexOf(File.separator) + 1, myParent.mainModel.ABM.filePath.length());
         File directory = new File(root);
-        for (int k = 0; k < 6; k++) {
-            for (int i = 0; i < tessellations.length; i++) {
-                for (int j = 0; j < 3; j++) {
-                    
+        String[] directories = directory.list(new FilenameFilter() {
+            @Override
+            public boolean accept(File current, String name) {
+                return new File(current, name).isDirectory();
+            }
+        });
+        for (int i = 0; i < tessellations.length; i++) {
+            for (int j = 0; j < 6; j++) {
+                String[] row = new String[6];
+                data.add(row);
+            }
+        }
+        for (int i = 0; i < tessellations.length; i++) {
+            String[] row = new String[3];
+            row[0] = tessellations[i];
+            row[1] = "AVD";
+            row[2] = "avg";
+            siderHeader.add(row);
+            row = new String[3];
+            row[0] = "";
+            row[1] = "";
+            row[2] = "var";
+            siderHeader.add(row);
+            row = new String[3];
+            row[0] = "";
+            row[1] = "NOV";
+            row[2] = "avg";
+            siderHeader.add(row);
+            row = new String[3];
+            row[0] = "";
+            row[1] = "";
+            row[2] = "var";
+            siderHeader.add(row);
+            row = new String[3];
+            row[0] = "";
+            row[1] = "PTAVSP";
+            row[2] = "avg";
+            siderHeader.add(row);
+            row = new String[3];
+            row[0] = "";
+            row[1] = "";
+            row[2] = "var";
+            siderHeader.add(row);
+        }
+        for (int k = 0; k < 6; k++) {//num agents
+            for (int i = 0; i < tessellations.length; i++) {//tessellation type
+                String targetDir = "_NumPeople_" + numAgents[k] + "_" + tessellations[i] + "_B0_A";
+                for (int h = 0; h < directories.length; h++) {
+                    if (directories[h].contains(targetDir)) {
+                        try {
+                            FileReader filereader = new FileReader(root + File.separator + directories[h] + File.separator + "AVD.csv");
+                            CSVReader csvReader = new CSVReaderBuilder(filereader).withSkipLines(0).build();
+                            List<String[]> readData = csvReader.readAll();
+                            double avdAvg = Double.parseDouble(readData.get(1)[2]);
+                            double avdVar = Double.parseDouble(readData.get(2)[2]);
+                            String[] temp = data.get(i * 6);
+                            temp[k] = String.valueOf(avdAvg);
+                            data.set(i * 6, temp);
+                            temp = data.get(i * 6 + 1);
+                            temp[k] = String.valueOf(avdVar);
+                            data.set(i * 6 + 1, temp);
+
+                            filereader = new FileReader(root + File.separator + directories[h] + File.separator + "NOV.csv");
+                            csvReader = new CSVReaderBuilder(filereader).withSkipLines(0).build();
+                            readData = csvReader.readAll();
+                            double novAvg = Double.parseDouble(readData.get(1)[2]);
+                            double novVar = Double.parseDouble(readData.get(2)[2]);
+                            temp = data.get(i * 6 + 2);
+                            temp[k] = String.valueOf(novAvg);
+                            data.set(i * 6 + 2, temp);
+                            temp = data.get(i * 6 + 3);
+                            temp[k] = String.valueOf(novVar);
+                            data.set(i * 6 + 3, temp);
+
+                            filereader = new FileReader(root + File.separator + directories[h] + File.separator + "PTAVSP.csv");
+                            csvReader = new CSVReaderBuilder(filereader).withSkipLines(0).build();
+                            readData = csvReader.readAll();
+                            double ptavspAvg = Double.parseDouble(readData.get(1)[6]);
+                            double ptavspVar = Double.parseDouble(readData.get(2)[6]);
+                            temp = data.get(i * 6 + 4);
+                            temp[k] = String.valueOf(ptavspAvg);
+                            data.set(i * 6 + 4, temp);
+                            temp = data.get(i * 6 + 5);
+                            temp[k] = String.valueOf(ptavspVar);
+                            data.set(i * 6 + 5, temp);
+
+//                            System.out.println("!!!");
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
             }
         }
+        System.out.println("!!!");
+
+        try {
+            CSVWriter writer = new CSVWriter(new FileWriter(root + File.separator + "SummaryOfAll.csv"));
+            ArrayList<String[]> headerRow = new ArrayList();
+            headerRow.add(header);
+            writer.writeAll(headerRow);
+            ArrayList<String[]> rows = new ArrayList();
+            for (int i = 0; i < siderHeader.size(); i++) {
+                String[] row = new String[9];
+                row[0] = siderHeader.get(i)[0];
+                row[1] = siderHeader.get(i)[1];
+                row[2] = siderHeader.get(i)[2];
+                row[3] = data.get(i)[0];
+                row[4] = data.get(i)[1];
+                row[5] = data.get(i)[2];
+                row[6] = data.get(i)[3];
+                row[7] = data.get(i)[4];
+                row[8] = data.get(i)[5];
+                rows.add(row);
+            }
+            writer.writeAll(rows);
+            writer.close();
+        } catch (IOException ex) {
+            Logger.getLogger(ResultProcessor.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
@@ -222,11 +353,11 @@ public class ResultProcessor extends javax.swing.JDialog {
                             runBatchesForNumAgents(numAgents[numAgentCounter]);
                             System.out.println("Started complete batch run for num: " + numAgents[numAgentCounter]);
                             numAgentCounter = numAgentCounter + 1;
-                        }else{
+                        } else {
                             numberTimer.cancel();
                             numberTimer.purge();
                             System.out.println("All runs finished!");
-                            isCompleteBatchRunning=false;
+                            isCompleteBatchRunning = false;
                             jToggleButton1.setSelected(false);
                         }
                     }
