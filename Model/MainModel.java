@@ -708,7 +708,6 @@ public class MainModel extends Dataset {
                 isRunning = false;
             }
         } else {
-            isPause = true;
             while (isRunning == true) {
                 try {
                     System.out.println("Waiting to pause fastforward run!");
@@ -717,6 +716,7 @@ public class MainModel extends Dataset {
                     Logger.getLogger(MainModel.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
+            isPause = true;
         }
         if (newSimulationDelayTime > -2) {
             simulationDelayTime = newSimulationDelayTime;

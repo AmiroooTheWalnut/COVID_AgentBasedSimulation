@@ -392,16 +392,34 @@ public class ResultProcessor extends javax.swing.JDialog {
             public void run() {
                 if (isBatchRunnerRunning == false) {
                     if (scenarioCounter < scenarios.length) {
-                        if (scenarioCounter == 9) {
-                            System.out.println("!!! DEBUG!");
-                        }
+//                        if (scenarioCounter == 9) {
+//                            System.out.println("!!! DEBUG!");
+//                        }
                         int numRegion = -1;
                         if (scenarioCounter > 5) {
                             String[] temp = scenarios[scenarioCounter].split("_");
                             numRegion = Integer.parseInt(temp[1]);
                         }
-                        runABatch(scenarios[scenarioCounter], numAgents, numRegion);
-                        System.out.println("Started batch run: " + scenarios[scenarioCounter]);
+                        String root = "projects" + File.separator + myParent.mainModel.ABM.filePath.substring(myParent.mainModel.ABM.filePath.lastIndexOf(File.separator) + 1, myParent.mainModel.ABM.filePath.length());
+                        String targetDir = "_NumPeople_" + numAgents + "_" + scenarios[scenarioCounter] + "_B0_A";
+                        File directory = new File(root);
+                        boolean isFound = false;
+                        String[] directories = directory.list(new FilenameFilter() {
+                            @Override
+                            public boolean accept(File current, String name) {
+                                return new File(current, name).isDirectory();
+                            }
+                        });
+                        for (int i = 0; i < directories.length; i++) {
+                            if (directories[i].contains(targetDir) == true) {
+                                isFound = true;
+                            }
+                        }
+                        System.out.println("Is simulation found: " + isFound + " _ " + targetDir);
+                        if (isFound == false) {
+                            runABatch(scenarios[scenarioCounter], numAgents, numRegion);
+                            System.out.println("Started batch run: " + scenarios[scenarioCounter]);
+                        }
                         scenarioCounter = scenarioCounter + 1;
                     } else {
                         waitTimer.cancel();
@@ -425,7 +443,7 @@ public class ResultProcessor extends javax.swing.JDialog {
             @Override
             public void run() {
 //                System.out.println("UPDATE: "+myParent.mainModel.agentBasedModel.currentTime.toString());
-                if (localBatchCounter >= (Integer) jSpinner7.getValue() && myParent.mainModel.isRunning == false) {
+                if (localBatchCounter >= (Integer) jSpinner7.getValue() && myParent.mainModel.isPause == false) {
                     BatchRun br = new BatchRun();
                     br.runPostProcess(myParent.mainModel.runs, myParent.mainModel);
                     batchTimer.cancel();
@@ -433,7 +451,7 @@ public class ResultProcessor extends javax.swing.JDialog {
                     System.out.println("Finished batch run: " + scenario);
                     isBatchRunnerRunning = false;
                 }
-                if (myParent.mainModel.isRunning == false) {
+                if (myParent.mainModel.isPause == false) {
                     if (myParent.mainModel.batchCounter < (Integer) jSpinner7.getValue()) {
                         myParent.mainModel.isRunning = true;
                         myParent.mainModel.isBatchRun = true;
