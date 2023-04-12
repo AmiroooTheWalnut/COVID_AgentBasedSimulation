@@ -443,16 +443,19 @@ public class ResultProcessor extends javax.swing.JDialog {
             @Override
             public void run() {
 //                System.out.println("UPDATE: "+myParent.mainModel.agentBasedModel.currentTime.toString());
-                if (localBatchCounter >= (Integer) jSpinner7.getValue() && myParent.mainModel.isPause == false) {
+                if (localBatchCounter >= (Integer) jSpinner7.getValue() && myParent.mainModel.isReadyForBatchRun == true) {
+                    myParent.mainModel.isReadyForBatchRun=false;
                     BatchRun br = new BatchRun();
                     br.runPostProcess(myParent.mainModel.runs, myParent.mainModel);
                     batchTimer.cancel();
                     batchTimer.purge();
                     System.out.println("Finished batch run: " + scenario);
                     isBatchRunnerRunning = false;
+                    myParent.mainModel.isReadyForBatchRun=true;
                 }
-                if (myParent.mainModel.isPause == false) {
+                if (myParent.mainModel.isReadyForBatchRun == true) {
                     if (myParent.mainModel.batchCounter < (Integer) jSpinner7.getValue()) {
+                        myParent.mainModel.isReadyForBatchRun=false;
                         myParent.mainModel.isRunning = true;
                         myParent.mainModel.isBatchRun = true;
                         localBatchCounter = localBatchCounter + 1;
@@ -461,6 +464,7 @@ public class ResultProcessor extends javax.swing.JDialog {
                         myParent.mainModel.isPause = false;
                         myParent.mainModel.startTimeNanoSecond = System.nanoTime();
                         myParent.mainModel.resume(true, true, myParent.numProcessors, true, false);
+                        myParent.mainModel.isReadyForBatchRun=true;
                     }
                 }
             }

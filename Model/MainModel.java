@@ -90,6 +90,7 @@ public class MainModel extends Dataset {
 
     public boolean isPause = false;
     public boolean isRunning = false;
+    public boolean isReadyForBatchRun = true;
 
     public int newSimulationDelayTime = -2;
 
