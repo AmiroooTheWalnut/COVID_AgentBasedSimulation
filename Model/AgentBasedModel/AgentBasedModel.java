@@ -166,11 +166,12 @@ public class AgentBasedModel {
                 ex.printStackTrace();
             }
         } else {
-            Agent currentEvaluatingAgent[] = new Agent[1];
+//            Agent currentEvaluatingAgent[] = new Agent[1];
             try {
-                currentEvaluatingAgent[0] = root;
+//                currentEvaluatingAgent[0] = root;
 
-                currentEvaluatingAgent[0].behavior();
+//                currentEvaluatingAgent[0].behavior();
+                root.behavior();
 
 //                if (rootAgent.myTemplate.behavior.isJavaScriptActive == true) {
 //                    //myMainModel.javaEvaluationEngine.runScript(rootAgent.myTemplate.behavior.javaScript.script);
@@ -230,9 +231,9 @@ public class AgentBasedModel {
                 //^^^ OLD DESIGN WITH THREADS
             } catch (Exception ex) {
                 System.out.println("ERROR ON AGENT TYPE:");
-                System.out.println(currentEvaluatingAgent[0].myType);
+                System.out.println(root.myType);
                 System.out.println("ERROR ON AGENT INDEX:");
-                System.out.println(currentEvaluatingAgent[0].myIndex);
+                System.out.println(root.myIndex);
                 ex.printStackTrace();
             }
         }

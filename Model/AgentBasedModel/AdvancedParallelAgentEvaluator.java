@@ -46,19 +46,22 @@ public class AdvancedParallelAgentEvaluator extends ParallelProcessor {
                         ex.printStackTrace();
                     }
                 } else {
-                    Agent currentEvaluatingAgent[] = new Agent[1];
+                    Agent currentEvaluatingAgent=data.get(myStartIndex);
+//                    Agent currentEvaluatingAgent[] = new Agent[1];
                     try {
 //                System.out.println(myStartIndex);
 //                System.out.println(myEndIndex);
                         for (int i = myStartIndex; i < myEndIndex; i++) {
-                            currentEvaluatingAgent[0] = data.get(i);
-                            currentEvaluatingAgent[0].behavior();
+//                            currentEvaluatingAgent[0] = data.get(i);
+//                            currentEvaluatingAgent[0].behavior();
+                            currentEvaluatingAgent=data.get(i);
+                            data.get(i).behavior();
                         }
                     } catch (Exception ex) {
                         System.out.println("ERROR ON AGENT TYPE:");
-                        System.out.println(currentEvaluatingAgent[0].myType);
+                        System.out.println(currentEvaluatingAgent.myType);
                         System.out.println("ERROR ON AGENT INDEX:");
-                        System.out.println(currentEvaluatingAgent[0].myIndex);
+                        System.out.println(currentEvaluatingAgent.myIndex);
                         ex.printStackTrace();
                     }
                 }
