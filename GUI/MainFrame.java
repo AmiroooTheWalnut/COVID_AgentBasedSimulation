@@ -601,7 +601,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         jPanel5.add(jPanel16);
 
-        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Artificial mobility"));
+        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Preprocess all commuting times"));
 
         jButton4.setText("Generate");
         jButton4.addActionListener(new java.awt.event.ActionListener() {
@@ -802,7 +802,7 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-
+        
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed

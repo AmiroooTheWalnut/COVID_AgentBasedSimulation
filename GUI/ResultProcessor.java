@@ -403,6 +403,10 @@ public class ResultProcessor extends javax.swing.JDialog {
                         String root = "projects" + File.separator + myParent.mainModel.ABM.filePath.substring(myParent.mainModel.ABM.filePath.lastIndexOf(File.separator) + 1, myParent.mainModel.ABM.filePath.length());
                         String targetDir = "_NumPeople_" + numAgents + "_" + scenarios[scenarioCounter] + "_B0_A";
                         File directory = new File(root);
+                        if (!directory.exists()) {
+                            directory.mkdirs();
+                            return;
+                        }
                         boolean isFound = false;
                         String[] directories = directory.list(new FilenameFilter() {
                             @Override
@@ -444,18 +448,22 @@ public class ResultProcessor extends javax.swing.JDialog {
             public void run() {
 //                System.out.println("UPDATE: "+myParent.mainModel.agentBasedModel.currentTime.toString());
                 if (localBatchCounter >= (Integer) jSpinner7.getValue() && myParent.mainModel.isReadyForBatchRun == true) {
-                    myParent.mainModel.isReadyForBatchRun=false;
+                    myParent.mainModel.isReadyForBatchRun = false;
                     BatchRun br = new BatchRun();
                     br.runPostProcess(myParent.mainModel.runs, myParent.mainModel);
                     batchTimer.cancel();
                     batchTimer.purge();
                     System.out.println("Finished batch run: " + scenario);
+                    myParent.mainModel.ABM.root = null;
+                    myParent.mainModel.ABM.agents = null;
+                    myParent.mainModel.ABM.agentsRaw = null;
+                    System.gc();
                     isBatchRunnerRunning = false;
-                    myParent.mainModel.isReadyForBatchRun=true;
+                    myParent.mainModel.isReadyForBatchRun = true;
                 }
                 if (myParent.mainModel.isReadyForBatchRun == true) {
                     if (myParent.mainModel.batchCounter < (Integer) jSpinner7.getValue()) {
-                        myParent.mainModel.isReadyForBatchRun=false;
+                        myParent.mainModel.isReadyForBatchRun = false;
                         myParent.mainModel.isRunning = true;
                         myParent.mainModel.isBatchRun = true;
                         localBatchCounter = localBatchCounter + 1;
@@ -464,7 +472,6 @@ public class ResultProcessor extends javax.swing.JDialog {
                         myParent.mainModel.isPause = false;
                         myParent.mainModel.startTimeNanoSecond = System.nanoTime();
                         myParent.mainModel.resume(true, true, myParent.numProcessors, true, false);
-                        myParent.mainModel.isReadyForBatchRun=true;
                     }
                 }
             }

@@ -641,8 +641,10 @@ public class MainModel extends Dataset {
                 if (isRunFromGUI == false) {
                     fastForwardPool.shutdown();
                     agentEvalPool.shutdown();
+                    isReadyForBatchRun=true;
                     return;
                 } else {
+                    isReadyForBatchRun=true;
                     return;
                 }
             }

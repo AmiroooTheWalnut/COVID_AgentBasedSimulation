@@ -158,6 +158,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
         jButton19 = new javax.swing.JButton();
         jButton18 = new javax.swing.JButton();
         jButton17 = new javax.swing.JButton();
+        jButton34 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -546,10 +547,18 @@ public class GISLocationDialog extends javax.swing.JDialog {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        jButton34.setText("Process all commuting times");
+        jButton34.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton34ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -558,9 +567,9 @@ public class GISLocationDialog extends javax.swing.JDialog {
                     .addComponent(jButton25)
                     .addComponent(jButton26)
                     .addComponent(jButton27)
-                    .addComponent(jButton28))
+                    .addComponent(jButton28)
+                    .addComponent(jButton34))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -579,6 +588,8 @@ public class GISLocationDialog extends javax.swing.JDialog {
                 .addComponent(jButton28)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton34)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -3028,7 +3039,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
 
         int cbgLayerIndex = RootArtificial.findLayerExactNotCaseSensitive(mainFParent.allData, "cbg");
         LayerDefinition cbgLayer = (LayerDefinition) (mainFParent.allData.all_Layers.get(cbgLayerIndex));
-        int targetNumCells = cbgLayer.categories.length-1;
+        int targetNumCells = cbgLayer.categories.length - 1;
 
         Collections.sort(pOILocationNodes, Collections.reverseOrder());
 
@@ -3036,7 +3047,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
         int cellRange = 3;
         int counter = 0;
         ArrayList<Integer> observedFacilities;
-        FacilityLocation pOIFacilities[]=new FacilityLocation[1];
+        FacilityLocation pOIFacilities[] = new FacilityLocation[1];
         for (int m = 0; m < maxTry; m++) {
             int numFacilities = targetNumCells + counter;
             pOIFacilities = new FacilityLocation[numFacilities];
@@ -3132,7 +3143,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
 
         int cbgvdLayerIndex = RootArtificial.findLayerExactNotCaseSensitive(mainFParent.allData, "cbgvdfmth");
         LayerDefinition cbgLayer = (LayerDefinition) (mainFParent.allData.all_Layers.get(cbgvdLayerIndex));
-        int targetNumCells = cbgLayer.categories.length-1;
+        int targetNumCells = cbgLayer.categories.length - 1;
 
         Collections.sort(pOILocationNodes, Collections.reverseOrder());
 
@@ -3140,7 +3151,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
         int cellRange = 3;
         int counter = 0;
         ArrayList<Integer> observedFacilities;
-        FacilityLocation pOIFacilities[]=new FacilityLocation[1];
+        FacilityLocation pOIFacilities[] = new FacilityLocation[1];
         for (int m = 0; m < maxTry; m++) {
             int numFacilities = targetNumCells + counter;
             pOIFacilities = new FacilityLocation[numFacilities];
@@ -3230,6 +3241,165 @@ public class GISLocationDialog extends javax.swing.JDialog {
         mainFParent.allData.all_Layers.add(tempLayer);
         mainFParent.refreshLayersList();
     }//GEN-LAST:event_jButton33ActionPerformed
+
+    private void jButton34ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton34ActionPerformed
+        String years[] = new String[2];
+        years[0] = "2020";
+        years[1] = "2021";
+        String months[][] = new String[2][12];
+//        months[0][0] = "09";
+//        months[0][1] = "10";
+//        months[0][2] = "11";
+
+//        months[0][0] = "03";
+//        months[0][1] = "04";
+        months[0][0] = "05";
+        months[0][1] = "06";
+        months[0][2] = "07";
+        months[0][3] = "08";
+
+        months[0][4] = "09";
+        months[0][5] = "10";
+        months[0][6] = "11";
+        months[0][7] = "12";
+        months[1][0] = "01";
+        months[1][1] = "02";
+        months[1][2] = "03";
+        months[1][3] = "04";
+        months[1][4] = "05";
+        months[1][5] = "06";
+        months[1][6] = "07";
+        myParent.mainModel.safegraph.requestDatasetRange(myParent.mainModel.datasetDirectory, myParent.mainModel.allGISData, myParent.mainModel.ABM.studyScope, years, months, true, myParent.numProcessors);
+        
+        shopFacilities = initShopsByExactNumber(4);
+        schoolFacilities = initSchoolsByExactNumber(4);
+        
+        int trafficLayerIndex = -1;
+        for (int i = 0; i < mainFParent.allData.all_Layers.size(); i++) {
+            if (((LayerDefinition) mainFParent.allData.all_Layers.get(i)).layerName.toLowerCase().contains("traffic")) {
+                trafficLayerIndex = i;
+            }
+        }
+//        int numProcessors = myParent.mainModel.numCPUs;
+        ArrayList<ArrayList<Double>> distancesToShops = new ArrayList();
+        for (int s = 0; s < shopFacilities.length; s++) {
+            ArrayList nodesDistas = new ArrayList();
+            for (int i = 0; i < mainFParent.allData.all_Nodes.length; i++) {
+                nodesDistas.add(0);
+            }
+            distancesToShops.add(nodesDistas);
+        }
+        ArrayList<ArrayList<Double>> distancesToSchools = new ArrayList();
+        for (int s = 0; s < schoolFacilities.length; s++) {
+            ArrayList nodesDistas = new ArrayList();
+            for (int i = 0; i < mainFParent.allData.all_Nodes.length; i++) {
+                nodesDistas.add(0);
+            }
+            distancesToSchools.add(nodesDistas);
+        }
+        for (int s = 0; s < shopFacilities.length; s++) {
+            for (int i = 0; i < mainFParent.allData.all_Nodes.length; i++) {
+                mainFParent.allData.setParallelLayers(1, -1);
+                Routing routingToOthers = new Routing(mainFParent.allData, trafficLayerIndex, 0);
+                routingToOthers.findPath(mainFParent.allData.all_Nodes[i], shopFacilities[s].nodeLocation);
+                double distance = routingToOthers.pathDistance;
+                distancesToShops.get(s).set(i, distance);
+                System.out.println("shop: "+s+" Total shops: "+shopFacilities.length+" Node: "+i+" Total nodes: "+mainFParent.allData.all_Nodes.length);
+            }
+        }
+        for (int s = 0; s < schoolFacilities.length; s++) {
+            for (int i = 0; i < mainFParent.allData.all_Nodes.length; i++) {
+                mainFParent.allData.setParallelLayers(1, -1);
+                Routing routingToOthers = new Routing(mainFParent.allData, trafficLayerIndex, 0);
+                routingToOthers.findPath(mainFParent.allData.all_Nodes[i], schoolFacilities[s].nodeLocation);
+                double distance = routingToOthers.pathDistance;
+                distancesToSchools.get(s).set(i, distance);
+                System.out.println("school: "+s+" Total shops: "+schoolFacilities.length+" Node: "+i+" Total nodes: "+mainFParent.allData.all_Nodes.length);
+            }
+        }
+        GISLocationDialog.writeDoubleArrayList(distancesToShops,"NetworkDistances"+File.separator+"shopsNodesDistances.csv");
+        GISLocationDialog.writeDoubleArrayList(distancesToSchools,"NetworkDistances"+File.separator+"schoolsNodesDistances.csv");
+    }//GEN-LAST:event_jButton34ActionPerformed
+
+    public static void writeDoubleArrayList(ArrayList<ArrayList<Double>> input, String path) {
+        ArrayList<String[]> data = new ArrayList();
+        for (int i = 0; i < input.size(); i++) {
+            String[] row = new String[input.get(i).size()];
+            for (int j = 0; j < input.get(i).size(); j++) {
+                row[j] = String.valueOf(input.get(i).get(j));
+            }
+            data.add(row);
+        }
+        try {
+            CSVWriter writer = new CSVWriter(new FileWriter(path));
+            writer.writeAll(data);
+            writer.close();
+        } catch (IOException ex) {
+            Logger.getLogger(GISLocationDialog.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public FacilityLocation[] initShopsByExactNumber(int input){
+        FacilityLocation[] output=null;
+        float tempThresh = shopMergeThreshold;
+        int numTries=0;
+        int numMaxTries=100;
+        float step=tempThresh*0.2f;
+        boolean isMore=false;
+        while(numTries<numMaxTries){
+            FacilityLocation[] facilites=initShopFacilities(tempThresh);
+            if(facilites.length==input){
+                output=facilites;
+                break;
+            }else if(facilites.length>input){
+                if(isMore==false){
+                    step=step*0.9f;
+                }
+                isMore=true;
+                tempThresh=tempThresh+step;
+                numTries=numTries+1;
+            }else{
+                if(isMore==true){
+                    step=step*0.9f;
+                }
+                isMore=false;
+                tempThresh=tempThresh-step;
+                numTries=numTries+1;
+            }
+        }
+        return output;
+    }
+    
+    public FacilityLocation[] initSchoolsByExactNumber(int input){
+        FacilityLocation[] output=null;
+        float tempThresh = schoolMergeThreshold;
+        int numTries=0;
+        int numMaxTries=100;
+        float step=tempThresh*0.2f;
+        boolean isMore=false;
+        while(numTries<numMaxTries){
+            FacilityLocation[] facilites=initSchoolFacilities(tempThresh);
+            if(facilites.length==input){
+                output=facilites;
+                break;
+            }else if(facilites.length>input){
+                if(isMore==false){
+                    step=step*0.9f;
+                }
+                isMore=true;
+                tempThresh=tempThresh+step;
+                numTries=numTries+1;
+            }else{
+                if(isMore==true){
+                    step=step*0.9f;
+                }
+                isMore=false;
+                tempThresh=tempThresh-step;
+                numTries=numTries+1;
+            }
+        }
+        return output;
+    }
 
     public void temp_VDFNC_70() {
         float currentShopMergeThreshold = 0.01072975f;
@@ -4193,16 +4363,16 @@ public class GISLocationDialog extends javax.swing.JDialog {
         }
         return cBGNumNodesHashMap;
     }
-    
+
     public static HashMap<CensusBlockGroup, Integer> getHashNumNodeForCluster(AllData allData, AllGISData allGISData, int vdIndex, int[][] clustImg, int cBGLayerIndex) {
-        VectorToPolygon vp=new VectorToPolygon();
+        VectorToPolygon vp = new VectorToPolygon();
         vp.setScaleFactors(allData);
-        vp.imgWidth=clustImg[0].length;
-        vp.imgHeight=clustImg.length;
+        vp.imgWidth = clustImg[0].length;
+        vp.imgHeight = clustImg.length;
         HashMap<CensusBlockGroup, Integer> cBGNumNodesHashMap = new HashMap();
         for (int i = 0; i < allData.all_Nodes.length; i++) {
             int[] imgPCl = vp.vectorToImage(allData.all_Nodes[i].lon, allData.all_Nodes[i].lat, clustImg[0].length, clustImg.length);
-            int cLIndex=clustImg[imgPCl[1]][imgPCl[0]];
+            int cLIndex = clustImg[imgPCl[1]][imgPCl[0]];
             if (cLIndex == vdIndex) {
                 Double value = Double.valueOf(Math.round(((LayerDefinition) (allData.all_Layers.get(cBGLayerIndex))).values[((short[]) (allData.all_Nodes[i].layers.get(cBGLayerIndex)))[0] - 1]));
                 CensusBlockGroup cBG = allGISData.findCensusBlockGroup(value.longValue());
@@ -4403,6 +4573,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
     private javax.swing.JButton jButton31;
     private javax.swing.JButton jButton32;
     private javax.swing.JButton jButton33;
+    private javax.swing.JButton jButton34;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
