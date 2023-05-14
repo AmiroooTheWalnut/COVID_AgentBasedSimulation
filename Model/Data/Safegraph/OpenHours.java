@@ -14,9 +14,16 @@ import lombok.Setter;
  *
  * @author Amir Mohammad Esmaieeli Sikaroudi
  */
-@Getter @Setter
+@Getter
+@Setter
 public class OpenHours implements Serializable {
+
     static final long serialVersionUID = softwareVersion;
+
+    public OpenHours() {
+
+    }
+
     public float startTime;
     public float endTimne;
 }

@@ -15,13 +15,17 @@ import lombok.Setter;
 public class SafegraphPlace implements Serializable, Comparable<SafegraphPlace> {
     static final long serialVersionUID = softwareVersion;
     
+    public SafegraphPlace(){
+        
+    }
+    
 //    public String id;//DROPPED IT IS GOING TO BE DEPRECIATED
     public transient SafegraphPlace parent;
     public String placeKey;
     public float lat;
     public float lon;
-    public ArrayList<Brand> brands;
-    public Category category;
+    public ArrayList<Brand> brands;//MAIN
+    public Category category;//MAIN
     // SUB CATEGORY IS DROPPED
     public int naics_code;
     public transient CensusBlockGroup censusBlock;
@@ -32,7 +36,7 @@ public class SafegraphPlace implements Serializable, Comparable<SafegraphPlace> 
 //    public ZipCode zipcode;//DROPPED
 //    public Country country;//DROPPED
     // PHONE NUMBER DROPPED
-    public OpenHours[] openHours;//7 days starting from monday
+    public OpenHours[] openHours;//7 days starting from monday //MAIN
     // category_tags,opened_on	closed_on,tracking_opened_since,tracking_closed_since DROPPED
     
     public float landArea=-1;

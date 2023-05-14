@@ -1,12 +1,18 @@
 package COVID_AgentBasedSimulation.GUI.GraphicalModel;
 
 import COVID_AgentBasedSimulation.GUI.MainFrame;
+import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.ProcessingMapRenderer;
 import COVID_AgentBasedSimulation.GUI.VoronoiGIS.GISLocationDialog;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.AllPatterns;
+import COVID_AgentBasedSimulation.Model.Data.Safegraph.CensusBlockGroupIntegerTuple;
+import COVID_AgentBasedSimulation.Model.Data.Safegraph.PatternsRecordProcessed;
 import COVID_AgentBasedSimulation.Model.GraphicalModel.GraphicalModel;
 import COVID_AgentBasedSimulation.Model.Structure.CensusBlockGroup;
 import COVID_AgentBasedSimulation.Model.Structure.City;
+import de.fhpotsdam.unfolding.utils.MapUtils;
 import com.opencsv.CSVWriter;
+import de.fhpotsdam.unfolding.UnfoldingMap;
+import de.fhpotsdam.unfolding.geo.Location;
 import de.siegmar.fastcsv.writer.CsvWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -27,6 +33,8 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
     public MainFrame myParent;
     String[] patternsList;
     String loadScope;
+
+    ProcessingMapRenderer sketch;
 
     /**
      * Creates new form GraphicalModelDialog
@@ -77,6 +85,12 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
         jScrollPane1 = new javax.swing.JScrollPane();
         jList1 = new javax.swing.JList<>();
         jButton12 = new javax.swing.JButton();
+        jButton13 = new javax.swing.JButton();
+        jButton14 = new javax.swing.JButton();
+        jButton15 = new javax.swing.JButton();
+        jPanel3 = new javax.swing.JPanel();
+        jButton16 = new javax.swing.JButton();
+        jButton17 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -198,7 +212,7 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 224, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -209,10 +223,47 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
                 .addContainerGap())
         );
 
-        jButton12.setText("Calc multi-visit shops");
+        jButton12.setText("Save multi-visit one month");
         jButton12.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton12ActionPerformed(evt);
+            }
+        });
+
+        jButton13.setText("CBGShop trajectories");
+        jButton13.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton13ActionPerformed(evt);
+            }
+        });
+
+        jButton14.setText("CBGSchool trajectories");
+        jButton14.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton14ActionPerformed(evt);
+            }
+        });
+
+        jButton15.setText("CBGRel trajectories");
+        jButton15.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton15ActionPerformed(evt);
+            }
+        });
+
+        jPanel3.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+
+        jButton16.setText("Start rendering");
+        jButton16.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton16ActionPerformed(evt);
+            }
+        });
+
+        jButton17.setText("Tucson");
+        jButton17.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton17ActionPerformed(evt);
             }
         });
 
@@ -222,6 +273,7 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -229,25 +281,28 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
                             .addComponent(jButton7)
                             .addComponent(jButton8)
                             .addComponent(jButton9)
-                            .addComponent(jButton10)
                             .addComponent(jButton5)
-                            .addComponent(jButton11))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jButton12)
+                            .addComponent(jButton11)
+                            .addComponent(jButton10)
+                            .addComponent(jButton13)
+                            .addComponent(jButton14)
+                            .addComponent(jButton15)
                             .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jButton12)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addContainerGap())
+                                .addComponent(jButton16)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButton17)))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jButton6)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -259,16 +314,24 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton9)
                         .addGap(18, 18, 18)
-                        .addComponent(jButton10)
+                        .addComponent(jButton12)
                         .addGap(18, 18, 18)
+                        .addComponent(jButton10)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton11)
                         .addGap(18, 18, 18)
-                        .addComponent(jButton12)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 64, Short.MAX_VALUE)
+                        .addComponent(jButton13)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton14)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton15)
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jButton16)
+                            .addComponent(jButton17))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 57, Short.MAX_VALUE)
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addContainerGap())))
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
 
         pack();
@@ -441,7 +504,6 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
                 dataReligiousLocations.add(row);
                 counterReligion = counterReligion + 1;
             }
-
         }
         CsvWriter writer = new CsvWriter();
         try {
@@ -670,22 +732,290 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
     private void jButton12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton12ActionPerformed
         myParent.mainModel.safegraph.clearPatternsPlaces();
         myParent.mainModel.safegraph.loadPatternsPlacesSet(myParent.mainModel.datasetDirectory, jList1.getSelectedValue(), myParent.mainModel.allGISData, myParent.mainModel.ABM.studyScope, true, myParent.numProcessors);
-        float numVisits = 0;
-        float numUniqueVisits = 0;
+        ArrayList<String[]> dataShops = new ArrayList();
+        ArrayList<String[]> dataSchools = new ArrayList();
+        ArrayList<String[]> dataReligiousLocations = new ArrayList();
+        String[] rowShop = new String[1];
+        String[] rowSchool = new String[1];
+        String[] rowRel = new String[1];
+        float numVisitsShop = 0;
+        float numUniqueVisitsShop = 0;
+        float numVisitsSchool = 0;
+        float numUniqueVisitsSchool = 0;
+        float numVisitsRel = 0;
+        float numUniqueVisitsRel = 0;
         for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.size(); i++) {
+            //for (int i = 0; i < 500; i++) {
             if (GISLocationDialog.isShop(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).place.naics_code) == true) {
-                numVisits=numVisits+myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).raw_visit_counts;
-                numUniqueVisits=numUniqueVisits+myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).raw_visitor_counts;
+                numVisitsShop = numVisitsShop + myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).raw_visit_counts;
+                numUniqueVisitsShop = numUniqueVisitsShop + myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).raw_visitor_counts;
+            }
+            if (GISLocationDialog.isSchool(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).place.naics_code) == true) {
+                numVisitsSchool = numVisitsSchool + myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).raw_visit_counts;
+                numUniqueVisitsSchool = numUniqueVisitsSchool + myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).raw_visitor_counts;
+            }
+            if (GISLocationDialog.isReligiousOrganization(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).place.naics_code) == true) {
+                numVisitsRel = numVisitsRel + myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).raw_visit_counts;
+                numUniqueVisitsRel = numUniqueVisitsRel + myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).raw_visitor_counts;
             }
         }
-        System.out.println("Num multi-visits for shops: "+numVisits/numUniqueVisits);
+        rowShop[0] = String.valueOf(numVisitsShop / numUniqueVisitsShop);
+        dataShops.add(rowShop);
+        rowSchool[0] = String.valueOf(numVisitsSchool / numUniqueVisitsSchool);
+        dataSchools.add(rowSchool);
+        rowRel[0] = String.valueOf(numVisitsRel / numUniqueVisitsRel);
+        dataReligiousLocations.add(rowRel);
+
+        CsvWriter writer = new CsvWriter();
+        try {
+            writer.write(new File("mobilityInference" + File.separator + myParent.mainModel.ABM.studyScope + File.separator + "MVShop_" + jList1.getSelectedValue() + ".csv"), Charset.forName("US-ASCII"), dataShops);
+            System.out.println("Num multi-visits for shops: " + numVisitsShop / numUniqueVisitsShop);
+        } catch (IOException ex) {
+            Logger.getLogger(GraphicalModelDialog.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
+            writer.write(new File("mobilityInference" + File.separator + myParent.mainModel.ABM.studyScope + File.separator + "MVSchool_" + jList1.getSelectedValue() + ".csv"), Charset.forName("US-ASCII"), dataSchools);
+            System.out.println("Num multi-visits for school: " + numVisitsSchool / numUniqueVisitsSchool);
+        } catch (IOException ex) {
+            Logger.getLogger(GraphicalModelDialog.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
+            writer.write(new File("mobilityInference" + File.separator + myParent.mainModel.ABM.studyScope + File.separator + "MVReligion_" + jList1.getSelectedValue() + ".csv"), Charset.forName("US-ASCII"), dataReligiousLocations);
+            System.out.println("Num multi-visits for rel: " + numVisitsRel / numUniqueVisitsRel);
+        } catch (IOException ex) {
+            Logger.getLogger(GraphicalModelDialog.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }//GEN-LAST:event_jButton12ActionPerformed
+
+    private void jButton13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton13ActionPerformed
+        myParent.mainModel.safegraph.clearPatternsPlaces();
+        myParent.mainModel.safegraph.loadPatternsPlacesSet(myParent.mainModel.datasetDirectory, jList1.getSelectedValue(), myParent.mainModel.allGISData, myParent.mainModel.ABM.studyScope, true, myParent.numProcessors);
+        ArrayList<CensusBlockGroup> allCBGs = new ArrayList();
+        for (int i = 0; i < ((City) (myParent.mainModel.ABM.studyScopeGeography)).censusTracts.size(); i++) {
+            for (int j = 0; j < ((City) (myParent.mainModel.ABM.studyScopeGeography)).censusTracts.get(i).censusBlocks.size(); j++) {
+                allCBGs.add(((City) (myParent.mainModel.ABM.studyScopeGeography)).censusTracts.get(i).censusBlocks.get(j));
+            }
+        }
+        int numShops = 0;
+        for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.size(); i++) {
+            if (GISLocationDialog.isShop(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).place.naics_code) == true) {
+                numShops = numShops + 1;
+            }
+        }
+        int[][] outputCBGShopVis = new int[numShops][allCBGs.size()];
+        int shopIndex = 0;
+        for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.size(); i++) {
+            if (GISLocationDialog.isShop(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).place.naics_code) == true) {
+                ArrayList<CensusBlockGroupIntegerTuple> hCBGs = myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).visitor_home_cbgs_place;
+                if (hCBGs != null) {
+                    for (int j = 0; j < hCBGs.size(); j++) {
+                        for (int m = 0; m < allCBGs.size(); m++) {
+                            if (hCBGs.get(j).key.id == allCBGs.get(m).id) {
+                                outputCBGShopVis[shopIndex][m] = outputCBGShopVis[shopIndex][m] + hCBGs.get(j).value;
+                            }
+                        }
+                    }
+                }
+                shopIndex = shopIndex + 1;
+            }
+        }
+        ArrayList<String[]> outputStrings = new ArrayList();
+        for (int i = 0; i < outputCBGShopVis.length; i++) {
+            String[] row = new String[outputCBGShopVis[0].length];
+            for (int j = 0; j < outputCBGShopVis[0].length; j++) {
+                row[j] = String.valueOf(outputCBGShopVis[i][j]);
+            }
+            outputStrings.add(row);
+        }
+        CsvWriter writer = new CsvWriter();
+        try {
+            writer.write(new File("mobilityInference" + File.separator + myParent.mainModel.ABM.studyScope + File.separator + "CBGSHOPVIS_" + jList1.getSelectedValue() + ".csv"), Charset.forName("US-ASCII"), outputStrings);
+            System.out.println("FINISHED SAVING CBG-SHOP VISITS!");
+        } catch (IOException ex) {
+            Logger.getLogger(GraphicalModelDialog.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton13ActionPerformed
+
+    private void jButton14ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton14ActionPerformed
+        myParent.mainModel.safegraph.clearPatternsPlaces();
+        myParent.mainModel.safegraph.loadPatternsPlacesSet(myParent.mainModel.datasetDirectory, jList1.getSelectedValue(), myParent.mainModel.allGISData, myParent.mainModel.ABM.studyScope, true, myParent.numProcessors);
+        ArrayList<CensusBlockGroup> allCBGs = new ArrayList();
+        for (int i = 0; i < ((City) (myParent.mainModel.ABM.studyScopeGeography)).censusTracts.size(); i++) {
+            for (int j = 0; j < ((City) (myParent.mainModel.ABM.studyScopeGeography)).censusTracts.get(i).censusBlocks.size(); j++) {
+                allCBGs.add(((City) (myParent.mainModel.ABM.studyScopeGeography)).censusTracts.get(i).censusBlocks.get(j));
+            }
+        }
+        int numSchools = 0;
+        for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.size(); i++) {
+            if (GISLocationDialog.isSchool(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).place.naics_code) == true) {
+                numSchools = numSchools + 1;
+            }
+        }
+        int[][] outputCBGSchoolVis = new int[numSchools][allCBGs.size()];
+        int schoolIndex = 0;
+        for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.size(); i++) {
+            if (GISLocationDialog.isSchool(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).place.naics_code) == true) {
+                ArrayList<CensusBlockGroupIntegerTuple> hCBGs = myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).visitor_home_cbgs_place;
+                if (hCBGs != null) {
+                    for (int j = 0; j < hCBGs.size(); j++) {
+                        for (int m = 0; m < allCBGs.size(); m++) {
+                            if (hCBGs.get(j).key.id == allCBGs.get(m).id) {
+                                outputCBGSchoolVis[schoolIndex][m] = outputCBGSchoolVis[schoolIndex][m] + hCBGs.get(j).value;
+                            }
+                        }
+                    }
+                }
+                schoolIndex = schoolIndex + 1;
+            }
+        }
+        ArrayList<String[]> outputStrings = new ArrayList();
+        for (int i = 0; i < outputCBGSchoolVis.length; i++) {
+            String[] row = new String[outputCBGSchoolVis[0].length];
+            for (int j = 0; j < outputCBGSchoolVis[0].length; j++) {
+                row[j] = String.valueOf(outputCBGSchoolVis[i][j]);
+            }
+            outputStrings.add(row);
+        }
+        CsvWriter writer = new CsvWriter();
+        try {
+            writer.write(new File("mobilityInference" + File.separator + myParent.mainModel.ABM.studyScope + File.separator + "CBGSCHOOLVIS_" + jList1.getSelectedValue() + ".csv"), Charset.forName("US-ASCII"), outputStrings);
+            System.out.println("FINISHED SAVING CBG-SCHOOL VISITS!");
+        } catch (IOException ex) {
+            Logger.getLogger(GraphicalModelDialog.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton14ActionPerformed
+
+    private void jButton15ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton15ActionPerformed
+        myParent.mainModel.safegraph.clearPatternsPlaces();
+        myParent.mainModel.safegraph.loadPatternsPlacesSet(myParent.mainModel.datasetDirectory, jList1.getSelectedValue(), myParent.mainModel.allGISData, myParent.mainModel.ABM.studyScope, true, myParent.numProcessors);
+        ArrayList<CensusBlockGroup> allCBGs = new ArrayList();
+        for (int i = 0; i < ((City) (myParent.mainModel.ABM.studyScopeGeography)).censusTracts.size(); i++) {
+            for (int j = 0; j < ((City) (myParent.mainModel.ABM.studyScopeGeography)).censusTracts.get(i).censusBlocks.size(); j++) {
+                allCBGs.add(((City) (myParent.mainModel.ABM.studyScopeGeography)).censusTracts.get(i).censusBlocks.get(j));
+            }
+        }
+        int numRel = 0;
+        for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.size(); i++) {
+            if (GISLocationDialog.isReligiousOrganization(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).place.naics_code) == true) {
+                numRel = numRel + 1;
+            }
+        }
+        int[][] outputCBGRelVis = new int[numRel][allCBGs.size()];
+        int relIndex = 0;
+        for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.size(); i++) {
+            if (GISLocationDialog.isReligiousOrganization(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).place.naics_code) == true) {
+                ArrayList<CensusBlockGroupIntegerTuple> hCBGs = myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).visitor_home_cbgs_place;
+                if (hCBGs != null) {
+                    for (int j = 0; j < hCBGs.size(); j++) {
+                        for (int m = 0; m < allCBGs.size(); m++) {
+                            if (hCBGs.get(j).key.id == allCBGs.get(m).id) {
+                                outputCBGRelVis[relIndex][m] = outputCBGRelVis[relIndex][m] + hCBGs.get(j).value;
+                            }
+                        }
+                    }
+                }
+                relIndex = relIndex + 1;
+            }
+        }
+        ArrayList<String[]> outputStrings = new ArrayList();
+        for (int i = 0; i < outputCBGRelVis.length; i++) {
+            String[] row = new String[outputCBGRelVis[0].length];
+            for (int j = 0; j < outputCBGRelVis[0].length; j++) {
+                row[j] = String.valueOf(outputCBGRelVis[i][j]);
+            }
+            outputStrings.add(row);
+        }
+        CsvWriter writer = new CsvWriter();
+        try {
+            writer.write(new File("mobilityInference" + File.separator + myParent.mainModel.ABM.studyScope + File.separator + "CBGRELVIS_" + jList1.getSelectedValue() + ".csv"), Charset.forName("US-ASCII"), outputStrings);
+            System.out.println("FINISHED SAVING CBG-REL VISITS!");
+        } catch (IOException ex) {
+            Logger.getLogger(GraphicalModelDialog.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton15ActionPerformed
+
+    private void jButton16ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton16ActionPerformed
+        sketch = new ProcessingMapRenderer(myParent, jPanel3, null);
+        sketch.isAccessedByMobilityDialog = true;
+        sketch.startRendering();
+        sketch.model = myParent.mainModel;
+    }//GEN-LAST:event_jButton16ActionPerformed
+
+    private void jButton17ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton17ActionPerformed
+        float zoomLevel = 11.8f;
+        Location mapLoc = new Location(32.215197, -110.903581);
+        sketch.map.zoomTo(zoomLevel);
+        sketch.map.panTo(mapLoc);
+        MapUtils.createDefaultEventDispatcher(sketch, new UnfoldingMap[]{sketch.map});
+        if (jList1.getSelectedIndex() != -1) {
+            myParent.mainModel.safegraph.clearPatternsPlaces();
+            myParent.mainModel.safegraph.loadPatternsPlacesSet(myParent.mainModel.datasetDirectory, jList1.getSelectedValue(), myParent.mainModel.allGISData, myParent.mainModel.ABM.studyScope, true, myParent.numProcessors);
+            ArrayList<Location[]> groupOfLocations = new ArrayList();
+            ArrayList<Float[]> groupColors = new ArrayList();
+
+            ArrayList<Location> locations = new ArrayList();
+            for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.size(); i++) {
+                PatternsRecordProcessed pattern = myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i);
+                if (GISLocationDialog.isShop(pattern.place.naics_code) == true) {
+                    locations.add(new Location(pattern.place.lat, pattern.place.lon));
+                }
+            }
+            Location[] locationsArray = new Location[locations.size()];
+            for (int i = 0; i < locations.size(); i++) {
+                locationsArray[i] = locations.get(i);
+            }
+            Float[] color = new Float[]{255f, 0f, 0f};
+            groupOfLocations.add(locationsArray);
+            groupColors.add(color);
+
+            locations = new ArrayList();
+            for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.size(); i++) {
+                PatternsRecordProcessed pattern = myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i);
+                if (GISLocationDialog.isSchool(pattern.place.naics_code) == true) {
+                    locations.add(new Location(pattern.place.lat, pattern.place.lon));
+                }
+            }
+            locationsArray = new Location[locations.size()];
+            for (int i = 0; i < locations.size(); i++) {
+                locationsArray[i] = locations.get(i);
+            }
+            color = new Float[]{0f, 255f, 0f};
+            groupOfLocations.add(locationsArray);
+            groupColors.add(color);
+
+            locations = new ArrayList();
+            for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.size(); i++) {
+                PatternsRecordProcessed pattern = myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i);
+                if (GISLocationDialog.isReligiousOrganization(pattern.place.naics_code) == true) {
+                    locations.add(new Location(pattern.place.lat, pattern.place.lon));
+                }
+            }
+            locationsArray = new Location[locations.size()];
+            for (int i = 0; i < locations.size(); i++) {
+                locationsArray[i] = locations.get(i);
+            }
+            color = new Float[]{0f, 0f, 255f};
+            groupOfLocations.add(locationsArray);
+            groupColors.add(color);
+            
+            
+
+            sketch.genericLocationsGroup = groupOfLocations;
+            sketch.genericColorsGroup = groupColors;
+        }
+    }//GEN-LAST:event_jButton17ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton10;
     private javax.swing.JButton jButton11;
     private javax.swing.JButton jButton12;
+    private javax.swing.JButton jButton13;
+    private javax.swing.JButton jButton14;
+    private javax.swing.JButton jButton15;
+    private javax.swing.JButton jButton16;
+    private javax.swing.JButton jButton17;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
@@ -697,6 +1027,7 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
     private javax.swing.JList<String> jList1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
 }

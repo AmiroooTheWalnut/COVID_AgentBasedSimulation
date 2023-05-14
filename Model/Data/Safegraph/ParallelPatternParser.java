@@ -58,7 +58,13 @@ public class ParallelPatternParser extends ParallelProcessor {
                     }
                     field = row.getField("poi_cbg");
                     if (field.length() > 0) {
-                        patternsRecordProcessed.poi_cbg = Long.parseLong(field);
+                        try {
+                            patternsRecordProcessed.poi_cbg = Long.parseLong(field);
+                        } catch (Exception ex) {
+                            continue;
+                        }
+                    }else{
+                        continue;
                     }
                     field = row.getField("date_range_start");
                     if (field.length() > 0) {

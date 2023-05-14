@@ -20,7 +20,11 @@ import lombok.Setter;
 public class Categories implements Serializable {
     static final long serialVersionUID = softwareVersion;
     
-    public ArrayList<Category> categories;
+    public Categories(){
+        
+    }
+    
+    public ArrayList<Category> categories=new ArrayList();
     
     public Category findAndInsertCategory(String input) {
         if (categories == null) {

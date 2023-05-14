@@ -17,5 +17,10 @@ import lombok.Setter;
 @Getter @Setter
 public class Category implements Serializable {
     static final long serialVersionUID = softwareVersion;
+    
+    public Category(){
+        
+    }
+    
     public String name;
 }

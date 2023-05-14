@@ -1769,9 +1769,9 @@ public class RootArtificial extends Root {
             xMeans.setMaxNumClusters(numRegions);
             xMeans.setMinNumClusters(numRegions);
             xMeans.setUseKDTree(false);
-            xMeans.setMaxIterations(1000);
-            xMeans.setMaxKMeans(1000);
-            xMeans.setMaxKMeansForChildren(1000);
+            xMeans.setMaxIterations(100);
+            xMeans.setMaxKMeans(100);
+            xMeans.setMaxKMeansForChildren(100);
             xMeans.setCutOffFactor(0.0);
             xMeans.buildClusterer(m_Instances);
 

@@ -57,6 +57,7 @@ public class ManualCompressNewCorePatterns extends javax.swing.JDialog {
         jList1 = new javax.swing.JList<>();
         jButton1 = new javax.swing.JButton();
         jCheckBox1 = new javax.swing.JCheckBox();
+        jButton2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -74,6 +75,13 @@ public class ManualCompressNewCorePatterns extends javax.swing.JDialog {
         jCheckBox1.setSelected(true);
         jCheckBox1.setText("IsParallel?");
 
+        jButton2.setText("serializable");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -84,6 +92,8 @@ public class ManualCompressNewCorePatterns extends javax.swing.JDialog {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jButton1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jCheckBox1)))
                 .addContainerGap())
@@ -95,7 +105,8 @@ public class ManualCompressNewCorePatterns extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton1)
-                    .addComponent(jCheckBox1))
+                    .addComponent(jCheckBox1)
+                    .addComponent(jButton2))
                 .addContainerGap())
         );
 
@@ -116,17 +127,34 @@ public class ManualCompressNewCorePatterns extends javax.swing.JDialog {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         if(jList1.getSelectedIndex()>-1){
             Patterns patterns=new Patterns();
-            patterns.preprocessMonthPatterns("./datasets/Safegraph/FullData/"+jList1.getSelectedValue(),jList1.getSelectedValue(),jCheckBox1.isSelected(),myParent.numProcessors);
+            patterns.preprocessMonthPatternsNew("./datasets/Safegraph/FullData/"+jList1.getSelectedValue(),jList1.getSelectedValue(),jCheckBox1.isSelected(),myParent.numProcessors);
             
             SafegraphPlaces safegraphPlaces=new SafegraphPlaces();
-            safegraphPlaces.preprocessMonthCorePlaces("./datasets/Safegraph/FullData/"+jList1.getSelectedValue(),jList1.getSelectedValue(),jCheckBox1.isSelected(),myParent.numProcessors);
-            Safegraph.saveSafegraphPlacesKryo("./datasets/Safegraph/FullData/"+jList1.getSelectedValue()+"/processedData", safegraphPlaces);
+            String[] split=jList1.getSelectedValue().split("_");
+            String month=split[1]+"_"+split[2];
+            safegraphPlaces.preprocessMonthCorePlacesNew("./datasets/Safegraph/FullData/"+jList1.getSelectedValue(),"./datasets/Safegraph/FullData/core_poi_"+month,jList1.getSelectedValue(),jCheckBox1.isSelected(),myParent.numProcessors);
+//            Safegraph.saveSafegraphPlacesKryo("./datasets/Safegraph/FullData/"+jList1.getSelectedValue()+"/processedData", safegraphPlaces);
             
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        if(jList1.getSelectedIndex()>-1){
+            Patterns patterns=new Patterns();
+            patterns.preprocessMonthPatternsNew("./datasets/Safegraph/FullData/"+jList1.getSelectedValue(),jList1.getSelectedValue(),jCheckBox1.isSelected(),myParent.numProcessors);
+            
+            SafegraphPlaces safegraphPlaces=new SafegraphPlaces();
+            String[] split=jList1.getSelectedValue().split("_");
+            String month=split[1]+"_"+split[2];
+            safegraphPlaces.preprocessMonthCorePlacesNew("./datasets/Safegraph/FullData/"+jList1.getSelectedValue(),"./datasets/Safegraph/FullData/core_poi_"+month,jList1.getSelectedValue(),jCheckBox1.isSelected(),myParent.numProcessors);
+//            Safegraph.saveSafegraphPlacesKryo("./datasets/Safegraph/FullData/"+jList1.getSelectedValue()+"/processedData", safegraphPlaces);
+            
+        }
+    }//GEN-LAST:event_jButton2ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JList<String> jList1;
     private javax.swing.JPanel jPanel1;

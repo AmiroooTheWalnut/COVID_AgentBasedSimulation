@@ -18,7 +18,10 @@ import COVID_AgentBasedSimulation.Model.Structure.VDCell;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
+import com.esotericsoftware.kryo.serializers.CollectionSerializer;
+import com.esotericsoftware.kryo.serializers.FieldSerializer;
 import com.esotericsoftware.kryo.util.DefaultInstantiatorStrategy;
+import com.esotericsoftware.minlog.Log;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -38,6 +41,8 @@ import java.util.logging.Logger;
 import org.objenesis.strategy.StdInstantiatorStrategy;
 import lombok.Getter;
 import lombok.Setter;
+import org.objenesis.ObjenesisStd;
+import org.objenesis.strategy.SerializingInstantiatorStrategy;
 
 /**
  *
@@ -55,7 +60,7 @@ public class Safegraph extends Dataset implements Serializable {
     @Override
     public void requestDataset(String datasetRoot, AllGISData allGISData, String project, String year, String month, boolean isParallel, int numCPU) {
         clearPatternsPlaces();
-        loadPatternsPlacesSet(datasetRoot,year + "_" + month, allGISData, project, isParallel, numCPU);
+        loadPatternsPlacesSet(datasetRoot, year + "_" + month, allGISData, project, isParallel, numCPU);
         startingDate = findEarliestPatternTime();
         endingDate = findLatestPatternTime();
     }
@@ -180,7 +185,7 @@ public class Safegraph extends Dataset implements Serializable {
             Logger.getLogger(Safegraph.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
+    
     public static void savePatternsKryo(String passed_file_path, Patterns patterns) {
         Kryo kryo = new Kryo();
         kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.Patterns.class);
@@ -210,6 +215,57 @@ public class Safegraph extends Dataset implements Serializable {
         }
     }
 
+//    public static void savePatternsKryo(String passed_file_path, Patterns patterns) {
+//        Kryo kryo = new Kryo();
+////        Log.TRACE();
+//        kryo.setWarnUnregisteredClasses(false);
+//        kryo.setRegistrationRequired(true);
+//        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.Patterns.class);
+//        CollectionSerializer cS=new CollectionSerializer();
+//        cS.setElementClass(PatternsRecordProcessed.class);
+//        
+//        CollectionSerializer cSLT=new CollectionSerializer();
+//        cSLT.setElementClass(LongIntTuple.class);
+//        kryo.register(java.util.ArrayList.class, cSLT);
+//        CollectionSerializer cSDT=new CollectionSerializer();
+//        cSDT.setElementClass(DwellTime.class);
+//        kryo.register(java.util.ArrayList.class, cSDT);
+//        
+//        kryo.register(java.util.ArrayList.class, cS);
+//        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.PatternsRecordProcessed.class);
+//        kryo.register(java.time.LocalDateTime.class);
+//        kryo.register(java.time.ZonedDateTime.class);
+//        kryo.register(int[].class);
+//        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.DwellTime.class);
+//        kryo.register(short[].class);
+//        kryo.register(java.util.HashMap.class);
+//        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.LongIntTuple.class);
+//        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.Brand.class);
+////        kryo.register(java.util.HashMap.class,25);
+////        kryo.register(int[].class,26);
+////        kryo.register(java.lang.String[].class,27);
+////        kryo.register(java.time.ZonedDateTime.class,28);
+////        kryo.register(COVID_AgentBasedSimulation.Model.DatasetTemplate.class,29);
+////        kryo.register(COVID_AgentBasedSimulation.Model.RecordTemplate.class,30);
+////        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.DwellTime.class,31);
+////        kryo.register(short[].class,32);
+//////        kryo.register(java.lang.String.class);
+////        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.LongIntTuple.class,33);
+//        kryo.setReferences(true);
+//        kryo.setInstantiatorStrategy(new DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
+////        kryo.setInstantiatorStrategy(new DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
+//
+//        Output output;
+//        try {
+//            output = new Output(new FileOutputStream(passed_file_path + ".bin"));
+//            kryo.writeObject(output, patterns);
+//            output.close();
+//        } catch (FileNotFoundException ex) {
+//            Logger.getLogger(Safegraph.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//    }
+
+    
     public static void saveSafegraphPlacesKryo(String passed_file_path, SafegraphPlaces safegraphPlaces) {
         Kryo kryo = new Kryo();
         kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.SafegraphPlaces.class);
@@ -238,6 +294,63 @@ public class Safegraph extends Dataset implements Serializable {
             Logger.getLogger(Safegraph.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+    
+//    public static void saveSafegraphPlacesKryo(String passed_file_path, SafegraphPlaces safegraphPlaces) {
+//        Kryo kryo = new Kryo();
+//        Log.TRACE();
+//        kryo.setWarnUnregisteredClasses(true);
+//        kryo.setRegistrationRequired(true);
+//        CollectionSerializer cSB=new CollectionSerializer();
+//        cSB.setElementClass(Brand.class);
+//        cSB.setElementSerializer(new FieldSerializer(kryo,Brand.class));
+//        kryo.register(java.util.ArrayList.class, cSB);
+//        CollectionSerializer cSC=new CollectionSerializer();
+//        cSC.setElementClass(Category.class);
+//        cSC.setElementSerializer(new FieldSerializer(kryo,Category.class));
+//        kryo.register(java.util.ArrayList.class, cSC);
+//        CollectionSerializer cSSP=new CollectionSerializer();
+//        cSSP.setElementClass(SafegraphPlace.class);
+//        cSSP.setElementSerializer(new FieldSerializer(kryo,SafegraphPlace.class));
+//        kryo.register(java.util.ArrayList.class, cSSP);
+////        kryo.register(java.util.ArrayList.class);
+//        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.SafegraphPlaces.class);
+//        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.Brands.class);
+//        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.Brand.class);
+//        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.Categories.class);
+//        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.Category.class);
+//        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.SafegraphPlace.class);
+//        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.OpenHours.class);
+//
+////        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.SafegraphPlaces.class,9);
+////        kryo.register(java.util.ArrayList.class,10);
+////        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.Brands.class,11);
+////        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.Brand.class,12);
+////        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.Categories.class,13);
+////        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.Category.class,14);
+////        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.SafegraphPlace.class,15);
+////        kryo.register(COVID_AgentBasedSimulation.Model.DatasetTemplate.class,16);
+////        kryo.register(COVID_AgentBasedSimulation.Model.RecordTemplate.class,17);
+////        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.DwellTime.class,18);
+////        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.OpenHours.class,19);
+////        kryo.register(short[].class,20);
+////        kryo.register(java.lang.String.class);
+//        kryo.setReferences(true);
+////        ((DefaultInstantiatorStrategy) kryo.getInstantiatorStrategy()).setFallbackInstantiatorStrategy(new StdInstantiatorStrategy());
+//        kryo.setInstantiatorStrategy(new DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
+////        ObjenesisStd objenesis = new ObjenesisStd();
+////        kryo.setInstantiatorStrategy(new SerializingInstantiatorStrategy());
+////        kryo.register(java.time.ZonedDateTime.class);
+//
+//        Output output;
+//        try {
+//            output = new Output(new FileOutputStream(passed_file_path + ".bin"));
+//            kryo.writeObject(output, safegraphPlaces);
+//            output.close();
+//        } catch (FileNotFoundException ex) {
+//            Logger.getLogger(Safegraph.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//    }
 
     public static void loadPatternsSerializable(String passed_file_path, Patterns allData) {
 
@@ -256,7 +369,8 @@ public class Safegraph extends Dataset implements Serializable {
             Logger.getLogger(Safegraph.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
+    
+    
     public static Patterns loadPatternsKryo(String passed_file_path) {
         Kryo kryo = new Kryo();
         kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.Patterns.class);
@@ -292,6 +406,66 @@ public class Safegraph extends Dataset implements Serializable {
         return null;
     }
 
+//    public static Patterns loadPatternsKryo(String passed_file_path) {
+//        Kryo kryo = new Kryo();
+//        Log.TRACE();
+//        kryo.setWarnUnregisteredClasses(false);
+//        kryo.setRegistrationRequired(true);
+//        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.Patterns.class);
+//        CollectionSerializer cS=new CollectionSerializer();
+//        cS.setElementClass(PatternsRecordProcessed.class);
+//        
+//        CollectionSerializer cSLT=new CollectionSerializer();
+//        cSLT.setElementClass(LongIntTuple.class);
+//        kryo.register(java.util.ArrayList.class, cSLT);
+//        CollectionSerializer cSDT=new CollectionSerializer();
+//        cSDT.setElementClass(DwellTime.class);
+//        kryo.register(java.util.ArrayList.class, cSDT);
+//        
+//        kryo.register(java.util.ArrayList.class, cS);
+//        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.PatternsRecordProcessed.class);
+//        kryo.register(java.time.LocalDateTime.class);
+//        kryo.register(java.time.ZonedDateTime.class);
+//        kryo.register(int[].class);
+//        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.DwellTime.class);
+//        kryo.register(short[].class);
+//        kryo.register(java.util.HashMap.class);
+//        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.LongIntTuple.class);
+//        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.Brand.class);
+////        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.Patterns.class,21);
+////        kryo.register(java.util.ArrayList.class,22);
+////        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.PatternsRecordProcessed.class,23);
+////        kryo.register(java.time.LocalDateTime.class,24);
+////        kryo.register(java.util.HashMap.class,25);
+////        kryo.register(int[].class,26);
+////        kryo.register(java.lang.String[].class,27);
+////        kryo.register(java.time.ZonedDateTime.class,28);
+////        kryo.register(COVID_AgentBasedSimulation.Model.DatasetTemplate.class,29);
+////        kryo.register(COVID_AgentBasedSimulation.Model.RecordTemplate.class,30);
+////        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.DwellTime.class,31);
+////        kryo.register(short[].class,32);
+//////        kryo.register(java.lang.String.class);
+////        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.LongIntTuple.class,33);
+//        kryo.setReferences(true);
+//        kryo.setInstantiatorStrategy(new DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
+////        kryo.setInstantiatorStrategy(new DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
+//
+//        Input input;
+//        try {
+//            File temp = new File(passed_file_path);
+//            if (temp.exists() == true) {
+//                input = new Input(new FileInputStream(passed_file_path));
+//                Patterns patterns = kryo.readObject(input, Patterns.class);
+//                input.close();
+//
+//                return patterns;
+//            }
+//        } catch (FileNotFoundException ex) {
+//            Logger.getLogger(Safegraph.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//        return null;
+//    }
+    
     public static SafegraphPlaces loadSafegraphPlacesKryo(String passed_file_path) {
         Kryo kryo = new Kryo();
         kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.SafegraphPlaces.class);
@@ -327,6 +501,68 @@ public class Safegraph extends Dataset implements Serializable {
         return null;
     }
 
+//    public static SafegraphPlaces loadSafegraphPlacesKryo(String passed_file_path) {
+//        Kryo kryo = new Kryo();
+//        Log.TRACE();
+//        kryo.setWarnUnregisteredClasses(true);
+//        kryo.setRegistrationRequired(true);
+//        CollectionSerializer cSB=new CollectionSerializer();
+//        cSB.setElementClass(Brand.class);
+//        cSB.setElementSerializer(new FieldSerializer(kryo,Brand.class));
+//        kryo.register(java.util.ArrayList.class, cSB);
+//        CollectionSerializer cSC=new CollectionSerializer();
+//        cSC.setElementClass(Category.class);
+//        cSC.setElementSerializer(new FieldSerializer(kryo,Category.class));
+//        kryo.register(java.util.ArrayList.class, cSC);
+//        CollectionSerializer cSSP=new CollectionSerializer();
+//        cSSP.setElementClass(SafegraphPlace.class);
+//        cSSP.setElementSerializer(new FieldSerializer(kryo,SafegraphPlace.class));
+//        kryo.register(java.util.ArrayList.class, cSSP);
+////        kryo.register(java.util.ArrayList.class);
+//        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.SafegraphPlaces.class);
+//        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.Brands.class);
+//        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.Brand.class);
+//        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.Categories.class);
+//        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.Category.class);
+//        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.SafegraphPlace.class);
+//        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.OpenHours.class);
+//
+////        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.SafegraphPlaces.class,9);
+////        kryo.register(java.util.ArrayList.class,10);
+////        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.Brands.class,11);
+////        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.Brand.class,12);
+////        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.Categories.class,13);
+////        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.Category.class,14);
+////        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.SafegraphPlace.class,15);
+////        kryo.register(COVID_AgentBasedSimulation.Model.DatasetTemplate.class,16);
+////        kryo.register(COVID_AgentBasedSimulation.Model.RecordTemplate.class,17);
+////        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.DwellTime.class,18);
+////        kryo.register(COVID_AgentBasedSimulation.Model.Data.Safegraph.OpenHours.class,19);
+////        kryo.register(short[].class,20);
+////        kryo.register(java.lang.String.class);
+//        kryo.setReferences(true);
+////        ((DefaultInstantiatorStrategy) kryo.getInstantiatorStrategy()).setFallbackInstantiatorStrategy(new StdInstantiatorStrategy());
+//        kryo.setInstantiatorStrategy(new DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
+////        kryo.setInstantiatorStrategy(new Kryo.DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
+////        kryo.setInstantiatorStrategy(new SerializingInstantiatorStrategy());
+////        kryo.register(java.time.ZonedDateTime.class);
+//
+//        Input input;
+//        try {
+//            File temp = new File(passed_file_path);
+//            if (temp.exists() == true) {
+//                input = new Input(new FileInputStream(passed_file_path));
+//                SafegraphPlaces safegraphPlaces = kryo.readObject(input, SafegraphPlaces.class);
+//                input.close();
+//
+//                return safegraphPlaces;
+//            }
+//        } catch (FileNotFoundException ex) {
+//            Logger.getLogger(Safegraph.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//        return null;
+//    }
+
     public void saveAllPatternsSerializable(String passed_file_path) {
 
         FileOutputStream f_out;
@@ -344,7 +580,7 @@ public class Safegraph extends Dataset implements Serializable {
             Logger.getLogger(Safegraph.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
+    
     public void saveAllPatternsKryo(String passed_file_path) {
         Kryo kryo = new Kryo();
         kryo.setInstantiatorStrategy(new DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
@@ -358,6 +594,21 @@ public class Safegraph extends Dataset implements Serializable {
             Logger.getLogger(Safegraph.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+
+//    public void saveAllPatternsKryo(String passed_file_path) {
+//        Kryo kryo = new Kryo();
+//        kryo.setRegistrationRequired(false);
+////        kryo.setInstantiatorStrategy(new DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
+////        kryo.setInstantiatorStrategy(new Kryo.DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
+//        Output output;
+//        try {
+//            output = new Output(new FileOutputStream(passed_file_path + ".bin"));
+//            kryo.writeObject(output, allPatterns);
+//            output.close();
+//        } catch (FileNotFoundException ex) {
+//            Logger.getLogger(Safegraph.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//    }
 
     public void clearPatternsPlaces() {
         if (allPatterns != null) {
@@ -374,8 +625,8 @@ public class Safegraph extends Dataset implements Serializable {
     }
 
     public void loadPatternsPlacesSet(String datasetRoot, String date, AllGISData allGISData, String project, boolean isParallel, int numCPU) {
-        Patterns patterns = loadPatternsKryo(datasetRoot+"/Safegraph/" + project + "/patterns_" + date + "/processedData.bin");
-        SafegraphPlaces safegraphPlaces = loadSafegraphPlacesKryo(datasetRoot+"/Safegraph/" + project + "/core_poi_" + date + "/processedData_withArea.bin");
+        Patterns patterns = loadPatternsKryo(datasetRoot + "/Safegraph/" + project + "/patterns_" + date + "/processedData.bin");
+        SafegraphPlaces safegraphPlaces = loadSafegraphPlacesKryo(datasetRoot + "/Safegraph/" + project + "/core_poi_" + date + "/processedData_withArea.bin");
 
         System.out.println("Data loaded");
         if (patterns == null || safegraphPlaces == null) {
@@ -695,7 +946,7 @@ public class Safegraph extends Dataset implements Serializable {
         }
         return output;
     }
-    
+
     public ArrayList<TessellationCell> getCBGVDTessellationFromCaseStudy(Object restriction, int tessellationIndex) {
         ArrayList<TessellationCell> output = new ArrayList();
         if (restriction instanceof City) {//SO FAR ONLY CITY IS SUPPORT
@@ -806,8 +1057,10 @@ public class Safegraph extends Dataset implements Serializable {
     public void writeTravelMatrix(Object scope, String granuality, String years[], String months[][], AllGISData allGISData, boolean isParallel, int numCPU) {
         ArrayList items = new ArrayList();
         ArrayList<ArrayList<Integer>> matrix = new ArrayList();
+        String scopeName = "";
         if (scope instanceof Country) {
             Country castedScope = ((Country) scope);
+            scopeName = castedScope.name;
             if (granuality.equals("state")) {
                 for (int i = 0; i < castedScope.states.size(); i++) {
                     items.add(castedScope.states.get(i));
@@ -842,6 +1095,7 @@ public class Safegraph extends Dataset implements Serializable {
             }
         } else if (scope instanceof State) {
             State castedScope = ((State) scope);
+            scopeName = castedScope.name;
             if (granuality.equals("county")) {
                 for (int j = 0; j < castedScope.counties.size(); j++) {
                     items.add(castedScope.counties.get(j));
@@ -866,6 +1120,7 @@ public class Safegraph extends Dataset implements Serializable {
             }
         } else if (scope instanceof County) {
             County castedScope = ((County) scope);
+            scopeName = castedScope.name;
             if (granuality.equals("censustract")) {
                 for (int k = 0; k < castedScope.censusTracts.size(); k++) {
                     items.add(castedScope.censusTracts.get(k));
@@ -880,6 +1135,7 @@ public class Safegraph extends Dataset implements Serializable {
             }
         } else if (scope instanceof City) {
             City castedScope = ((City) scope);
+            scopeName = castedScope.name;
             if (granuality.equals("censustract")) {
                 for (int k = 0; k < castedScope.censusTracts.size(); k++) {
                     items.add(castedScope.censusTracts.get(k));
@@ -925,7 +1181,7 @@ public class Safegraph extends Dataset implements Serializable {
         }
 
         try {
-            FileWriter myWriter = new FileWriter("travelMatrix_directed.csv");
+            FileWriter myWriter = new FileWriter(scopeName + "_travelMatrix_directed.csv");
             for (int i = 0; i < matrix.size(); i++) {
                 for (int j = 0; j < matrix.get(i).size(); j++) {
                     myWriter.write(String.valueOf(matrix.get(i).get(j)));
@@ -943,7 +1199,7 @@ public class Safegraph extends Dataset implements Serializable {
         }
 
         try {
-            FileWriter myWriter = new FileWriter("travelMatrix_undirected.csv");
+            FileWriter myWriter = new FileWriter(scopeName + "_travelMatrix_undirected.csv");
             for (int i = 0; i < matrix.size(); i++) {
                 for (int j = 0; j < matrix.get(i).size(); j++) {
                     if (i == j) {
@@ -967,7 +1223,7 @@ public class Safegraph extends Dataset implements Serializable {
         }
 
         try {
-            FileWriter myWriter = new FileWriter("indices_information.csv");
+            FileWriter myWriter = new FileWriter(scopeName + "_indices_information.csv");
             for (int i = 0; i < items.size(); i++) {
                 if (granuality.equals("state")) {
                     myWriter.write(((State) (items.get(i))).name);
@@ -1303,7 +1559,7 @@ public class Safegraph extends Dataset implements Serializable {
                     }
                 }
 
-            } else if (granuality.equals("censusblock")) {
+            } else if (granuality.equals("censusblockgroup")) {
                 for (int i = 0; i < monthPatterns.patternRecords.size(); i++) {
                     if (monthPatterns.patternRecords.get(i).visitor_home_cbgs_place != null) {
                         CensusBlockGroup foundCBGSource = castedScope.findCBG(monthPatterns.patternRecords.get(i).poi_cbg_censusBlock.id);

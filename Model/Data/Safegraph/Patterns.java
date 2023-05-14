@@ -37,7 +37,7 @@ public class Patterns implements Serializable {
     public String name;
 
     public ArrayList<PatternsRecordProcessed> patternRecords;
-    
+
     public void preprocessExtractMonthPatterns(String directoryName, String patternName, boolean isParallel, int numCPU) {
         name = patternName;
         patternRecords = new ArrayList();
@@ -141,6 +141,71 @@ public class Patterns implements Serializable {
                 ArrayList<PatternsRecordProcessed> recordsLocal;
                 try {
                     recordsLocal = readData(cSVfileList[i].getCanonicalPath(), isParallel, numCPU);
+                    patternRecords = recordsLocal;
+                    Safegraph.savePatternsKryo(directoryName + "/ProcessedData_" + cSVfileList[i].getName(), this);
+                    patternRecords.clear();
+                    patternRecords = new ArrayList();
+                    System.gc();
+                } catch (IOException ex) {
+                    Logger.getLogger(Patterns.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+
+        File[] binFileListRecheck = directory.listFiles(binFilesFilter);
+        patternRecords = new ArrayList();
+        for (int i = 0; i < binFileListRecheck.length; i++) {
+            Patterns patterns = Safegraph.loadPatternsKryo(binFileListRecheck[i].getPath());
+            patternRecords.addAll(patterns.patternRecords);
+            patterns = null;
+            System.out.println("Data read: " + i);
+        }
+        Collections.sort(patternRecords);
+        Safegraph.savePatternsKryo(directoryName + "/processedData", this);
+        for (int i = 0; i < binFileListRecheck.length; i++) {
+            binFileListRecheck[i].delete();
+        }
+        System.gc();
+    }
+
+    public void preprocessMonthPatternsNew(String directoryName, String patternName, boolean isParallel, int numCPU) {
+        name = patternName;
+        patternRecords = new ArrayList();
+        File directory = new File(directoryName);
+
+        FileFilter binFilesFilter = new FileFilter() {
+            @Override
+            public boolean accept(File file) {
+                if (file.getName().endsWith(".bin")) {
+                    return true;
+                }
+                return false;
+            }
+        };
+        File[] binFileList = directory.listFiles(binFilesFilter);
+
+        FileFilter cSVFilesFilter = new FileFilter() {
+            @Override
+            public boolean accept(File file) {
+                if (file.getName().endsWith(".csv")) {
+                    return true;
+                }
+                return false;
+            }
+        };
+        File[] cSVfileList = directory.listFiles(cSVFilesFilter);
+        for (int i = 0; i < cSVfileList.length; i++) {
+            boolean isRawBinFound = false;
+            for (int j = 0; j < binFileList.length; j++) {
+                if (binFileList[j].getName().contains(cSVfileList[i].getName())) {
+                    isRawBinFound = true;
+                    break;
+                }
+            }
+            if (isRawBinFound == false) {
+                ArrayList<PatternsRecordProcessed> recordsLocal;
+                try {
+                    recordsLocal = readDataNew(cSVfileList[i].getCanonicalPath(), isParallel, numCPU);
                     patternRecords = recordsLocal;
                     Safegraph.savePatternsKryo(directoryName + "/ProcessedData_" + cSVfileList[i].getName(), this);
                     patternRecords.clear();
@@ -309,17 +374,16 @@ public class Patterns implements Serializable {
                         try {
                             JSONObject object = new JSONObject(field);
                             JSONArray names = object.names();
-                            ArrayList<DwellTime> dwellData=new ArrayList();
+                            ArrayList<DwellTime> dwellData = new ArrayList();
                             for (int k = 0; k < names.length(); k++) {
                                 DwellTime temp = new DwellTime();
                                 temp.number = object.getInt(names.getString(k));
                                 temp.dwellDuration = DwellTime.getDwellDuration(names.getString(k));
                                 dwellData.add(temp);
                             }
-                            patternsRecordProcessed.bucketed_dwell_times=dwellData;
-                            
+                            patternsRecordProcessed.bucketed_dwell_times = dwellData;
+
 //                            System.out.println("!!!");
-                            
                         } catch (Exception ex) {
 //                            System.out.println(ex.getMessage());
                         }
@@ -384,7 +448,7 @@ public class Patterns implements Serializable {
         }
         return null;
     }
-    
+
     public ArrayList<PatternsRecordProcessed> readDataNew(String fileName, boolean isParallel, int numCPU) {
         ArrayList<PatternsRecordProcessed> recordsLocal = new ArrayList();
         File patternFile = new File(fileName);
@@ -438,7 +502,13 @@ public class Patterns implements Serializable {
                     }
                     field = row.getField("poi_cbg");
                     if (field.length() > 0) {
-                        patternsRecordProcessed.poi_cbg = Long.parseLong(field);
+                        try {
+                            patternsRecordProcessed.poi_cbg = Long.parseLong(field);
+                        } catch (Exception ex) {
+                            continue;
+                        }
+                    }else{
+                        continue;
                     }
                     field = row.getField("date_range_start");
                     if (field.length() > 0) {
@@ -526,17 +596,16 @@ public class Patterns implements Serializable {
                         try {
                             JSONObject object = new JSONObject(field);
                             JSONArray names = object.names();
-                            ArrayList<DwellTime> dwellData=new ArrayList();
+                            ArrayList<DwellTime> dwellData = new ArrayList();
                             for (int k = 0; k < names.length(); k++) {
                                 DwellTime temp = new DwellTime();
                                 temp.number = object.getInt(names.getString(k));
                                 temp.dwellDuration = DwellTime.getDwellDuration(names.getString(k));
                                 dwellData.add(temp);
                             }
-                            patternsRecordProcessed.bucketed_dwell_times=dwellData;
-                            
+                            patternsRecordProcessed.bucketed_dwell_times = dwellData;
+
 //                            System.out.println("!!!");
-                            
                         } catch (Exception ex) {
 //                            System.out.println(ex.getMessage());
                         }

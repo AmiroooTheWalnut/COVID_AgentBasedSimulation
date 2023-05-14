@@ -13,6 +13,9 @@ import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.RegionImageLayer
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Region;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.RegionSnapshot;
 import COVID_AgentBasedSimulation.Model.HistoricalRun;
+import COVID_AgentBasedSimulation.Model.Structure.CensusBlockGroup;
+import COVID_AgentBasedSimulation.Model.Structure.CensusTract;
+import COVID_AgentBasedSimulation.Model.Structure.City;
 import COVID_AgentBasedSimulation.Model.Structure.Marker;
 import de.fhpotsdam.unfolding.geo.Location;
 import de.siegmar.fastcsv.writer.CsvWriter;
@@ -148,6 +151,7 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
         jButton3 = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
         jSpinner1 = new javax.swing.JSpinner();
+        jButton4 = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jList2 = new javax.swing.JList<>();
@@ -200,13 +204,18 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
 
         jLabel4.setText("Percentage drop:");
 
+        jButton4.setText("Set random CBG arcs");
+        jButton4.setToolTipText("");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jButton1)
-                .addGap(0, 0, Short.MAX_VALUE))
             .addComponent(jScrollPane3)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
@@ -216,13 +225,15 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
                     .addComponent(jButton3)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addComponent(jSpinner1, javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jButton1)
+                    .addComponent(jButton4))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 741, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 670, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jToggleButton1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -233,8 +244,10 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(12, 12, 12)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 65, Short.MAX_VALUE)
+                .addComponent(jButton4)
                 .addContainerGap())
         );
 
@@ -363,7 +376,7 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
         setRegionImageLayer();
         setRegionIndicesNames();
         setRegionCentralLocations();
-        lastEvent=evt;
+        lastEvent = evt;
     }//GEN-LAST:event_jTree1ValueChanged
 
     private void jList2ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList2ValueChanged
@@ -423,7 +436,7 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
                     }
                     try {
                         CsvWriter writer = new CsvWriter();
-                        writer.write(new File("ReportCBGInVD_"+(int) (jSpinner1.getValue())+".csv"), Charset.forName("US-ASCII"), allValues);
+                        writer.write(new File("ReportCBGInVD_" + (int) (jSpinner1.getValue()) + ".csv"), Charset.forName("US-ASCII"), allValues);
                     } catch (IOException ex) {
                         Logger.getLogger(PreviousRunsDialog.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -462,7 +475,7 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
                     }
                     try {
                         CsvWriter writer = new CsvWriter();
-                        writer.write(new File("ReportCBGInVDRatio_"+(int) (jSpinner1.getValue())+".csv"), Charset.forName("US-ASCII"), allValues);
+                        writer.write(new File("ReportCBGInVDRatio_" + (int) (jSpinner1.getValue()) + ".csv"), Charset.forName("US-ASCII"), allValues);
                     } catch (IOException ex) {
                         Logger.getLogger(PreviousRunsDialog.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -478,6 +491,19 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
             }
         }
     }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        ArrayList<CensusTract> cts = new ArrayList();
+        City castedScope = ((City) myParent.mainModel.ABM.studyScopeGeography);
+        for (int k = 0; k < castedScope.censusTracts.size(); k++) {
+//            for (int m = 0; m < castedScope.censusTracts.get(k).censusBlocks.size(); m++) {
+                cts.add(castedScope.censusTracts.get(k));
+//            }
+        }
+        System.out.println("NUM CENSUS TRACTS: "+cts.size());
+        sketch.setRandomArc(cts, cts.size());
+        sketch.isDrawRandomArcs=true;
+    }//GEN-LAST:event_jButton4ActionPerformed
 
     public void setRendererRegionLayerShades() {
         if (jList2.getSelectedIndex() > -1) {
@@ -576,7 +602,7 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
             jLabel1.setText("Start: " + currentHistoricalRun.startTimeString);
             jLabel2.setText("Current: " + currentHistoricalRun.startTimeString);
             jLabel3.setText("End: " + currentHistoricalRun.endTimeString);
-        }else{
+        } else {
             System.out.println("HISTORICAL RUN IS NULL!");
         }
 
@@ -644,6 +670,7 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

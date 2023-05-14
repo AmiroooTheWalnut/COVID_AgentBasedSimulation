@@ -19,6 +19,10 @@ import lombok.Setter;
 public class Brands implements Serializable {
     static final long serialVersionUID = softwareVersion;
     
+    public Brands(){
+        
+    }
+    
     public ArrayList<Brand> brands;
     
     public Brand findAndInsertCategory(String input) {
