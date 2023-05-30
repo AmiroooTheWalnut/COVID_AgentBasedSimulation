@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Random;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
-import processing.awt.PSurfaceAWT.SmoothCanvas;
 import processing.core.PApplet;
 import processing.core.PImage;
 import processing.core.PSurface;
@@ -93,9 +92,12 @@ public class ProcessingMapRenderer extends PApplet {
 
     //RANDOM ARCS
     ArrayList<TupleIntFloat> sortedFlowIndices;
+    ArrayList<TupleIntFloat> sortedFlowIndicesReduced;
     ArrayList<Boolean> isDrawRandomArc;
+    ArrayList<Boolean> isDrawRandomArcReduced;
     float[][] rawFlowData;
     float[][] thirdPointDeviationPercentages;
+    float[][] thirdPointDeviationPercentagesReduced;
     float[][] quarantinedFlowData;
     Location[] latLons;
     public boolean isDrawRandomArcs = false;
@@ -198,7 +200,7 @@ public class ProcessingMapRenderer extends PApplet {
 //                break;
 //            }
 //        }
-        map = ((MapSourse) mapSources.maps.get(0)).map;
+        map = ((MapSourse) mapSources.maps.get(4)).map;
         MapUtils.createDefaultEventDispatcher(this, new UnfoldingMap[]{this.map});
 
         parentMainFrame.child = this;
@@ -439,7 +441,7 @@ public class ProcessingMapRenderer extends PApplet {
                             int loc = x + y * width;
                             int index = regionImageLayer.indexedImage[x][height - y - 1] - 1;
                             if (index >= 0) {
-                                img.pixels[loc] = color((int) (regionImageLayer.severities[index]), 0, 255 - (int) (regionImageLayer.severities[index]), 30+(int)regionImageLayer.severities[index]);
+                                img.pixels[loc] = color((int) (regionImageLayer.severities[index]), 0, 255 - (int) (regionImageLayer.severities[index]), 30 + (int) regionImageLayer.severities[index]);
                             } else {
                                 img.pixels[loc] = color(0, 0, 0, 0);
                             }
@@ -498,6 +500,77 @@ public class ProcessingMapRenderer extends PApplet {
         }
     }
 
+//    public void drawAllArcs() {
+//        
+//        
+//        
+//        for (int h = 0; h < sortedFlowIndices.size(); h++) {
+//            int y = (sortedFlowIndices.get(h).index) % (rawFlowData.length);
+//            int x = (int) (Math.floor(sortedFlowIndices.get(h).index / rawFlowData.length));
+//            strokeWeight(1 + quarantinedFlowData[x][y] * 6.7f);
+//            stroke(40 + (float) Math.pow(quarantinedFlowData[x][y], 0.4) * 220, 0, 0, Math.max(0, -1 + (float) Math.pow(quarantinedFlowData[x][y] * 7.5, 4)));
+//            drawArc(x, y, latLons[x], latLons[y], 0.00025f);
+//        }
+//        
+////        for (int h = 0; h < sortedFlowIndices.size(); h++) {
+////            int y = (sortedFlowIndices.get(h).index) % (rawFlowData.length);
+////            int x = (int) (Math.floor(sortedFlowIndices.get(h).index / rawFlowData.length));
+////            strokeWeight(1 + quarantinedFlowData[x][y] * 6.7f);
+////            stroke(40 + (float) Math.pow(quarantinedFlowData[x][y], 0.4) * 220, 0, 0, Math.max(0, -1 + (float) Math.pow(quarantinedFlowData[x][y] * 7.5, 4)));
+////            drawArc(x, y, latLons[x], latLons[y], 0.00025f);
+////        }
+//    }
+//
+//    public void drawArc(float angle, int sourceIndex, int destinationIndex, Location start, Location end, float deviationMultiplier) {
+//        float distance = start.dist((PVector) end);
+//        Location middlePoint = new Location(start.x + (end.x - start.x) / 2.0F, start.y + (end.y - start.y) / 2.0F);
+//        float deltaX = end.x - start.x;
+//        Location slope;
+//        Location inverseSlope;
+//        if (Math.abs(deltaX) < 0.00001) {
+//            slope = new Location(0, 1);
+//            inverseSlope = new Location(1, 0);
+//        } else {
+//            slope = new Location(1, (end.y - start.y) / deltaX);
+//            inverseSlope = new Location(slope.x, -1.0F / slope.y);
+//        }
+//
+//        float sum = (float) Math.sqrt(Math.pow(inverseSlope.x, 2) + Math.pow(inverseSlope.y, 2) + Math.pow(inverseSlope.z, 2));
+//        inverseSlope.x = inverseSlope.x / sum;
+//        inverseSlope.y = inverseSlope.y / sum;
+//        inverseSlope.z = inverseSlope.z / sum;
+//
+//        Location thirdPoint = new Location(middlePoint.x + distance * this.thirdPointDeviationPercentages[sourceIndex][destinationIndex] / 10.0F, middlePoint.y + distance * this.thirdPointDeviationPercentages[sourceIndex][destinationIndex] / 10.0F);
+//
+//        Location startCopy = new Location(start.x, start.y);
+//        startCopy.add(inverseSlope.x * deviationMultiplier / (this.map.getZoomLevel() / 20f), inverseSlope.y * deviationMultiplier / (this.map.getZoomLevel() / 20f), inverseSlope.z * deviationMultiplier / (this.map.getZoomLevel() / 20f));
+//
+//        Location endCopy = new Location(end.x, end.y);
+//        endCopy.add(inverseSlope.x * deviationMultiplier / (this.map.getZoomLevel() / 20f), inverseSlope.y * deviationMultiplier / (this.map.getZoomLevel() / 20f), inverseSlope.z * deviationMultiplier / (this.map.getZoomLevel() / 20f));
+//
+//        Location middleCopy = new Location(thirdPoint.x, thirdPoint.y);
+//        middleCopy.add(inverseSlope.x * deviationMultiplier / (this.map.getZoomLevel() / 20f), inverseSlope.y * deviationMultiplier / (this.map.getZoomLevel() / 20f), inverseSlope.z * deviationMultiplier / (this.map.getZoomLevel() / 20f));
+//
+//        SimplePointMarker startMarker = new SimplePointMarker(startCopy);
+//        SimplePointMarker endMarker = new SimplePointMarker(endCopy);
+//        SimplePointMarker middleMarker = new SimplePointMarker(middleCopy);
+//
+//        ScreenPosition scStartPos = startMarker.getScreenPosition(this.map);
+//        ScreenPosition scEndPos = endMarker.getScreenPosition(this.map);
+//        ScreenPosition scMiddlePos = middleMarker.getScreenPosition(this.map);
+//
+//        beginShape();
+//        curveVertex(scStartPos.x, scStartPos.y);
+//        curveVertex(scStartPos.x, scStartPos.y);
+//        curveVertex(scMiddlePos.x, scMiddlePos.y);
+//        curveVertex(scEndPos.x, scEndPos.y);
+//        curveVertex(scEndPos.x, scEndPos.y);
+//        endShape();
+//    }
+//
+//    public void setTrajectories() {
+//
+//    }
     public void drawPTAVSPMeasure() {
         Location loc = new Location(model.ABM.measureHolder.pTAVSPMeasure.get(0).destination.patternsRecord.poi_cbg_censusBlock.lon, model.ABM.measureHolder.pTAVSPMeasure.get(0).destination.patternsRecord.poi_cbg_censusBlock.lat);
         SimplePointMarker locSM = new SimplePointMarker(loc);
@@ -585,6 +658,54 @@ public class ProcessingMapRenderer extends PApplet {
         }
     }
 
+    public void setRandomArcGM(ArrayList<CensusBlockGroup> cBGs, int numCBGs, int seed, float[][] dataF, int testCBG) {
+        Random rnd = new Random(seed);
+        latLons = new Location[numCBGs];
+        for (int j = 0; j < numCBGs; j++) {
+            latLons[j] = new Location(cBGs.get(j).lon, cBGs.get(j).lat);
+        }
+        float maxThirdPointCurveDeviationPercent = 2.0F;
+        float minThirdPointCurveDeviationPercent = -2.0F;
+        thirdPointDeviationPercentages = new float[numCBGs][numCBGs];
+        rawFlowData = new float[numCBGs][numCBGs];
+        quarantinedFlowData = new float[numCBGs][numCBGs];
+        sortedFlowIndices = new ArrayList();
+        sortedFlowIndicesReduced = new ArrayList();
+        isDrawRandomArc = new ArrayList();
+        isDrawRandomArcReduced = new ArrayList();
+        for (int j = 0; j < numCBGs; j++) {
+            for (int k = j + 1; k < numCBGs; k++) {
+                rawFlowData[j][k] = dataF[j][k] + 0.3f+(rnd.nextFloat() * 0.2f);
+                sortedFlowIndices.add(new TupleIntFloat(j * (numCBGs) + k, this.rawFlowData[j][k]));
+                thirdPointDeviationPercentages[j][k] = (float) (minThirdPointCurveDeviationPercent + rnd.nextFloat() * (maxThirdPointCurveDeviationPercent - minThirdPointCurveDeviationPercent));
+                quarantinedFlowData[j][k] = rawFlowData[j][k] + ((rnd.nextFloat() - 0.5f) * 0.6f);
+                sortedFlowIndicesReduced.add(new TupleIntFloat(j * (numCBGs) + k, this.quarantinedFlowData[j][k]));
+                if (rnd.nextDouble() < 0.00001) {
+                    isDrawRandomArc.add(true);
+                    isDrawRandomArcReduced.add(true);
+                } else {
+                    isDrawRandomArc.add(false);
+                    isDrawRandomArcReduced.add(false);
+                }
+                if (j == testCBG) {
+                    isDrawRandomArc.add(true);
+                    isDrawRandomArcReduced.add(true);
+                }
+                if (j == 27 || j == 43 || j == 88) {
+                    if (rnd.nextDouble() < 0.05) {
+                        isDrawRandomArc.add(true);
+                        isDrawRandomArcReduced.add(true);
+                    }
+                }
+            }
+        }
+        for (int j = 0; j < isDrawRandomArcReduced.size(); j++) {
+            if (rnd.nextDouble() < 0.0001) {
+                isDrawRandomArcReduced.set(j, !isDrawRandomArcReduced.get(j));
+            }
+        }
+    }
+
     public void setRandomArc(ArrayList<CensusTract> cBGs, int numCBGs) {
         Random rnd = new Random();
         this.latLons = new Location[numCBGs];
@@ -593,7 +714,7 @@ public class ProcessingMapRenderer extends PApplet {
         }
         float maxThirdPointCurveDeviationPercent = 2.0F;
         float minThirdPointCurveDeviationPercent = -2.0F;
-        this.thirdPointDeviationPercentages = new float[numCBGs][numCBGs];
+        thirdPointDeviationPercentages = new float[numCBGs][numCBGs];
         rawFlowData = new float[numCBGs][numCBGs];
         quarantinedFlowData = new float[numCBGs][numCBGs];
         sortedFlowIndices = new ArrayList();
@@ -607,7 +728,7 @@ public class ProcessingMapRenderer extends PApplet {
                 } else {
                     isDrawRandomArc.add(false);
                 }
-                this.thirdPointDeviationPercentages[j][k] = (float) (minThirdPointCurveDeviationPercent + rnd.nextFloat() * (maxThirdPointCurveDeviationPercent - minThirdPointCurveDeviationPercent));
+                thirdPointDeviationPercentages[j][k] = (float) (minThirdPointCurveDeviationPercent + rnd.nextFloat() * (maxThirdPointCurveDeviationPercent - minThirdPointCurveDeviationPercent));
                 quarantinedFlowData[j][k] = (rnd.nextFloat() * 0.5f);
             }
         }
@@ -618,10 +739,19 @@ public class ProcessingMapRenderer extends PApplet {
             int y = (sortedFlowIndices.get(h).index) % (rawFlowData.length);
             int x = (int) (Math.floor(sortedFlowIndices.get(h).index / rawFlowData.length));
 //            strokeWeight(1 + quarantinedFlowData[x][y] * 6.7f);
-            strokeWeight(1 + quarantinedFlowData[x][y] * 6.7f);
-            stroke(40 + (float) Math.pow(quarantinedFlowData[x][y], 0.4) * 220, 0, 0, Math.max(0, -1 + (float) Math.pow(quarantinedFlowData[x][y] * 7.5, 4)));
+            strokeWeight(1 + rawFlowData[x][y] * 6.7f);
+            stroke(40 + (float) Math.pow(rawFlowData[x][y], 0.4) * 220, 0, 0, Math.max(0, -1 + (float) Math.pow(rawFlowData[x][y] * 4, 5)+51f));
             if (isDrawRandomArc.get(h) == true) {
-                drawArc(x, y, latLons[x], latLons[y], 0.00025f);
+                drawArc(x, y, latLons[x], latLons[y], 0.00045f);
+            }
+
+            y = (sortedFlowIndicesReduced.get(h).index) % (quarantinedFlowData.length);
+            x = (int) (Math.floor(sortedFlowIndicesReduced.get(h).index / quarantinedFlowData.length));
+//            strokeWeight(1 + quarantinedFlowData[x][y] * 6.7f);
+            strokeWeight(1 + quarantinedFlowData[x][y] * 6.7f);
+            stroke(0, 0, 40 + (float) Math.pow(quarantinedFlowData[x][y], 0.4) * 220, Math.max(0, -1 + (float) Math.pow(quarantinedFlowData[x][y] * 4, 3.9f)+51f));
+            if (isDrawRandomArcReduced.get(h) == true) {
+                drawArc(x, y, latLons[x], latLons[y], -0.00045f);
             }
 
 //            if (isShowReductionFrame == true) {
@@ -638,6 +768,7 @@ public class ProcessingMapRenderer extends PApplet {
     }
 
     public void drawArc(int sourceIndex, int destinationIndex, Location start, Location end, float deviationMultiplier) {
+        noFill();
         float distance = start.dist((PVector) end);
         Location middlePoint = new Location(start.x + (end.x - start.x) / 2.0F, start.y + (end.y - start.y) / 2.0F);
         float deltaX = end.x - start.x;

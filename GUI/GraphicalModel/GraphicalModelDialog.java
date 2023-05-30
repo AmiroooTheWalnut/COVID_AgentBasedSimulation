@@ -13,16 +13,25 @@ import de.fhpotsdam.unfolding.utils.MapUtils;
 import com.opencsv.CSVWriter;
 import de.fhpotsdam.unfolding.UnfoldingMap;
 import de.fhpotsdam.unfolding.geo.Location;
+import de.siegmar.fastcsv.reader.CsvContainer;
+import de.siegmar.fastcsv.reader.CsvReader;
+import de.siegmar.fastcsv.reader.CsvRow;
 import de.siegmar.fastcsv.writer.CsvWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
+import com.opencsv.exceptions.CsvException;
+import java.io.FileReader;
+import java.util.List;
 
 /**
  *
@@ -91,6 +100,17 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
         jPanel3 = new javax.swing.JPanel();
         jButton16 = new javax.swing.JButton();
         jButton17 = new javax.swing.JButton();
+        jButton18 = new javax.swing.JButton();
+        jButton19 = new javax.swing.JButton();
+        jButton20 = new javax.swing.JButton();
+        jButton21 = new javax.swing.JButton();
+        jButton22 = new javax.swing.JButton();
+        jButton23 = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        jSpinner1 = new javax.swing.JSpinner();
+        jLabel2 = new javax.swing.JLabel();
+        jSpinner2 = new javax.swing.JSpinner();
+        jButton24 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -267,35 +287,113 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
             }
         });
 
+        jButton18.setText("Show shop trajectories");
+
+        jButton19.setText("Show school trajectories");
+
+        jButton20.setText("Show rel trajectories");
+
+        jButton21.setText("Tucson show sh");
+        jButton21.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton21ActionPerformed(evt);
+            }
+        });
+
+        jButton22.setText("Tucson show sch");
+        jButton22.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton22ActionPerformed(evt);
+            }
+        });
+
+        jButton23.setText("Tucson show rel");
+        jButton23.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton23ActionPerformed(evt);
+            }
+        });
+
+        jLabel1.setText("Seed:");
+
+        jSpinner1.setModel(new javax.swing.SpinnerNumberModel(1, 1, null, 1));
+
+        jLabel2.setText("CBG:");
+
+        jSpinner2.setModel(new javax.swing.SpinnerNumberModel(-1, -1, null, 1));
+        jSpinner2.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                jSpinner2StateChanged(evt);
+            }
+        });
+
+        jButton24.setText("Save output");
+        jButton24.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton24ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jButton6)
+                                    .addComponent(jButton7)
+                                    .addComponent(jButton8)
+                                    .addComponent(jButton9)
+                                    .addComponent(jButton5)
+                                    .addComponent(jButton12)
+                                    .addComponent(jButton11)
+                                    .addComponent(jButton10)
+                                    .addComponent(jButton13)
+                                    .addComponent(jButton14)
+                                    .addComponent(jButton15)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jButton16)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jButton17)))))
+                        .addGroup(layout.createSequentialGroup()
+                            .addContainerGap()
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                    .addComponent(jButton23)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(jButton20))
+                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                    .addComponent(jButton22)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(jButton19)))
+                            .addGap(0, 0, Short.MAX_VALUE)))
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton6)
-                            .addComponent(jButton7)
-                            .addComponent(jButton8)
-                            .addComponent(jButton9)
-                            .addComponent(jButton5)
-                            .addComponent(jButton12)
-                            .addComponent(jButton11)
-                            .addComponent(jButton10)
-                            .addComponent(jButton13)
-                            .addComponent(jButton14)
-                            .addComponent(jButton15)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jButton16)
+                                .addComponent(jButton21)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton17)))))
+                                .addComponent(jButton18))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButton24))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jSpinner2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 697, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -329,7 +427,28 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jButton16)
                             .addComponent(jButton17))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 57, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jButton18)
+                            .addComponent(jButton21))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jButton19)
+                            .addComponent(jButton22))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jButton20)
+                            .addComponent(jButton23))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel1)
+                            .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jButton24))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel2)
+                            .addComponent(jSpinner2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 16, Short.MAX_VALUE)
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
@@ -943,7 +1062,7 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton16ActionPerformed
 
     private void jButton17ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton17ActionPerformed
-        float zoomLevel = 11.8f;
+        float zoomLevel = 12f;
         Location mapLoc = new Location(32.215197, -110.903581);
         sketch.map.zoomTo(zoomLevel);
         sketch.map.panTo(mapLoc);
@@ -998,13 +1117,152 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
             color = new Float[]{0f, 0f, 255f};
             groupOfLocations.add(locationsArray);
             groupColors.add(color);
-            
-            
 
             sketch.genericLocationsGroup = groupOfLocations;
             sketch.genericColorsGroup = groupColors;
         }
     }//GEN-LAST:event_jButton17ActionPerformed
+
+    private void jButton21ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton21ActionPerformed
+        sketch.isDrawRandomArcs = false;
+        float zoomLevel = 12f;
+        Location mapLoc = new Location(32.215197, -110.903581);
+        sketch.map.zoomTo(zoomLevel);
+        sketch.map.panTo(mapLoc);
+        MapUtils.createDefaultEventDispatcher(sketch, new UnfoldingMap[]{sketch.map});
+        if (jList1.getSelectedIndex() != -1) {
+            myParent.mainModel.safegraph.clearPatternsPlaces();
+            myParent.mainModel.safegraph.loadPatternsPlacesSet(myParent.mainModel.datasetDirectory, jList1.getSelectedValue(), myParent.mainModel.allGISData, myParent.mainModel.ABM.studyScope, true, myParent.numProcessors);
+            ArrayList<Location[]> groupOfLocations = new ArrayList();
+            ArrayList<Float[]> groupColors = new ArrayList();
+
+            ArrayList<Location> locations = new ArrayList();
+            for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.size(); i++) {
+                PatternsRecordProcessed pattern = myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i);
+                if (GISLocationDialog.isShop(pattern.place.naics_code) == true) {
+                    locations.add(new Location(pattern.place.lat, pattern.place.lon));
+                }
+            }
+            Location[] locationsArray = new Location[locations.size()];
+            for (int i = 0; i < locations.size(); i++) {
+                locationsArray[i] = locations.get(i);
+            }
+            Float[] color = new Float[]{255f, 0f, 0f};
+            groupOfLocations.add(locationsArray);
+            groupColors.add(color);
+
+            sketch.genericLocationsGroup = groupOfLocations;
+            sketch.genericColorsGroup = groupColors;
+
+            City castedScope = ((City) myParent.mainModel.ABM.studyScopeGeography);
+            ArrayList<CensusBlockGroup> allCBGs = new ArrayList();
+            for (int i = 0; i < castedScope.censusTracts.size(); i++) {
+                for (int j = 0; j < castedScope.censusTracts.get(i).censusBlocks.size(); j++) {
+                    allCBGs.add(castedScope.censusTracts.get(i).censusBlocks.get(j));
+                }
+            }
+
+            try {
+//                File GISDataFile = new File("sourceCBG_shopCBG_probability_2021_12.csv");
+//                CsvReader cSVReader = new CsvReader();
+//                cSVReader.setContainsHeader(false);
+//                CsvContainer data = cSVReader.read(GISDataFile, StandardCharsets.UTF_8);
+
+                FileReader filereader = new FileReader("sourceCBG_shopCBG_probability_2021_12.csv");
+
+                CSVReader csvReader = new CSVReaderBuilder(filereader)
+                        .withSkipLines(0)
+                        .build();
+                List<String[]> data = csvReader.readAll();
+
+                float[][] dataF = new float[data.size()][data.size()];
+                for (int j = 0; j < data.size(); j++) {
+                    for (int k = 0; k < data.get(j).length; k++) {
+                        dataF[j][k] = Float.parseFloat(data.get(j)[k]);
+                    }
+                }
+                sketch.setRandomArcGM(allCBGs, allCBGs.size(), (int) (jSpinner1.getValue()), dataF,(int) (jSpinner2.getValue()));
+                sketch.isDrawRandomArcs = true;
+            } catch (IOException ex) {
+                Logger.getLogger(GraphicalModelDialog.class.getName()).log(Level.SEVERE, (String) null, ex);
+            } catch (CsvException ex) {
+                Logger.getLogger(GraphicalModelDialog.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        }
+    }//GEN-LAST:event_jButton21ActionPerformed
+
+    private void jButton22ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton22ActionPerformed
+        float zoomLevel = 11.8f;
+        Location mapLoc = new Location(32.215197, -110.903581);
+        sketch.map.zoomTo(zoomLevel);
+        sketch.map.panTo(mapLoc);
+        MapUtils.createDefaultEventDispatcher(sketch, new UnfoldingMap[]{sketch.map});
+        if (jList1.getSelectedIndex() != -1) {
+            myParent.mainModel.safegraph.clearPatternsPlaces();
+            myParent.mainModel.safegraph.loadPatternsPlacesSet(myParent.mainModel.datasetDirectory, jList1.getSelectedValue(), myParent.mainModel.allGISData, myParent.mainModel.ABM.studyScope, true, myParent.numProcessors);
+            ArrayList<Location[]> groupOfLocations = new ArrayList();
+            ArrayList<Float[]> groupColors = new ArrayList();
+
+            ArrayList<Location> locations = new ArrayList();
+            for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.size(); i++) {
+                PatternsRecordProcessed pattern = myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i);
+                if (GISLocationDialog.isSchool(pattern.place.naics_code) == true) {
+                    locations.add(new Location(pattern.place.lat, pattern.place.lon));
+                }
+            }
+            Location[] locationsArray = new Location[locations.size()];
+            for (int i = 0; i < locations.size(); i++) {
+                locationsArray[i] = locations.get(i);
+            }
+            Float[] color = new Float[]{0f, 255f, 0f};
+            groupOfLocations.add(locationsArray);
+            groupColors.add(color);
+
+            sketch.genericLocationsGroup = groupOfLocations;
+            sketch.genericColorsGroup = groupColors;
+        }
+    }//GEN-LAST:event_jButton22ActionPerformed
+
+    private void jButton23ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton23ActionPerformed
+        float zoomLevel = 11.8f;
+        Location mapLoc = new Location(32.215197, -110.903581);
+        sketch.map.zoomTo(zoomLevel);
+        sketch.map.panTo(mapLoc);
+        MapUtils.createDefaultEventDispatcher(sketch, new UnfoldingMap[]{sketch.map});
+        if (jList1.getSelectedIndex() != -1) {
+            myParent.mainModel.safegraph.clearPatternsPlaces();
+            myParent.mainModel.safegraph.loadPatternsPlacesSet(myParent.mainModel.datasetDirectory, jList1.getSelectedValue(), myParent.mainModel.allGISData, myParent.mainModel.ABM.studyScope, true, myParent.numProcessors);
+            ArrayList<Location[]> groupOfLocations = new ArrayList();
+            ArrayList<Float[]> groupColors = new ArrayList();
+
+            ArrayList<Location> locations = new ArrayList();
+            for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.size(); i++) {
+                PatternsRecordProcessed pattern = myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i);
+                if (GISLocationDialog.isReligiousOrganization(pattern.place.naics_code) == true) {
+                    locations.add(new Location(pattern.place.lat, pattern.place.lon));
+                }
+            }
+            Location[] locationsArray = new Location[locations.size()];
+            for (int i = 0; i < locations.size(); i++) {
+                locationsArray[i] = locations.get(i);
+            }
+            Float[] color = new Float[]{0f, 0f, 255f};
+            groupOfLocations.add(locationsArray);
+            groupColors.add(color);
+
+            sketch.genericLocationsGroup = groupOfLocations;
+            sketch.genericColorsGroup = groupColors;
+        }
+    }//GEN-LAST:event_jButton23ActionPerformed
+
+    private void jSpinner2StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinner2StateChanged
+        jButton21ActionPerformed(null);
+    }//GEN-LAST:event_jSpinner2StateChanged
+
+    private void jButton24ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton24ActionPerformed
+        sketch.saveFile();
+    }//GEN-LAST:event_jButton24ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
@@ -1016,7 +1274,14 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
     private javax.swing.JButton jButton15;
     private javax.swing.JButton jButton16;
     private javax.swing.JButton jButton17;
+    private javax.swing.JButton jButton18;
+    private javax.swing.JButton jButton19;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton20;
+    private javax.swing.JButton jButton21;
+    private javax.swing.JButton jButton22;
+    private javax.swing.JButton jButton23;
+    private javax.swing.JButton jButton24;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
@@ -1024,10 +1289,14 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
     private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton8;
     private javax.swing.JButton jButton9;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JList<String> jList1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JSpinner jSpinner1;
+    private javax.swing.JSpinner jSpinner2;
     // End of variables declaration//GEN-END:variables
 }

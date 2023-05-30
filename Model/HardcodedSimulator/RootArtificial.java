@@ -677,7 +677,9 @@ public class RootArtificial extends Root {
             fromHomeFreqs[avgCounter] = Float16Utils.floatToHalf(dist);
             avgCounter = avgCounter + 1;
 //                people.get(i).exactProperties.pOIHomeProbabilities.put(value, dist);
+        System.out.println("FUCK0");
         }
+        System.out.println("FUCK1");
         avg = avg / (float) avgCounter;
         person.exactProperties.fromHomeFreqsCDF = new float[person.exactProperties.pOIs.length];
         person.exactProperties.fromHomeFreqs = new short[pOIs.size()];

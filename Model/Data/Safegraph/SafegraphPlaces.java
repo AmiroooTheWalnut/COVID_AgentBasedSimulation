@@ -235,7 +235,7 @@ public class SafegraphPlaces implements Serializable {
                 for (int i = 0; i < numProcessors; i++) {
                     try {
                         parallelSafegraphParsers[i].myThread.join();
-                        System.out.println("thread " + i + "finished for records: " + parallelSafegraphParsers[i].myStartIndex + " | " + parallelSafegraphParsers[i].myEndIndex);
+//                        System.out.println("thread " + i + "finished for records: " + parallelSafegraphParsers[i].myStartIndex + " | " + parallelSafegraphParsers[i].myEndIndex);
                     } catch (InterruptedException ie) {
                         System.out.println(ie.toString());
                     }
@@ -337,7 +337,7 @@ public class SafegraphPlaces implements Serializable {
                 for (int i = 0; i < numProcessors; i++) {
                     try {
                         parallelSafegraphParsers[i].myThread.join();
-                        System.out.println("thread " + i + "finished for records: " + parallelSafegraphParsers[i].myStartIndex + " | " + parallelSafegraphParsers[i].myEndIndex);
+//                        System.out.println("thread " + i + "finished for records: " + parallelSafegraphParsers[i].myStartIndex + " | " + parallelSafegraphParsers[i].myEndIndex);
                     } catch (InterruptedException ie) {
                         System.out.println(ie.toString());
                     }

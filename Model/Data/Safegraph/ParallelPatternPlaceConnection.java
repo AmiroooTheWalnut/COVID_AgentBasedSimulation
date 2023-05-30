@@ -27,8 +27,8 @@ public class ParallelPatternPlaceConnection extends ParallelProcessor {
         myThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                System.out.println("Thread: " + threadIndex + " startIndex: " + myStartIndex);
-                System.out.println("Thread: " + threadIndex + " endIndex: " + myEndIndex);
+//                System.out.println("Thread: " + threadIndex + " startIndex: " + myStartIndex);
+//                System.out.println("Thread: " + threadIndex + " endIndex: " + myEndIndex);
                 int counter = 0;
                 int largerCounter = 0;
                 int counterInterval = 100000;

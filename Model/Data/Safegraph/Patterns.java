@@ -258,7 +258,7 @@ public class Patterns implements Serializable {
                 for (int i = 0; i < numProcessors; i++) {
                     try {
                         parallelPatternParsers[i].myThread.join();
-                        System.out.println("thread " + i + "finished for records: " + parallelPatternParsers[i].myStartIndex + " | " + parallelPatternParsers[i].myEndIndex);
+//                        System.out.println("thread " + i + "finished for records: " + parallelPatternParsers[i].myStartIndex + " | " + parallelPatternParsers[i].myEndIndex);
                     } catch (InterruptedException ie) {
                         System.out.println(ie.toString());
                     }
@@ -474,7 +474,7 @@ public class Patterns implements Serializable {
                 for (int i = 0; i < numProcessors; i++) {
                     try {
                         parallelPatternParsers[i].myThread.join();
-                        System.out.println("thread " + i + "finished for records: " + parallelPatternParsers[i].myStartIndex + " | " + parallelPatternParsers[i].myEndIndex);
+//                        System.out.println("thread " + i + "finished for records: " + parallelPatternParsers[i].myStartIndex + " | " + parallelPatternParsers[i].myEndIndex);
                     } catch (InterruptedException ie) {
                         System.out.println(ie.toString());
                     }

@@ -36,8 +36,8 @@ public class ParallelPatternParser extends ParallelProcessor {
         myThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                System.out.println("Thread: "+threadIndex+" startIndex: "+myStartIndex);
-                System.out.println("Thread: "+threadIndex+" endIndex: "+myEndIndex);
+//                System.out.println("Thread: "+threadIndex+" startIndex: "+myStartIndex);
+//                System.out.println("Thread: "+threadIndex+" endIndex: "+myEndIndex);
                 ArrayList<PatternsRecordProcessed> localRecords=new ArrayList();
                 int counter=0;
                 int largerCounter=0;

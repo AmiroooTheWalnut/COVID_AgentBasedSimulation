@@ -628,16 +628,16 @@ public class Safegraph extends Dataset implements Serializable {
         Patterns patterns = loadPatternsKryo(datasetRoot + "/Safegraph/" + project + "/patterns_" + date + "/processedData.bin");
         SafegraphPlaces safegraphPlaces = loadSafegraphPlacesKryo(datasetRoot + "/Safegraph/" + project + "/core_poi_" + date + "/processedData_withArea.bin");
 
-        System.out.println("Data loaded");
+//        System.out.println("Data loaded");
         if (patterns == null || safegraphPlaces == null) {
             System.out.println("Pattern or Core place is missing. Skipping the data " + date);
             return;
         }
-        System.out.println("Connecting patterns and places ...");
-        System.out.println("Patterns size before connection: " + patterns.patternRecords.size());
+//        System.out.println("Connecting patterns and places ...");
+//        System.out.println("Patterns size before connection: " + patterns.patternRecords.size());
         connectPatternsAndPlaces(patterns, safegraphPlaces, allGISData, isParallel, numCPU);
-        System.out.println("Patterns size before connection: " + patterns.patternRecords.size());
-        System.out.println("Connection done");
+//        System.out.println("Patterns size before connection: " + patterns.patternRecords.size());
+//        System.out.println("Connection done");
         if (patterns != null) {
             if (allPatterns != null) {
                 if (allPatterns.monthlyPatternsList != null) {
@@ -703,7 +703,7 @@ public class Safegraph extends Dataset implements Serializable {
             for (int i = 0; i < numProcessors; i++) {
                 try {
                     parallelPatternPlaceConnection[i].myThread.join();
-                    System.out.println("thread " + i + "finished for records: " + parallelPatternPlaceConnection[i].myStartIndex + " | " + parallelPatternPlaceConnection[i].myEndIndex);
+//                    System.out.println("thread " + i + "finished for records: " + parallelPatternPlaceConnection[i].myStartIndex + " | " + parallelPatternPlaceConnection[i].myEndIndex);
                 } catch (InterruptedException ie) {
                     System.out.println(ie.toString());
                 }
