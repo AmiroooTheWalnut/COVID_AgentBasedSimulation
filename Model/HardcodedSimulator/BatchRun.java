@@ -339,6 +339,7 @@ public class BatchRun {
         String[] header = new String[7];
         String[] firstRow = new String[7];
         String[] secondRow = new String[7];
+        String[] thirdRow = new String[runs.size()];
         for (int i = 0; i < runs.size(); i++) {
             try {
                 FileReader filereader = new FileReader(runs.get(i) + File.separator + "PTAVSP.csv");
@@ -360,6 +361,7 @@ public class BatchRun {
                 firstRow[1] = data.get(1)[1];
                 firstRow[2] = data.get(1)[2];
                 firstRow[3] = data.get(1)[3];
+                thirdRow[i] = String.valueOf(vmp);
                 csvReader.close();
             } catch (IOException ex) {
                 Logger.getLogger(BatchRun.class.getName()).log(Level.SEVERE, null, ex);
@@ -396,6 +398,7 @@ public class BatchRun {
         rows.add(header);
         rows.add(firstRow);
         rows.add(secondRow);
+        rows.add(thirdRow);
         return rows;
     }
 
@@ -405,6 +408,7 @@ public class BatchRun {
         String[] header = new String[3];
         String[] firstRow = new String[3];
         String[] secondRow = new String[3];
+        String[] thirdRow = new String[runs.size()];
         for (int i = 0; i < runs.size(); i++) {
             try {
                 FileReader filereader = new FileReader(runs.get(i) + File.separator + "NOV.csv");
@@ -413,11 +417,12 @@ public class BatchRun {
                         .build();
                 List<String[]> data = csvReader.readAll();
                 header = data.get(0);
-                Double aVd = Double.valueOf(data.get(1)[2]);
-                nOVs.add(aVd);
-                sum = sum + aVd;
+                Double nOV = Double.valueOf(data.get(1)[2]);
+                nOVs.add(nOV);
+                sum = sum + nOV;
                 firstRow[0] = data.get(1)[0];
                 firstRow[1] = data.get(1)[1];
+                thirdRow[i] = String.valueOf(nOV);
                 csvReader.close();
             } catch (IOException ex) {
                 Logger.getLogger(BatchRun.class.getName()).log(Level.SEVERE, null, ex);
@@ -438,6 +443,7 @@ public class BatchRun {
         rows.add(header);
         rows.add(firstRow);
         rows.add(secondRow);
+        rows.add(thirdRow);
         return rows;
     }
 
@@ -447,6 +453,7 @@ public class BatchRun {
         String[] header = new String[3];
         String[] firstRow = new String[3];
         String[] secondRow = new String[3];
+        String[] thirdRow = new String[runs.size()];
         for (int i = 0; i < runs.size(); i++) {
             try {
                 FileReader filereader = new FileReader(runs.get(i) + File.separator + "AVD.csv");
@@ -460,6 +467,7 @@ public class BatchRun {
                 sum = sum + aVd;
                 firstRow[0] = data.get(1)[0];
                 firstRow[1] = data.get(1)[1];
+                thirdRow[i] = String.valueOf(aVd);
                 csvReader.close();
             } catch (IOException ex) {
                 Logger.getLogger(BatchRun.class.getName()).log(Level.SEVERE, null, ex);
@@ -480,6 +488,7 @@ public class BatchRun {
         rows.add(header);
         rows.add(firstRow);
         rows.add(secondRow);
+        rows.add(thirdRow);
         return rows;
     }
 

@@ -43,7 +43,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import weka.clusterers.ClusterEvaluation;
@@ -523,15 +525,7 @@ public class RootArtificial extends Root {
                 }
             }
         }
-        pOIs_array = new POI[pOIs.size()];
-        int counter = 0;
-        for (POI value : pOIs.values()) {
-//            String key = mapElement.getKey();
-//            POI value = mapElement.getValue();
-            pOIs_array[counter] = value;
-            counter = counter + 1;
-            travelsToAllPOIsFreqs.put(value.patternsRecord.placeKey, 0L);
-        }
+        
 
         try {
             FileReader filereader = new FileReader(myModelRoot.datasetDirectory + File.separator + "FullScale_exhaustiveNAICS.csv");
@@ -547,6 +541,7 @@ public class RootArtificial extends Root {
         }
         ArrayList<Long> freqs = new ArrayList();
         ArrayList<String> pOIIds = new ArrayList();
+        ArrayList<String> keysToRemove=new ArrayList();
         long sum = 0;
         for (HashMap.Entry<String, POI> mapElement : pOIs.entrySet()) {
             String key = mapElement.getKey();
@@ -555,7 +550,21 @@ public class RootArtificial extends Root {
                 freqs.add(exhaustiveNAICSFreqs.get(value.patternsRecord.place.naics_code));
                 pOIIds.add(key);
                 sum = sum + exhaustiveNAICSFreqs.get(value.patternsRecord.place.naics_code);
+            }else{
+                keysToRemove.add(key);
             }
+        }
+        for (int i = 0; i < keysToRemove.size(); i++) {
+            pOIs.remove(keysToRemove.get(i));
+        }
+        pOIs_array = new POI[pOIs.size()];
+        int counter = 0;
+        for (POI value : pOIs.values()) {
+//            String key = mapElement.getKey();
+//            POI value = mapElement.getValue();
+            pOIs_array[counter] = value;
+            counter = counter + 1;
+            travelsToAllPOIsFreqs.put(value.patternsRecord.placeKey, 0L);
         }
         for (int i = 0; i < freqs.size(); i++) {
             pOIProbs.put(pOIIds.get(i), (float) (freqs.get(i)) / (float) sum);
@@ -586,9 +595,14 @@ public class RootArtificial extends Root {
             }
 
             //myMainModel.agentEvalPool.invokeAny(calls);
-            myModelRoot.preprocessEvalPool.invokeAll(calls);
+            List<Future<Object>> tasks = myModelRoot.preprocessEvalPool.invokeAll(calls);
+            for(int i=0;i<tasks.size();i++){
+                tasks.get(i).get();
+            }
         } catch (InterruptedException ex) {
             Logger.getLogger(ShamilSimulatorController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ExecutionException ex) {
+            Logger.getLogger(RootArtificial.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         myModelRoot.preprocessEvalPool.shutdown();
@@ -677,9 +691,7 @@ public class RootArtificial extends Root {
             fromHomeFreqs[avgCounter] = Float16Utils.floatToHalf(dist);
             avgCounter = avgCounter + 1;
 //                people.get(i).exactProperties.pOIHomeProbabilities.put(value, dist);
-        System.out.println("FUCK0");
         }
-        System.out.println("FUCK1");
         avg = avg / (float) avgCounter;
         person.exactProperties.fromHomeFreqsCDF = new float[person.exactProperties.pOIs.length];
         person.exactProperties.fromHomeFreqs = new short[pOIs.size()];

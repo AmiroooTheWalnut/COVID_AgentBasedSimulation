@@ -31,6 +31,9 @@ public class AdvancedParallelRouting extends ParallelProcessor {
                     Routing routingToOthers = new Routing(parent.allData, trafficLayerIndex, CPUIndex);
                     routingToOthers.findPath(parent.allData.all_Nodes[sampleIndices.get(i)], facilities[facilityIndex].nodeLocation);
                     double distance = routingToOthers.pathDistance;
+                    if(Double.isInfinite(distance)){
+                        System.out.println("PROBLEM on node: "+sampleIndices.get(i)+" "+facilityName+" "+facilityIndex+" facility location node: "+facilities[facilityIndex].nodeLocation.id);
+                    }
                     data.get(facilityIndex).set(i, distance);
                     System.out.println(facilityName+": " + facilityIndex + " Total "+facilityName+"s: " + facilities.length + " Processed locally: " + (100-((myEndIndex-i)*100)/(myEndIndex-myStartIndex)) + " total local length: "+(myEndIndex-myStartIndex)+" Total length: "+sampleIndices.size());
                 }
