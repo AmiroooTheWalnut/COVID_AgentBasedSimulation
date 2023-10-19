@@ -39,6 +39,8 @@ public class RunConfig {
     public int numCPUsInModel;
     public boolean isArtificial;
     
+    public int fixedNumInfected=-1;
+    
     public int noTessellationNumResidents;
     
     public static RunConfig loadModel(String path){

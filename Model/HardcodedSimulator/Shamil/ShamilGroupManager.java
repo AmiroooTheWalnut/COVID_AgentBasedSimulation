@@ -58,14 +58,14 @@ public class ShamilGroupManager {
 
         for (int i = 0; i < persons.size(); i++) {
 //        for prsn in persons:
-            boolean isAlive = false;
-            for (int m = 0; m < persons.get(i).insidePeople.size(); m++) {
-                if (persons.get(i).insidePeople.get(m).sfpp.isAlive == true) {
-                    isAlive = true;
-                }
-            }
+//            boolean isAlive = false;
+//            for (int m = 0; m < persons.get(i).insidePeople.size(); m++) {
+//                if (persons.get(i).insidePeople.get(m).sfpp.isAlive == true) {
+//                    isAlive = true;
+//                }
+//            }
 
-            if (isAlive == false) {
+            if (persons.get(i).isExistAlive == false) {
 //            if not prsn.is_alive:
 
                 continue;
@@ -379,17 +379,19 @@ public class ShamilGroupManager {
     }
 
     public static void createGroupRegion(MainModel mainModel, Region region, List<Integer> transport_free_seats, int n_events, ConcurrentHashMap<String, ShamilGroup> groupDict) {
+        
 //        int transport_free_seats_size=transport_free_seats.size();
         for (int i = 0; i < region.residents.size(); i++) {
 //        for prsn in persons:
-            boolean isAlive = false;
-            for (int m = 0; m < region.residents.get(i).insidePeople.size(); m++) {
-                if (region.residents.get(i).insidePeople.get(m).sfpp.isAlive == true) {
-                    isAlive = true;
-                }
-            }
+//            boolean isAlive = false;
+//            for (int m = 0; m < region.residents.get(i).insidePeople.size(); m++) {
+//                if (region.residents.get(i).insidePeople.get(m).sfpp.isAlive == true) {
+//                    isAlive = true;
+//                    break;
+//                }
+//            }
 
-            if (isAlive == false) {
+            if (region.residents.get(i).isExistAlive == false) {
 //            if not prsn.is_alive:
                 continue;
             }
@@ -445,10 +447,13 @@ public class ShamilGroupManager {
             }
 
 //                if (group_id.length() > 0) {//if (!groupDict.containsKey(group_id) && group_id.length() > 0) {//group_id not in groupDict):
-            if (!groupDict.containsKey(group_id) && group_id.length() > 0) {
-                groupDict.put(group_id, new ShamilGroup(group_id, true));
-//                groupDict[group_id] = Group(group_id);
+            if(group_id.length()>0){
+                groupDict.putIfAbsent(group_id, new ShamilGroup(group_id, true));
             }
+//            if (!groupDict.containsKey(group_id) && group_id.length() > 0) {
+//                groupDict.put(group_id, new ShamilGroup(group_id, true));
+////                groupDict[group_id] = Group(group_id);
+//            }
             groupDict.get(group_id).persons.add(region.residents.get(i));
 //            groupDict[group_id].addPerson(prsn)
 //                }
@@ -459,14 +464,14 @@ public class ShamilGroupManager {
         for (int r = 0; r < regions.size(); r++) {
             for (int i = 0; i < regions.get(r).residents.size(); i++) {
 //        for prsn in persons:
-                boolean isAlive = false;
-                for (int m = 0; m < regions.get(r).residents.get(i).insidePeople.size(); m++) {
-                    if (regions.get(r).residents.get(i).insidePeople.get(m).sfpp.isAlive == true) {
-                        isAlive = true;
-                    }
-                }
+//                boolean isAlive = false;
+//                for (int m = 0; m < regions.get(r).residents.get(i).insidePeople.size(); m++) {
+//                    if (regions.get(r).residents.get(i).insidePeople.get(m).sfpp.isAlive == true) {
+//                        isAlive = true;
+//                    }
+//                }
 
-                if (isAlive == false) {
+                if (regions.get(r).residents.get(i).isExistAlive == false) {
 //            if not prsn.is_alive:
                     continue;
                 }

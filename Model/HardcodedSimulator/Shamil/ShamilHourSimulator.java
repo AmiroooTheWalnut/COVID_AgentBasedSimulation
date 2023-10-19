@@ -17,8 +17,15 @@ public class ShamilHourSimulator {
     public static void generateHourlyActions(MainModel mainModel, ArrayList<Person> people, int hour) {
 
         for (int i = 0; i < people.size(); i++) {
-
-            ShamilTask current_task = people.get(i).shamilPersonProperties.currentTask;
+            boolean isAlive = false;
+            for (int m = 0; m < people.get(i).insidePeople.size(); m++) {
+                if (people.get(i).insidePeople.get(m).sfpp.isAlive == true) {
+                    isAlive = true;
+                    break;
+                }
+            }
+            if (isAlive == true) {
+                ShamilTask current_task = people.get(i).shamilPersonProperties.currentTask;
 //            if(current_task!=null){
                 people.get(i).shamilPersonProperties.actions = ShamilActionManager.generateActions(mainModel, people.get(i).shamilPersonProperties.id, ShamilPersonManager.actions_def.get(people.get(i).shamilPersonProperties.currentTask.name));
 //            }
@@ -26,6 +33,7 @@ public class ShamilHourSimulator {
 //            if(print_opt):
 //                print('=== {} === {} === {} ==='.format(hour, prsn.profession, current_task))
 //                ActionManager.printActions(prsn.actions)
+            }
         }
     }
 }

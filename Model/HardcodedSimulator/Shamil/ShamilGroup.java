@@ -60,7 +60,7 @@ public class ShamilGroup {
 //            System.out.println("@@@@@@@@@@@");
 //        }
         boolean full_random_proximity = false;
-        if(persons.size()>25){
+        if(persons.size()>20){
             full_random_proximity = true;
 //            if(persons.size()>500){
 //                System.out.println(group_name+" "+persons.size());
@@ -80,7 +80,7 @@ public class ShamilGroup {
         //System.out.println(persons.size());
         if (full_random_proximity == true) {
             proximity = new double[persons.size()][persons.size()];
-            if(actions.size()==0){
+            if(actions.isEmpty()){
                 return;
             }
             for (int i = 0; i < persons.size(); i++) {
@@ -112,7 +112,7 @@ public class ShamilGroup {
         }
 
         proximity = new double[persons.size()][persons.size()];
-        if(actions.size()==0){
+        if(actions.isEmpty()){
             return;
         }
         /*

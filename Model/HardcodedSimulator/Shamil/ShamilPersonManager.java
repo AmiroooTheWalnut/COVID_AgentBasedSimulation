@@ -437,13 +437,23 @@ public class ShamilPersonManager {
     }
 
     public static void die(MainModel mainModel, Person person) {
+        boolean isAllDead = true;
         for (int m = 0; m < person.insidePeople.size(); m++) {
-            if (person.insidePeople.get(m).sfpp.infectedDays > 15) {
-                if (mainModel.ABM.root.rnd.nextDouble() > 0.97) {
-                    person.insidePeople.get(m).sfpp.isAlive = false;
-                    //print('Person {} has died'.format(self.id));
+            if (person.insidePeople.get(m).sfpp.isAlive == true) {
+                if (person.insidePeople.get(m).sfpp.infectedDays > 15) {
+                    if (mainModel.ABM.root.rnd.nextDouble() > 0.97) {
+                        person.insidePeople.get(m).sfpp.isAlive = false;
+                        //print('Person {} has died'.format(self.id));
+                    }else{
+                        isAllDead=false;
+                    }
+                }else{
+                    isAllDead=false;
                 }
             }
+        }
+        if(isAllDead==true){
+            person.isExistAlive=true;
         }
     }
 

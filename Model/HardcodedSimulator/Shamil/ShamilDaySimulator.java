@@ -134,6 +134,7 @@ public class ShamilDaySimulator {
 //            if(endProfessionName1.equals("Hospitalized") && !initialProfessionName.equals("Hospitalized")){
 //                 System.out.println("!!!!!!!!!!!!!!!!!!");
 //            }
+            boolean isAllDead=false;
             for (int O = 0; O < prsn.insidePeople.size(); O++) {
                 if (prsn.insidePeople.get(O).sfpp.isInfected == false) {
                     if (prsn.insidePeople.get(O).sfpp.infectionLevel >= INFECTION_PROBABILITY) {

@@ -99,7 +99,7 @@ public class RootArtificial extends Root {
     }
 
     @Override
-    public void constructor(MainModel modelRoot, int passed_numAgents, String passed_regionType, int passed_numRandomRegions, boolean isCompleteInfection, boolean isInfectCBGOnly, ArrayList<Integer> initialInfectionRegionIndex) {
+    public void constructor(MainModel modelRoot, int passed_numAgents, String passed_regionType, int passed_numRandomRegions, boolean isCompleteInfection, boolean isInfectCBGOnly, ArrayList<Integer> initialInfectionRegionIndex, int fixedNumInfected) {
         myModelRoot = modelRoot;
         myModelRoot.isArtificialExact = true;
         allDataGIS = myModelRoot.ABM.allData;
@@ -191,7 +191,7 @@ public class RootArtificial extends Root {
         if (modelRoot.ABM.isShamilABMActive == true) {
             if (modelRoot.ABM.isOurABMActive == true) {
                 ShamilSimulatorController.shamilAgentGenerationSpatial(modelRoot, regions, people);
-                initiallyInfect(isCompleteInfection, isInfectCBGOnly, true, initialInfectionRegionIndex);
+                initiallyInfect(isCompleteInfection, isInfectCBGOnly, true, initialInfectionRegionIndex, fixedNumInfected);
 //                initiallyInfectDummy();
                 reportConsoleOurABMInfection(true);
                 for (int i = 0; i < people.size(); i++) {
@@ -749,7 +749,7 @@ public class RootArtificial extends Root {
 
     }
 
-    public void initiallyInfect(boolean isCompleteInfection, boolean isInfectCBGOnly, boolean isExactInfection, ArrayList<Integer> initialInfectionRegionIndex) {
+    public void initiallyInfect(boolean isCompleteInfection, boolean isInfectCBGOnly, boolean isExactInfection, ArrayList<Integer> initialInfectionRegionIndex, int fixedNumInfected) {
         if (isExactInfection == true) {
             Scope scope = (Scope) (myModelRoot.ABM.studyScopeGeography);
             detectRelevantCounties(scope);
@@ -761,11 +761,18 @@ public class RootArtificial extends Root {
                     sumRelevantCountiesInfection += relevantDailyConfirmedCases.get(i).numActiveCases * (10f / 3f);
                 }
             }
-            int expectedInfectionInScope = (int) (((double) sumRelevantCountiesInfection / (double) sumRelevantCountiesPopulation) * (double) (scope.population));
+            int expectedInfectionInScope = -1;
+            if (fixedNumInfected == -1) {
+                expectedInfectionInScope = (int) (((double) sumRelevantCountiesInfection / (double) sumRelevantCountiesPopulation) * (double) (scope.population));
+            } else {
+                expectedInfectionInScope = fixedNumInfected;
+            }
             double expectedInfectionPercentage = (double) (expectedInfectionInScope) / (double) (scope.population);
             initialRecovered(expectedInfectionPercentage);
             double currentInfections = 0;
             double currentInfectionPercentage = 0;
+            int maxTry=2000;
+            int currentNumTry=0;
             while (currentInfectionPercentage < expectedInfectionPercentage) {
                 int selectedResident = (int) (rnd.nextDouble() * people.size() - 1);
                 if (rnd.nextDouble() > 0.7) {
@@ -787,9 +794,14 @@ public class RootArtificial extends Root {
                         }
                     }
                 }
+                currentNumTry=currentNumTry+1;
+                if(currentNumTry>maxTry){
+                    System.out.println("SEVERE ISSUE: MAXIMUM INFECTION TRY IS REACHED!");
+                    break;
+                }
             }
         } else {
-            super.initiallyInfect(isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
+            super.initiallyInfect(isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex,fixedNumInfected);
         }
     }
 

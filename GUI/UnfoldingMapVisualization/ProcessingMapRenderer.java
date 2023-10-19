@@ -658,7 +658,7 @@ public class ProcessingMapRenderer extends PApplet {
         }
     }
 
-    public void setRandomArcGM(ArrayList<CensusBlockGroup> cBGs, int numCBGs, int seed, float[][] dataF, int testCBG) {
+    public void setRandomArcGMSeattle(ArrayList<CensusBlockGroup> cBGs, int numCBGs, int seed, float[][] dataF, int testCBG, int[] impCBGs) {
         Random rnd = new Random(seed);
         latLons = new Location[numCBGs];
         for (int j = 0; j < numCBGs; j++) {
@@ -675,28 +675,111 @@ public class ProcessingMapRenderer extends PApplet {
         isDrawRandomArcReduced = new ArrayList();
         for (int j = 0; j < numCBGs; j++) {
             for (int k = j + 1; k < numCBGs; k++) {
-                rawFlowData[j][k] = dataF[j][k] + 0.3f+(rnd.nextFloat() * 0.2f);
+                boolean isFamous=false;
+                for (int m = 0; m < impCBGs.length; m++){
+                    if (j == impCBGs[m] || k == impCBGs[m]){
+                        if (rnd.nextDouble() < 0.04) {
+                            isFamous = true;
+                        }
+                    }
+                }
+                if (isFamous == true){
+//                    rawFlowData[j][k] = dataF[j][k]/500.0f + 0.4f+(rnd.nextFloat() * 0.8f);
+                    rawFlowData[j][k] = 0.01f+(rnd.nextFloat() * 0.7f);
+                }else{
+//                    rawFlowData[j][k] = dataF[j][k]/500.0f + 0.2f+(rnd.nextFloat() * 0.4f);
+                    rawFlowData[j][k] = 0;
+                }
+                for (int m = 0; m < impCBGs.length; m++){
+                    if (j == impCBGs[m] || k == impCBGs[m]) {
+                        if (rawFlowData[j][k] <0.669) {
+                            if (rnd.nextDouble() < 0.8) {
+                                isFamous = false;
+                            }
+                        } else {
+                            if (rnd.nextDouble() < 0.1) {
+                                isFamous = false;
+                            }
+                        }
+                    }
+                }
+                rawFlowData[j][k]=(float)Math.pow(rawFlowData[j][k],1.4);
+                sortedFlowIndices.add(new TupleIntFloat(j * (numCBGs) + k, this.rawFlowData[j][k]));
+                thirdPointDeviationPercentages[j][k] = (float) (minThirdPointCurveDeviationPercent + rnd.nextFloat() * (maxThirdPointCurveDeviationPercent - minThirdPointCurveDeviationPercent));
+                quarantinedFlowData[j][k] = rawFlowData[j][k] + ((rnd.nextFloat() - 0.5f) * 0.6f);
+                sortedFlowIndicesReduced.add(new TupleIntFloat(j * (numCBGs) + k, this.quarantinedFlowData[j][k]));
+                if (isFamous == true) {
+                    isDrawRandomArc.add(true);
+                    isDrawRandomArcReduced.add(true);
+                } else {
+                    if (rnd.nextDouble() < 0.000001) {
+                        if (rawFlowData[j][k] < 0.3 && rnd.nextDouble() < 0.01) {
+                            isDrawRandomArc.add(false);
+                            isDrawRandomArcReduced.add(false);
+                        } else {
+                            isDrawRandomArc.add(true);
+                            isDrawRandomArcReduced.add(true);
+                        }
+                    } else {
+                        isDrawRandomArc.add(false);
+                        isDrawRandomArcReduced.add(false);
+                    }
+                    if (j == testCBG) {
+                        isDrawRandomArc.add(true);
+                        isDrawRandomArcReduced.add(true);
+                    }
+                    
+                }
+            }
+        }
+        for (int j = 0; j < isDrawRandomArcReduced.size(); j++) {
+            if (rnd.nextDouble() < 0.0001) {
+                isDrawRandomArcReduced.set(j, !isDrawRandomArcReduced.get(j));
+            }
+        }
+    }
+    
+    public void setRandomArcGMTucson(ArrayList<CensusBlockGroup> cBGs, int numCBGs, int seed, float[][] dataF, int testCBG, int[] impCBGs) {
+        Random rnd = new Random(seed);
+        latLons = new Location[numCBGs];
+        for (int j = 0; j < numCBGs; j++) {
+            latLons[j] = new Location(cBGs.get(j).lon, cBGs.get(j).lat);
+        }
+        float maxThirdPointCurveDeviationPercent = 2.0F;
+        float minThirdPointCurveDeviationPercent = -2.0F;
+        thirdPointDeviationPercentages = new float[numCBGs][numCBGs];
+        rawFlowData = new float[numCBGs][numCBGs];
+        quarantinedFlowData = new float[numCBGs][numCBGs];
+        sortedFlowIndices = new ArrayList();
+        sortedFlowIndicesReduced = new ArrayList();
+        isDrawRandomArc = new ArrayList();
+        isDrawRandomArcReduced = new ArrayList();
+        for (int j = 0; j < numCBGs; j++) {
+            for (int k = j + 1; k < numCBGs; k++) {
+                
+                rawFlowData[j][k] = 0.02f+(rnd.nextFloat() * 0.4f);
+                
                 sortedFlowIndices.add(new TupleIntFloat(j * (numCBGs) + k, this.rawFlowData[j][k]));
                 thirdPointDeviationPercentages[j][k] = (float) (minThirdPointCurveDeviationPercent + rnd.nextFloat() * (maxThirdPointCurveDeviationPercent - minThirdPointCurveDeviationPercent));
                 quarantinedFlowData[j][k] = rawFlowData[j][k] + ((rnd.nextFloat() - 0.5f) * 0.6f);
                 sortedFlowIndicesReduced.add(new TupleIntFloat(j * (numCBGs) + k, this.quarantinedFlowData[j][k]));
                 if (rnd.nextDouble() < 0.00001) {
-                    isDrawRandomArc.add(true);
-                    isDrawRandomArcReduced.add(true);
-                } else {
-                    isDrawRandomArc.add(false);
-                    isDrawRandomArcReduced.add(false);
-                }
-                if (j == testCBG) {
-                    isDrawRandomArc.add(true);
-                    isDrawRandomArcReduced.add(true);
-                }
-                if (j == 27 || j == 43 || j == 88) {
-                    if (rnd.nextDouble() < 0.05) {
+                        isDrawRandomArc.add(true);
+                        isDrawRandomArcReduced.add(true);
+                    } else {
+                        isDrawRandomArc.add(false);
+                        isDrawRandomArcReduced.add(false);
+                    }
+                    if (j == testCBG) {
                         isDrawRandomArc.add(true);
                         isDrawRandomArcReduced.add(true);
                     }
-                }
+                    if (j == 27 || j == 43 || j == 88) {
+                        if (rnd.nextDouble() < 0.05) {
+                            isDrawRandomArc.add(true);
+                            isDrawRandomArcReduced.add(true);
+                        }
+                    }
             }
         }
         for (int j = 0; j < isDrawRandomArcReduced.size(); j++) {
@@ -735,12 +818,14 @@ public class ProcessingMapRenderer extends PApplet {
     }
 
     public void drawArcs() {
+//        for (int h = 0; h < 20000; h++) {
         for (int h = 0; h < sortedFlowIndices.size(); h++) {
             int y = (sortedFlowIndices.get(h).index) % (rawFlowData.length);
             int x = (int) (Math.floor(sortedFlowIndices.get(h).index / rawFlowData.length));
 //            strokeWeight(1 + quarantinedFlowData[x][y] * 6.7f);
             strokeWeight(1 + rawFlowData[x][y] * 6.7f);
             stroke(40 + (float) Math.pow(rawFlowData[x][y], 0.4) * 220, 0, 0, Math.max(0, -1 + (float) Math.pow(rawFlowData[x][y] * 4, 5)+51f));
+//            stroke(40 + (float) Math.pow(rawFlowData[x][y], 0.4) * 220, 0, 0, 250);
             if (isDrawRandomArc.get(h) == true) {
                 drawArc(x, y, latLons[x], latLons[y], 0.00045f);
             }

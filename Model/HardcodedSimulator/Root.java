@@ -120,7 +120,7 @@ public class Root extends Agent {
      * @param isInfectCBGOnly
      * @param initialInfectionRegionIndex
      */
-    public void constructor(MainModel modelRoot, int passed_numAgents, String passed_regionType, int passed_numRandomRegions, boolean isCompleteInfection, boolean isInfectCBGOnly, ArrayList<Integer> initialInfectionRegionIndex) {
+    public void constructor(MainModel modelRoot, int passed_numAgents, String passed_regionType, int passed_numRandomRegions, boolean isCompleteInfection, boolean isInfectCBGOnly, ArrayList<Integer> initialInfectionRegionIndex, int fixedNumInfected) {
         myModelRoot = modelRoot;
         regionType = passed_regionType;
 
@@ -152,7 +152,7 @@ public class Root extends Agent {
         if (modelRoot.ABM.isShamilABMActive == true) {
             if (modelRoot.ABM.isOurABMActive == true) {
                 ShamilSimulatorController.shamilAgentGenerationSpatial(modelRoot, regions, people);
-                initiallyInfect(isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
+                initiallyInfect(isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex, fixedNumInfected);
 //                initiallyInfectDummy();
                 reportConsoleOurABMInfection(true);
                 for (int i = 0; i < people.size(); i++) {
@@ -164,7 +164,7 @@ public class Root extends Agent {
             }
         } else {
             if (modelRoot.ABM.isOurABMActive == true) {
-                initiallyInfect(isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
+                initiallyInfect(isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex, fixedNumInfected);
 //                initiallyInfectDummy();
                 reportConsoleOurABMInfection(true);
                 for (int i = 0; i < people.size(); i++) {
@@ -851,7 +851,7 @@ public class Root extends Agent {
 
     }
 
-    public void initiallyInfect(boolean isCompleteInfection, boolean isInfectCBGOnly, ArrayList<Integer> initialInfectionRegionIndex) {
+    public void initiallyInfect(boolean isCompleteInfection, boolean isInfectCBGOnly, ArrayList<Integer> initialInfectionRegionIndex, int fixedNumInfected) {
         Scope scope = (Scope) (myModelRoot.ABM.studyScopeGeography);
         if (isInfectCBGOnly == false) {
             if (isCompleteInfection == true) {
@@ -864,11 +864,18 @@ public class Root extends Agent {
                         sumRelevantCountiesInfection += relevantDailyConfirmedCases.get(i).numActiveCases * (10f / 3f);
                     }
                 }
-                int expectedInfectionInScope = (int) (((double) sumRelevantCountiesInfection / (double) sumRelevantCountiesPopulation) * (double) (scope.population));
+                int expectedInfectionInScope = -1;
+                if (fixedNumInfected == -1) {
+                    expectedInfectionInScope = (int) (((double) sumRelevantCountiesInfection / (double) sumRelevantCountiesPopulation) * (double) (scope.population));
+                } else {
+                    expectedInfectionInScope = fixedNumInfected;
+                }
                 double expectedInfectionPercentage = (double) (expectedInfectionInScope) / (double) (scope.population);
                 initialRecovered(expectedInfectionPercentage);
                 double currentInfections = 0;
                 double currentInfectionPercentage = 0;
+                int maxTry = 2000;
+                int currentNumTry = 0;
                 while (currentInfectionPercentage < expectedInfectionPercentage) {
 //            System.out.println("S currentInfectionPercentage: "+currentInfectionPercentage +" expectedInfectionPercentage: "+expectedInfectionPercentage);
                     double selectedRegion = (rnd.nextDouble() * (sumRegionsPopulation));
@@ -913,6 +920,11 @@ public class Root extends Agent {
                         }
                     }
 //            System.out.println("E currentInfectionPercentage: "+currentInfectionPercentage +" expectedInfectionPercentage: "+expectedInfectionPercentage);
+                    currentNumTry = currentNumTry + 1;
+                    if (currentNumTry > maxTry) {
+                        System.out.println("SEVERE ISSUE: MAXIMUM INFECTION TRY IS REACHED!");
+                        break;
+                    }
                 }
             } else {
                 int regionPopulation = 0;
@@ -975,7 +987,7 @@ public class Root extends Agent {
                                 tryCounter += 1;
                             }
                             if (tryCounter > maxRetry) {
-                                System.out.println("MAXIMUM INFECTION TRY IS REACHED!");
+                                System.out.println("SEVERE ISSUE: MAXIMUM INFECTION TRY IS REACHED!");
                                 break;
                             }
 

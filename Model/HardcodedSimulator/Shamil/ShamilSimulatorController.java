@@ -50,7 +50,7 @@ public class ShamilSimulatorController {
             Logger.getLogger(ShamilSimulatorController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     public static void convertOurToShamilParallel(ArrayList<Person> people, MainModel myMainModel) {
         int numProcessors = myMainModel.numCPUs;
         try {
@@ -309,7 +309,16 @@ public class ShamilSimulatorController {
 
     public static void updateHour(ArrayList<Person> people, ArrayList<Region> regions, int hour, int day, boolean isSpatial, boolean debug, MainModel myMainModel) {
         for (int i = 0; i < people.size(); i++) {
-            ShamilPersonManager.updateCurrentTask(people.get(i), hour);
+//            boolean isAlive = false;
+//            for (int m = 0; m < people.get(i).insidePeople.size(); m++) {
+//                if (people.get(i).insidePeople.get(m).sfpp.isAlive == true) {
+//                    isAlive = true;
+//                    break;
+//                }
+//            }
+            if (people.get(i).isExistAlive == true) {
+                ShamilPersonManager.updateCurrentTask(people.get(i), hour);
+            }
 //            if(people.get(i).shamilPersonProperties.currentTask==null){
 //                System.out.println("NULL TASK!");
 //            }

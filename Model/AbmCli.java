@@ -199,12 +199,15 @@ public class AbmCli {
         mainModel.loadAndConnectSupplementaryCaseStudyDataKryo(datasetRoot + "/Safegraph/" + mainModel.ABM.studyScope + "/supplementaryGIS.bin");
 //          myParent.mainModel.allGISData.loadScopeCBGPolygons((Scope)(myParent.mainModel.ABM.studyScopeGeography));//THIS IS NOW IN SUPPLAMENTARY DATA
         ArrayList<Integer> infectionIndices = new ArrayList();
+        int fixedNumInfected=-1;
         if (runConfig.isSpecialScenarioActive == false) {
             if (runConfig.isSpecificRegionInfected) {
                 String[] indices = runConfig.infectedRegionIndicesString.split(",");
                 for (int i = 0; i < indices.length; i++) {
                     infectionIndices.add(Integer.valueOf(indices[i]));
                 }
+            }else{
+                fixedNumInfected=runConfig.fixedNumInfected;
             }
         } else {
             infectionIndices.add(runConfig.CBGIndexToInfect);
@@ -217,9 +220,9 @@ public class AbmCli {
         }
         mainModel.simulationDelayTime = -1;
         if (runConfig.isArtificial == false) {
-            mainModel.initModelHardCoded(false, true, runConfig.isParallelBehaviorEvaluation, runConfig.numResidents, numRegions, runConfig.numCPUsInModel, !runConfig.isSpecificRegionInfected, runConfig.isSpecialScenarioActive, infectionIndices);
+            mainModel.initModelHardCoded(false, true, runConfig.isParallelBehaviorEvaluation, runConfig.numResidents, numRegions, runConfig.numCPUsInModel, !runConfig.isSpecificRegionInfected, runConfig.isSpecialScenarioActive, infectionIndices,fixedNumInfected);
         } else {
-            mainModel.initModelArtificial(false, true, runConfig.isParallelBehaviorEvaluation, runConfig.numResidents, numRegions, runConfig.numCPUsInModel, !runConfig.isSpecificRegionInfected, runConfig.isSpecialScenarioActive, infectionIndices, runConfig.noTessellationNumResidents);
+            mainModel.initModelArtificial(false, true, runConfig.isParallelBehaviorEvaluation, runConfig.numResidents, numRegions, runConfig.numCPUsInModel, !runConfig.isSpecificRegionInfected, runConfig.isSpecialScenarioActive, infectionIndices, runConfig.noTessellationNumResidents,fixedNumInfected);
         }
         mainModel.ABM.agents = new CopyOnWriteArrayList(mainModel.ABM.agentsRaw);
         mainModel.startTimeNanoSecond = System.nanoTime();

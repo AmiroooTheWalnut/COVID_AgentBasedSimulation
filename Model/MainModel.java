@@ -349,7 +349,7 @@ public class MainModel extends Dataset {
         ABM.agentTemplates.add(rootAgentTemplate);
     }
 
-    public void initModelHardCoded(boolean isRunFromGUI, boolean isParallelLoadingData, boolean isParallelBehaviorEvaluation, int numResidents, int numRegions, int numCPUs, boolean isCompleteInfection, boolean isInfectCBGOnly, ArrayList<Integer> initialInfectionRegionIndex) {
+    public void initModelHardCoded(boolean isRunFromGUI, boolean isParallelLoadingData, boolean isParallelBehaviorEvaluation, int numResidents, int numRegions, int numCPUs, boolean isCompleteInfection, boolean isInfectCBGOnly, ArrayList<Integer> initialInfectionRegionIndex, int fixedNumInfected) {
         isResultSavedAtTheEnd = false;
         int month = ABM.startTime.getMonthValue();
         currentMonth = month;
@@ -380,21 +380,21 @@ public class MainModel extends Dataset {
         ABM.root.numAgents = numResidents;
 
         if (scenario.scenarioName.equals("CBG")) {
-            ABM.root.constructor(this, numResidents, "CBG", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
+            ABM.root.constructor(this, numResidents, "CBG", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex, fixedNumInfected);
         } else if (scenario.scenarioName.equals("VDFMTH")) {
-            ABM.root.constructor(this, numResidents, "VDFMTH", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
+            ABM.root.constructor(this, numResidents, "VDFMTH", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex, fixedNumInfected);
         } else if (scenario.scenarioName.equals("CBGVDFMTH")) {
-            ABM.root.constructor(this, numResidents, "CBGVDFMTH", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
+            ABM.root.constructor(this, numResidents, "CBGVDFMTH", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex,fixedNumInfected);
         } else if (scenario.scenarioName.equals("AVDFMTH")) {
-            ABM.root.constructor(this, numResidents, "AVDFMTH", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
+            ABM.root.constructor(this, numResidents, "AVDFMTH", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex,fixedNumInfected);
         } else if (scenario.scenarioName.startsWith("RMCBG")) {
-            ABM.root.constructor(this, numResidents, "RMCBG", numRegions, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
+            ABM.root.constructor(this, numResidents, "RMCBG", numRegions, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex,fixedNumInfected);
         } else if (scenario.scenarioName.startsWith("VDFNC")) {
             String[] temp = scenario.scenarioName.split("_");
             int numCells = Integer.valueOf(temp[1]);
-            ABM.root.constructor(this, numResidents, "VDFNC", numCells, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
+            ABM.root.constructor(this, numResidents, "VDFNC", numCells, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex,fixedNumInfected);
         } else if (scenario.scenarioName.equals("OVD")) {
-            ABM.root.constructor(this, numResidents, "OVD", numRegions, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
+            ABM.root.constructor(this, numResidents, "OVD", numRegions, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex,fixedNumInfected);
         }
         ABM.measureHolder.initializeMeasures((Scope) (ABM.studyScopeGeography), ABM.root.pOIs);
 
@@ -417,7 +417,7 @@ public class MainModel extends Dataset {
         resetTimerTask(isRunFromGUI, passingNumCPU, true, isInfectCBGOnly);
     }
 
-    public void initModelArtificial(boolean isRunFromGUI, boolean isParallelLoadingData, boolean isParallelBehaviorEvaluation, int numResidents, int numRegions, int numCPUs, boolean isCompleteInfection, boolean isInfectCBGOnly, ArrayList<Integer> initialInfectionRegionIndex, int numNoTessellation) {
+    public void initModelArtificial(boolean isRunFromGUI, boolean isParallelLoadingData, boolean isParallelBehaviorEvaluation, int numResidents, int numRegions, int numCPUs, boolean isCompleteInfection, boolean isInfectCBGOnly, ArrayList<Integer> initialInfectionRegionIndex, int numNoTessellation, int fixedNumInfected) {
         isResultSavedAtTheEnd = false;
         int month = ABM.startTime.getMonthValue();
         currentMonth = month;
@@ -455,29 +455,29 @@ public class MainModel extends Dataset {
         ((RootArtificial) (ABM.root)).numNoTessellation = numNoTessellation;
 
         if (scenario.scenarioName.equals("CBG")) {
-            ABM.root.constructor(this, numResidents, "CBG", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
+            ABM.root.constructor(this, numResidents, "CBG", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex,fixedNumInfected);
         } else if (scenario.scenarioName.equals("VDFMTH")) {
-            ABM.root.constructor(this, numResidents, "VDFMTH", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
+            ABM.root.constructor(this, numResidents, "VDFMTH", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex,fixedNumInfected);
         } else if (scenario.scenarioName.equals("CBGVDFMTH")) {
-            ABM.root.constructor(this, numResidents, "CBGVDFMTH", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
+            ABM.root.constructor(this, numResidents, "CBGVDFMTH", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex,fixedNumInfected);
         } else if (scenario.scenarioName.equals("VD_CBG")) {
-            ABM.root.constructor(this, numResidents, "VD_CBG", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
+            ABM.root.constructor(this, numResidents, "VD_CBG", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex,fixedNumInfected);
         } else if (scenario.scenarioName.equals("VD_CBGVD")) {
-            ABM.root.constructor(this, numResidents, "VD_CBGVD", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
+            ABM.root.constructor(this, numResidents, "VD_CBGVD", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex,fixedNumInfected);
         } else if (scenario.scenarioName.equals("AVDFMTH")) {
-            ABM.root.constructor(this, numResidents, "AVDFMTH", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
+            ABM.root.constructor(this, numResidents, "AVDFMTH", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex,fixedNumInfected);
         } else if (scenario.scenarioName.startsWith("RMCBG")) {
-            ABM.root.constructor(this, numResidents, "RMCBG", numRegions, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
+            ABM.root.constructor(this, numResidents, "RMCBG", numRegions, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex,fixedNumInfected);
         } else if (scenario.scenarioName.startsWith("Xmeans")) {
-            ABM.root.constructor(this, numResidents, "Xmeans", numRegions, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
+            ABM.root.constructor(this, numResidents, "Xmeans", numRegions, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex,fixedNumInfected);
         } else if (scenario.scenarioName.startsWith("VDFNC")) {
             String[] temp = scenario.scenarioName.split("_");
             int numCells = Integer.valueOf(temp[1]);
-            ABM.root.constructor(this, numResidents, "VDFNC", numCells, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
+            ABM.root.constructor(this, numResidents, "VDFNC", numCells, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex,fixedNumInfected);
         } else if (scenario.scenarioName.equals("OVD")) {
-            ABM.root.constructor(this, numResidents, "OVD", numRegions, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
+            ABM.root.constructor(this, numResidents, "OVD", numRegions, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex,fixedNumInfected);
         } else if (scenario.scenarioName.equals("noTessellation")) {
-            ABM.root.constructor(this, numResidents, "noTessellation", numRegions, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex);
+            ABM.root.constructor(this, numResidents, "noTessellation", numRegions, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex,fixedNumInfected);
         }
         ABM.measureHolder.initializeMeasures((Scope) (ABM.studyScopeGeography), ABM.root.pOIs);
 
@@ -680,7 +680,7 @@ public class MainModel extends Dataset {
             agentEvalPool = Executors.newFixedThreadPool(numCPUs);
         }
         if (groupInteractionEvalPool == null) {
-            groupInteractionEvalPool = Executors.newFixedThreadPool(numCPUs);
+            groupInteractionEvalPool = Executors.newFixedThreadPool(2*numCPUs);
         }
         if (isHardCoded == true) {
             if (simulationDelayTime > -1) {

@@ -31,6 +31,8 @@ public class Person extends Agent {
     public boolean isPolledPTAVSP = false;
     
     public boolean isActive = false;//IF OUR ABM IS ACTIVE, THEN THIS CLASS'S BEHAVIOR WILL RUN
+    
+    public boolean isExistAlive = true;//THIS IS UPDATED EVERY DAY
 
     public int numTravels = 0;
     public int numTravelsInDay = 0;
