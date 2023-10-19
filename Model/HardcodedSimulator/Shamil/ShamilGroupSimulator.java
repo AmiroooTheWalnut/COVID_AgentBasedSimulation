@@ -129,7 +129,7 @@ public class ShamilGroupSimulator {
             Person acting_person = grp.persons.get(grp.person_mapper.get(acting_person_id));
 //            acting_person = grp.persons[grp.person_mapper[acting_person_id]];
 
-            int numProcessors = 2*mainModel.numCPUs;
+            int numProcessors = mainModel.numCPUs;
             try {
                 AdvancedParallelGroupInteractionPersonsEvaluator parallelGroupInteractionPersonsEvaluator[] = new AdvancedParallelGroupInteractionPersonsEvaluator[numProcessors];
 

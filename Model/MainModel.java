@@ -680,7 +680,7 @@ public class MainModel extends Dataset {
             agentEvalPool = Executors.newFixedThreadPool(numCPUs);
         }
         if (groupInteractionEvalPool == null) {
-            groupInteractionEvalPool = Executors.newFixedThreadPool(2*numCPUs);
+            groupInteractionEvalPool = Executors.newFixedThreadPool(numCPUs);
         }
         if (isHardCoded == true) {
             if (simulationDelayTime > -1) {
