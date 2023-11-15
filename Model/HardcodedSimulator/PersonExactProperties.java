@@ -8,7 +8,7 @@ import esmaieeli.gisFastLocationOptimization.GIS3D.LocationNode;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class PersonExactProperties {
     public LocationNode exactHomeLocation;

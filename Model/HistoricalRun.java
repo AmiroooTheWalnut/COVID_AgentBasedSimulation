@@ -33,7 +33,7 @@ import org.objenesis.strategy.StdInstantiatorStrategy;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class HistoricalRun implements Serializable {
 

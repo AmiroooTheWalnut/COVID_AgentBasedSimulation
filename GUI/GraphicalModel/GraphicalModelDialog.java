@@ -35,7 +35,7 @@ import java.util.List;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class GraphicalModelDialog extends javax.swing.JDialog {
 
@@ -159,7 +159,7 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
             }
         });
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Amidst (DEPRECIATED)"));
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Amidst (DEPRECATED)"));
 
         jButton1.setText("Test generate net");
         jButton1.addActionListener(new java.awt.event.ActionListener() {

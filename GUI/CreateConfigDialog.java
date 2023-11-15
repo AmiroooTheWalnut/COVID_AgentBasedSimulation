@@ -10,7 +10,7 @@ import javax.swing.JFileChooser;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class CreateConfigDialog extends javax.swing.JDialog {
 

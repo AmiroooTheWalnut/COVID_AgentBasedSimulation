@@ -7,7 +7,7 @@ package COVID_AgentBasedSimulation.Model.HardcodedSimulator;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 class PersonGenerated {
     

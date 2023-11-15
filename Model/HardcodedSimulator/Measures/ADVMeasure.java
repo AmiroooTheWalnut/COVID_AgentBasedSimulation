@@ -9,7 +9,7 @@ import COVID_AgentBasedSimulation.Model.Structure.CensusBlockGroup;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class ADVMeasure {
     public CensusBlockGroup source;//s

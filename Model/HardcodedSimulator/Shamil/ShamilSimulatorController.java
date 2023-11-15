@@ -14,19 +14,23 @@ import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Root.statusEnum;
 import COVID_AgentBasedSimulation.Model.MainModel;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class ShamilSimulatorController {
 
     public static ArrayList<HashMap<Integer, ArrayList<Integer>>> daily_groups;
     public static int n_infected_init = 200;
+
+    public ShamilGroupManager shamilGroupManager = new ShamilGroupManager();
 
     public static void convertShamilToOurParallel(ArrayList<Person> people, MainModel myMainModel) {
         int numProcessors = myMainModel.numCPUs;
@@ -45,8 +49,13 @@ public class ShamilSimulatorController {
             }
 
             //myMainModel.agentEvalPool.invokeAny(calls);
-            myMainModel.agentEvalPool.invokeAll(calls);
+            List<Future<Object>> futures = myMainModel.agentEvalPool.invokeAll(calls);
+            for (int n = 0; n < futures.size(); n++) {
+                futures.get(n).get();
+            }
         } catch (InterruptedException ex) {
+            Logger.getLogger(ShamilSimulatorController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ExecutionException ex) {
             Logger.getLogger(ShamilSimulatorController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -68,8 +77,13 @@ public class ShamilSimulatorController {
             }
 
             //myMainModel.agentEvalPool.invokeAny(calls);
-            myMainModel.agentEvalPool.invokeAll(calls);
+            List<Future<Object>> futures = myMainModel.agentEvalPool.invokeAll(calls);
+            for (int n = 0; n < futures.size(); n++) {
+                futures.get(n).get();
+            }
         } catch (InterruptedException ex) {
+            Logger.getLogger(ShamilSimulatorController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ExecutionException ex) {
             Logger.getLogger(ShamilSimulatorController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -240,7 +254,7 @@ public class ShamilSimulatorController {
 //        System.out.println("convertOurToShamil INF: "+inf);
     }
 
-    public static void runRawShamilSimulation(ArrayList<Person> people, int numDaysToSimulate, MainModel mainModel) {
+    public void runRawShamilSimulation(ArrayList<Person> people, int numDaysToSimulate, MainModel mainModel) {
         shamilAgentGeneration(mainModel, people);
         for (int d = 0; d < numDaysToSimulate; d++) {
             startDay(mainModel, people, d);
@@ -251,7 +265,7 @@ public class ShamilSimulatorController {
         }
     }
 
-    public static void runShamilSimulationOnly(ArrayList<Person> people, int numDaysToSimulate, MainModel mainModel) {
+    public void runShamilSimulationOnly(ArrayList<Person> people, int numDaysToSimulate, MainModel mainModel) {
         for (int d = 0; d < numDaysToSimulate; d++) {
             startDay(mainModel, people, d);
             for (int h = 0; h < 24; h++) {
@@ -307,7 +321,7 @@ public class ShamilSimulatorController {
         daily_groups = new ArrayList();
     }
 
-    public static void updateHour(ArrayList<Person> people, ArrayList<Region> regions, int hour, int day, boolean isSpatial, boolean debug, MainModel myMainModel) {
+    public void updateHour(ArrayList<Person> people, ArrayList<Region> regions, int hour, int day, boolean isSpatial, boolean debug, MainModel myMainModel) {
         for (int i = 0; i < people.size(); i++) {
 //            boolean isAlive = false;
 //            for (int m = 0; m < people.get(i).insidePeople.size(); m++) {
@@ -326,9 +340,9 @@ public class ShamilSimulatorController {
         ShamilHourSimulator.generateHourlyActions(myMainModel, people, hour);
         Object output[];
         if (isSpatial == true) {
-            output = ShamilGroupManager.assignGroupsSpatial(regions, tracing_percentage, day, debug, myMainModel);
+            output = shamilGroupManager.assignGroupsSpatial(regions, tracing_percentage, day, debug, myMainModel);
         } else {
-            output = ShamilGroupManager.assignGroups(myMainModel, people, tracing_percentage, day);
+            output = shamilGroupManager.assignGroups(myMainModel, people, tracing_percentage, day);
         }
 
         ArrayList<ShamilGroup> groups = (ArrayList<ShamilGroup>) output[0];
@@ -372,8 +386,13 @@ public class ShamilSimulatorController {
             }
 
 //            myMainModel.agentEvalPool.invokeAny(calls);
-            myMainModel.agentEvalPool.invokeAll(calls);
+            List<Future<Object>> futures = myMainModel.agentEvalPool.invokeAll(calls);
+            for (int n = 0; n < futures.size(); n++) {
+                futures.get(n).get();
+            }
         } catch (InterruptedException ex) {
+            Logger.getLogger(ShamilSimulatorController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ExecutionException ex) {
             Logger.getLogger(ShamilSimulatorController.class.getName()).log(Level.SEVERE, null, ex);
         }
 //        catch (ExecutionException ex) {

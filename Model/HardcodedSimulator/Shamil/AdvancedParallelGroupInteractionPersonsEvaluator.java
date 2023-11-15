@@ -14,7 +14,7 @@ import java.util.concurrent.Executors;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class AdvancedParallelGroupInteractionPersonsEvaluator extends ParallelProcessor {
     public Runnable myRunnable;

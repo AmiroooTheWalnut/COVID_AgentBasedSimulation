@@ -12,7 +12,7 @@ import java.util.Collections;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class ShamilActionManager {
 

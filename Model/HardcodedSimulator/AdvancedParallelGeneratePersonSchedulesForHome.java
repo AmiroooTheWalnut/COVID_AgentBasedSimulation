@@ -11,7 +11,7 @@ import java.util.concurrent.Executors;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class AdvancedParallelGeneratePersonSchedulesForHome extends ParallelProcessor {
     Runnable myRunnable;

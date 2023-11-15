@@ -8,7 +8,7 @@ import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilFuzzyabl
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class FuzzyPerson {
 

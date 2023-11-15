@@ -15,7 +15,7 @@ import java.util.concurrent.Executors;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class AdvancedParallelGroupCreator extends ParallelProcessor {
     Runnable myRunnable;
@@ -26,7 +26,7 @@ public class AdvancedParallelGroupCreator extends ParallelProcessor {
             @Override
             public void run() {
                 for (int i = myStartIndex; i < myEndIndex; i++) {
-                    ShamilGroupManager.createGroupRegion(parent, regions.get(i), transport_free_seats, n_events, groupDict);
+                    parent.ABM.root.shamilSimulatorController.shamilGroupManager.createGroupRegion(parent, regions.get(i), transport_free_seats, n_events, groupDict);
                 }
             }
         };

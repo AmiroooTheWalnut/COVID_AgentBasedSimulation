@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class MyPolygons {
     public ArrayList<MyPolygon> polygons=new ArrayList();

@@ -6,7 +6,7 @@ package COVID_AgentBasedSimulation.Model.AgentBasedModel;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class Scenario {
     public String scenarioName= "CBG";

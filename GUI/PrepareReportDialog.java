@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class PrepareReportDialog extends javax.swing.JDialog {
 

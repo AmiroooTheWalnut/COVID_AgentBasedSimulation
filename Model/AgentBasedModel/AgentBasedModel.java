@@ -27,9 +27,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -143,8 +145,11 @@ public class AgentBasedModel {
                 }
 
                 //myMainModel.agentEvalPool.invokeAny(calls);
-                myMainModel.agentEvalPool.invokeAll(calls);
-
+                List<Future<Object>> futures = myMainModel.agentEvalPool.invokeAll(calls);
+                for(int n=0;n<futures.size();n++){
+                    futures.get(n).get();
+                }
+                
                 //\/\/\/ OLD DESIGN WITH THREADS
 //                for (int i = 0; i < numProcessors; i++) {
 //                    parallelAgentEval[i].myThread.start();
@@ -214,8 +219,11 @@ public class AgentBasedModel {
                 }
 
 //                myMainModel.agentEvalPool.invokeAny(calls);
-                myMainModel.agentEvalPool.invokeAll(calls);
-
+                List<Future<Object>> futures = myMainModel.agentEvalPool.invokeAll(calls);
+                for(int n=0;n<futures.size();n++){
+                    futures.get(n).get();
+                }
+                
                 //\/\/\/ OLD DESIGN WITH THREADS
 //                for (int i = 0; i < numProcessors; i++) {
 //                    parallelAgentEval[i].myThread.start();

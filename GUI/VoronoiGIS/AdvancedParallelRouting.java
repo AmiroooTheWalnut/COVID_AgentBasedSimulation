@@ -15,7 +15,7 @@ import java.util.concurrent.Executors;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class AdvancedParallelRouting extends ParallelProcessor {
 

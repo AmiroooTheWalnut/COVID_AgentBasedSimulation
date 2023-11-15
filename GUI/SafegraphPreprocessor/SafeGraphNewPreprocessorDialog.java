@@ -21,7 +21,7 @@ import java.util.ArrayList;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class SafeGraphNewPreprocessorDialog extends javax.swing.JDialog {
 

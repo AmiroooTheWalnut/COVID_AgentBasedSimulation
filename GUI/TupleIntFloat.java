@@ -6,7 +6,7 @@ package COVID_AgentBasedSimulation.GUI;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class TupleIntFloat implements Comparable<TupleIntFloat> {
     public int index;

@@ -16,7 +16,7 @@ import COVID_AgentBasedSimulation.Model.Data.CovidCsseJhu.DailyConfirmedCases;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilSimulatorController;
 import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilSimulatorController.endDay;
 import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilSimulatorController.startDay;
-import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilSimulatorController.updateHour;
+//import static COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil.ShamilSimulatorController.updateHour;
 import COVID_AgentBasedSimulation.Model.Structure.CBGVDCell;
 import COVID_AgentBasedSimulation.Model.Structure.City;
 import COVID_AgentBasedSimulation.Model.Structure.Scope;
@@ -55,6 +55,8 @@ public class Root extends Agent {
     public int numContacts;
 
     public double pTSFraction;//USED FOR FUZZY STATUS
+    
+    public ShamilSimulatorController shamilSimulatorController=new ShamilSimulatorController();
 
     public enum statusEnum {
         SUSCEPTIBLE, INFECTED_SYM, INFECTED_ASYM, RECOVERED, DEAD;
@@ -1137,7 +1139,7 @@ public class Root extends Agent {
             //if (myModelRoot.ABM.currentTime.getHour() == 9) {
             //    debug = true;
             //}
-            updateHour(people, regions, myModelRoot.ABM.currentTime.getHour(), day, isSpatial, debug, myModelRoot);
+            shamilSimulatorController.updateHour(people, regions, myModelRoot.ABM.currentTime.getHour(), day, isSpatial, debug, myModelRoot);
         }
         if (myModelRoot.ABM.currentTime.getHour() == 23 && myModelRoot.ABM.currentTime.getMinute() == 59) {
             endDay(myModelRoot, people, day, isFuzzyStatus, pTSFraction);

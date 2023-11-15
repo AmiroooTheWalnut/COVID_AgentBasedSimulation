@@ -18,7 +18,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class Person extends Agent {
     

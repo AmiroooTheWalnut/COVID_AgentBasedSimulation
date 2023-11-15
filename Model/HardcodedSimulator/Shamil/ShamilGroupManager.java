@@ -15,17 +15,44 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class ShamilGroupManager {
 
-    public static Object[] assignGroups(MainModel mainModel, ArrayList<Person> persons, double tracing_percentage, int num_of_day) {
+    public ArrayList<Integer> transport_free_seats;
+    public AtomicInteger transportSeatIndex = new AtomicInteger(-1);
+    public AtomicInteger privateTransportIndex = new AtomicInteger(0);
+    public int maxPrivateTransportSize = 4;
+    private int privateTransportCounter = 0;
+
+    public AtomicInteger hospitalIndex = new AtomicInteger(0);
+    public int maxHospitalGroupSize = 100;
+    private int hospitalCounter = 0;
+
+    public ShamilGroupManager() {
+        int n_transport = (ShamilPersonManager.preference_def.get("n_transport")).intValue();
+        int transport_seat_limit = (ShamilPersonManager.preference_def.get("transport_seat_limit")).intValue();
+        transport_free_seats = new ArrayList();
+        for (int i = 0; i < n_transport; i++) {// i in range(n_transport):            
+            ArrayList<Integer> temp = new ArrayList();
+            for (int j = 0; j < transport_seat_limit; j++) {
+                temp.add(i);
+            }
+            transport_free_seats.addAll(temp);
+//            transport_free_seats.extend([i]*transport_seat_limit)
+        }
+    }
+
+    public Object[] assignGroups(MainModel mainModel, ArrayList<Person> persons, double tracing_percentage, int num_of_day) {
         HashMap<Integer, ArrayList<Integer>> person_group = new HashMap();
 //        person_group = {}
         //# fline = open("seed.txt").readline().rstrip()
@@ -172,7 +199,7 @@ public class ShamilGroupManager {
 
     }
 
-    public static Object[] assignGroupsSpatial(ArrayList<Region> regions, double tracing_percentage, int num_of_day, boolean debug, MainModel myMainModel) {
+    public Object[] assignGroupsSpatial(ArrayList<Region> regions, double tracing_percentage, int num_of_day, boolean debug, MainModel myMainModel) {
         HashMap<Integer, ArrayList<Integer>> person_group = new HashMap();
 //        person_group = {}
         //# fline = open("seed.txt").readline().rstrip()
@@ -182,27 +209,27 @@ public class ShamilGroupManager {
         ConcurrentHashMap<String, ShamilGroup> groupDict = new ConcurrentHashMap();
 //        groupDict = {}
 
-        ArrayList<Integer> transport_free_seats = new ArrayList();
+//        ArrayList<Integer> transport_free_seats = new ArrayList();
 //        transport_free_seats = []
-
-        int n_transport = (ShamilPersonManager.preference_def.get("n_transport")).intValue();
-//        n_transport = dfToInt(preferences_df, "n_transport")
-        int transport_seat_limit = (ShamilPersonManager.preference_def.get("transport_seat_limit")).intValue();
-//        transport_seat_limit = dfToInt(preferences_df, "transport_seat_limit")
+//        int n_transport = (ShamilPersonManager.preference_def.get("n_transport")).intValue();
+////        n_transport = dfToInt(preferences_df, "n_transport")
+//        int transport_seat_limit = (ShamilPersonManager.preference_def.get("transport_seat_limit")).intValue();
+////        transport_seat_limit = dfToInt(preferences_df, "transport_seat_limit")
         int n_events = (ShamilPersonManager.preference_def.get("n_events")).intValue();
 //        n_events = dfToInt(preferences_df, "n_events")
         int quarantine_start = (ShamilPersonManager.preference_def.get("quarantine_start")).intValue();
 //        quarantine_start = dfToInt(preferences_df, "quarantine_start")
 
-        for (int i = 0; i < n_transport; i++) {// i in range(n_transport):            
-            ArrayList<Integer> temp = new ArrayList();
-            for (int j = 0; j < transport_seat_limit; j++) {
-                temp.add(i);
-            }
-            transport_free_seats.addAll(temp);
-//            transport_free_seats.extend([i]*transport_seat_limit)
-        }
-        List<Integer> transport_free_seats_Sync = Collections.synchronizedList(transport_free_seats);
+//        for (int i = 0; i < n_transport; i++) {// i in range(n_transport):            
+//            ArrayList<Integer> temp = new ArrayList();
+//            for (int j = 0; j < transport_seat_limit; j++) {
+//                temp.add(i);
+//            }
+//            transport_free_seats.addAll(temp);
+////            transport_free_seats.extend([i]*transport_seat_limit)
+//        }
+//        List<Integer> transport_free_seats_Sync = Collections.synchronizedList(transport_free_seats);
+        Collections.shuffle(transport_free_seats);
 
         try {
             int numProcessors = myMainModel.numCPUs;
@@ -210,9 +237,9 @@ public class ShamilGroupManager {
             AdvancedParallelGroupCreator parallelGroupCreate[] = new AdvancedParallelGroupCreator[numProcessors];
 
             for (int i = 0; i < numProcessors - 1; i++) {
-                parallelGroupCreate[i] = new AdvancedParallelGroupCreator(myMainModel, regions, transport_free_seats_Sync, n_events, groupDict, (int) Math.floor(i * ((regions.size()) / numProcessors)), (int) Math.floor((i + 1) * ((regions.size()) / numProcessors)));
+                parallelGroupCreate[i] = new AdvancedParallelGroupCreator(myMainModel, regions, transport_free_seats, n_events, groupDict, (int) Math.floor(i * ((regions.size()) / numProcessors)), (int) Math.floor((i + 1) * ((regions.size()) / numProcessors)));
             }
-            parallelGroupCreate[numProcessors - 1] = new AdvancedParallelGroupCreator(myMainModel, regions, transport_free_seats_Sync, n_events, groupDict, (int) Math.floor((numProcessors - 1) * ((regions.size()) / numProcessors)), regions.size());
+            parallelGroupCreate[numProcessors - 1] = new AdvancedParallelGroupCreator(myMainModel, regions, transport_free_seats, n_events, groupDict, (int) Math.floor((numProcessors - 1) * ((regions.size()) / numProcessors)), regions.size());
 
             ArrayList<Callable<Object>> calls = new ArrayList<Callable<Object>>();
 
@@ -221,7 +248,10 @@ public class ShamilGroupManager {
             }
 
 //            myMainModel.agentEvalPool.invokeAny(calls);
-            myMainModel.agentEvalPool.invokeAll(calls);
+            List<Future<Object>> futures = myMainModel.agentEvalPool.invokeAll(calls);
+            for (int i = 0; i < futures.size(); i++) {
+                futures.get(i);
+            }
         } catch (InterruptedException ex) {
             Logger.getLogger(ShamilSimulatorController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -307,15 +337,32 @@ public class ShamilGroupManager {
             ArrayList<Integer> personid_arr = new ArrayList();
             for (int j = 0; j < personarr.size(); j++) { // pers in personarr:
                 double decision_var = myMainModel.ABM.root.rnd.nextDouble();
-                if (decision_var < tracing_percentage && personarr.get(j).shamilPersonProperties.isTraceable) {
-                    personid_arr.add(personarr.get(j).shamilPersonProperties.id);
+//                if(personarr.get(j)==null){
+//                    for(int m=0;m<regions.size();m++){
+//                        for(int h=0;h<regions.get(m).residents.size();h++){
+//                            if(regions.get(m).residents.get(h)==null){
+//                                System.out.println("EXTREME ISSUE! REGION HAS NULL RESIDENT!");
+//                            }
+//                        }
+//                    }
+//                }
+                if (personarr.get(j) != null) {
+                    if (decision_var < tracing_percentage && personarr.get(j).shamilPersonProperties.isTraceable) {
+                        personid_arr.add(personarr.get(j).shamilPersonProperties.id);
+                    }
+                } else {
+                    personid_arr.remove(j);
                 }
             }
 
             for (int j = 0; j < personarr.size(); j++) {// prsn in personarr:
                 // #print(prsn.id)
                 // #person_group[prsn.id] = personarr
-                person_group.put(personarr.get(j).shamilPersonProperties.id, personid_arr);//[prsn.id] = personid_arr
+                if (personarr.get(j) != null) {
+                    person_group.put(personarr.get(j).shamilPersonProperties.id, personid_arr);//[prsn.id] = personid_arr
+                } else {
+                    personid_arr.remove(j);
+                }
             }
 
             // #print(person_group)
@@ -344,9 +391,14 @@ public class ShamilGroupManager {
             }
 
 //            myMainModel.agentEvalPool.invokeAny(calls);
-            myMainModel.agentEvalPool.invokeAll(calls);
+            List<Future<Object>> futures = myMainModel.agentEvalPool.invokeAll(calls);
+            for (int n = 0; n < futures.size(); n++) {
+                futures.get(n).get();
+            }
         } catch (InterruptedException ex) {
             Logger.getLogger(ShamilSimulatorController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ExecutionException ex) {
+            Logger.getLogger(ShamilGroupManager.class.getName()).log(Level.SEVERE, null, ex);
         }
 //        catch (ExecutionException ex) {
 //            Logger.getLogger(ShamilGroupManager.class.getName()).log(Level.SEVERE, null, ex);
@@ -378,8 +430,8 @@ public class ShamilGroupManager {
 
     }
 
-    public static void createGroupRegion(MainModel mainModel, Region region, List<Integer> transport_free_seats, int n_events, ConcurrentHashMap<String, ShamilGroup> groupDict) {
-        
+    public void createGroupRegion(MainModel mainModel, Region region, List<Integer> transport_free_seats, int n_events, ConcurrentHashMap<String, ShamilGroup> groupDict) {
+
 //        int transport_free_seats_size=transport_free_seats.size();
         for (int i = 0; i < region.residents.size(); i++) {
 //        for prsn in persons:
@@ -404,17 +456,36 @@ public class ShamilGroupManager {
 //                group_id = "F-{}".format(prsn.family_id)
             } else if (region.residents.get(i).shamilPersonProperties.currentTask.name.equals("Go to Work") || region.residents.get(i).shamilPersonProperties.currentTask.name.equals("Returns Home")) {
 //                int selected_transport_index = (int) (mainModel.ABM.root.rnd.nextDouble() * transport_free_seats_size);
-                synchronized (transport_free_seats) {
-                    int selected_transport_index = (int) (mainModel.ABM.root.rnd.nextDouble() * transport_free_seats.size());
-                    int selected_transport = transport_free_seats.get(selected_transport_index);
-//                selected_transport = random.choice(transport_free_seats)
-
-                    transport_free_seats.remove(selected_transport);
-//                transport_free_seats.remove(selected_transport)
-
-                    group_id = "T-" + selected_transport;
-                }
+//                synchronized (transport_free_seats) {
+//                    int selected_transport_index = (int) (mainModel.ABM.root.rnd.nextDouble() * transport_free_seats.size());
+//                    int selected_transport = transport_free_seats.get(selected_transport_index);
+////                selected_transport = random.choice(transport_free_seats)
+//
+//                    transport_free_seats.remove(selected_transport);
+////                transport_free_seats.remove(selected_transport)
+//
+//                    group_id = "T-" + selected_transport;
+//                }
 //                group_id = "T-{}".format(selected_transport);
+
+                int v = transportSeatIndex.incrementAndGet();
+                int selected_transport = 0;
+                if (v < transport_free_seats.size()) {
+                    selected_transport = transport_free_seats.get(v);
+                } else {
+                    privateTransportCounter = privateTransportCounter + 1;
+                    if (privateTransportCounter > maxPrivateTransportSize) {
+                        int vp = privateTransportIndex.decrementAndGet();
+                        selected_transport = vp;
+                        privateTransportCounter = 0;
+                    } else {
+                        selected_transport = privateTransportIndex.get();
+                    }
+                }
+
+//                selected_transport = random.choice(transport_free_seats)
+                group_id = "T-" + selected_transport;
+
             } else if (region.residents.get(i).shamilPersonProperties.currentTask.name.equals("Work")) {
                 group_id = "W-" + region.residents.get(i).shamilPersonProperties.professionGroupId;
 //                group_id = "W-{}".format(prsn.profession_group_id)                
@@ -441,19 +512,42 @@ public class ShamilGroupManager {
                  */
 
             } else if (region.residents.get(i).shamilPersonProperties.currentTask.name.equals("Stay Hospital")) {
-                group_id = "H";
+                int selected_group;
+                hospitalCounter = hospitalCounter + 1;
+                if (hospitalCounter > maxHospitalGroupSize) {
+                    int vp = hospitalIndex.incrementAndGet();
+                    selected_group = vp;
+                    hospitalCounter = 0;
+                } else {
+                    selected_group = hospitalIndex.get();
+                }
+                group_id = "H-" + selected_group;
+//                group_id = "H";
             } else if (region.residents.get(i).shamilPersonProperties.currentTask.name.equals("Treat Patients")) {
-                group_id = "H";
+                int selected_group;
+                hospitalCounter = hospitalCounter + 1;
+                if (hospitalCounter > maxHospitalGroupSize) {
+                    int vp = hospitalIndex.incrementAndGet();
+                    selected_group = vp;
+                    hospitalCounter = 0;
+                } else {
+                    selected_group = hospitalIndex.get();
+                }
+                group_id = "H-" + selected_group;
+//                group_id = "H";
             }
 
 //                if (group_id.length() > 0) {//if (!groupDict.containsKey(group_id) && group_id.length() > 0) {//group_id not in groupDict):
-            if(group_id.length()>0){
+            if (group_id.length() > 0) {
                 groupDict.putIfAbsent(group_id, new ShamilGroup(group_id, true));
             }
 //            if (!groupDict.containsKey(group_id) && group_id.length() > 0) {
 //                groupDict.put(group_id, new ShamilGroup(group_id, true));
 ////                groupDict[group_id] = Group(group_id);
 //            }
+            if (region.residents.get(i) == null) {
+                System.out.println("SEVER ISSUE! PERSON IS NULL!!!");
+            }
             groupDict.get(group_id).persons.add(region.residents.get(i));
 //            groupDict[group_id].addPerson(prsn)
 //                }

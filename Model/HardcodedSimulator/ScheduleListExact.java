@@ -6,7 +6,7 @@ package COVID_AgentBasedSimulation.Model.HardcodedSimulator;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class ScheduleListExact {
     public int regionIndex=-1;

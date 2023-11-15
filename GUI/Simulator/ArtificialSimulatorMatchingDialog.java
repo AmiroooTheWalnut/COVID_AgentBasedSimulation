@@ -7,11 +7,8 @@ package COVID_AgentBasedSimulation.GUI.Simulator;
 import COVID_AgentBasedSimulation.GUI.MainFrame;
 import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.ProcessingMapRenderer;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.BatchRun;
-import COVID_AgentBasedSimulation.Model.HardcodedSimulator.ClustererManager;
-import COVID_AgentBasedSimulation.Model.HardcodedSimulator.ClustererManager.ClustererInfo;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.RootArtificial;
 import COVID_AgentBasedSimulation.Model.Structure.Scope;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -21,7 +18,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  *
  * @author Amir Mohammad Esmaieeli Sikaroudi
  */
-public class ArtificialSimulatorDialog extends javax.swing.JDialog {
+public class ArtificialSimulatorMatchingDialog extends javax.swing.JDialog {
 
     MainFrame myParent;
     boolean isRateChanged = false;
@@ -32,16 +29,13 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
     int localBatchCounter = 0;
 
     ProcessingMapRenderer sketch;
-
+    
     /**
-     * Creates new form ArtificialSimulatorDialog
+     * Creates new form ArtificialSimulatorMatchingDialog
      */
-    public ArtificialSimulatorDialog(java.awt.Frame parent, boolean modal) {
+    public ArtificialSimulatorMatchingDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-
-        myParent = (MainFrame) parent;
-        myParent.mainModel.scenario.scenarioName = "noTessellation";
     }
 
     /**
@@ -53,9 +47,6 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        buttonGroup1 = new javax.swing.ButtonGroup();
-        buttonGroup2 = new javax.swing.ButtonGroup();
-        buttonGroup3 = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         jRadioButton1 = new javax.swing.JRadioButton();
         jRadioButton2 = new javax.swing.JRadioButton();
@@ -106,13 +97,6 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
         jLabel6 = new javax.swing.JLabel();
         jCheckBox9 = new javax.swing.JCheckBox();
         jSpinner4 = new javax.swing.JSpinner();
-        jPanel5 = new javax.swing.JPanel();
-        jPanel6 = new javax.swing.JPanel();
-        jLabel7 = new javax.swing.JLabel();
-        jToggleButton2 = new javax.swing.JToggleButton();
-        jLabel8 = new javax.swing.JLabel();
-        jSpinner5 = new javax.swing.JSpinner();
-        jSpinner6 = new javax.swing.JSpinner();
         jPanel7 = new javax.swing.JPanel();
         jPanel8 = new javax.swing.JPanel();
         jButton3 = new javax.swing.JButton();
@@ -121,13 +105,14 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
         jToggleButton5 = new javax.swing.JToggleButton();
         jButton4 = new javax.swing.JButton();
         jSpinner7 = new javax.swing.JSpinner();
+        jPanel5 = new javax.swing.JPanel();
+        jCheckBox1 = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Tessellation type"));
         jPanel1.setLayout(new java.awt.GridLayout(0, 1));
 
-        buttonGroup1.add(jRadioButton1);
         jRadioButton1.setSelected(true);
         jRadioButton1.setText("No tessellation");
         jRadioButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -137,7 +122,6 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
         });
         jPanel1.add(jRadioButton1);
 
-        buttonGroup1.add(jRadioButton2);
         jRadioButton2.setText("CBG");
         jRadioButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -146,7 +130,6 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
         });
         jPanel1.add(jRadioButton2);
 
-        buttonGroup1.add(jRadioButton3);
         jRadioButton3.setText("CBGVDFMTH_cut only");
         jRadioButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -155,7 +138,6 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
         });
         jPanel1.add(jRadioButton3);
 
-        buttonGroup1.add(jRadioButton5);
         jRadioButton5.setText("CBGVDFMTH_cut merge");
         jRadioButton5.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -164,7 +146,6 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
         });
         jPanel1.add(jRadioButton5);
 
-        buttonGroup1.add(jRadioButton17);
         jRadioButton17.setText("VDFMTH");
         jRadioButton17.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -173,7 +154,6 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
         });
         jPanel1.add(jRadioButton17);
 
-        buttonGroup1.add(jRadioButton4);
         jRadioButton4.setText("VD_CBG");
         jRadioButton4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -182,7 +162,6 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
         });
         jPanel1.add(jRadioButton4);
 
-        buttonGroup1.add(jRadioButton19);
         jRadioButton19.setText("VD_CBGVD");
         jRadioButton19.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -191,7 +170,6 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
         });
         jPanel1.add(jRadioButton19);
 
-        buttonGroup1.add(jRadioButton20);
         jRadioButton20.setText("Xmeans");
         jRadioButton20.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -200,7 +178,6 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
         });
         jPanel1.add(jRadioButton20);
 
-        buttonGroup1.add(jRadioButton18);
         jRadioButton18.setText("VD fixed num cells");
         jRadioButton18.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -209,7 +186,6 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
         });
         jPanel1.add(jRadioButton18);
 
-        buttonGroup1.add(jRadioButton6);
         jRadioButton6.setText("RMCBG fixed num cells");
         jRadioButton6.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -251,35 +227,27 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
         jPanel3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jPanel3.setLayout(new java.awt.GridLayout(0, 1));
 
-        buttonGroup2.add(jRadioButton7);
         jRadioButton7.setText("1 tick per 5 seconds");
         jPanel3.add(jRadioButton7);
 
-        buttonGroup2.add(jRadioButton8);
         jRadioButton8.setText("1 tick per 2 seconds");
         jPanel3.add(jRadioButton8);
 
-        buttonGroup2.add(jRadioButton9);
         jRadioButton9.setText("1 tick per second");
         jPanel3.add(jRadioButton9);
 
-        buttonGroup2.add(jRadioButton10);
         jRadioButton10.setText("1 tick per 0.5 second");
         jPanel3.add(jRadioButton10);
 
-        buttonGroup2.add(jRadioButton11);
         jRadioButton11.setText("1 tick per 0.25 second");
         jPanel3.add(jRadioButton11);
 
-        buttonGroup2.add(jRadioButton12);
         jRadioButton12.setText("1 tick per 0.1 seconds");
         jPanel3.add(jRadioButton12);
 
-        buttonGroup2.add(jRadioButton13);
         jRadioButton13.setText("1 tick per 0.05 seconds");
         jPanel3.add(jRadioButton13);
 
-        buttonGroup2.add(jRadioButton14);
         jRadioButton14.setSelected(true);
         jRadioButton14.setText("Fastforward");
         jPanel3.add(jRadioButton14);
@@ -298,18 +266,15 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
 
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Initial infection"));
 
-        buttonGroup3.add(jRadioButton15);
         jRadioButton15.setSelected(true);
         jRadioButton15.setText("Complete infection");
 
-        buttonGroup3.add(jRadioButton16);
         jRadioButton16.setText("Specific region");
 
         jTextArea1.setColumns(20);
         jTextArea1.setRows(5);
         jScrollPane1.setViewportView(jTextArea1);
 
-        buttonGroup3.add(jRadioButton21);
         jRadioButton21.setText("Fixed num infections");
 
         jSpinner8.setModel(new javax.swing.SpinnerNumberModel(1000, 1, null, 1));
@@ -336,7 +301,7 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
-                .addContainerGap()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jRadioButton15)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jRadioButton16)
@@ -345,8 +310,7 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
                 .addGap(18, 18, 18)
                 .addComponent(jRadioButton21)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSpinner8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jSpinner8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         jToggleButton1.setText("Run");
@@ -377,69 +341,6 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
         });
 
         jSpinner4.setModel(new javax.swing.SpinnerNumberModel(5000, 1, null, 1));
-
-        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Clusterers"));
-
-        jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Xmeans"));
-
-        jLabel7.setText("Min cluster");
-
-        jToggleButton2.setText("Off");
-        jToggleButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jToggleButton2ActionPerformed(evt);
-            }
-        });
-
-        jLabel8.setText("Max cluster");
-
-        jSpinner5.setModel(new javax.swing.SpinnerNumberModel(2, 2, null, 1));
-
-        jSpinner6.setModel(new javax.swing.SpinnerNumberModel(2, 2, null, 1));
-
-        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
-        jPanel6.setLayout(jPanel6Layout);
-        jPanel6Layout.setHorizontalGroup(
-            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel6Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jToggleButton2)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addComponent(jSpinner5, javax.swing.GroupLayout.DEFAULT_SIZE, 81, Short.MAX_VALUE)
-            .addGroup(jPanel6Layout.createSequentialGroup()
-                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel7)
-                    .addComponent(jLabel8))
-                .addGap(0, 0, Short.MAX_VALUE))
-            .addComponent(jSpinner6)
-        );
-        jPanel6Layout.setVerticalGroup(
-            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
-                .addComponent(jToggleButton2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel7)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSpinner5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jLabel8)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSpinner6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(8, Short.MAX_VALUE))
-        );
-
-        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
-        jPanel5.setLayout(jPanel5Layout);
-        jPanel5Layout.setHorizontalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
-                .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 49, Short.MAX_VALUE))
-        );
-        jPanel5Layout.setVerticalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
 
         jPanel8.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
@@ -497,6 +398,27 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
 
         jSpinner7.setModel(new javax.swing.SpinnerNumberModel(3, 1, null, 1));
 
+        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Matching"));
+
+        jCheckBox1.setText("Shop-Gym matching");
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jCheckBox1)
+                .addContainerGap(100, Short.MAX_VALUE))
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jCheckBox1)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -512,14 +434,9 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(jLabel4)
-                                .addGap(18, 18, 18)
-                                .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 369, Short.MAX_VALUE)))
+                        .addComponent(jLabel4)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, 349, Short.MAX_VALUE)
                         .addGap(332, 332, 332))
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(jButton2)
@@ -551,7 +468,7 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
                                     .addComponent(jLabel6)
                                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                     .addComponent(jSpinner4, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 22, Short.MAX_VALUE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                 .addComponent(jToggleButton4, javax.swing.GroupLayout.Alignment.TRAILING)
                                 .addComponent(jToggleButton5, javax.swing.GroupLayout.Alignment.TRAILING)))
@@ -566,7 +483,11 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
                                     .addComponent(jSpinner7, javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jButton4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(jPanel2Layout.createSequentialGroup()
+                                    .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGap(59, 59, 59))
+                                .addComponent(jPanel5, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                     .addComponent(jCheckBox6))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -607,15 +528,18 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jCheckBox6)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jCheckBox7)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jCheckBox8)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton4)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSpinner7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(jCheckBox7)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jCheckBox8)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jSpinner7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                         .addComponent(jButton1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -629,9 +553,7 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 186, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                        .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -649,18 +571,63 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jRadioButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton1ActionPerformed
+        myParent.mainModel.scenario.scenarioName = "noTessellation";
+    }//GEN-LAST:event_jRadioButton1ActionPerformed
+
+    private void jRadioButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton2ActionPerformed
+        myParent.mainModel.scenario.scenarioName = "CBG";
+    }//GEN-LAST:event_jRadioButton2ActionPerformed
+
+    private void jRadioButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton3ActionPerformed
+        myParent.mainModel.scenario.scenarioName = "CBGVD_CUT";
+    }//GEN-LAST:event_jRadioButton3ActionPerformed
+
+    private void jRadioButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton5ActionPerformed
+        myParent.mainModel.scenario.scenarioName = "CBGVDFMTH";
+    }//GEN-LAST:event_jRadioButton5ActionPerformed
+
+    private void jRadioButton17ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton17ActionPerformed
+        myParent.mainModel.scenario.scenarioName = "VDFMTH";
+    }//GEN-LAST:event_jRadioButton17ActionPerformed
+
+    private void jRadioButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton4ActionPerformed
+        myParent.mainModel.scenario.scenarioName = "VD_CBG";
+    }//GEN-LAST:event_jRadioButton4ActionPerformed
+
+    private void jRadioButton19ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton19ActionPerformed
+        myParent.mainModel.scenario.scenarioName = "VD_CBGVD";
+    }//GEN-LAST:event_jRadioButton19ActionPerformed
+
+    private void jRadioButton20ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton20ActionPerformed
+        myParent.mainModel.scenario.scenarioName = "Xmeans";
+    }//GEN-LAST:event_jRadioButton20ActionPerformed
+
+    private void jRadioButton18ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton18ActionPerformed
+        myParent.mainModel.scenario.scenarioName = "VDFNC_" + jSpinner3.getValue();
+    }//GEN-LAST:event_jRadioButton18ActionPerformed
+
+    private void jRadioButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton6ActionPerformed
+        myParent.mainModel.scenario.scenarioName = "RMCBG_" + jSpinner3.getValue();
+    }//GEN-LAST:event_jRadioButton6ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         System.out.println("Case study: "+myParent.mainModel.ABM.studyScope);
@@ -669,11 +636,11 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
         myParent.mainModel.ABM.isReportContactRate = jCheckBox5.isSelected();
         myParent.mainModel.ABM.isFuzzyStatus = jCheckBox4.isSelected();
         myParent.mainModel.ABM.isSaveHistoricalRun = jCheckBox8.isSelected();
-//        myParent.mainModel.ABM.isSimpleTransmissionModel = jCheckBox10.isSelected();
-//        myParent.mainModel.javaEvaluationEngine.connectToConsole(jTextArea1);
-//        myParent.mainModel.pythonEvaluationEngine.connectToConsole(jTextArea2);
+        //        myParent.mainModel.ABM.isSimpleTransmissionModel = jCheckBox10.isSelected();
+        //        myParent.mainModel.javaEvaluationEngine.connectToConsole(jTextArea1);
+        //        myParent.mainModel.pythonEvaluationEngine.connectToConsole(jTextArea2);
         myParent.mainModel.loadAndConnectSupplementaryCaseStudyDataKryo("./datasets/Safegraph/" + myParent.mainModel.ABM.studyScope + "/supplementaryGIS.bin");
-//        myParent.mainModel.allGISData.loadScopeCBGPolygons((Scope)(myParent.mainModel.ABM.studyScopeGeography));//THIS IS NOW IN SUPPLAMENTARY DATA
+        //        myParent.mainModel.allGISData.loadScopeCBGPolygons((Scope)(myParent.mainModel.ABM.studyScopeGeography));//THIS IS NOW IN SUPPLAMENTARY DATA
 
         ArrayList<Integer> infectionIndices = new ArrayList();
         int fixedNumInfected=-1;
@@ -702,16 +669,16 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
         } else {
             myParent.mainModel.initModelArtificial(true, true, isParallelCheckBox.isSelected(), (int) (jSpinner2.getValue()), (int) (jSpinner3.getValue()), myParent.numProcessors, jRadioButton15.isSelected(), isSpecialScenarioActive, infectionIndices, noTessellationNumResidents,fixedNumInfected);
         }
-        ClustererManager clustererManager = new ClustererManager();
-        if (jToggleButton2.isSelected()) {
-            ClustererManager.ClustererInfo cf = new ClustererManager.ClustererInfo();
-            cf.clustererName = "xmeans";
-            cf.isClusterRangeSupported = true;
-            cf.maxCluster = (int) (jSpinner6.getValue());
-            cf.minCluster = (int) (jSpinner5.getValue());
-            clustererManager.activeClustererNames.add(cf);
-        }
-        ((RootArtificial) (myParent.mainModel.ABM.root)).clustererManager = clustererManager;
+//        ClustererManager clustererManager = new ClustererManager();
+//        if (jToggleButton2.isSelected()) {
+//            ClustererManager.ClustererInfo cf = new ClustererManager.ClustererInfo();
+//            cf.clustererName = "xmeans";
+//            cf.isClusterRangeSupported = true;
+//            cf.maxCluster = (int) (jSpinner6.getValue());
+//            cf.minCluster = (int) (jSpinner5.getValue());
+//            clustererManager.activeClustererNames.add(cf);
+//        }
+//        ((RootArtificial) (myParent.mainModel.ABM.root)).clustererManager = clustererManager;
         myParent.mainModel.ABM.agents = new CopyOnWriteArrayList(myParent.mainModel.ABM.agentsRaw);
 
         jLabel5.setText(myParent.mainModel.ABM.startTime.toString());
@@ -720,7 +687,7 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
         refreshSimulationDialogTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-//                System.out.println("UPDATE: "+myParent.mainModel.agentBasedModel.currentTime.toString());
+                //                System.out.println("UPDATE: "+myParent.mainModel.agentBasedModel.currentTime.toString());
                 if (myParent.mainModel.isRunning == false) {
                     jToggleButton1.setText("Run");
                     jToggleButton1.setSelected(false);
@@ -733,8 +700,8 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
                         myParent.mainModel.resume(true, isParallelCheckBox.isSelected(), myParent.numProcessors, true, isSpecialScenarioActive);
                     }
                     //else if (jToggleButton1.getText().equals("Pause")) {
-                    //    myParent.mainModel.resume(true, jCheckBox1.isSelected(), myParent.numProcessors, false, isSpecialScenarioActive);
-                    //}
+                        //    myParent.mainModel.resume(true, jCheckBox1.isSelected(), myParent.numProcessors, false, isSpecialScenarioActive);
+                        //}
                     isRateChanged = false;
                 }
             }
@@ -750,48 +717,24 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
             myParent.mainModel.startTimeNanoSecond = System.nanoTime();
             myParent.mainModel.resume(true, jCheckBox2.isSelected(), myParent.numProcessors, true, isSpecialScenarioActive);
             jToggleButton1.setText("Pause");
-//            jButton4.setEnabled(false);
+            //            jButton4.setEnabled(false);
         } else if (jToggleButton1.getText().equals("Pause")) {
             myParent.mainModel.isPause = true;
             myParent.mainModel.pause();
             jToggleButton1.setText("Run");
-//            jButton4.setEnabled(true);
+            //            jButton4.setEnabled(true);
         }
     }//GEN-LAST:event_jToggleButton1ActionPerformed
-
-    private void jRadioButton17ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton17ActionPerformed
-        myParent.mainModel.scenario.scenarioName = "VDFMTH";
-    }//GEN-LAST:event_jRadioButton17ActionPerformed
-
-    private void jRadioButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton3ActionPerformed
-        myParent.mainModel.scenario.scenarioName = "CBGVD_CUT";
-    }//GEN-LAST:event_jRadioButton3ActionPerformed
-
-    private void jRadioButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton5ActionPerformed
-        myParent.mainModel.scenario.scenarioName = "CBGVDFMTH";
-    }//GEN-LAST:event_jRadioButton5ActionPerformed
-
-    private void jRadioButton18ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton18ActionPerformed
-        myParent.mainModel.scenario.scenarioName = "VDFNC_" + jSpinner3.getValue();
-    }//GEN-LAST:event_jRadioButton18ActionPerformed
-
-    private void jRadioButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton6ActionPerformed
-        myParent.mainModel.scenario.scenarioName = "RMCBG_" + jSpinner3.getValue();
-    }//GEN-LAST:event_jRadioButton6ActionPerformed
-
-    private void jRadioButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton2ActionPerformed
-        myParent.mainModel.scenario.scenarioName = "CBG";
-    }//GEN-LAST:event_jRadioButton2ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         myParent.mainModel.simulationDelayTime = -1;
         myParent.mainModel.ABM.isReportContactRate = jCheckBox5.isSelected();
         myParent.mainModel.ABM.isFuzzyStatus = jCheckBox4.isSelected();
         myParent.mainModel.ABM.isSaveHistoricalRun = jCheckBox8.isSelected();
-//        myParent.mainModel.javaEvaluationEngine.connectToConsole(jTextArea1);
-//        myParent.mainModel.pythonEvaluationEngine.connectToConsole(jTextArea2);
+        //        myParent.mainModel.javaEvaluationEngine.connectToConsole(jTextArea1);
+        //        myParent.mainModel.pythonEvaluationEngine.connectToConsole(jTextArea2);
         myParent.mainModel.loadAndConnectSupplementaryCaseStudyDataKryo("./datasets/Safegraph/" + myParent.mainModel.ABM.studyScope + "/supplementaryGIS.bin");
-//        myParent.mainModel.allGISData.loadScopeCBGPolygons((Scope)(myParent.mainModel.ABM.studyScopeGeography));//THIS IS NOW IN SUPPLAMENTARY DATA
+        //        myParent.mainModel.allGISData.loadScopeCBGPolygons((Scope)(myParent.mainModel.ABM.studyScopeGeography));//THIS IS NOW IN SUPPLAMENTARY DATA
         ArrayList<Integer> infectionIndices = new ArrayList();
         int fixedNumInfected=-1;
         if (isSpecialScenarioActive == false) {
@@ -826,7 +769,7 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
         refreshSimulationDialogTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-//                System.out.println("UPDATE: "+myParent.mainModel.agentBasedModel.currentTime.toString());
+                //                System.out.println("UPDATE: "+myParent.mainModel.agentBasedModel.currentTime.toString());
                 if (myParent.mainModel.isRunning == false) {
                     jToggleButton1.setText("Run");
                     jToggleButton1.setSelected(false);
@@ -839,52 +782,32 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
                         myParent.mainModel.resume(true, isParallelCheckBox.isSelected(), myParent.numProcessors, true, isSpecialScenarioActive);
                     }
                     //else if (jToggleButton1.getText().equals("Pause")) {
-                    //    myParent.mainModel.resume(true, jCheckBox1.isSelected(), myParent.numProcessors, false, isSpecialScenarioActive);
-                    //}
+                        //    myParent.mainModel.resume(true, jCheckBox1.isSelected(), myParent.numProcessors, false, isSpecialScenarioActive);
+                        //}
                     isRateChanged = false;
                 }
             }
         }, 0, 1000);
 
-//        jList7.setModel(new javax.swing.AbstractListModel() {
-//            @Override
-//            public int getSize() {
-//                return myParent.mainModel.ABM.agents.size();
-//            }
-//
-//            @Override
-//            public Object getElementAt(int index) {
-//                return myParent.mainModel.ABM.agents.get(index).myType + " " + myParent.mainModel.ABM.agents.get(index).myIndex;
-//            }
-//        });
-//
-//        jButton4.setEnabled(true);
-        System.out.println("###");
+        //        jList7.setModel(new javax.swing.AbstractListModel() {
+            //            @Override
+            //            public int getSize() {
+                //                return myParent.mainModel.ABM.agents.size();
+                //            }
+            //
+            //            @Override
+            //            public Object getElementAt(int index) {
+                //                return myParent.mainModel.ABM.agents.get(index).myType + " " + myParent.mainModel.ABM.agents.get(index).myIndex;
+                //            }
+            //        });
+    //
+    //        jButton4.setEnabled(true);
+    System.out.println("###");
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    private void jRadioButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton1ActionPerformed
-        myParent.mainModel.scenario.scenarioName = "noTessellation";
-    }//GEN-LAST:event_jRadioButton1ActionPerformed
-
-    private void jToggleButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton2ActionPerformed
-        if (jToggleButton2.isSelected()) {
-            jToggleButton2.setText("On");
-        } else {
-            jToggleButton2.setText("Off");
-        }
-    }//GEN-LAST:event_jToggleButton2ActionPerformed
-
-    private void jRadioButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton4ActionPerformed
-        myParent.mainModel.scenario.scenarioName = "VD_CBG";
-    }//GEN-LAST:event_jRadioButton4ActionPerformed
-
-    private void jRadioButton19ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton19ActionPerformed
-        myParent.mainModel.scenario.scenarioName = "VD_CBGVD";
-    }//GEN-LAST:event_jRadioButton19ActionPerformed
-
-    private void jRadioButton20ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton20ActionPerformed
-        myParent.mainModel.scenario.scenarioName = "Xmeans";
-    }//GEN-LAST:event_jRadioButton20ActionPerformed
+    private void jCheckBox9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox9ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jCheckBox9ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         sketch = new ProcessingMapRenderer(myParent, jPanel8, null);
@@ -925,21 +848,10 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
         batchTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-//                System.out.println("UPDATE: "+myParent.mainModel.agentBasedModel.currentTime.toString());
+                //                System.out.println("UPDATE: "+myParent.mainModel.agentBasedModel.currentTime.toString());
                 if (localBatchCounter >= (Integer) jSpinner7.getValue() && myParent.mainModel.isRunning == false) {
 
                     BatchRun br = new BatchRun();
-//                    ArrayList<String> runs = new ArrayList();
-//                    String baseDir = "projects" + File.separator + myParent.mainModel.ABM.filePath.substring(myParent.mainModel.ABM.filePath.lastIndexOf(File.separator) + 1, myParent.mainModel.ABM.filePath.length());
-//                    File testDirectory = new File(baseDir);
-//                    File[] dirs = testDirectory.listFiles();
-//                    int counter = 0;
-//                    for (int i = 0; i < dirs.length; i++) {
-//                        if (dirs[0].getName().contains(myParent.mainModel.testPathName)) {
-//                            runs.add(baseDir + File.separator + myParent.mainModel.testPathName + "_B" + counter);
-//                            counter = counter + 1;
-//                        }
-//                    }
                     br.runPostProcess(myParent.mainModel.runs, myParent.mainModel);
                     batchTimer.cancel();
                     batchTimer.purge();
@@ -959,31 +871,57 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
                 }
             }
         }, 0, 1000);
-
-//        for (int i = 0; i < (int) jSpinner7.getValue(); i++) {
-//            myParent.mainModel.isBatchRun = true;
-//            jButton1ActionPerformed(null);
-//            myParent.mainModel.isPause = false;
-//            myParent.mainModel.startTimeNanoSecond = System.nanoTime();
-//            myParent.mainModel.resume(true, jCheckBox2.isSelected(), myParent.numProcessors, true, isSpecialScenarioActive);
-//        }
-
     }//GEN-LAST:event_jButton4ActionPerformed
 
-    private void jCheckBox9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox9ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jCheckBox9ActionPerformed
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(ArtificialSimulatorMatchingDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(ArtificialSimulatorMatchingDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(ArtificialSimulatorMatchingDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(ArtificialSimulatorMatchingDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
 
+        /* Create and display the dialog */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                ArtificialSimulatorMatchingDialog dialog = new ArtificialSimulatorMatchingDialog(new javax.swing.JFrame(), true);
+                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+                    @Override
+                    public void windowClosing(java.awt.event.WindowEvent e) {
+                        System.exit(0);
+                    }
+                });
+                dialog.setVisible(true);
+            }
+        });
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.ButtonGroup buttonGroup1;
-    private javax.swing.ButtonGroup buttonGroup2;
-    private javax.swing.ButtonGroup buttonGroup3;
     private javax.swing.JCheckBox isParallelCheckBox;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
+    private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JCheckBox jCheckBox2;
     private javax.swing.JCheckBox jCheckBox3;
     private javax.swing.JCheckBox jCheckBox4;
@@ -998,14 +936,11 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
-    private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JRadioButton jRadioButton1;
@@ -1034,13 +969,10 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
     private javax.swing.JSpinner jSpinner2;
     private javax.swing.JSpinner jSpinner3;
     private javax.swing.JSpinner jSpinner4;
-    private javax.swing.JSpinner jSpinner5;
-    private javax.swing.JSpinner jSpinner6;
     private javax.swing.JSpinner jSpinner7;
     private javax.swing.JSpinner jSpinner8;
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JToggleButton jToggleButton1;
-    private javax.swing.JToggleButton jToggleButton2;
     private javax.swing.JToggleButton jToggleButton3;
     private javax.swing.JToggleButton jToggleButton4;
     private javax.swing.JToggleButton jToggleButton5;

@@ -10,7 +10,7 @@ import java.io.Serializable;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class RegionSnapshot implements Serializable {
     static final long serialVersionUID = softwareVersion;

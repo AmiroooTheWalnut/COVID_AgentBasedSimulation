@@ -11,10 +11,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class ShamilGroup {
 
@@ -26,11 +27,11 @@ public class ShamilGroup {
 
     public ShamilGroup(String passed_group_name, boolean isParallel) {
         group_name = passed_group_name;
-//        if(isParallel==true){
-//            persons = Collections.synchronizedList(new ArrayList());
-//        }else{
+        if(isParallel==true){
+            persons = new CopyOnWriteArrayList();
+        }else{
             persons = new ArrayList();
-//        }
+        }
         person_mapper = new HashMap();
         actions = new ArrayList();
 //        proximity = null;
@@ -54,6 +55,9 @@ public class ShamilGroup {
     }
 
     public void updateProximity(MainModel mainModel) {
+        if(actions.isEmpty()){
+            return;
+        }
 //        System.out.println("GROUP SIZE: "+persons.size());
 //        System.out.println("GROUP NAME: "+group_name);
 //        if(persons.size()>100){
@@ -62,10 +66,9 @@ public class ShamilGroup {
         boolean full_random_proximity = false;
         if(persons.size()>20){
             full_random_proximity = true;
-//            if(persons.size()>500){
-//                System.out.println(group_name+" "+persons.size());
-//            }
-            
+            if(persons.size()>500){
+                System.out.println(group_name+" "+persons.size());
+            }
         }
         
         // # fline = open("seed.txt").readline().rstrip()
@@ -77,12 +80,12 @@ public class ShamilGroup {
         double max_proximity = 1;
         double min_proximity = 0.5;
 
+        
         //System.out.println(persons.size());
         if (full_random_proximity == true) {
+//            long start_time = System.nanoTime();
             proximity = new double[persons.size()][persons.size()];
-            if(actions.isEmpty()){
-                return;
-            }
+            
             for (int i = 0; i < persons.size(); i++) {
                 for (int j = 0; j < persons.size(); j++) {
 //                    proximity[i][j] = ShamilPersonManager.rnd.nextGaussian();
@@ -108,13 +111,14 @@ public class ShamilGroup {
 //                }
 //            }
 //            proximity = np.clip(self.proximity, min_proximity, max_proximity)
+//            long end_time = System.nanoTime();
+//            System.out.println("Inside random proximity: "+(end_time - start_time) / 1e6);
             return;
         }
-
+        
+//        long start_time = System.nanoTime();
         proximity = new double[persons.size()][persons.size()];
-        if(actions.isEmpty()){
-            return;
-        }
+        
         /*
         for (int i = 0; i < persons.size(); i++) {
             for (int j = 0; j < persons.size(); j++) {
@@ -132,17 +136,20 @@ public class ShamilGroup {
         int counter = 0;
 
         ArrayList<int[]> locs = new ArrayList();
-
+        int maxVal=persons.size()*(persons.size()-1)/2;
         for (int i = 0; i < persons.size(); i++) {
             for (int j = i + 1; j < persons.size(); j++) {
                 int[] temp = new int[2];
                 temp[0] = i;
                 temp[1] = j;
                 locs.add(temp);
-                random_locs.add(counter);
+//                random_locs.add(mainModel.ABM.root.rnd.nextInt(0, maxVal));
+                random_locs.add(mainModel.ABM.root.rnd.nextInt(0, maxVal));
                 counter=counter+1;
             }
         }
+//        long end_time = System.nanoTime();
+//        System.out.println("Outside proximity part1: "+(end_time - start_time) / 1e6);
 
 //        for i in range(len(self.persons)):
 //
@@ -165,7 +172,11 @@ public class ShamilGroup {
 //        if(random_locs.size()>100){
 //            System.out.println("!@#!@#");
 //        }
-        Collections.shuffle(random_locs);
+
+//        Collections.shuffle(random_locs);
+        
+//        end_time = System.nanoTime();
+//        System.out.println("Outside proximity part2: "+(end_time - start_time) / 1e6);
 
 //        random_locs = list(range(tot_locs))
 //        np.random.shuffle(random_locs)
@@ -195,6 +206,8 @@ public class ShamilGroup {
 //            self.proximity[locs[random_locs[i]][0]][locs[random_locs[i]][1]] = var1
 //            self.proximity[locs[random_locs[i]][1]][locs[random_locs[i]][0]] = var2
         }
+//        end_time = System.nanoTime();
+//        System.out.println("Outside proximity part3: "+(end_time - start_time) / 1e6);
     }
 
     public void updateActions() {

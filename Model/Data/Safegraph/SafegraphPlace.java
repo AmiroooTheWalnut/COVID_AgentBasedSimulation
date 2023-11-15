@@ -19,7 +19,7 @@ public class SafegraphPlace implements Serializable, Comparable<SafegraphPlace> 
         
     }
     
-//    public String id;//DROPPED IT IS GOING TO BE DEPRECIATED
+//    public String id;//DROPPED IT IS GOING TO BE DEPRECATED
     public transient SafegraphPlace parent;
     public String placeKey;
     public float lat;

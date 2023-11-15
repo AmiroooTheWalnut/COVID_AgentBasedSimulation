@@ -10,7 +10,7 @@ import org.locationtech.jts.geom.Polygon;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class RequestResponse {
     public ArrayList<Polygon> data;

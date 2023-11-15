@@ -13,7 +13,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class PatternsRecordRaw implements Serializable {
     static final long serialVersionUID = softwareVersion;

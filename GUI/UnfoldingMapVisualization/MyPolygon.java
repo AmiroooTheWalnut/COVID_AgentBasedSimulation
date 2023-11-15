@@ -16,7 +16,7 @@ import org.locationtech.jts.geom.Polygon;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class MyPolygon implements Serializable{
     static final long serialVersionUID = softwareVersion;

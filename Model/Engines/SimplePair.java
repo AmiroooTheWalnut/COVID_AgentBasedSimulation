@@ -9,7 +9,7 @@ import lombok.Setter;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 @Getter @Setter
 public class SimplePair<T extends Object, U extends Object> implements Comparable{

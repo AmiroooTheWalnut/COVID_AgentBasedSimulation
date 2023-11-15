@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class ShamilProfession {
 
@@ -44,7 +44,7 @@ public class ShamilProfession {
                 tasks_df.add(task);
                 task = new ShamilTemplateTask("Stay Home", 17, 21, 10, 10, 1, 1);
                 tasks_df.add(task);
-                task = new ShamilTemplateTask("Attend Event", 12, 14, 2, 4, 0.3, 0.9);
+                task = new ShamilTemplateTask("Attend Event", 12, 14, 2, 4, 0.1, 0.3);
                 tasks_df.add(task);
                 break;
             case "Driver":
@@ -58,7 +58,7 @@ public class ShamilProfession {
                 tasks_df.add(task);
                 task = new ShamilTemplateTask("Stay Home", 16, 21, 10, 10, 1, 1);
                 tasks_df.add(task);
-                task = new ShamilTemplateTask("Attend Event", 12, 14, 2, 4, 0.3, 0.6);
+                task = new ShamilTemplateTask("Attend Event", 12, 14, 2, 4, 0.1, 0.15);
                 tasks_df.add(task);
                 break;
             case "Doctor":
@@ -72,7 +72,7 @@ public class ShamilProfession {
                 tasks_df.add(task);
                 task = new ShamilTemplateTask("Stay Home", 17, 21, 10, 10, 1, 1);
                 tasks_df.add(task);
-                task = new ShamilTemplateTask("Attend Event", 12, 14, 2, 4, 0.3, 0.7);
+                task = new ShamilTemplateTask("Attend Event", 12, 14, 2, 4, 0.1, 0.15);
                 tasks_df.add(task);
                 break;
             case "Student":
@@ -86,7 +86,7 @@ public class ShamilProfession {
                 tasks_df.add(task);
                 task = new ShamilTemplateTask("Stay Home", 15, 27, 10, 10, 1, 1);
                 tasks_df.add(task);
-                task = new ShamilTemplateTask("Attend Event", 12, 14, 2, 4, 0.4, 0.9);
+                task = new ShamilTemplateTask("Attend Event", 12, 14, 2, 4, 0.2, 0.3);
                 tasks_df.add(task);
                 break;
             case "Unemployed":
@@ -98,7 +98,7 @@ public class ShamilProfession {
                 tasks_df.add(task);
                 task = new ShamilTemplateTask("Stay Home", 16, 17, 10, 10, 1, 1);
                 tasks_df.add(task);
-                task = new ShamilTemplateTask("Attend Event", 13, 14, 2, 4, 0.35, 0.6);
+                task = new ShamilTemplateTask("Attend Event", 13, 14, 2, 4, 0.1, 0.175);
                 tasks_df.add(task);
                 break;
             case "Hospitalized":

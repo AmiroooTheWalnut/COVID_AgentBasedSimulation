@@ -16,7 +16,7 @@ import java.util.SplittableRandom;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class ShamilPersonManager {
 
@@ -42,7 +42,7 @@ public class ShamilPersonManager {
             put("n_transport", 15000d);
 //            put("transport_seat_limit", 60d);//ORIGINAL
             put("transport_seat_limit", 30d);
-            put("n_events", 100d);
+            put("n_events", 2d);
 //        put("n_persons",10000d);
 //        put("n_infected_init",252d);
 //            put("awareness_start", 7d);//ORIGINAL
@@ -271,37 +271,47 @@ public class ShamilPersonManager {
     }
 
     public static void assignProfessionGroupSpatial(MainModel mainModel, ArrayList<Region> regions, ArrayList<Person> persons) {
-        ArrayList<Integer> worker_ids = new ArrayList();
+        int maxWorkGroupSize=20;
+        int numIds=persons.size()/maxWorkGroupSize;
         for (int r = 0; r < regions.size(); r++) {
             for (int i = 0; i < regions.get(r).residents.size(); i++) {
-                if (regions.get(r).residents.get(i).shamilPersonProperties.profession.name.equals("Service")) {
-                    worker_ids.add(regions.get(r).residents.get(i).shamilPersonProperties.id);
-                }
+                regions.get(r).residents.get(i).shamilPersonProperties.professionGroupId=mainModel.ABM.root.rnd.nextInt(0, numIds);
             }
         }
-        Collections.shuffle(worker_ids);
-//        int n_workgroup = (preference_def.get("n_workgroup")).intValue();
-//        int n_workgroup = (int) (worker_ids.size() * (preference_def.get("n_workgroup") / 7410d));//ORIGINAL
-//        int n_workgroup = (int) (worker_ids.size() * (preference_def.get("n_workgroup") / 150000d));//ORIGINAL
-//        int n_workgroup = (int)(mainModel.ABM.root.rnd.nextDouble()*100000);
-//        if (n_workgroup == 0) {
-//            n_workgroup = 1;
-//        }
 
-//        int worker_per_workgroup = (int) (Math.floorDiv(worker_ids.size(), n_workgroup));
-//        if (worker_per_workgroup == 0) {
-//            worker_per_workgroup = 1;
+//        ArrayList<Integer> worker_ids = new ArrayList();
+//        for (int r = 0; r < regions.size(); r++) {
+//            for (int i = 0; i < regions.get(r).residents.size(); i++) {
+//                if (regions.get(r).residents.get(i).shamilPersonProperties.profession.name.equals("Service")) {
+//                    worker_ids.add(regions.get(r).residents.get(i).shamilPersonProperties.id);
+//                }
+//            }
 //        }
-        int WS = worker_ids.size();
-        for (int i = 0; i < worker_ids.size(); i++) {
-//            persons.get(worker_ids.get(i)).shamilPersonProperties.professionGroupId = Math.min(Math.floorDiv(i, worker_per_workgroup), n_workgroup);
-            persons.get(worker_ids.get(i)).shamilPersonProperties.professionGroupId = (int) (mainModel.ABM.root.rnd.nextDouble() * WS / 10.0);
-        }
-//        for (int i = 0; i < persons.size(); i++) {
-//            System.out.println(persons.get(i).shamilPersonProperties.professionGroupId);
+//        Collections.shuffle(worker_ids);
+////        int n_workgroup = (preference_def.get("n_workgroup")).intValue();
+////        int n_workgroup = (int) (worker_ids.size() * (preference_def.get("n_workgroup") / 7410d));//ORIGINAL
+////        int n_workgroup = (int) (worker_ids.size() * (preference_def.get("n_workgroup") / 150000d));//ORIGINAL
+////        int n_workgroup = (int)(mainModel.ABM.root.rnd.nextDouble()*100000);
+////        if (n_workgroup == 0) {
+////            n_workgroup = 1;
+////        }
+//
+////        int worker_per_workgroup = (int) (Math.floorDiv(worker_ids.size(), n_workgroup));
+////        if (worker_per_workgroup == 0) {
+////            worker_per_workgroup = 1;
+////        }
+//        int WS = worker_ids.size();
+//        for (int i = 0; i < worker_ids.size(); i++) {
+////            persons.get(worker_ids.get(i)).shamilPersonProperties.professionGroupId = Math.min(Math.floorDiv(i, worker_per_workgroup), n_workgroup);
+//            int id= (int) (mainModel.ABM.root.rnd.nextDouble() * WS / 1.0);
+////            System.out.println("ID: "+id);
+//            persons.get(worker_ids.get(i)).shamilPersonProperties.professionGroupId = id;
 //        }
-
-//        System.out.println("n_workgroup: " + n_workgroup);
+////        for (int i = 0; i < persons.size(); i++) {
+////            System.out.println(persons.get(i).shamilPersonProperties.professionGroupId);
+////        }
+//
+////        System.out.println("n_workgroup: " + n_workgroup);
     }
 
     public static void assignProfessionGroup(ArrayList<Person> persons) {

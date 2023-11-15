@@ -10,7 +10,7 @@ import COVID_AgentBasedSimulation.Model.Structure.CensusBlockGroup;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class CBG extends Region{
     public CensusBlockGroup cbgVal;

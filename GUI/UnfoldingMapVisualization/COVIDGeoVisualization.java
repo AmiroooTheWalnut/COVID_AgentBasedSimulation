@@ -17,7 +17,7 @@ import processing.core.PFont;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class COVIDGeoVisualization extends PApplet {
 

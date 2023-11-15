@@ -15,7 +15,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class SupplementaryCaseStudyData implements Serializable {
 
@@ -29,9 +29,9 @@ public class SupplementaryCaseStudyData implements Serializable {
     public double schoolMergePrecision;
     public double templeMergePrecision;
 
-    public HashMap<Long, MyPolygons> cBGPolygons = new HashMap();//DEPRECIATED!
-    public HashMap<Integer, MyPolygons> vDPolygons = new HashMap();//DEPRECIATED!
-    public HashMap<Integer, MyPolygons> cBGVDPolygons = new HashMap();//DEPRECIATED!
+    public HashMap<Long, MyPolygons> cBGPolygons = new HashMap();//DEPRECATED!
+    public HashMap<Integer, MyPolygons> vDPolygons = new HashMap();//DEPRECATED!
+    public HashMap<Integer, MyPolygons> cBGVDPolygons = new HashMap();//DEPRECATED!
     
 //    public RegionImageLayer vDRegionLayer;
 //    public RegionImageLayer cBGVDGRegionLayer;

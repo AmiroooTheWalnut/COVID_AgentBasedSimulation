@@ -90,7 +90,7 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
         updateProjects();
         jSlider1.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
-//                setRendererPolygonShades();//DEPRECIATED!!!
+//                setRendererPolygonShades();//DEPRECATED!!!
                 setRendererRegionLayerShades();
                 ZonedDateTime temp = currentHistoricalRun.startTime.plusHours((int) (jSlider1.getValue()));
                 jLabel2.setText("Current: " + temp.toString());

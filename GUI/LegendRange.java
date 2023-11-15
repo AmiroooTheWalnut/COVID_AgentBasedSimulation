@@ -11,7 +11,7 @@ import javax.swing.JPanel;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class LegendRange extends JPanel {
 

@@ -11,7 +11,7 @@ import java.io.Serializable;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class RegionImageLayer implements Serializable {
 

@@ -7,7 +7,7 @@ package COVID_AgentBasedSimulation.Model.HardcodedSimulator.Shamil;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class ShamilTemplateAction {
 

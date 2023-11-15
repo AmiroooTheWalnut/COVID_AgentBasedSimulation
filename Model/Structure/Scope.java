@@ -15,7 +15,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author user
+ * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class Scope extends Marker implements Serializable {
     static final long serialVersionUID = softwareVersion;
@@ -27,10 +27,10 @@ public class Scope extends Marker implements Serializable {
     public transient ArrayList<VDCell> vDCells;
     public transient ArrayList<CBGVDCell> cBGVDCells;
     
-    public transient HashMap<Integer, MyPolygons> vDPolygons=new HashMap();//DEPRECIATED! THIS IS TRANSIENT BECAUSE THE SupplementaryCaseStudyData HANDLES IT
-    public transient HashMap<Integer, MyPolygons> cBGVDPolygons=new HashMap();//DEPRECIATED! THIS IS TRANSIENT BECAUSE THE SupplementaryCaseStudyData HANDLES IT
+    public transient HashMap<Integer, MyPolygons> vDPolygons=new HashMap();//DEPRECATED! THIS IS TRANSIENT BECAUSE THE SupplementaryCaseStudyData HANDLES IT
+    public transient HashMap<Integer, MyPolygons> cBGVDPolygons=new HashMap();//DEPRECATED! THIS IS TRANSIENT BECAUSE THE SupplementaryCaseStudyData HANDLES IT
     
-    public transient HashMap<Long, MyPolygons> cBGPolygons=new HashMap();//DEPRECIATED! THIS IS TRANSIENT BECAUSE THE SupplementaryCaseStudyData HANDLES IT
+    public transient HashMap<Long, MyPolygons> cBGPolygons=new HashMap();//DEPRECATED! THIS IS TRANSIENT BECAUSE THE SupplementaryCaseStudyData HANDLES IT
     
     public transient RegionImageLayer vDRegionLayer;
     public transient RegionImageLayer cBGVDRegionLayer;
