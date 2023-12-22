@@ -10,6 +10,8 @@ import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Measures.MeasureHolde
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Root;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.RootArtificial;
 import COVID_AgentBasedSimulation.Model.MainModel;
+import COVID_AgentBasedSimulation.Model.Matching.MatchingConfig;
+import COVID_AgentBasedSimulation.Model.Matching.MatchingData;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import esmaieeli.gisFastLocationOptimization.GIS3D.AllData;
@@ -96,6 +98,12 @@ public class AgentBasedModel {
     public transient AllData allData;
     public transient PreProcessor preProcessor;
     public transient MeasureHolder measureHolder=new MeasureHolder();
+    
+    public transient boolean isMatching=false;
+    
+    public MatchingConfig matchingConfig=new MatchingConfig();
+    
+    public MatchingData matchingData;
 
     public AgentBasedModel(MainModel mainModel) {
         myMainModel = mainModel;

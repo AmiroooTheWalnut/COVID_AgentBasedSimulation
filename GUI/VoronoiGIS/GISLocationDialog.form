@@ -162,7 +162,7 @@
                   <Component id="jButton14" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Component id="jButton36" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="87" max="32767" attributes="0"/>
+                  <EmptySpace max="32767" attributes="0"/>
                   <Component id="jPanel4" min="-2" max="-2" attributes="0"/>
               </Group>
           </Group>
@@ -461,6 +461,7 @@
                               <Component id="jButton35" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="jButton38" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="jButton39" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="jButton40" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                       </Group>
@@ -507,6 +508,8 @@
                   <Component id="jButton35" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Component id="jButton39" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                  <Component id="jButton40" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="32767" attributes="0"/>
                   <Component id="jButton38" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
@@ -715,6 +718,14 @@
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton39ActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JButton" name="jButton40">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Save FACS_style data"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton40ActionPerformed"/>
           </Events>
         </Component>
       </SubComponents>

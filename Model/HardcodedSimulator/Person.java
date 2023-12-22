@@ -21,37 +21,37 @@ import java.util.HashMap;
  * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class Person extends Agent {
-    
+
     Person currentAgent = this;
-    
+
     public ArrayList<FuzzyPerson> insidePeople;
-    
+
     public boolean isPolled = false;
-    
+
     public boolean isPolledPTAVSP = false;
-    
+
     public boolean isActive = false;//IF OUR ABM IS ACTIVE, THEN THIS CLASS'S BEHAVIOR WILL RUN
-    
+
     public boolean isExistAlive = true;//THIS IS UPDATED EVERY DAY
 
     public int numTravels = 0;
     public int numTravelsInDay = 0;
     public int numContacts = 0;
-    
+
     public PersonProperties properties = new PersonProperties();
     public ShamilPersonProperties shamilPersonProperties = new ShamilPersonProperties();
     public PersonExactProperties exactProperties = new PersonExactProperties();
-    
+
     public Person(int index) {
         myType = "Person";
         myIndex = index;
     }
-    
+
     @Override
     public void constructor(MainModel modelRoot) {
         myModelRoot = modelRoot;
     }
-    
+
     @Override
     public void behavior() {
         if (isActive == true) {
@@ -84,7 +84,7 @@ public class Person extends Agent {
             }
         }
     }
-    
+
     public void returnFromTravel() {
         if (properties.minutesStayed > properties.dwellTime.dwellDuration[0]) {
             if (myModelRoot.ABM.root.rnd.nextDouble() < (float) (properties.minutesStayed - properties.dwellTime.dwellDuration[0]) / (float) (properties.dwellTime.dwellDuration[1] - properties.dwellTime.dwellDuration[0])) {
@@ -92,7 +92,7 @@ public class Person extends Agent {
             }
         }
     }
-    
+
     public void returnAction() {
         myModelRoot.ABM.measureHolder.handleAVD(myModelRoot, properties);
         if (properties.didTravelFromHome == true) {
@@ -127,7 +127,7 @@ public class Person extends Agent {
         }
         properties.currentPOI = null;
         properties.currentPattern = null;
-        
+
         if (isPolledPTAVSP == false) {
             for (int i = 0; i < properties.homeRegion.cBGsIDsInvolved.size(); i++) {
                 if (properties.homeRegion.cBGsIDsInvolved.get(i) == myModelRoot.ABM.measureHolder.pTAVSPMeasure.get(0).source1.id || properties.homeRegion.cBGsIDsInvolved.get(i) == myModelRoot.ABM.measureHolder.pTAVSPMeasure.get(0).source2.id) {
@@ -141,7 +141,7 @@ public class Person extends Agent {
         }
         isPolledPTAVSP = false;
     }
-    
+
     public void travelFromWork(ZonedDateTime currentTime, boolean isArtifical, boolean isTessellationBuilt) {
         if (isArtifical == false) {
             PatternsRecordProcessed dest = chooseDestination(properties.workRegion);
@@ -164,7 +164,7 @@ public class Person extends Agent {
 //            System.out.println("mtIndex: "+myIndex);
 //        System.out.println("properties.currentPOI.peopleInPOI.size(): before:"+pOI.peopleInPOI.size());
                 pOI.peopleInPOI.add(this);
-                
+
                 properties.currentPOI = pOI;
 
 //        System.out.println("properties.currentPOI.peopleInPOI.size(): after:"+properties.currentPOI.peopleInPOI.size());
@@ -234,7 +234,7 @@ public class Person extends Agent {
 //        System.out.println("properties.currentPOI.peopleInPOI.size(): before:"+pOI.peopleInPOI.size());
                     pOI.peopleInPOI.add(this);
                     properties.currentPOI = pOI;
-                    
+
                     int dayInMonth = currentTime.getDayOfMonth() - 1;
                     byte dayInWeek = (byte) ((currentTime.getDayOfWeek().getValue()) - 1);
                     int hourInDay = currentTime.getHour();
@@ -265,10 +265,79 @@ public class Person extends Agent {
             }
         }
     }
-    
+
     public void travelFromHome(ZonedDateTime currentTime, boolean isArtifical, boolean isTessellationBuilt) {
         if (isArtifical == false) {
             PatternsRecordProcessed dest = chooseDestination(properties.homeRegion);
+
+            if (myModelRoot.ABM.isMatching == true) {
+                boolean isFoundValidType1 = false;
+                boolean isFoundValidType2 = false;
+                for (int i = 0; i < myModelRoot.ABM.matchingData.pOIType1Options.size(); i++) {
+                    if (dest.place.naics_code == myModelRoot.ABM.matchingData.pOIType1Options.get(i)) {
+                        isFoundValidType1 = true;
+                        break;
+                    }
+                }
+                for (int i = 0; i < myModelRoot.ABM.matchingData.pOIType1NotOptions.size(); i++) {
+                    if (dest.place.naics_code == myModelRoot.ABM.matchingData.pOIType1NotOptions.get(i)) {
+                        isFoundValidType1 = false;
+                        break;
+                    }
+                }
+                for (int i = 0; i < myModelRoot.ABM.matchingData.pOIType2Options.size(); i++) {
+                    if (dest.place.naics_code == myModelRoot.ABM.matchingData.pOIType2Options.get(i)) {
+                        isFoundValidType2 = true;
+                        break;
+                    }
+                }
+                for (int i = 0; i < myModelRoot.ABM.matchingData.pOIType2NotOptions.size(); i++) {
+                    if (dest.place.naics_code == myModelRoot.ABM.matchingData.pOIType2NotOptions.get(i)) {
+                        isFoundValidType2 = false;
+                        break;
+                    }
+                }
+                if (isFoundValidType1 == true) {
+                    float minDist = Float.MAX_VALUE;
+                    int directFoundIndexType1 = -1;
+                    for (int i = 0; i < myModelRoot.ABM.matchingData.pOIType1Lats.length; i++) {
+                        float dist = (float) Math.sqrt(Math.pow(lat - myModelRoot.ABM.matchingData.pOIType1Lats[i], 2) + Math.pow(lon - myModelRoot.ABM.matchingData.pOIType1Lons[i], 2));
+                        if (dist < minDist) {
+                            minDist = dist;
+                            directFoundIndexType1 = i;
+                        }
+                    }
+                    for (int i = 0; i < myModelRoot.ABM.matchingData.pOIType2Lats.length; i++) {
+                        float dist = (float) Math.sqrt(Math.pow(lat - myModelRoot.ABM.matchingData.pOIType2Lats[i], 2) + Math.pow(lon - myModelRoot.ABM.matchingData.pOIType2Lons[i], 2));
+                        if (dist < minDist) {
+                            minDist = dist;
+                            directFoundIndexType1 = myModelRoot.ABM.matchingData.permuteData[i];
+                        }
+                    }
+                    int index=(int)(Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * myModelRoot.ABM.matchingData.foundType1POIs[directFoundIndexType1].size()));
+                    dest=myModelRoot.ABM.matchingData.foundType1POIs[directFoundIndexType1].get(index);
+                }
+                if (isFoundValidType2 == true) {
+                    float minDist = Float.MAX_VALUE;
+                    int directFoundIndexType2 = -1;
+                    for (int i = 0; i < myModelRoot.ABM.matchingData.pOIType2Lats.length; i++) {
+                        float dist = (float) Math.sqrt(Math.pow(lat - myModelRoot.ABM.matchingData.pOIType2Lats[i], 2) + Math.pow(lon - myModelRoot.ABM.matchingData.pOIType2Lons[i], 2));
+                        if (dist < minDist) {
+                            minDist = dist;
+                            directFoundIndexType2 = i;
+                        }
+                    }
+                    for (int i = 0; i < myModelRoot.ABM.matchingData.pOIType1Lats.length; i++) {
+                        float dist = (float) Math.sqrt(Math.pow(lat - myModelRoot.ABM.matchingData.pOIType1Lats[i], 2) + Math.pow(lon - myModelRoot.ABM.matchingData.pOIType1Lons[i], 2));
+                        if (dist < minDist) {
+                            minDist = dist;
+                            directFoundIndexType2 = myModelRoot.ABM.matchingData.permuteData[i];
+                        }
+                    }
+                    int index=(int)(Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * myModelRoot.ABM.matchingData.foundType2POIs[directFoundIndexType2].size()));
+                    dest=myModelRoot.ABM.matchingData.foundType2POIs[directFoundIndexType2].get(index);
+                }
+            }
             boolean decision = decideToTravel(dest, currentTime);
             if (decision == true) {
                 numTravels = numTravels + 1;
@@ -289,7 +358,7 @@ public class Person extends Agent {
 //        System.out.println("properties.currentPOI.peopleInPOI.size(): before:"+pOI.peopleInPOI.size());
                 pOI.peopleInPOI.add(this);
                 properties.currentPOI = pOI;
-                
+
                 int dayInMonth = currentTime.getDayOfMonth() - 1;
                 byte dayInWeek = (byte) ((currentTime.getDayOfWeek().getValue()) - 1);
                 int hourInDay = currentTime.getHour();
@@ -349,7 +418,7 @@ public class Person extends Agent {
 //        System.out.println("properties.currentPOI.peopleInPOI.size(): before:"+pOI.peopleInPOI.size());
                     pOI.peopleInPOI.add(this);
                     properties.currentPOI = pOI;
-                    
+
                     int dayInMonth = currentTime.getDayOfMonth() - 1;
                     byte dayInWeek = (byte) ((currentTime.getDayOfWeek().getValue()) - 1);
                     int hourInDay = currentTime.getHour();
@@ -382,7 +451,7 @@ public class Person extends Agent {
             }
         }
     }
-    
+
     public DwellTime decideDwellTime(PatternsRecordProcessed record) {
         int selectedDwellTime = (int) (Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * record.sumDwellTime));
         int cumulativeDwellTime = 0;
@@ -394,7 +463,7 @@ public class Person extends Agent {
         }
         return null;
     }
-    
+
     public boolean decideToTravelExact(ZonedDateTime currentTime) {
         int hourInDay = currentTime.getHour();
         if (hourInDay > 8 && hourInDay < 21) {
@@ -408,7 +477,7 @@ public class Person extends Agent {
         }
         return false;
     }
-    
+
     public boolean decideToTravel(PatternsRecordProcessed record, ZonedDateTime currentTime) {
         int dayInMonth = currentTime.getDayOfMonth() - 1;
         try {
@@ -448,10 +517,10 @@ public class Person extends Agent {
             //ex.printStackTrace(System.out);
             //System.out.println(ex.getMessage());
         }
-        
+
         return false;
     }
-    
+
     public PatternsRecordProcessed chooseDestination(Region region) {
         double selectedDestFreq = (Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * region.scheduleList.originalSumFrequencies));
         double cumulativeDestFreqs = 0;
@@ -463,7 +532,7 @@ public class Person extends Agent {
         }
         return null;
     }
-    
+
     public POI chooseDestinationExact(boolean isFromHome) {
         if (isFromHome == true) {
 //            double selectedDestFreq = (Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * this.exactProperties.sumHomeFreqs));
@@ -495,7 +564,7 @@ public class Person extends Agent {
 //            return null;
         }
     }
-    
+
     public POI chooseDestinationExact(Region region, boolean isFromHome) {
         if (isFromHome == true) {
             float selectedDestFreq = (float) (Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * region.scheduleListExact.sumHomeFreqs));
@@ -507,7 +576,7 @@ public class Person extends Agent {
             return region.scheduleListExact.pOIs[index];
         }
     }
-    
+
     public void pollContact() {
         if (properties.isInTravel == true) {
             if (isPolled == false) {
@@ -525,9 +594,9 @@ public class Person extends Agent {
 //                }
                             myModelRoot.ABM.root.agentPairContact[myIndex][i] = myModelRoot.ABM.root.agentPairContact[myIndex][i] + properties.currentPOI.peopleInPOI.size();
                             myModelRoot.ABM.root.agentPairContact[i][myIndex] = myModelRoot.ABM.root.agentPairContact[i][myIndex] + properties.currentPOI.peopleInPOI.size();
-                            
+
                             properties.currentPOI.peopleInPOI.get(i).isPolled = true;
-                            
+
                         }
                     }
                 } catch (Exception ex) {
