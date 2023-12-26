@@ -55,8 +55,8 @@ public class Root extends Agent {
     public int numContacts;
 
     public double pTSFraction;//USED FOR FUZZY STATUS
-    
-    public ShamilSimulatorController shamilSimulatorController=new ShamilSimulatorController();
+
+    public ShamilSimulatorController shamilSimulatorController = new ShamilSimulatorController();
 
     public enum statusEnum {
         SUSCEPTIBLE, INFECTED_SYM, INFECTED_ASYM, RECOVERED, DEAD;
@@ -335,6 +335,26 @@ public class Root extends Agent {
                         POI tempPOI = new POI();
                         tempPOI.patternsRecord = patternRecordsTemp.get(j);
                         pOIs.put(patternRecordsTemp.get(j).placeKey, tempPOI);
+                    }
+                } else if (isSchool(patternRecordsTemp.get(j).place.naics_code) == true) {
+                    patternRecords.add(patternRecordsTemp.get(j));
+                    if (pOIs.containsKey(patternRecordsTemp.get(j).placeKey)) {
+                        pOIs.get(patternRecordsTemp.get(j).placeKey).patternsRecord = patternRecordsTemp.get(j);
+                    } else {
+                        POI tempPOI = new POI();
+                        tempPOI.patternsRecord = patternRecordsTemp.get(j);
+                        pOIs.put(patternRecordsTemp.get(j).placeKey, tempPOI);
+                    }
+                } else {
+                    if (Math.random() > 0.8) {
+                        patternRecords.add(patternRecordsTemp.get(j));
+                        if (pOIs.containsKey(patternRecordsTemp.get(j).placeKey)) {
+                            pOIs.get(patternRecordsTemp.get(j).placeKey).patternsRecord = patternRecordsTemp.get(j);
+                        } else {
+                            POI tempPOI = new POI();
+                            tempPOI.patternsRecord = patternRecordsTemp.get(j);
+                            pOIs.put(patternRecordsTemp.get(j).placeKey, tempPOI);
+                        }
                     }
                 }
             }
@@ -963,15 +983,15 @@ public class Root extends Agent {
                         if (cumulativeRegionPopulation > selectedRegion) {
                             if (!regions.get(initialInfectionRegionIndex.get(j)).residents.isEmpty()) {
                                 int selectedResident = (int) ((rnd.nextDouble() * (regions.get(initialInfectionRegionIndex.get(j)).residents.size() - 1)));
-                                for (int m = 0; m < regions.get(j).residents.get(selectedResident).insidePeople.size(); m++) {
+                                for (int m = 0; m < regions.get(initialInfectionRegionIndex.get(j)).residents.get(selectedResident).insidePeople.size(); m++) {
                                     if (regions.get(initialInfectionRegionIndex.get(j)).residents.get(selectedResident).insidePeople.get(m).fpp.status == statusEnum.SUSCEPTIBLE.ordinal()) {
                                         if (rnd.nextDouble() > 0.7) {
-                                            if (regions.get(j).residents.get(selectedResident).insidePeople.get(m).fpp.status == statusEnum.SUSCEPTIBLE.ordinal()) {
+                                            if (regions.get(initialInfectionRegionIndex.get(j)).residents.get(selectedResident).insidePeople.get(m).fpp.status == statusEnum.SUSCEPTIBLE.ordinal()) {
                                                 regions.get(initialInfectionRegionIndex.get(j)).residents.get(selectedResident).insidePeople.get(m).fpp.status = statusEnum.INFECTED_SYM.ordinal();
                                                 regions.get(initialInfectionRegionIndex.get(j)).residents.get(selectedResident).insidePeople.get(m).sfpp.infectedDays = 4 + (int) (rnd.nextDouble() * 10);
                                             }
                                         } else {
-                                            if (regions.get(j).residents.get(selectedResident).insidePeople.get(m).fpp.status == statusEnum.SUSCEPTIBLE.ordinal()) {
+                                            if (regions.get(initialInfectionRegionIndex.get(j)).residents.get(selectedResident).insidePeople.get(m).fpp.status == statusEnum.SUSCEPTIBLE.ordinal()) {
                                                 regions.get(initialInfectionRegionIndex.get(j)).residents.get(selectedResident).insidePeople.get(m).fpp.status = statusEnum.INFECTED_ASYM.ordinal();
                                                 regions.get(initialInfectionRegionIndex.get(j)).residents.get(selectedResident).insidePeople.get(m).sfpp.infectedDays = 3 + (int) (rnd.nextDouble() * 3);
                                             }
@@ -979,7 +999,7 @@ public class Root extends Agent {
                                         currentInfections = currentInfections + 1;
                                         currentInfectionPercentage = (double) currentInfections / (double) aBMRegionPopulation;
                                         tryCounter = 0;
-                                        break;
+//                                        break;
                                     } else {
                                         tryCounter += 1;
                                     }

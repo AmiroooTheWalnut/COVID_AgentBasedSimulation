@@ -47,6 +47,12 @@ public class SimulatorDialog extends javax.swing.JDialog {
 
         ProcessingMapRenderer sketch = new ProcessingMapRenderer(myParent, jPanel14, null);
         sketch.startRendering();
+        
+        boolean isDefaultMatchingFound = myParent.mainModel.ABM.matchingConfig.loadMatchConfig();
+        if(isDefaultMatchingFound==true){
+            jLabel9.setText(myParent.mainModel.ABM.matchingConfig.shopSchPerm);
+            jLabel10.setText(myParent.mainModel.ABM.matchingConfig.geoFile);
+        }
     }
 
     public void refreshLists() {
@@ -297,6 +303,7 @@ public class SimulatorDialog extends javax.swing.JDialog {
 
         jPanel21.setBorder(javax.swing.BorderFactory.createTitledBorder("Hardcoded"));
 
+        jCheckBox2.setSelected(true);
         jCheckBox2.setText("IsParallel?");
         jCheckBox2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -320,7 +327,7 @@ public class SimulatorDialog extends javax.swing.JDialog {
 
         jLabel3.setText("Num residents:");
 
-        jSpinner1.setModel(new javax.swing.SpinnerNumberModel(5000, 1, null, 1));
+        jSpinner1.setModel(new javax.swing.SpinnerNumberModel(50000, 1, null, 1));
 
         jButton4.setText("Manually save");
         jButton4.setEnabled(false);
@@ -2004,9 +2011,11 @@ public class SimulatorDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton7ActionPerformed
 
     private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
-        myParent.mainModel.ABM.matchingConfig.loadMatchConfig();
-        jLabel9.setText(myParent.mainModel.ABM.matchingConfig.shopSchPerm);
-        jLabel10.setText(myParent.mainModel.ABM.matchingConfig.geoFile);
+        boolean isDefaultMatchingFound = myParent.mainModel.ABM.matchingConfig.loadMatchConfig();
+        if(isDefaultMatchingFound==true){
+            jLabel9.setText(myParent.mainModel.ABM.matchingConfig.shopSchPerm);
+            jLabel10.setText(myParent.mainModel.ABM.matchingConfig.geoFile);
+        }
     }//GEN-LAST:event_jButton8ActionPerformed
 
     private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
@@ -2043,12 +2052,10 @@ public class SimulatorDialog extends javax.swing.JDialog {
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
-    private javax.swing.JButton jButton6;
     private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton8;
     private javax.swing.JButton jButton9;
     private javax.swing.JCheckBox jCheckBox1;
-    private javax.swing.JCheckBox jCheckBox10;
     private javax.swing.JCheckBox jCheckBox11;
     private javax.swing.JCheckBox jCheckBox2;
     private javax.swing.JCheckBox jCheckBox3;
@@ -2065,7 +2072,6 @@ public class SimulatorDialog extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JList<String> jList1;
     private javax.swing.JList<String> jList2;
@@ -2093,7 +2099,6 @@ public class SimulatorDialog extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel23;
     private javax.swing.JPanel jPanel24;
     private javax.swing.JPanel jPanel25;
-    private javax.swing.JPanel jPanel26;
     private javax.swing.JPanel jPanel27;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;

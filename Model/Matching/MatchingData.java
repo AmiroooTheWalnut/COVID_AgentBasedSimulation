@@ -105,37 +105,42 @@ public class MatchingData {
         } catch (CsvException ex) {
             Logger.getLogger(MatchingData.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
     }
     
     public void findPOIs(MainModel model){
-        foundType1POIs=new ArrayList[model.ABM.matchingData.pOIType1Options.size()];
-        foundType2POIs=new ArrayList[model.ABM.matchingData.pOIType2Options.size()];
+        foundType1POIs=new ArrayList[model.ABM.matchingData.pOIType1Lats.length];
+        foundType2POIs=new ArrayList[model.ABM.matchingData.pOIType2Lats.length];
+        for(int i=0;i<foundType1POIs.length;i++){
+            foundType1POIs[i]=new ArrayList();
+        }
+        for(int i=0;i<foundType2POIs.length;i++){
+            foundType2POIs[i]=new ArrayList();
+        }
         for (int i = 0; i < model.safegraph.allPatterns.monthlyPatternsList.size(); i++) {
             for (int j = 0; j < model.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.size(); j++) {
                 int naics=model.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.naics_code;
                 boolean isFoundValidType1 = false;
                 boolean isFoundValidType2 = false;
                 for (int m = 0; m < model.ABM.matchingData.pOIType1Options.size(); m++) {
-                    if (naics == model.ABM.matchingData.pOIType1Options.get(m)) {
+                    if (String.valueOf(naics).startsWith(String.valueOf(model.ABM.matchingData.pOIType1Options.get(m)))) {
                         isFoundValidType1 = true;
                         break;
                     }
                 }
                 for (int m = 0; m < model.ABM.matchingData.pOIType1NotOptions.size(); m++) {
-                    if (naics == model.ABM.matchingData.pOIType1NotOptions.get(m)) {
+                    if (String.valueOf(naics).startsWith(String.valueOf(model.ABM.matchingData.pOIType1NotOptions.get(m)))) {
                         isFoundValidType1 = false;
                         break;
                     }
                 }
                 for (int m = 0; m < model.ABM.matchingData.pOIType2Options.size(); m++) {
-                    if (naics == model.ABM.matchingData.pOIType2Options.get(m)) {
+                    if (String.valueOf(naics).startsWith(String.valueOf(model.ABM.matchingData.pOIType2Options.get(m)))) {
                         isFoundValidType2 = true;
                         break;
                     }
                 }
                 for (int m = 0; m < model.ABM.matchingData.pOIType2NotOptions.size(); m++) {
-                    if (naics == model.ABM.matchingData.pOIType2NotOptions.get(m)) {
+                    if (String.valueOf(naics).startsWith(String.valueOf(model.ABM.matchingData.pOIType2NotOptions.get(m)))) {
                         isFoundValidType2 = false;
                         break;
                     }

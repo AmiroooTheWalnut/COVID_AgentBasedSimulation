@@ -22,7 +22,7 @@ import java.util.HashMap;
  */
 public class Person extends Agent {
 
-    Person currentAgent = this;
+//    Person currentAgent = this;
 
     public ArrayList<FuzzyPerson> insidePeople;
 
@@ -50,6 +50,8 @@ public class Person extends Agent {
     @Override
     public void constructor(MainModel modelRoot) {
         myModelRoot = modelRoot;
+        lat = properties.homeRegion.lat;
+        lon = properties.homeRegion.lon;
     }
 
     @Override
@@ -145,6 +147,77 @@ public class Person extends Agent {
     public void travelFromWork(ZonedDateTime currentTime, boolean isArtifical, boolean isTessellationBuilt) {
         if (isArtifical == false) {
             PatternsRecordProcessed dest = chooseDestination(properties.workRegion);
+            if (myModelRoot.ABM.isMatching == true) {
+                boolean isFoundValidType1 = false;
+                boolean isFoundValidType2 = false;
+                for (int i = 0; i < myModelRoot.ABM.matchingData.pOIType1Options.size(); i++) {
+                    if (String.valueOf(dest.place.naics_code).startsWith(String.valueOf(myModelRoot.ABM.matchingData.pOIType1Options.get(i)))) {
+                        isFoundValidType1 = true;
+                        break;
+                    }
+                }
+                for (int i = 0; i < myModelRoot.ABM.matchingData.pOIType1NotOptions.size(); i++) {
+                    if (String.valueOf(dest.place.naics_code).startsWith(String.valueOf(myModelRoot.ABM.matchingData.pOIType1NotOptions.get(i)))) {
+                        isFoundValidType1 = false;
+                        break;
+                    }
+                }
+                for (int i = 0; i < myModelRoot.ABM.matchingData.pOIType2Options.size(); i++) {
+                    if (String.valueOf(dest.place.naics_code).startsWith(String.valueOf(myModelRoot.ABM.matchingData.pOIType2Options.get(i)))) {
+                        isFoundValidType2 = true;
+                        break;
+                    }
+                }
+                for (int i = 0; i < myModelRoot.ABM.matchingData.pOIType2NotOptions.size(); i++) {
+                    if (String.valueOf(dest.place.naics_code).startsWith(String.valueOf(myModelRoot.ABM.matchingData.pOIType2NotOptions.get(i)))) {
+                        isFoundValidType2 = false;
+                        break;
+                    }
+                }
+                if (isFoundValidType1 == true) {
+                    float minDist = Float.MAX_VALUE;
+                    int directFoundIndexType1 = -1;
+                    for (int i = 0; i < myModelRoot.ABM.matchingData.pOIType1Lats.length; i++) {
+                        float dist = (float) Math.sqrt(Math.pow(lon - myModelRoot.ABM.matchingData.pOIType1Lats[i], 2) + Math.pow(lat - myModelRoot.ABM.matchingData.pOIType1Lons[i], 2));
+                        if (dist < minDist) {
+                            minDist = dist;
+                            directFoundIndexType1 = i;
+                        }
+                    }
+                    for (int i = 0; i < myModelRoot.ABM.matchingData.pOIType2Lats.length; i++) {
+                        float dist = (float) Math.sqrt(Math.pow(lon - myModelRoot.ABM.matchingData.pOIType2Lats[i], 2) + Math.pow(lat - myModelRoot.ABM.matchingData.pOIType2Lons[i], 2));
+                        if (dist < minDist) {
+                            minDist = dist;
+                            directFoundIndexType1 = myModelRoot.ABM.matchingData.permuteData[i]-1;
+                        }
+                    }
+                    int index=(int)(Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * myModelRoot.ABM.matchingData.foundType1POIs[directFoundIndexType1].size()));
+//                    System.out.println("directFoundIndexType1: "+directFoundIndexType1);
+                    dest=myModelRoot.ABM.matchingData.foundType1POIs[directFoundIndexType1].get(index);
+                }
+                if (isFoundValidType2 == true) {
+                    float minDist = Float.MAX_VALUE;
+                    int directFoundIndexType2 = -1;
+                    for (int i = 0; i < myModelRoot.ABM.matchingData.pOIType2Lats.length; i++) {
+                        float dist = (float) Math.sqrt(Math.pow(lon - myModelRoot.ABM.matchingData.pOIType2Lats[i], 2) + Math.pow(lat - myModelRoot.ABM.matchingData.pOIType2Lons[i], 2));
+                        if (dist < minDist) {
+                            minDist = dist;
+                            directFoundIndexType2 = i;
+                        }
+                    }
+                    for (int i = 0; i < myModelRoot.ABM.matchingData.pOIType1Lats.length; i++) {
+                        float dist = (float) Math.sqrt(Math.pow(lon - myModelRoot.ABM.matchingData.pOIType1Lats[i], 2) + Math.pow(lat - myModelRoot.ABM.matchingData.pOIType1Lons[i], 2));
+                        if (dist < minDist) {
+                            minDist = dist;
+                            directFoundIndexType2 = myModelRoot.ABM.matchingData.permuteData[i]-1;
+                        }
+                    }
+                    int index=(int)(Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * myModelRoot.ABM.matchingData.foundType2POIs[directFoundIndexType2].size()));
+//                    System.out.println("directFoundIndexType2: "+directFoundIndexType2);
+                    dest=myModelRoot.ABM.matchingData.foundType2POIs[directFoundIndexType2].get(index);
+                }
+            }
+            
             boolean decision = decideToTravel(dest, currentTime);
             if (decision == true) {
                 numTravels = numTravels + 1;
@@ -269,30 +342,30 @@ public class Person extends Agent {
     public void travelFromHome(ZonedDateTime currentTime, boolean isArtifical, boolean isTessellationBuilt) {
         if (isArtifical == false) {
             PatternsRecordProcessed dest = chooseDestination(properties.homeRegion);
-
             if (myModelRoot.ABM.isMatching == true) {
+//                System.out.println("NAICS: "+dest.place.naics_code);
                 boolean isFoundValidType1 = false;
                 boolean isFoundValidType2 = false;
                 for (int i = 0; i < myModelRoot.ABM.matchingData.pOIType1Options.size(); i++) {
-                    if (dest.place.naics_code == myModelRoot.ABM.matchingData.pOIType1Options.get(i)) {
+                    if (String.valueOf(dest.place.naics_code).startsWith(String.valueOf(myModelRoot.ABM.matchingData.pOIType1Options.get(i)))) {
                         isFoundValidType1 = true;
                         break;
                     }
                 }
                 for (int i = 0; i < myModelRoot.ABM.matchingData.pOIType1NotOptions.size(); i++) {
-                    if (dest.place.naics_code == myModelRoot.ABM.matchingData.pOIType1NotOptions.get(i)) {
+                    if (String.valueOf(dest.place.naics_code).startsWith(String.valueOf(myModelRoot.ABM.matchingData.pOIType1NotOptions.get(i)))) {
                         isFoundValidType1 = false;
                         break;
                     }
                 }
                 for (int i = 0; i < myModelRoot.ABM.matchingData.pOIType2Options.size(); i++) {
-                    if (dest.place.naics_code == myModelRoot.ABM.matchingData.pOIType2Options.get(i)) {
+                    if (String.valueOf(dest.place.naics_code).startsWith(String.valueOf(myModelRoot.ABM.matchingData.pOIType2Options.get(i)))) {
                         isFoundValidType2 = true;
                         break;
                     }
                 }
                 for (int i = 0; i < myModelRoot.ABM.matchingData.pOIType2NotOptions.size(); i++) {
-                    if (dest.place.naics_code == myModelRoot.ABM.matchingData.pOIType2NotOptions.get(i)) {
+                    if (String.valueOf(dest.place.naics_code).startsWith(String.valueOf(myModelRoot.ABM.matchingData.pOIType2NotOptions.get(i)))) {
                         isFoundValidType2 = false;
                         break;
                     }
@@ -301,40 +374,42 @@ public class Person extends Agent {
                     float minDist = Float.MAX_VALUE;
                     int directFoundIndexType1 = -1;
                     for (int i = 0; i < myModelRoot.ABM.matchingData.pOIType1Lats.length; i++) {
-                        float dist = (float) Math.sqrt(Math.pow(lat - myModelRoot.ABM.matchingData.pOIType1Lats[i], 2) + Math.pow(lon - myModelRoot.ABM.matchingData.pOIType1Lons[i], 2));
+                        float dist = (float) Math.sqrt(Math.pow(lon - myModelRoot.ABM.matchingData.pOIType1Lats[i], 2) + Math.pow(lat - myModelRoot.ABM.matchingData.pOIType1Lons[i], 2));
                         if (dist < minDist) {
                             minDist = dist;
                             directFoundIndexType1 = i;
                         }
                     }
                     for (int i = 0; i < myModelRoot.ABM.matchingData.pOIType2Lats.length; i++) {
-                        float dist = (float) Math.sqrt(Math.pow(lat - myModelRoot.ABM.matchingData.pOIType2Lats[i], 2) + Math.pow(lon - myModelRoot.ABM.matchingData.pOIType2Lons[i], 2));
+                        float dist = (float) Math.sqrt(Math.pow(lon - myModelRoot.ABM.matchingData.pOIType2Lats[i], 2) + Math.pow(lat - myModelRoot.ABM.matchingData.pOIType2Lons[i], 2));
                         if (dist < minDist) {
                             minDist = dist;
-                            directFoundIndexType1 = myModelRoot.ABM.matchingData.permuteData[i];
+                            directFoundIndexType1 = myModelRoot.ABM.matchingData.permuteData[i]-1;
                         }
                     }
                     int index=(int)(Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * myModelRoot.ABM.matchingData.foundType1POIs[directFoundIndexType1].size()));
+//                    System.out.println("directFoundIndexType1: "+directFoundIndexType1);
                     dest=myModelRoot.ABM.matchingData.foundType1POIs[directFoundIndexType1].get(index);
                 }
                 if (isFoundValidType2 == true) {
                     float minDist = Float.MAX_VALUE;
                     int directFoundIndexType2 = -1;
                     for (int i = 0; i < myModelRoot.ABM.matchingData.pOIType2Lats.length; i++) {
-                        float dist = (float) Math.sqrt(Math.pow(lat - myModelRoot.ABM.matchingData.pOIType2Lats[i], 2) + Math.pow(lon - myModelRoot.ABM.matchingData.pOIType2Lons[i], 2));
+                        float dist = (float) Math.sqrt(Math.pow(lon - myModelRoot.ABM.matchingData.pOIType2Lats[i], 2) + Math.pow(lat - myModelRoot.ABM.matchingData.pOIType2Lons[i], 2));
                         if (dist < minDist) {
                             minDist = dist;
                             directFoundIndexType2 = i;
                         }
                     }
                     for (int i = 0; i < myModelRoot.ABM.matchingData.pOIType1Lats.length; i++) {
-                        float dist = (float) Math.sqrt(Math.pow(lat - myModelRoot.ABM.matchingData.pOIType1Lats[i], 2) + Math.pow(lon - myModelRoot.ABM.matchingData.pOIType1Lons[i], 2));
+                        float dist = (float) Math.sqrt(Math.pow(lon - myModelRoot.ABM.matchingData.pOIType1Lats[i], 2) + Math.pow(lat - myModelRoot.ABM.matchingData.pOIType1Lons[i], 2));
                         if (dist < minDist) {
                             minDist = dist;
-                            directFoundIndexType2 = myModelRoot.ABM.matchingData.permuteData[i];
+                            directFoundIndexType2 = myModelRoot.ABM.matchingData.permuteData[i]-1;
                         }
                     }
                     int index=(int)(Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * myModelRoot.ABM.matchingData.foundType2POIs[directFoundIndexType2].size()));
+//                    System.out.println("directFoundIndexType2: "+directFoundIndexType2);
                     dest=myModelRoot.ABM.matchingData.foundType2POIs[directFoundIndexType2].get(index);
                 }
             }

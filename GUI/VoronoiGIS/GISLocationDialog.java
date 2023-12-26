@@ -197,6 +197,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
         jButton38 = new javax.swing.JButton();
         jButton39 = new javax.swing.JButton();
         jButton40 = new javax.swing.JButton();
+        jButton41 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -658,6 +659,13 @@ public class GISLocationDialog extends javax.swing.JDialog {
             }
         });
 
+        jButton41.setText("Fix unreachable nodes");
+        jButton41.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton41ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
@@ -690,7 +698,8 @@ public class GISLocationDialog extends javax.swing.JDialog {
                             .addComponent(jButton35)
                             .addComponent(jButton38)
                             .addComponent(jButton39)
-                            .addComponent(jButton40))
+                            .addComponent(jButton40)
+                            .addComponent(jButton41))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -725,8 +734,10 @@ public class GISLocationDialog extends javax.swing.JDialog {
                     .addComponent(jSpinner3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton34)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton35)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton41)
                 .addGap(18, 18, 18)
                 .addComponent(jButton39)
                 .addGap(18, 18, 18)
@@ -837,7 +848,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
-        shopFacilities = initShopFacilities(shopMergeThreshold);
+        shopFacilities = initShopFacilities(shopMergeThreshold, null);
     }//GEN-LAST:event_jButton7ActionPerformed
 
     private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
@@ -3171,7 +3182,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
         int maxIterations = 20;
 
         for (int iter = 0; iter < maxIterations; iter++) {
-            shopFacilities = initShopFacilities(currentShopMergeThreshold);
+            shopFacilities = initShopFacilities(currentShopMergeThreshold, null);
             schoolFacilities = initSchoolFacilities(currentSchoolMergeThreshold, null);
             makeVDs(shopFacilities, "shops_v_VDFNC_" + targetNumCells);
             makeVDs(schoolFacilities, "schools_v_VDFNC_" + targetNumCells);
@@ -3462,23 +3473,92 @@ public class GISLocationDialog extends javax.swing.JDialog {
         myParent.mainModel.safegraph.requestDatasetRange(myParent.mainModel.datasetDirectory, myParent.mainModel.allGISData, myParent.mainModel.ABM.studyScope, years, months, true, myParent.numProcessors);
 
         ArrayList<LocationNode> bannedNodes = new ArrayList();
-        ArrayList<Long> cursedTucsonNodes = new ArrayList();
-        cursedTucsonNodes.add(6948564736l);
-        cursedTucsonNodes.add(6881882718l);
-        cursedTucsonNodes.add(6881882717l);
-        cursedTucsonNodes.add(6881882719l);
-        cursedTucsonNodes.add(6881882716l);
-        cursedTucsonNodes.add(6881882720l);
-        cursedTucsonNodes.add(6881882721l);
+//        ArrayList<Long> cursedTucsonNodes = new ArrayList();
+//        cursedTucsonNodes.add(6948564736l);
+//        cursedTucsonNodes.add(6881882718l);
+//        cursedTucsonNodes.add(6881882717l);
+//        cursedTucsonNodes.add(6881882719l);
+//        cursedTucsonNodes.add(6881882716l);
+//        cursedTucsonNodes.add(6881882720l);
+//        cursedTucsonNodes.add(6881882721l);
+
+        ArrayList<Long> cursedSantaFeNodes = new ArrayList();
+//        cursedSantaFeNodes.add(-52517l);
+//        cursedSantaFeNodes.add(-52833l);
+//        cursedSantaFeNodes.add(-58115l);
+//        cursedSantaFeNodes.add(-52516l);
+//        cursedSantaFeNodes.add(-96738l);
+//        cursedSantaFeNodes.add(-52834l);
+//        cursedSantaFeNodes.add(-52515l);
+//        cursedSantaFeNodes.add(-53328l);
+//        cursedSantaFeNodes.add(-52514l);
+//        cursedSantaFeNodes.add(-58214l);
+//        cursedSantaFeNodes.add(-52832l);
+//        cursedSantaFeNodes.add(-52513l);
+//        cursedSantaFeNodes.add(-52837l);
+//        cursedSantaFeNodes.add(-52835l);
+//        cursedSantaFeNodes.add(-52836l);
+//        cursedSantaFeNodes.add(-58119l);
+//        cursedSantaFeNodes.add(-58118l);
+//        cursedSantaFeNodes.add(-52538l);
+//        cursedSantaFeNodes.add(-52540l);
+//        cursedSantaFeNodes.add(-58182l);
+//        cursedSantaFeNodes.add(-113697l);
+//        cursedSantaFeNodes.add(-52541l);
+//        cursedSantaFeNodes.add(-58120l);
+//        cursedSantaFeNodes.add(-58184l);
+//        cursedSantaFeNodes.add(-164070l);
+//        cursedSantaFeNodes.add(-52539l);
+//        cursedSantaFeNodes.add(-58116l);
+//        cursedSantaFeNodes.add(-58129l);
+//        cursedSantaFeNodes.add(-148660l);
+//        cursedSantaFeNodes.add(-52542l);
+//        cursedSantaFeNodes.add(-164071l);
+//        cursedSantaFeNodes.add(-52548l);
+//        cursedSantaFeNodes.add(-148659l);
+//        cursedSantaFeNodes.add(-164068l);
+//        cursedSantaFeNodes.add(-52512l);
+//        cursedSantaFeNodes.add(-52831l);
+//        cursedSantaFeNodes.add(-52511l);
+//        cursedSantaFeNodes.add(-52810l);
+//        cursedSantaFeNodes.add(-52811l);
+//        cursedSantaFeNodes.add(-52809l);
+//        cursedSantaFeNodes.add(-52808l);
+//        cursedSantaFeNodes.add(-52543l);
+//        cursedSantaFeNodes.add(-58128l);
+//        cursedSantaFeNodes.add(-148666l);
+//        cursedSantaFeNodes.add(-148665l);
+//        cursedSantaFeNodes.add(-58130l);
+//        cursedSantaFeNodes.add(-148661l);
+//        cursedSantaFeNodes.add(-52549l);
+//        cursedSantaFeNodes.add(-58104l);
+//        cursedSantaFeNodes.add(-58127l);
+//        cursedSantaFeNodes.add(-52552l);
+//        cursedSantaFeNodes.add(-52807l);
+//        cursedSantaFeNodes.add(-52550l);
+//        cursedSantaFeNodes.add(-148662l);
+//        cursedSantaFeNodes.add(-52840l);
+//        cursedSantaFeNodes.add(-58126l);
+//        cursedSantaFeNodes.add(-164069l);
+//        cursedSantaFeNodes.add(-52553l);
         for (int i = 0; i < mainFParent.allData.all_Nodes.length; i++) {
-            for (int j = 0; j < cursedTucsonNodes.size(); j++) {
-                if (mainFParent.allData.all_Nodes[i].id == cursedTucsonNodes.get(j)) {
+            for (int j = 0; j < cursedSantaFeNodes.size(); j++) {
+                if (mainFParent.allData.all_Nodes[i].id == cursedSantaFeNodes.get(j)) {
                     bannedNodes.add(mainFParent.allData.all_Nodes[i]);
+//                    System.out.println(((short[])(mainFParent.allData.all_Nodes[i].layers.get(0)))[0]);
+//                    final int passed_i=i;
+//                    (mainFParent.app).enqueue(new Callable() {
+//                        public Object call() throws Exception {
+////                            mainFParent.app.removeAllHeadquarters();
+//                            mainFParent.app.headquarter(mainFParent.allData.all_Nodes[passed_i].renderingLocation, 0.4f, "center");
+//                            return null;
+//                        }
+//                    });
                 }
             }
         }
 
-        shopFacilities = initShopsByExactNumber((int) jSpinner2.getValue());
+        shopFacilities = initShopsByExactNumber((int) jSpinner2.getValue(), bannedNodes);
         schoolFacilities = initSchoolsByExactNumber((int) jSpinner3.getValue(), bannedNodes);
 
         int trafficLayerIndex = -1;
@@ -3961,89 +4041,89 @@ public class GISLocationDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton39ActionPerformed
 
     private void jButton40ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton40ActionPerformed
-        ArrayList<String[]> rows=new ArrayList();
+        ArrayList<String[]> rows = new ArrayList();
         for (int i = 0; i < myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.size(); i++) {
-            System.out.println("Month "+i);
+            System.out.println("Month " + i);
             for (int j = 0; j < myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.size(); j++) {
-                System.out.println("Month "+i+" place percentage "+(float)j/myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.size());
+                System.out.println("Month " + i + " place percentage " + (float) j / myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.size());
                 if (myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).censusBlock != null) {
                     if (isHospital_FACS(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).naics_code) == true) {
 //                        LocationNode node = getNearestNode(mainFParent, myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lat, myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lon, null);
                         float[] result = getBuildingAreaLevelsOnline(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lat, myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lon, false);
                         float landArea = result[0];
                         int buldingLevels = (int) result[1];
-                        float s=buldingLevels*landArea;
+                        float s = buldingLevels * landArea;
                         String[] row = new String[4];
-                        row[0]="hospital";
-                        row[1]=String.valueOf(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lat);
-                        row[2]=String.valueOf(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lon);
-                        row[3]=String.valueOf(s);
+                        row[0] = "hospital";
+                        row[1] = String.valueOf(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lat);
+                        row[2] = String.valueOf(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lon);
+                        row[3] = String.valueOf(s);
                         rows.add(row);
-                    }else if(isLeisure_FACS(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).naics_code) == true){
+                    } else if (isLeisure_FACS(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).naics_code) == true) {
                         float[] result = getBuildingAreaLevelsOnline(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lat, myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lon, false);
                         float landArea = result[0];
                         int buldingLevels = (int) result[1];
-                        float s=buldingLevels*landArea;
+                        float s = buldingLevels * landArea;
                         String[] row = new String[4];
-                        row[0]="leisure";
-                        row[1]=String.valueOf(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lat);
-                        row[2]=String.valueOf(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lon);
-                        row[3]=String.valueOf(s);
+                        row[0] = "leisure";
+                        row[1] = String.valueOf(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lat);
+                        row[2] = String.valueOf(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lon);
+                        row[3] = String.valueOf(s);
                         rows.add(row);
-                    }else if(isOffice_FACS(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).naics_code) == true){
+                    } else if (isOffice_FACS(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).naics_code) == true) {
                         float[] result = getBuildingAreaLevelsOnline(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lat, myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lon, false);
                         float landArea = result[0];
                         int buldingLevels = (int) result[1];
-                        float s=buldingLevels*landArea;
+                        float s = buldingLevels * landArea;
                         String[] row = new String[4];
-                        row[0]="office";
-                        row[1]=String.valueOf(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lat);
-                        row[2]=String.valueOf(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lon);
-                        row[3]=String.valueOf(s);
+                        row[0] = "office";
+                        row[1] = String.valueOf(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lat);
+                        row[2] = String.valueOf(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lon);
+                        row[3] = String.valueOf(s);
                         rows.add(row);
-                    }else if(isPark_FACS(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).naics_code) == true){
+                    } else if (isPark_FACS(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).naics_code) == true) {
                         float[] result = getBuildingAreaLevelsOnline(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lat, myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lon, false);
                         float landArea = result[0];
                         int buldingLevels = (int) result[1];
-                        float s=buldingLevels*landArea;
+                        float s = buldingLevels * landArea;
                         String[] row = new String[4];
-                        row[0]="park";
-                        row[1]=String.valueOf(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lat);
-                        row[2]=String.valueOf(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lon);
-                        row[3]=String.valueOf(s);
+                        row[0] = "park";
+                        row[1] = String.valueOf(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lat);
+                        row[2] = String.valueOf(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lon);
+                        row[3] = String.valueOf(s);
                         rows.add(row);
-                    }else if(isSchool_FACS(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).naics_code) == true){
+                    } else if (isSchool_FACS(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).naics_code) == true) {
                         float[] result = getBuildingAreaLevelsOnline(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lat, myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lon, false);
                         float landArea = result[0];
                         int buldingLevels = (int) result[1];
-                        float s=buldingLevels*landArea;
+                        float s = buldingLevels * landArea;
                         String[] row = new String[4];
-                        row[0]="school";
-                        row[1]=String.valueOf(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lat);
-                        row[2]=String.valueOf(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lon);
-                        row[3]=String.valueOf(s);
+                        row[0] = "school";
+                        row[1] = String.valueOf(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lat);
+                        row[2] = String.valueOf(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lon);
+                        row[3] = String.valueOf(s);
                         rows.add(row);
-                    }else if(isShopping_FACS(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).naics_code) == true){
+                    } else if (isShopping_FACS(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).naics_code) == true) {
                         float[] result = getBuildingAreaLevelsOnline(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lat, myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lon, false);
                         float landArea = result[0];
                         int buldingLevels = (int) result[1];
-                        float s=buldingLevels*landArea;
+                        float s = buldingLevels * landArea;
                         String[] row = new String[4];
-                        row[0]="shopping";
-                        row[1]=String.valueOf(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lat);
-                        row[2]=String.valueOf(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lon);
-                        row[3]=String.valueOf(s);
+                        row[0] = "shopping";
+                        row[1] = String.valueOf(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lat);
+                        row[2] = String.valueOf(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lon);
+                        row[3] = String.valueOf(s);
                         rows.add(row);
-                    }else if(isSupermarket_FACS(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).naics_code) == true){
+                    } else if (isSupermarket_FACS(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).naics_code) == true) {
                         float[] result = getBuildingAreaLevelsOnline(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lat, myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lon, false);
                         float landArea = result[0];
                         int buldingLevels = (int) result[1];
-                        float s=buldingLevels*landArea;
+                        float s = buldingLevels * landArea;
                         String[] row = new String[4];
-                        row[0]="supermarket";
-                        row[1]=String.valueOf(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lat);
-                        row[2]=String.valueOf(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lon);
-                        row[3]=String.valueOf(s);
+                        row[0] = "supermarket";
+                        row[1] = String.valueOf(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lat);
+                        row[2] = String.valueOf(myParent.mainModel.safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(i).placesRecords.get(j).lon);
+                        row[3] = String.valueOf(s);
                         rows.add(row);
                     }
                 }
@@ -4057,6 +4137,105 @@ public class GISLocationDialog extends javax.swing.JDialog {
             Logger.getLogger(GISLocationDialog.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButton40ActionPerformed
+
+    private void jButton41ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton41ActionPerformed
+        try {
+            CSVReader csvReader = new CSVReader(new FileReader("NetworkDistances" + File.separator + "shopsNodesDistances.csv"));
+            List<String[]> type1DistsRaw = new ArrayList<>();
+            type1DistsRaw = csvReader.readAll();
+            csvReader.close();
+            System.out.println("TYPE 1 DISTS READ!");
+            ArrayList<String[]> type1DistsCols = new ArrayList();
+            for (int j = 0; j < type1DistsRaw.get(0).length; j++) {
+                String[] col = new String[type1DistsRaw.size()];
+                for (int i = 0; i < type1DistsRaw.size(); i++) {
+                    col[i] = type1DistsRaw.get(i)[j];
+                }
+                type1DistsCols.add(col);
+            }
+
+            csvReader = new CSVReader(new FileReader("NetworkDistances" + File.separator + "schoolsNodesDistances.csv"));
+            List<String[]> type2DistsRaw = new ArrayList<>();
+            type2DistsRaw = csvReader.readAll();
+            csvReader.close();
+            System.out.println("TYPE 2 DISTS READ!");
+            ArrayList<String[]> type2DistsCols = new ArrayList();
+            for (int j = 0; j < type2DistsRaw.get(0).length; j++) {
+                String[] col = new String[type2DistsRaw.size()];
+                for (int i = 0; i < type2DistsRaw.size(); i++) {
+                    col[i] = type2DistsRaw.get(i)[j];
+                }
+                type2DistsCols.add(col);
+            }
+
+            csvReader = new CSVReader(new FileReader("NetworkDistances" + File.separator + "nodeLocations.csv"));
+            List<String[]> nodeList = new ArrayList<>();
+            nodeList = csvReader.readAll();
+            csvReader.close();
+            System.out.println("NODES READ!");
+
+            for (int i = type1DistsCols.size()-1; i > 0; i--) {
+                for (int j = 0; j < type1DistsCols.get(i).length; j++) {
+                    if (type1DistsCols.get(i)[j].equals("Infinity")) {
+                        type1DistsCols.remove(i);
+                        type2DistsCols.remove(i);
+                        nodeList.remove(i);
+//                        i=i-1;
+                        break;
+                    }
+                }
+            }
+            
+            for (int i = type2DistsCols.size()-1; i > 0; i--) {
+                for (int j = 0; j < type2DistsCols.get(i).length; j++) {
+                    if (type1DistsCols.get(i)[j].equals("Infinity")) {
+                        type2DistsCols.remove(i);
+                        type1DistsCols.remove(i);
+                        nodeList.remove(i);
+//                        i=i-1;
+                        break;
+                    }
+                }
+            }
+            
+            ArrayList<String[]> type1DistsRows = new ArrayList();
+            for (int j = 0; j < type1DistsCols.get(0).length; j++) {
+                String[] row = new String[nodeList.size()];
+                for (int i = 0; i < type1DistsCols.size(); i++) {
+                    row[i] = type1DistsCols.get(i)[j];
+                }
+                type1DistsRows.add(row);
+            }
+            ArrayList<String[]> type2DistsRows = new ArrayList();
+            for (int j = 0; j < type2DistsCols.get(0).length; j++) {
+                String[] row = new String[nodeList.size()];
+                for (int i = 0; i < type2DistsCols.size(); i++) {
+                    row[i] = type2DistsCols.get(i)[j];
+                }
+                type2DistsRows.add(row);
+            }
+            
+            CSVWriter writer = new CSVWriter(new FileWriter("NetworkDistances" + File.separator + "shopsNodesDistances.csv"));
+            writer.writeAll(type1DistsRows);
+            writer.close();
+            
+            writer = new CSVWriter(new FileWriter("NetworkDistances" + File.separator + "schoolsNodesDistances.csv"));
+            writer.writeAll(type2DistsRows);
+            writer.close();
+            
+            writer = new CSVWriter(new FileWriter("NetworkDistances" + File.separator + "nodeLocations.csv"));
+            writer.writeAll(nodeList);
+            writer.close();
+            
+            System.out.println("Successfully removed all infinite distance nodes!");
+        } catch (IOException ex) {
+            Logger.getLogger(GISLocationDialog.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("SHOP NUMBER OF VISITS BY ORDER FAILED TO READ");
+        } catch (CsvException ex) {
+            Logger.getLogger(GISLocationDialog.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("SHOP NUMBER OF VISITS BY ORDER FAILED TO READ");
+        }
+    }//GEN-LAST:event_jButton41ActionPerformed
 
     public static void writeDoubleArrayList(ArrayList<ArrayList<Double>> input, String path) {
         ArrayList<String[]> data = new ArrayList();
@@ -4132,7 +4311,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
         }
     }
 
-    public FacilityLocation[] initShopsByExactNumber(int input) {
+    public FacilityLocation[] initShopsByExactNumber(int input, ArrayList<LocationNode> banedNodes) {
         FacilityLocation[] output = null;
         float tempThresh = shopMergeThreshold;
         int numTries = 0;
@@ -4141,7 +4320,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
         boolean isMore = false;
         ArrayList<LocationNodeSafegraph> shopLocations = initShopLocations();
         while (numTries < numMaxTries) {
-            FacilityLocation[] facilites = initShopFacilities(shopLocations, tempThresh);
+            FacilityLocation[] facilites = initShopFacilities(shopLocations, tempThresh, banedNodes);
             if (facilites.length == input) {
                 output = facilites;
                 break;
@@ -4200,7 +4379,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
         float currentShopMergeThreshold = 0.01072975f;
         float currentSchoolMergeThreshold = 0.009574889f;
 
-        shopFacilities = initShopFacilities(currentShopMergeThreshold);
+        shopFacilities = initShopFacilities(currentShopMergeThreshold, null);
         schoolFacilities = initSchoolFacilities(currentSchoolMergeThreshold, null);
         makeVDs(shopFacilities, "shops_v_VDFNC_" + 70);
         makeVDs(schoolFacilities, "schools_v_VDFNC_" + 70);
@@ -4242,7 +4421,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
         currentSchoolMergeThreshold = currentSchoolMergeThreshold * (1 - stepSize);
         stepSize = stepSize * 0.95f;
 
-        shopFacilities = initShopFacilities(currentShopMergeThreshold);
+        shopFacilities = initShopFacilities(currentShopMergeThreshold, null);
         schoolFacilities = initSchoolFacilities(currentSchoolMergeThreshold, null);
         makeVDs(shopFacilities, "shops_v_VDFNC_" + 100);
         makeVDs(schoolFacilities, "schools_v_VDFNC_" + 100);
@@ -4800,7 +4979,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
         return temples;
     }
 
-    public FacilityLocation[] initShopFacilities(float threshold) {
+    public FacilityLocation[] initShopFacilities(float threshold, ArrayList<LocationNode> banedNodes) {
         ArrayList<LocationNodeSafegraph> shopLocations = initShopLocations();
         Integer indices[] = labelMergedFacilities(shopLocations, threshold);
         List<Integer> indicesRawList = Arrays.asList(indices);
@@ -4809,7 +4988,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
         ArrayList<Integer> indicesUniqueList = new ArrayList(indicesUniqueSetHS);
 
         System.out.println("Initial number of shops: " + shopLocations.size());
-        ArrayList<LocationNodeSafegraph> shops = mergeFacilitiesWithIndices(shopLocations, indicesList, indicesUniqueList, null);
+        ArrayList<LocationNodeSafegraph> shops = mergeFacilitiesWithIndices(shopLocations, indicesList, indicesUniqueList, banedNodes);
 
         shopLocationNodes = shops;
 
@@ -4830,7 +5009,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
         return output;
     }
 
-    public FacilityLocation[] initShopFacilities(ArrayList<LocationNodeSafegraph> locations, float threshold) {
+    public FacilityLocation[] initShopFacilities(ArrayList<LocationNodeSafegraph> locations, float threshold, ArrayList<LocationNode> banedNodes) {
         Integer indices[] = labelMergedFacilities(locations, threshold);
         List<Integer> indicesRawList = Arrays.asList(indices);
         ArrayList<Integer> indicesList = new ArrayList(indicesRawList);
@@ -4838,7 +5017,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
         ArrayList<Integer> indicesUniqueList = new ArrayList(indicesUniqueSetHS);
 
         System.out.println("Initial number of shops: " + locations.size());
-        ArrayList<LocationNodeSafegraph> shops = mergeFacilitiesWithIndices(locations, indicesList, indicesUniqueList, null);
+        ArrayList<LocationNodeSafegraph> shops = mergeFacilitiesWithIndices(locations, indicesList, indicesUniqueList, banedNodes);
 
         shopLocationNodes = shops;
 
@@ -5064,17 +5243,19 @@ public class GISLocationDialog extends javax.swing.JDialog {
                     for (int i = 0; i < outputGrid.myNodes.length; i++) {
                         //System.out.println(outputGrid.myNodes[i]);//WARNING, NULL POINTER SPOTTED, A GRID HAS A NULL LOCATIONNODE
                         if (outputGrid.myNodes[i] != null) {
-                            double dist = Math.sqrt(Math.pow(collisionPositionx - outputGrid.myNodes[i].lat, 2) + Math.pow(collisionPositiony - outputGrid.myNodes[i].lon, 2));
-                            if (dist < leastDistance) {
-                                boolean isFound = false;
-                                for (int h = 0; h < bannedNodes.size(); h++) {
-                                    if (outputGrid.myNodes[i].id == bannedNodes.get(h).id) {
-                                        isFound = true;
+                            if (((short[]) (outputGrid.myNodes[i].layers.get(0)))[0] != 9 && ((short[]) (outputGrid.myNodes[i].layers.get(0)))[0] != 10) {//ADDED AS EXTREMEM MEASURE
+                                double dist = Math.sqrt(Math.pow(collisionPositionx - outputGrid.myNodes[i].lat, 2) + Math.pow(collisionPositiony - outputGrid.myNodes[i].lon, 2));
+                                if (dist < leastDistance) {
+                                    boolean isFound = false;
+                                    for (int h = 0; h < bannedNodes.size(); h++) {
+                                        if (outputGrid.myNodes[i].id == bannedNodes.get(h).id) {
+                                            isFound = true;
+                                        }
                                     }
-                                }
-                                if (isFound == false) {
-                                    nearestNode = outputGrid.myNodes[i];
-                                    leastDistance = dist;
+                                    if (isFound == false) {
+                                        nearestNode = outputGrid.myNodes[i];
+                                        leastDistance = dist;
+                                    }
                                 }
                             }
                         }
@@ -5087,10 +5268,12 @@ public class GISLocationDialog extends javax.swing.JDialog {
                     for (int i = 0; i < outputGrid.myNodes.length; i++) {
                         //System.out.println(outputGrid.myNodes[i]);//WARNING, NULL POINTER SPOTTED, A GRID HAS A NULL LOCATIONNODE
                         if (outputGrid.myNodes[i] != null) {
-                            double dist = Math.sqrt(Math.pow(collisionPositionx - outputGrid.myNodes[i].lat, 2) + Math.pow(collisionPositiony - outputGrid.myNodes[i].lon, 2));
-                            if (dist < leastDistance) {
-                                nearestNode = outputGrid.myNodes[i];
-                                leastDistance = dist;
+                            if (((short[]) (outputGrid.myNodes[i].layers.get(0)))[0] != 9 && ((short[]) (outputGrid.myNodes[i].layers.get(0)))[0] != 10) {//ADDED AS EXTREMEM MEASURE
+                                double dist = Math.sqrt(Math.pow(collisionPositionx - outputGrid.myNodes[i].lat, 2) + Math.pow(collisionPositiony - outputGrid.myNodes[i].lon, 2));
+                                if (dist < leastDistance) {
+                                    nearestNode = outputGrid.myNodes[i];
+                                    leastDistance = dist;
+                                }
                             }
                         }
                     }
@@ -5666,6 +5849,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
     private javax.swing.JButton jButton39;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton40;
+    private javax.swing.JButton jButton41;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
     private javax.swing.JButton jButton7;
