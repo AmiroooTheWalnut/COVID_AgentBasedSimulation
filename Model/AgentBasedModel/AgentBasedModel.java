@@ -84,6 +84,7 @@ public class AgentBasedModel {
     public transient ZonedDateTime endTime;
 
     public transient int infectedByPOIContactDaily = 0;
+    public transient int infectedByPOISuperspreadDaily = 0;
     public transient int infectedByPOIEnvDaily = 0;
     public transient int infectedByShamilDaily = 0;
     public transient int infectedPOIDaily = 0;

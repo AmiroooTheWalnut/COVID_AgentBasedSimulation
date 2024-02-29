@@ -455,6 +455,7 @@ public class SimulatorDialog extends javax.swing.JDialog {
             }
         });
 
+        jCheckBox9.setSelected(true);
         jCheckBox9.setText("Save historical run");
 
         javax.swing.GroupLayout jPanel21Layout = new javax.swing.GroupLayout(jPanel21);

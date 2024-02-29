@@ -345,8 +345,9 @@ public class Root extends Agent {
                         tempPOI.patternsRecord = patternRecordsTemp.get(j);
                         pOIs.put(patternRecordsTemp.get(j).placeKey, tempPOI);
                     }
-                } else {
-                    if (Math.random() > 0.8) {
+                }
+                else {
+                    if (Math.random() > 0.9) {
                         patternRecords.add(patternRecordsTemp.get(j));
                         if (pOIs.containsKey(patternRecordsTemp.get(j).placeKey)) {
                             pOIs.get(patternRecordsTemp.get(j).placeKey).patternsRecord = patternRecordsTemp.get(j);
@@ -968,11 +969,12 @@ public class Root extends Agent {
                     }
                 }
                 int expectedInfectionInScope = (int) (((double) sumRelevantCountiesInfection / (double) sumRelevantCountiesPopulation) * (double) (scope.population));
-                double expectedInfectionPercentage = ((double) (expectedInfectionInScope) / (double) (scope.population)) * ((double) (regionPopulation) / (double) (scope.population));
+//                double expectedInfectionPercentage = ((double) (expectedInfectionInScope) / (double) (scope.population)) * ((double) (regionPopulation) / (double) (scope.population));
+                double expectedInfectionPercentage = ((double) (expectedInfectionInScope) / (double) (scope.population));
                 initialRecovered(expectedInfectionPercentage);
                 double currentInfections = 0;
                 double currentInfectionPercentage = 0;
-                int maxRetry = 2000;
+                int maxRetry = 60;
                 int tryCounter = 0;
                 while (currentInfectionPercentage < expectedInfectionPercentage) {
 //            System.out.println("S currentInfectionPercentage: "+currentInfectionPercentage +" expectedInfectionPercentage: "+expectedInfectionPercentage);
@@ -997,7 +999,8 @@ public class Root extends Agent {
                                             }
                                         }
                                         currentInfections = currentInfections + 1;
-                                        currentInfectionPercentage = (double) currentInfections / (double) aBMRegionPopulation;
+//                                        currentInfectionPercentage = (double) currentInfections / (double) aBMRegionPopulation;
+                                        currentInfectionPercentage = (double) currentInfections / (double) (scope.population);
                                         tryCounter = 0;
 //                                        break;
                                     } else {
@@ -1008,12 +1011,12 @@ public class Root extends Agent {
                             } else {
                                 tryCounter += 1;
                             }
-                            if (tryCounter > maxRetry) {
-                                System.out.println("SEVERE ISSUE: MAXIMUM INFECTION TRY IS REACHED!");
-                                break;
-                            }
 
                         }
+                    }
+                    if (tryCounter > maxRetry) {
+                        System.out.println("SEVERE ISSUE: MAXIMUM INFECTION TRY IS REACHED!");
+                        break;
                     }
 //            System.out.println("E currentInfectionPercentage: "+currentInfectionPercentage +" expectedInfectionPercentage: "+expectedInfectionPercentage);
                 }
@@ -1244,6 +1247,7 @@ public class Root extends Agent {
         if (myModelRoot.ABM.currentTime.getHour() == 0 && myModelRoot.ABM.currentTime.getMinute() == 0) {
             if (myModelRoot.isDebugging == true) {
                 System.out.println("infectedByPOIContactDaily: " + myModelRoot.ABM.infectedByPOIContactDaily);
+                System.out.println("infectedByPOISuperspreadDaily: " + myModelRoot.ABM.infectedByPOISuperspreadDaily);
                 System.out.println("infectedByPOIEnvDaily: " + myModelRoot.ABM.infectedByPOIEnvDaily);
                 System.out.println("infectedByShamilDaily: " + myModelRoot.ABM.infectedByShamilDaily);
                 System.out.println("infectedPOIDaily: " + myModelRoot.ABM.infectedPOIDaily);
@@ -1252,6 +1256,7 @@ public class Root extends Agent {
                 System.out.println("shamilInf3: " + myModelRoot.ABM.shamilInf3);
 
                 myModelRoot.ABM.infectedByPOIContactDaily = 0;
+                myModelRoot.ABM.infectedByPOISuperspreadDaily = 0;
                 myModelRoot.ABM.infectedByPOIEnvDaily = 0;
                 myModelRoot.ABM.infectedByShamilDaily = 0;
                 myModelRoot.ABM.infectedPOIDaily = 0;
@@ -1347,7 +1352,11 @@ public class Root extends Agent {
             if (person.insidePeople.get(m).fpp.status == statusEnum.RECOVERED.ordinal()) {
                 int minsSick = person.properties.minutesSick;
                 person.properties.minutesSick = minsSick + 1;
-                if (minsSick > 86400) {
+//                if (minsSick > 86400) {
+//                    person.properties.minutesSick = -1;
+//                    person.insidePeople.get(m).fpp.status = statusEnum.SUSCEPTIBLE.ordinal();
+//                }
+                if (minsSick > 864000) {
                     person.properties.minutesSick = -1;
                     person.insidePeople.get(m).fpp.status = statusEnum.SUSCEPTIBLE.ordinal();
                 }
@@ -1707,6 +1716,7 @@ public class Root extends Agent {
         if (myModelRoot.ABM.currentTime.getMinute() == 0) {
             for (int i = 0; i < regions.size(); i++) {
                 RegionSnapshot snapshot = new RegionSnapshot();
+                snapshot.population=regions.get(i).population;
                 if (regions.get(i).hourlyRegionSnapshot.size() > 0) {
                     snapshot.rate = regions.get(i).hourlyRegionSnapshot.get(regions.get(i).hourlyRegionSnapshot.size() - 1).rate;
                 }

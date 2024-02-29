@@ -514,6 +514,7 @@
             </Component>
             <Component class="javax.swing.JCheckBox" name="jCheckBox9">
               <Properties>
+                <Property name="selected" type="boolean" value="true"/>
                 <Property name="text" type="java.lang.String" value="Save historical run"/>
               </Properties>
             </Component>

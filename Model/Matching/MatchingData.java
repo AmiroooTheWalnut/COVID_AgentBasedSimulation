@@ -179,6 +179,52 @@ public class MatchingData {
                 }
             }
         }
+        for(int i=0;i<foundType1POIs.length;i++){
+            if(foundType1POIs[i].isEmpty()){
+                float nearestPOIDist=Float.MAX_VALUE;
+                int groupIndex=-1;
+                int withinGroupIndex=-1;
+                for(int j=0;j<foundType1POIs.length;j++){
+                    for(int k=0;k<foundType1POIs[j].size();k++){
+                        float lat=foundType1POIs[j].get(k).place.lat;
+                        float lon=foundType1POIs[j].get(k).place.lon;
+                        float lat1=model.ABM.matchingData.pOIType1Lats[i];
+                        float lon1=model.ABM.matchingData.pOIType1Lons[i];
+                        float dist = (float) Math.sqrt(Math.pow(lat - lat1, 2) + Math.pow(lon - lon1, 2));
+                        if(dist<nearestPOIDist && foundType1POIs[j].size()>1){
+                            nearestPOIDist=dist;
+                            groupIndex=j;
+                            withinGroupIndex=k;
+                        }
+                    }
+                }
+                foundType1POIs[i].add(foundType1POIs[groupIndex].get(withinGroupIndex));
+                foundType1POIs[groupIndex].remove(withinGroupIndex);
+            }
+        }
+        for(int i=0;i<foundType2POIs.length;i++){
+            if(foundType2POIs[i].isEmpty()){
+                float nearestPOIDist=Float.MAX_VALUE;
+                int groupIndex=-1;
+                int withinGroupIndex=-1;
+                for(int j=0;j<foundType2POIs.length;j++){
+                    for(int k=0;k<foundType2POIs[j].size();k++){
+                        float lat=foundType2POIs[j].get(k).place.lat;
+                        float lon=foundType2POIs[j].get(k).place.lon;
+                        float lat1=model.ABM.matchingData.pOIType2Lats[i];
+                        float lon1=model.ABM.matchingData.pOIType2Lons[i];
+                        float dist = (float) Math.sqrt(Math.pow(lat - lat1, 2) + Math.pow(lon - lon1, 2));
+                        if(dist<nearestPOIDist && foundType2POIs[j].size()>1){
+                            nearestPOIDist=dist;
+                            groupIndex=j;
+                            withinGroupIndex=k;
+                        }
+                    }
+                }
+                foundType2POIs[i].add(foundType2POIs[groupIndex].get(withinGroupIndex));
+                foundType2POIs[groupIndex].remove(withinGroupIndex);
+            }
+        }
     }
 
 }

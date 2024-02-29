@@ -21,11 +21,12 @@ import java.util.List;
  */
 public class POI {
 
-    public static double CONTACT_RATE = 5;//0.26;//0.55;//0.23;//CONTACT PER MINUTE
-    public static double CHANCE_OF_ENV_CONTAMINATION = 0.0001;//0.00055;//0.00015;
+    public static double CONTACT_RATE = 0.55;//0.26;//0.55;//0.23;//CONTACT PER MINUTE
+    public static double CHANCE_OF_ENV_CONTAMINATION = 0.0002;//0.00055;//0.00015;
 
     public PatternsRecordProcessed patternsRecord;
     public float contaminatedTime = 0;
+    public float superSpreadContaminatedTime = 0;
 //    public int numInfectedPeopleInPOI=0;
     public List<Person> peopleInPOI = Collections.synchronizedList(new ArrayList());
 
@@ -41,9 +42,10 @@ public class POI {
             //probability=10;//DEBUG
             infectedByEnvironment(mainModel, person, pTSFraction);
             infectByContact(mainModel, probability, person, pTSFraction);
+            infectedBySuperspreader(mainModel, person);
         } else {
             for (int m = 0; m < person.insidePeople.size(); m++) {
-                if (mainModel.ABM.root.rnd.nextDouble() < (numInfected / (double) (peopleInPOI.size() * pTSFraction))*fixedTransmissionRate) {
+                if (mainModel.ABM.root.rnd.nextDouble() < (numInfected / (double) (peopleInPOI.size() * pTSFraction)) * fixedTransmissionRate) {
                     if (person.insidePeople.get(m).fpp.status == statusEnum.SUSCEPTIBLE.ordinal()) {
 //                  System.out.println("CONTACT INFECTION");
                         if (mainModel.ABM.root.rnd.nextDouble() > 0.7) {
@@ -132,20 +134,46 @@ public class POI {
 //            System.out.println("protectionLevel: "+person.shamilPersonProperties.protectionLevel);
 
             for (int m = 0; m < person.insidePeople.size(); m++) {
-                if (mainModel.ABM.root.rnd.nextDouble() < CONTACT_RATE*0.00005) {
-                    double r = mainModel.ABM.root.rnd.nextDouble();
-                    if (r < person.shamilPersonProperties.protectionLevel ) {
-//                    if (r < (1 - person.shamilPersonProperties.protectionLevel) * 0.00085) {
-                        if (person.insidePeople.get(m).fpp.status == statusEnum.SUSCEPTIBLE.ordinal()) {
-//                      System.out.println("ENV INFECTION");
-                            if (mainModel.ABM.root.rnd.nextDouble() > 0.7) {
-                                person.insidePeople.get(m).fpp.status = statusEnum.INFECTED_ASYM.ordinal();
-                            } else {
-                                person.insidePeople.get(m).fpp.status = statusEnum.INFECTED_SYM.ordinal();
+                if (mainModel.ABM.root.rnd.nextDouble() < CONTACT_RATE) {
+                    double v = mainModel.ABM.root.rnd.nextDouble();
+                    if (v < 0.001) {
+                        double r = mainModel.ABM.root.rnd.nextDouble();
+                        if (r < person.shamilPersonProperties.protectionLevel) {
+//                      if (r < (1 - person.shamilPersonProperties.protectionLevel) * 0.00085) {
+                            if (person.insidePeople.get(m).fpp.status == statusEnum.SUSCEPTIBLE.ordinal()) {
+//                              System.out.println("ENV INFECTION");
+                                if (mainModel.ABM.root.rnd.nextDouble() > 0.7) {
+                                    person.insidePeople.get(m).fpp.status = statusEnum.INFECTED_ASYM.ordinal();
+                                } else {
+                                    person.insidePeople.get(m).fpp.status = statusEnum.INFECTED_SYM.ordinal();
+                                }
+                                if (mainModel.isDebugging == true) {
+                                    mainModel.ABM.infectedByPOIEnvDaily += 1;
+                                }
                             }
-                            if (mainModel.isDebugging == true) {
-                                mainModel.ABM.infectedByPOIEnvDaily += 1;
-                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public void infectedBySuperspreader(MainModel mainModel, Person person) {
+        if (superSpreadContaminatedTime > 0) {
+//            System.out.println("awarenessLevel: "+person.shamilPersonProperties.awarenessLevel);
+//            System.out.println("protectionLevel: "+person.shamilPersonProperties.protectionLevel);
+            for (int m = 0; m < person.insidePeople.size(); m++) {
+                double r = mainModel.ABM.root.rnd.nextDouble();
+                if (r < person.shamilPersonProperties.protectionLevel) {
+                    if (person.insidePeople.get(m).fpp.status == statusEnum.SUSCEPTIBLE.ordinal()) {
+//                              System.out.println("SUPER SPREAD INFECTION");
+                        if (mainModel.ABM.root.rnd.nextDouble() > 0.7) {
+                            person.insidePeople.get(m).fpp.status = statusEnum.INFECTED_ASYM.ordinal();
+                        } else {
+                            person.insidePeople.get(m).fpp.status = statusEnum.INFECTED_SYM.ordinal();
+                        }
+                        if (mainModel.isDebugging == true) {
+                            mainModel.ABM.infectedByPOISuperspreadDaily += 1;
                         }
                     }
                 }
@@ -156,6 +184,9 @@ public class POI {
     public void updateContamination() {
         if (contaminatedTime > 0) {
             contaminatedTime -= 1;
+        }
+        if (superSpreadContaminatedTime > 0) {
+            superSpreadContaminatedTime -= 1;
         }
     }
 

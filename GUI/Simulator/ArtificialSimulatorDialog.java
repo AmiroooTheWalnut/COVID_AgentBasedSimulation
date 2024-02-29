@@ -10,6 +10,7 @@ import COVID_AgentBasedSimulation.Model.HardcodedSimulator.BatchRun;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.ClustererManager;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.ClustererManager.ClustererInfo;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.RootArtificial;
+import COVID_AgentBasedSimulation.Model.Structure.City;
 import COVID_AgentBasedSimulation.Model.Structure.Scope;
 import java.io.File;
 import java.util.ArrayList;
@@ -42,6 +43,8 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
 
         myParent = (MainFrame) parent;
         myParent.mainModel.scenario.scenarioName = "noTessellation";
+        
+        jLabel10.setText(String.valueOf(((City)myParent.mainModel.ABM.studyScopeGeography).population));
     }
 
     /**
@@ -121,6 +124,8 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
         jToggleButton5 = new javax.swing.JToggleButton();
         jButton4 = new javax.swing.JButton();
         jSpinner7 = new javax.swing.JSpinner();
+        jLabel9 = new javax.swing.JLabel();
+        jLabel10 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -286,7 +291,7 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
 
         jLabel2.setText("Num residents:");
 
-        jSpinner2.setModel(new javax.swing.SpinnerNumberModel(330412, 1, null, 1));
+        jSpinner2.setModel(new javax.swing.SpinnerNumberModel(67879, 1, null, 1));
 
         jCheckBox5.setText("Report contact stats");
 
@@ -376,7 +381,7 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
             }
         });
 
-        jSpinner4.setModel(new javax.swing.SpinnerNumberModel(5000, 1, null, 1));
+        jSpinner4.setModel(new javax.swing.SpinnerNumberModel(67879, 1, null, 1));
 
         jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Clusterers"));
 
@@ -497,6 +502,10 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
 
         jSpinner7.setModel(new javax.swing.SpinnerNumberModel(3, 1, null, 1));
 
+        jLabel9.setText("Real city population:");
+
+        jLabel10.setText("0");
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -564,7 +573,10 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
                                 .addComponent(jButton1)
                                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                     .addComponent(jSpinner7, javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jButton4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                    .addComponent(jButton4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addComponent(jLabel10, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(jLabel9, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addComponent(jCheckBox6))
@@ -615,8 +627,12 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSpinner7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                        .addComponent(jLabel9)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel10)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jButton1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jToggleButton1)
@@ -993,6 +1009,7 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
     private javax.swing.JCheckBox jCheckBox8;
     private javax.swing.JCheckBox jCheckBox9;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -1000,6 +1017,7 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;

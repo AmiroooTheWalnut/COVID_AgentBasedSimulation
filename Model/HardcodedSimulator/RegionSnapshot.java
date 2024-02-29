@@ -23,4 +23,6 @@ public class RegionSnapshot implements Serializable {
     public int D=0;
     public double rate=0;
     public int sick=0;
+    
+    public int population=0;
 }

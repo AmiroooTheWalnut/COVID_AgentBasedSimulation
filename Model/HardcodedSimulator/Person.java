@@ -23,7 +23,6 @@ import java.util.HashMap;
 public class Person extends Agent {
 
 //    Person currentAgent = this;
-
     public ArrayList<FuzzyPerson> insidePeople;
 
     public boolean isPolled = false;
@@ -96,6 +95,7 @@ public class Person extends Agent {
     }
 
     public void returnAction() {
+        superSpread();
         myModelRoot.ABM.measureHolder.handleAVD(myModelRoot, properties);
         if (properties.didTravelFromHome == true) {
             lat = properties.homeRegion.lat;
@@ -188,12 +188,12 @@ public class Person extends Agent {
                         float dist = (float) Math.sqrt(Math.pow(lon - myModelRoot.ABM.matchingData.pOIType2Lats[i], 2) + Math.pow(lat - myModelRoot.ABM.matchingData.pOIType2Lons[i], 2));
                         if (dist < minDist) {
                             minDist = dist;
-                            directFoundIndexType1 = myModelRoot.ABM.matchingData.permuteData[i]-1;
+                            directFoundIndexType1 = myModelRoot.ABM.matchingData.permuteData[i] - 1;
                         }
                     }
-                    int index=(int)(Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * myModelRoot.ABM.matchingData.foundType1POIs[directFoundIndexType1].size()));
+                    int index = (int) (Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * myModelRoot.ABM.matchingData.foundType1POIs[directFoundIndexType1].size()));
 //                    System.out.println("directFoundIndexType1: "+directFoundIndexType1);
-                    dest=myModelRoot.ABM.matchingData.foundType1POIs[directFoundIndexType1].get(index);
+                    dest = myModelRoot.ABM.matchingData.foundType1POIs[directFoundIndexType1].get(index);
                 }
                 if (isFoundValidType2 == true) {
                     float minDist = Float.MAX_VALUE;
@@ -209,15 +209,15 @@ public class Person extends Agent {
                         float dist = (float) Math.sqrt(Math.pow(lon - myModelRoot.ABM.matchingData.pOIType1Lats[i], 2) + Math.pow(lat - myModelRoot.ABM.matchingData.pOIType1Lons[i], 2));
                         if (dist < minDist) {
                             minDist = dist;
-                            directFoundIndexType2 = myModelRoot.ABM.matchingData.permuteData[i]-1;
+                            directFoundIndexType2 = myModelRoot.ABM.matchingData.permuteData[i] - 1;
                         }
                     }
-                    int index=(int)(Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * myModelRoot.ABM.matchingData.foundType2POIs[directFoundIndexType2].size()));
+                    int index = (int) (Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * myModelRoot.ABM.matchingData.foundType2POIs[directFoundIndexType2].size()));
 //                    System.out.println("directFoundIndexType2: "+directFoundIndexType2);
-                    dest=myModelRoot.ABM.matchingData.foundType2POIs[directFoundIndexType2].get(index);
+                    dest = myModelRoot.ABM.matchingData.foundType2POIs[directFoundIndexType2].get(index);
                 }
             }
-            
+
             boolean decision = decideToTravel(dest, currentTime);
             if (decision == true) {
                 numTravels = numTravels + 1;
@@ -384,12 +384,12 @@ public class Person extends Agent {
                         float dist = (float) Math.sqrt(Math.pow(lon - myModelRoot.ABM.matchingData.pOIType2Lats[i], 2) + Math.pow(lat - myModelRoot.ABM.matchingData.pOIType2Lons[i], 2));
                         if (dist < minDist) {
                             minDist = dist;
-                            directFoundIndexType1 = myModelRoot.ABM.matchingData.permuteData[i]-1;
+                            directFoundIndexType1 = myModelRoot.ABM.matchingData.permuteData[i] - 1;
                         }
                     }
-                    int index=(int)(Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * myModelRoot.ABM.matchingData.foundType1POIs[directFoundIndexType1].size()));
+                    int index = (int) (Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * myModelRoot.ABM.matchingData.foundType1POIs[directFoundIndexType1].size()));
 //                    System.out.println("directFoundIndexType1: "+directFoundIndexType1);
-                    dest=myModelRoot.ABM.matchingData.foundType1POIs[directFoundIndexType1].get(index);
+                    dest = myModelRoot.ABM.matchingData.foundType1POIs[directFoundIndexType1].get(index);
                 }
                 if (isFoundValidType2 == true) {
                     float minDist = Float.MAX_VALUE;
@@ -405,12 +405,12 @@ public class Person extends Agent {
                         float dist = (float) Math.sqrt(Math.pow(lon - myModelRoot.ABM.matchingData.pOIType1Lats[i], 2) + Math.pow(lat - myModelRoot.ABM.matchingData.pOIType1Lons[i], 2));
                         if (dist < minDist) {
                             minDist = dist;
-                            directFoundIndexType2 = myModelRoot.ABM.matchingData.permuteData[i]-1;
+                            directFoundIndexType2 = myModelRoot.ABM.matchingData.permuteData[i] - 1;
                         }
                     }
-                    int index=(int)(Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * myModelRoot.ABM.matchingData.foundType2POIs[directFoundIndexType2].size()));
+                    int index = (int) (Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * myModelRoot.ABM.matchingData.foundType2POIs[directFoundIndexType2].size()));
 //                    System.out.println("directFoundIndexType2: "+directFoundIndexType2);
-                    dest=myModelRoot.ABM.matchingData.foundType2POIs[directFoundIndexType2].get(index);
+                    dest = myModelRoot.ABM.matchingData.foundType2POIs[directFoundIndexType2].get(index);
                 }
             }
             boolean decision = decideToTravel(dest, currentTime);
@@ -649,6 +649,14 @@ public class Person extends Agent {
             float selectedDestFreq = (float) (Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * region.scheduleListExact.sumWorkFreqs));
             int index = MainModel.binarySearchCumulative(selectedDestFreq, region.scheduleListExact.fromWorkFreqsCDF);
             return region.scheduleListExact.pOIs[index];
+        }
+    }
+
+    public void superSpread() {
+        if (myModelRoot.ABM.root.rnd.nextDouble() < 0.00001) {
+            if (properties.currentPOI.superSpreadContaminatedTime < 1) {
+                properties.currentPOI.superSpreadContaminatedTime = 2;
+            }
         }
     }
 

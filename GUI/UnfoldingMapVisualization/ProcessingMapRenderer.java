@@ -81,7 +81,7 @@ public class ProcessingMapRenderer extends PApplet {
 
     boolean isPan = false;
     boolean isReadyPan = false;
-    boolean isShowText = false;
+    public boolean isShowText = false;
     public boolean isShowRegionIndexText = true;
 
     public boolean isSave = false;
@@ -95,10 +95,10 @@ public class ProcessingMapRenderer extends PApplet {
     ArrayList<TupleIntFloat> sortedFlowIndicesReduced;
     ArrayList<Boolean> isDrawRandomArc;
     ArrayList<Boolean> isDrawRandomArcReduced;
-    float[][] rawFlowData;
+    public float[][] rawFlowData;
     float[][] thirdPointDeviationPercentages;
     float[][] thirdPointDeviationPercentagesReduced;
-    float[][] quarantinedFlowData;
+    public float[][] quarantinedFlowData;
     Location[] latLons;
     public boolean isDrawRandomArcs = false;
     //RANDOM ARCS
@@ -756,7 +756,6 @@ public class ProcessingMapRenderer extends PApplet {
         isDrawRandomArcReduced = new ArrayList();
         for (int j = 0; j < numCBGs; j++) {
             for (int k = j + 1; k < numCBGs; k++) {
-                
                 rawFlowData[j][k] = 0.02f+(rnd.nextFloat() * 0.4f);
                 
                 sortedFlowIndices.add(new TupleIntFloat(j * (numCBGs) + k, this.rawFlowData[j][k]));

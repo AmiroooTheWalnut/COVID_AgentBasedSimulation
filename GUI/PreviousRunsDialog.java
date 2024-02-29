@@ -254,7 +254,7 @@ public class PreviousRunsDialog extends javax.swing.JDialog {
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Feature"));
 
         jList2.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Number of residents (N)", "Number of susceptibles (S)", "Number of infections symptomatic (IS)", "Number of infections asymptomatic (IAS)", "Number of recovered (R)", "Number of deaths (D)", "Cumulative infections (rate)", "Number of sick (sick)" };
+            String[] strings = { "Number of residents (N)", "Number of susceptibles (S)", "Number of infections symptomatic (IS)", "Number of infections asymptomatic (IAS)", "Number of recovered (R)", "Number of deaths (D)", "Cumulative infections (rate)", "Number of sick (sick)", "Census population (population)" };
             public int getSize() { return strings.length; }
             public String getElementAt(int i) { return strings[i]; }
         });

@@ -114,6 +114,8 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
         jLabel3 = new javax.swing.JLabel();
+        jButton18 = new javax.swing.JButton();
+        jButton19 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -353,6 +355,20 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
 
         jLabel3.setText("IMP CBGs");
 
+        jButton18.setText("Save flow data");
+        jButton18.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton18ActionPerformed(evt);
+            }
+        });
+
+        jButton19.setText("Save model flow data");
+        jButton19.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton19ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
@@ -385,7 +401,11 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
                                 .addComponent(jLabel2)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jSpinner2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(jLabel3))
+                            .addComponent(jLabel3)
+                            .addGroup(jPanel4Layout.createSequentialGroup()
+                                .addComponent(jButton18)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButton19)))
                         .addGap(0, 53, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -405,7 +425,11 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
                 .addComponent(jButton22)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton23)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton18)
+                    .addComponent(jButton19))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -417,7 +441,7 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
                 .addGap(18, 18, 18)
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 99, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -1215,8 +1239,8 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
                         dataF[j][k] = Float.parseFloat(data.get(j)[k]);
                     }
                 }
-                int[] indices=new int[0];
-                sketch.setRandomArcGMTucson(allCBGs, allCBGs.size(), (int) (jSpinner1.getValue()), dataF,(int) (jSpinner2.getValue()), indices);
+                int[] indices = new int[0];
+                sketch.setRandomArcGMTucson(allCBGs, allCBGs.size(), (int) (jSpinner1.getValue()), dataF, (int) (jSpinner2.getValue()), indices);
                 sketch.isDrawRandomArcs = true;
             } catch (IOException ex) {
                 Logger.getLogger(GraphicalModelDialog.class.getName()).log(Level.SEVERE, (String) null, ex);
@@ -1421,15 +1445,15 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
                 }
                 String indicesRaw = jTextArea1.getText();
                 String[] indicesStr = indicesRaw.split(",");
-                int[] indices=new int[indicesStr.length];
-                for(int m=0;m<indices.length;m++){
-                    try{
-                        indices[m]=Integer.parseInt(indicesStr[m]);
-                    }catch(Exception ex){
-                        indices[m]=-1;
+                int[] indices = new int[indicesStr.length];
+                for (int m = 0; m < indices.length; m++) {
+                    try {
+                        indices[m] = Integer.parseInt(indicesStr[m]);
+                    } catch (Exception ex) {
+                        indices[m] = -1;
                     }
                 }
-                sketch.setRandomArcGMSeattle(allCBGs, allCBGs.size(), (int) (jSpinner1.getValue()), dataF,(int) (jSpinner2.getValue()), indices);
+                sketch.setRandomArcGMSeattle(allCBGs, allCBGs.size(), (int) (jSpinner1.getValue()), dataF, (int) (jSpinner2.getValue()), indices);
                 sketch.isDrawRandomArcs = true;
             } catch (IOException ex) {
                 Logger.getLogger(GraphicalModelDialog.class.getName()).log(Level.SEVERE, (String) null, ex);
@@ -1439,6 +1463,46 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
 
         }
     }//GEN-LAST:event_jButton26ActionPerformed
+
+    private void jButton18ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton18ActionPerformed
+        if (sketch.rawFlowData != null) {
+            ArrayList<String[]> rows = new ArrayList();
+            for (int i = 0; i < sketch.rawFlowData.length; i++) {
+                String row[] = new String[sketch.rawFlowData[i].length];
+                for (int j = 0; j < sketch.rawFlowData[i].length; j++) {
+                    row[j] = String.valueOf(sketch.rawFlowData[i][j]);
+                }
+                rows.add(row);
+            }
+            try {
+                CSVWriter writer = new CSVWriter(new FileWriter("predictedTrajectories.csv"));
+                writer.writeAll(rows);
+                writer.close();
+            } catch (IOException ex) {
+                Logger.getLogger(GraphicalModelDialog.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_jButton18ActionPerformed
+
+    private void jButton19ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton19ActionPerformed
+        if (sketch.quarantinedFlowData != null) {
+            ArrayList<String[]> rows = new ArrayList();
+            for (int i = 0; i < sketch.quarantinedFlowData.length; i++) {
+                String row[] = new String[sketch.quarantinedFlowData[i].length];
+                for (int j = 0; j < sketch.quarantinedFlowData[i].length; j++) {
+                    row[j] = String.valueOf(sketch.quarantinedFlowData[i][j]);
+                }
+                rows.add(row);
+            }
+            try {
+                CSVWriter writer = new CSVWriter(new FileWriter("trueTrajectories.csv"));
+                writer.writeAll(rows);
+                writer.close();
+            } catch (IOException ex) {
+                Logger.getLogger(GraphicalModelDialog.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_jButton19ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
@@ -1450,6 +1514,8 @@ public class GraphicalModelDialog extends javax.swing.JDialog {
     private javax.swing.JButton jButton15;
     private javax.swing.JButton jButton16;
     private javax.swing.JButton jButton17;
+    private javax.swing.JButton jButton18;
+    private javax.swing.JButton jButton19;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton21;
     private javax.swing.JButton jButton22;

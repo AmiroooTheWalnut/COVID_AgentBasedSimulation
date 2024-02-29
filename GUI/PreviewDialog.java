@@ -96,6 +96,7 @@ public class PreviewDialog extends javax.swing.JDialog {
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
+        jCheckBox1 = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -279,11 +280,18 @@ public class PreviewDialog extends javax.swing.JDialog {
             }
         });
 
-        jLabel1.setText("jLabel1");
+        jLabel1.setText("Zoom");
 
         jLabel2.setText("Size:");
 
         jLabel3.setText("jLabel3");
+
+        jCheckBox1.setText("Show text");
+        jCheckBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCheckBox1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
         jPanel9.setLayout(jPanel9Layout);
@@ -294,20 +302,25 @@ public class PreviewDialog extends javax.swing.JDialog {
                 .addContainerGap()
                 .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel9Layout.createSequentialGroup()
-                        .addComponent(jLabel2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel3)
-                        .addGap(0, 138, Short.MAX_VALUE))
-                    .addGroup(jPanel9Layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jSlider1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
+                        .addComponent(jSlider1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                    .addGroup(jPanel9Layout.createSequentialGroup()
+                        .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel9Layout.createSequentialGroup()
+                                .addComponent(jLabel2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel3))
+                            .addComponent(jCheckBox1))
+                        .addGap(0, 119, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel9Layout.setVerticalGroup(
             jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel9Layout.createSequentialGroup()
                 .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jCheckBox1)
                 .addGap(18, 18, 18)
                 .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING)
@@ -373,7 +386,7 @@ public class PreviewDialog extends javax.swing.JDialog {
             String[] childrenNames = new String[myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.size()];
             ArrayList<Marker> markers = new ArrayList();
             for (int i = 0; i < childrenNames.length; i++) {
-                childrenNames[i] = myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(i).name;
+                childrenNames[i] = myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(i).name+"_"+myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(i).population;
                 markers.add(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(i));
             }
             myParent.child.setDrawingGISMarkers(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()), markers, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).name, childrenNames);
@@ -414,7 +427,7 @@ public class PreviewDialog extends javax.swing.JDialog {
             String[] childrenNames = new String[myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.size()];
             ArrayList<Marker> markers = new ArrayList();
             for (int i = 0; i < childrenNames.length; i++) {
-                childrenNames[i] = myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(i).name;
+                childrenNames[i] = myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(i).name+"_"+myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(i).population;
                 markers.add(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(i));
             }
             myParent.child.setDrawingGISMarkers(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()), markers, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).name, childrenNames);
@@ -480,7 +493,7 @@ public class PreviewDialog extends javax.swing.JDialog {
             String[] childrenNames = new String[myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.size()];
             ArrayList<Marker> markers = new ArrayList();
             for (int i = 0; i < childrenNames.length; i++) {
-                childrenNames[i] = String.valueOf(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(i).id);
+                childrenNames[i] = String.valueOf(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(i).id)+"_"+myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(i).population;
                 markers.add(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(i));
             }
             myParent.child.setDrawingGISMarkers(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()), markers, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).name, childrenNames);
@@ -516,7 +529,7 @@ public class PreviewDialog extends javax.swing.JDialog {
             String[] childrenNames = new String[myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.size()];
             ArrayList<Marker> markers = new ArrayList();
             for (int i = 0; i < childrenNames.length; i++) {
-                childrenNames[i] = String.valueOf(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.get(i).id);
+                childrenNames[i] = String.valueOf(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.get(i).id)+"_"+myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.get(i).population;
                 markers.add(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.get(i));
             }
             myParent.child.setDrawingGISMarkers(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()), markers, String.valueOf(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).id), childrenNames);
@@ -575,7 +588,7 @@ public class PreviewDialog extends javax.swing.JDialog {
             String[] childrenNames = new String[myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList7.getSelectedIndex()).censusTracts.size()];
             ArrayList<Marker> markers = new ArrayList();
             for (int i = 0; i < childrenNames.length; i++) {
-                childrenNames[i] = String.valueOf(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList7.getSelectedIndex()).censusTracts.get(i).id);
+                childrenNames[i] = String.valueOf(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList7.getSelectedIndex()).censusTracts.get(i).id)+"_"+myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList7.getSelectedIndex()).censusTracts.get(i).population;
                 markers.add(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList7.getSelectedIndex()).censusTracts.get(i));
             }
             myParent.child.setDrawingGISMarkers(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList7.getSelectedIndex()), markers, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList7.getSelectedIndex()).name, childrenNames);
@@ -592,8 +605,13 @@ public class PreviewDialog extends javax.swing.JDialog {
 //        }
     }//GEN-LAST:event_jPanel7AncestorResized
 
+    private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
+        myParent.child.isShowText=jCheckBox1.isSelected();
+    }//GEN-LAST:event_jCheckBox1ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

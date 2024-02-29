@@ -26,7 +26,7 @@ public class ShamilPersonManager {
 //    static double tracing_percentage = 0.3;//ORIGINAL
     static double tracing_percentage = 0.3;
 //    static int quarantine_days = 14;//ORIGINAL
-    static int quarantine_days = 7;
+    static int quarantine_days = 14;
     static int trace_days = 2;
 
     static HashMap<String, Double> preference_def = new HashMap<String, Double>() {
