@@ -33,6 +33,8 @@ public class Person extends Agent {
 
     public boolean isExistAlive = true;//THIS IS UPDATED EVERY DAY
 
+    public int maxAgentsToChangeDest = 10;
+
     public int numTravels = 0;
     public int numTravelsInDay = 0;
     public int numContacts = 0;
@@ -193,7 +195,10 @@ public class Person extends Agent {
                     }
                     int index = (int) (Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * myModelRoot.ABM.matchingData.foundType1POIs[directFoundIndexType1].size()));
 //                    System.out.println("directFoundIndexType1: "+directFoundIndexType1);
-                    dest = myModelRoot.ABM.matchingData.foundType1POIs[directFoundIndexType1].get(index);
+                    POI tempPoi=myModelRoot.ABM.root.pOIs.get(myModelRoot.ABM.matchingData.foundType1POIs[directFoundIndexType1].get(index).placeKey);
+                    if (tempPoi.peopleInPOI.size() < maxAgentsToChangeDest) {
+                        dest = myModelRoot.ABM.matchingData.foundType1POIs[directFoundIndexType1].get(index);
+                    }
                 }
                 if (isFoundValidType2 == true) {
                     float minDist = Float.MAX_VALUE;
@@ -214,7 +219,10 @@ public class Person extends Agent {
                     }
                     int index = (int) (Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * myModelRoot.ABM.matchingData.foundType2POIs[directFoundIndexType2].size()));
 //                    System.out.println("directFoundIndexType2: "+directFoundIndexType2);
-                    dest = myModelRoot.ABM.matchingData.foundType2POIs[directFoundIndexType2].get(index);
+                    POI tempPoi=myModelRoot.ABM.root.pOIs.get(myModelRoot.ABM.matchingData.foundType2POIs[directFoundIndexType2].get(index).placeKey);
+                    if (tempPoi.peopleInPOI.size() < maxAgentsToChangeDest) {
+                        dest = myModelRoot.ABM.matchingData.foundType2POIs[directFoundIndexType2].get(index);
+                    }
                 }
             }
 
@@ -389,7 +397,10 @@ public class Person extends Agent {
                     }
                     int index = (int) (Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * myModelRoot.ABM.matchingData.foundType1POIs[directFoundIndexType1].size()));
 //                    System.out.println("directFoundIndexType1: "+directFoundIndexType1);
-                    dest = myModelRoot.ABM.matchingData.foundType1POIs[directFoundIndexType1].get(index);
+                    POI tempPoi=myModelRoot.ABM.root.pOIs.get(myModelRoot.ABM.matchingData.foundType1POIs[directFoundIndexType1].get(index).placeKey);
+                    if (tempPoi.peopleInPOI.size() < maxAgentsToChangeDest) {
+                        dest = myModelRoot.ABM.matchingData.foundType1POIs[directFoundIndexType1].get(index);
+                    }
                 }
                 if (isFoundValidType2 == true) {
                     float minDist = Float.MAX_VALUE;
@@ -410,7 +421,10 @@ public class Person extends Agent {
                     }
                     int index = (int) (Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * myModelRoot.ABM.matchingData.foundType2POIs[directFoundIndexType2].size()));
 //                    System.out.println("directFoundIndexType2: "+directFoundIndexType2);
-                    dest = myModelRoot.ABM.matchingData.foundType2POIs[directFoundIndexType2].get(index);
+                    POI tempPoi=myModelRoot.ABM.root.pOIs.get(myModelRoot.ABM.matchingData.foundType2POIs[directFoundIndexType2].get(index).placeKey);
+                    if (tempPoi.peopleInPOI.size() < maxAgentsToChangeDest) {
+                        dest = myModelRoot.ABM.matchingData.foundType2POIs[directFoundIndexType2].get(index);
+                    }
                 }
             }
             boolean decision = decideToTravel(dest, currentTime);

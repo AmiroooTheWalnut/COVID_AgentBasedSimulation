@@ -26,9 +26,11 @@ public class ShamilHourSimulator {
             }
             if (isAlive == true) {
                 ShamilTask current_task = people.get(i).shamilPersonProperties.currentTask;
-//            if(current_task!=null){
-                people.get(i).shamilPersonProperties.actions = ShamilActionManager.generateActions(mainModel, people.get(i).shamilPersonProperties.id, ShamilPersonManager.actions_def.get(people.get(i).shamilPersonProperties.currentTask.name));
-//            }
+                if (current_task != null) {
+                    people.get(i).shamilPersonProperties.actions = ShamilActionManager.generateActions(mainModel, people.get(i).shamilPersonProperties.id, ShamilPersonManager.actions_def.get(current_task.name));
+                } else {
+                    people.get(i).shamilPersonProperties.actions.clear();
+                }
 //            prsn.setActions(ActionManager.generateActions(prsn.id, actions_df[actions_df["task"]==current_task.name], thresholds_df))
 //            if(print_opt):
 //                print('=== {} === {} === {} ==='.format(hour, prsn.profession, current_task))

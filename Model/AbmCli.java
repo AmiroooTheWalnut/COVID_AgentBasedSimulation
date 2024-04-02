@@ -1,6 +1,7 @@
 package COVID_AgentBasedSimulation.Model;
 
 import COVID_AgentBasedSimulation.Model.Data.CovidCsseJhu.CovidCsseJhu;
+import COVID_AgentBasedSimulation.Model.Matching.MatchingData;
 import COVID_AgentBasedSimulation.Model.Structure.AllGISData;
 import java.io.File;
 import java.lang.reflect.Field;
@@ -35,7 +36,6 @@ public class AbmCli {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        //java.awt.event.
         AbmCli test = new AbmCli();
 
         RunConfig runConfig = RunConfig.loadModel(args[1]);
@@ -149,9 +149,8 @@ public class AbmCli {
                     Logger.getLogger(AbmCli.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
+            testThreadPool.shutdown();
         }
-
-        testThreadPool.shutdown();
     }
 
     public void runARun(String datasetRoot, String projectLocation, RunConfig runConfig) {
@@ -159,7 +158,7 @@ public class AbmCli {
         mainModel.datasetDirectory = datasetRoot;
         mainModel.numCPUs = numProcessorsInModel;
 
-//        mainModel.initAgentBasedModel(false);
+        mainModel.initAgentBasedModel(false);
         mainModel.initData();
 
         try {
@@ -190,10 +189,18 @@ public class AbmCli {
 
         mainModel.ABM.loadModel(projectLocation);
         mainModel.ABM.filePath = projectLocation;
+        
+        mainModel.ABM.isMatching = runConfig.isMatching;
+        if(mainModel.ABM.isMatching==true){
+            mainModel.ABM.matchingData=new MatchingData();
+            mainModel.ABM.matchingData.readData(runConfig.matchingFilePath,runConfig.geoFilePath);
+            mainModel.ABM.matchingData.parseNAICSRules(runConfig.pOIType1Patterns, runConfig.pOIType2Patterns);
+        }
 
         mainModel.ABM.isReportContactRate = runConfig.isReportContactRate;
         mainModel.ABM.isFuzzyStatus = runConfig.isFuzzyStatus;
         mainModel.ABM.isSaveHistoricalRun = runConfig.isSaveHistoricalRun;
+        
         //mainModel.javaEvaluationEngine.connectToConsole(jTextArea1);
         //mainModel.pythonEvaluationEngine.connectToConsole(jTextArea2);
         mainModel.loadAndConnectSupplementaryCaseStudyDataKryo(datasetRoot + "/Safegraph/" + mainModel.ABM.studyScope + "/supplementaryGIS.bin");
@@ -225,6 +232,9 @@ public class AbmCli {
             mainModel.initModelArtificial(false, true, runConfig.isParallelBehaviorEvaluation, runConfig.numResidents, numRegions, runConfig.numCPUsInModel, !runConfig.isSpecificRegionInfected, runConfig.isSpecialScenarioActive, infectionIndices, runConfig.noTessellationNumResidents,fixedNumInfected);
         }
         mainModel.ABM.agents = new CopyOnWriteArrayList(mainModel.ABM.agentsRaw);
+        if(mainModel.ABM.isMatching==true){
+            mainModel.ABM.matchingData.findPOIs(mainModel);
+        }
         mainModel.startTimeNanoSecond = System.nanoTime();
         mainModel.resume(false, runConfig.isParallelBehaviorEvaluation, runConfig.numCPUsInModel, true, runConfig.isSpecialScenarioActive);
     }

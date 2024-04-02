@@ -43,6 +43,13 @@ public class RunConfig {
     
     public int noTessellationNumResidents;
     
+    public boolean isMatching;
+    
+    public String matchingFilePath;
+    public String geoFilePath;
+    public String pOIType1Patterns;
+    public String pOIType2Patterns;
+    
     public static RunConfig loadModel(String path){
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         FileReader in;

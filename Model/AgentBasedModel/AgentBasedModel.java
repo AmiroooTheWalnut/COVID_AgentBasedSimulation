@@ -100,7 +100,7 @@ public class AgentBasedModel {
     public transient PreProcessor preProcessor;
     public transient MeasureHolder measureHolder=new MeasureHolder();
     
-    public transient boolean isMatching=false;
+    public boolean isMatching=false;
     
     public MatchingConfig matchingConfig=new MatchingConfig();
     

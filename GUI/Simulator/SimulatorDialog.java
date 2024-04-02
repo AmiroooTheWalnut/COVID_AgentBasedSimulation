@@ -1019,6 +1019,7 @@ public class SimulatorDialog extends javax.swing.JDialog {
             }
         });
 
+        jCheckBox8.setSelected(true);
         jCheckBox8.setText("Is fuzzy status?");
 
         javax.swing.GroupLayout jPanel25Layout = new javax.swing.GroupLayout(jPanel25);
@@ -1754,6 +1755,7 @@ public class SimulatorDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jRadioButton8ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        System.out.println("Scope population: "+((Scope)(myParent.mainModel.ABM.studyScopeGeography)).population);
         if(jCheckBox11.isSelected()){
             myParent.mainModel.ABM.matchingData=new MatchingData();
             myParent.mainModel.ABM.matchingData.readData(jLabel9.getText(),jLabel10.getText());
