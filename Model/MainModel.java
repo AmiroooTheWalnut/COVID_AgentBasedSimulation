@@ -42,8 +42,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.SwingUtilities;
-import lombok.Getter;
-import lombok.Setter;
+//import lombok.Getter;
+//import lombok.Setter;
 import org.objenesis.strategy.StdInstantiatorStrategy;
 
 /*
@@ -55,8 +55,6 @@ import org.objenesis.strategy.StdInstantiatorStrategy;
  *
  * @author Amir Mohammad Esmaieeli Sikaroudi
  */
-@Getter
-@Setter
 public class MainModel extends Dataset {
 
     public static final long softwareVersion = 1L;
@@ -1073,4 +1071,11 @@ public class MainModel extends Dataset {
         return index;
     }
 
+    public Safegraph getSafegraph(){
+        return safegraph;
+    }
+    
+    public AgentBasedModel getABM(){
+        return ABM;
+    }
 }

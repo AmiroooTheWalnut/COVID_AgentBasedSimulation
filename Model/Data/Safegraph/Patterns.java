@@ -21,15 +21,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import lombok.Getter;
-import lombok.Setter;
+//import lombok.Getter;
+//import lombok.Setter;
 
 /**
  *
  * @author Amir Mohammad Esmaieeli Sikaroudi
  */
-@Getter
-@Setter
 public class Patterns implements Serializable {
 
     static final long serialVersionUID = softwareVersion;

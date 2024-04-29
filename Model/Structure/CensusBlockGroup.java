@@ -5,15 +5,14 @@ import COVID_AgentBasedSimulation.Model.Data.Safegraph.SafegraphPlace;
 import static COVID_AgentBasedSimulation.Model.MainModel.softwareVersion;
 import java.io.Serializable;
 import java.util.ArrayList;
-import lombok.Getter;
-import lombok.Setter;
+//import lombok.Getter;
+//import lombok.Setter;
 import org.locationtech.jts.geom.Polygon;
 
 /**
  *
  * @author Amir Mohammad Esmaieeli Sikaroudi
  */
-@Getter @Setter
 public class CensusBlockGroup extends Marker implements Serializable, Comparable<CensusBlockGroup> {
     static final long serialVersionUID = softwareVersion;
     public long id;
@@ -22,6 +21,15 @@ public class CensusBlockGroup extends Marker implements Serializable, Comparable
     public State state;
     public County county;
     public CensusTract censusTract;
+    
+    public int age0_18=0;
+    public int age19_64=0;
+    public int age65_inf=0;
+    
+    public int edu=0;
+    public int driver=0;
+    public int health=0;
+    public int service=0;
     
     public transient MyPolygon polygon;
     

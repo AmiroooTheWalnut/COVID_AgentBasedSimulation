@@ -9,15 +9,13 @@ import java.time.ZonedDateTime;
 import static COVID_AgentBasedSimulation.Model.MainModel.softwareVersion;
 import COVID_AgentBasedSimulation.Model.Structure.County;
 import java.io.Serializable;
-import lombok.Getter;
-import lombok.Setter;
+//import lombok.Getter;
+//import lombok.Setter;
 
 /**
  *
  * @author Amir Mohammad Esmaieeli Sikaroudi
  */
-@Getter
-@Setter
 public class DailyConfirmedCases implements Serializable {
     static final long serialVersionUID = softwareVersion;
     

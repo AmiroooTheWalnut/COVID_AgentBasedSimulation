@@ -33,8 +33,8 @@ import java.util.logging.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.objenesis.strategy.StdInstantiatorStrategy;
-import lombok.Getter;
-import lombok.Setter;
+//import lombok.Getter;
+//import lombok.Setter;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LinearRing;
@@ -44,8 +44,6 @@ import org.locationtech.jts.geom.Polygon;
  *
  * @author Amir Mohammad Esmaieeli Sikaroudi
  */
-@Getter
-@Setter
 public class AllGISData extends Dataset implements Serializable {
 
     static final long serialVersionUID = softwareVersion;
@@ -93,13 +91,13 @@ public class AllGISData extends Dataset implements Serializable {
         long censusTractID = (long) getMidDigits(id, 2, 12);
 //        byte censusBlockGroupID=(byte)getMidDigits(id,1,1);
         for (int i = 0; i < countries.size(); i++) {
-            try{
-            State state = countries.get(i).findState(stateID);
-            County county = state.findCounty(countyID);
-            CensusTract censusTract = county.findCensusTract(censusTractID);
-            CensusBlockGroup censusBlockGroup = censusTract.findCensusBlock(id);
-            return censusBlockGroup;
-            }catch(Exception ex){
+            try {
+                State state = countries.get(i).findState(stateID);
+                County county = state.findCounty(countyID);
+                CensusTract censusTract = county.findCensusTract(censusTractID);
+                CensusBlockGroup censusBlockGroup = censusTract.findCensusBlock(id);
+                return censusBlockGroup;
+            } catch (Exception ex) {
                 System.out.println("^^^^^^^^^^");
             }
         }
@@ -114,7 +112,7 @@ public class AllGISData extends Dataset implements Serializable {
     public void processUSData(String geographyDirectory) {
         System.out.println("READING STATES");
         File statesFile = new File(geographyDirectory + "/US_States.json");
-        try ( BufferedReader br = new BufferedReader(new FileReader(statesFile))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(statesFile))) {
 //            if (countries == null) {
 //                countries = new ArrayList();
 //            }
@@ -152,7 +150,7 @@ public class AllGISData extends Dataset implements Serializable {
 
         System.out.println("READING COUNTIES");
         File countiesFile = new File(geographyDirectory + "/US_Counties.json");
-        try ( BufferedReader br = new BufferedReader(new FileReader(countiesFile))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(countiesFile))) {
             String line;
             int counter = 0;
             int largerCounter = 0;
@@ -190,7 +188,7 @@ public class AllGISData extends Dataset implements Serializable {
 
         System.out.println("READING CENSUS BLOCK GROUPS");
         File censusBlockGroupFile = new File(geographyDirectory + "/US_CensusBlockGroup.json");
-        try ( BufferedReader br = new BufferedReader(new FileReader(censusBlockGroupFile))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(censusBlockGroupFile))) {
             String line;
             int deguggingCounter = 0;
             int counter = 0;
@@ -277,7 +275,164 @@ public class AllGISData extends Dataset implements Serializable {
             Logger.getLogger(Patterns.class.getName()).log(Level.SEVERE, (String) null, ex);
         }
 
-        System.out.println("READING census block population");
+        System.out.println("READING census block group age");
+        File cBGAgeFile = new File(geographyDirectory + "/SafeGraph_Census/safegraph_open_census_data_2020/data/cbg_b01.csv");
+        try {
+            CsvReader cSVReader = new CsvReader();
+            cSVReader.setContainsHeader(true);
+            CsvContainer data = cSVReader.read(cBGAgeFile, StandardCharsets.UTF_8);
+//            int counter = 0;
+//            int largerCounter = 0;
+//            int counterInterval = 1000;
+            ArrayList<String> age_0_18_colNames = new ArrayList();
+            age_0_18_colNames.add("B01001e27");
+            age_0_18_colNames.add("B01001e28");
+            age_0_18_colNames.add("B01001e29");
+            age_0_18_colNames.add("B01001e3");
+            age_0_18_colNames.add("B01001e30");
+            age_0_18_colNames.add("B01001e31");
+
+            ArrayList<String> age_19_65_colNames = new ArrayList();
+            age_19_65_colNames.add("B01001e10");
+            age_19_65_colNames.add("B01001e12");
+            age_19_65_colNames.add("B01001e13");
+            age_19_65_colNames.add("B01001e14");
+            age_19_65_colNames.add("B01001e15");
+            age_19_65_colNames.add("B01001e16");
+            age_19_65_colNames.add("B01001e17");
+            age_19_65_colNames.add("B01001e18");
+            age_19_65_colNames.add("B01001e19");
+            age_19_65_colNames.add("B01001e32");
+            age_19_65_colNames.add("B01001e33");
+            age_19_65_colNames.add("B01001e34");
+            age_19_65_colNames.add("B01001e35");
+            age_19_65_colNames.add("B01001e36");
+            age_19_65_colNames.add("B01001e37");
+            age_19_65_colNames.add("B01001e38");
+            age_19_65_colNames.add("B01001e39");
+            age_19_65_colNames.add("B01001e40");
+            age_19_65_colNames.add("B01001e41");
+            age_19_65_colNames.add("B01001e42");
+            age_19_65_colNames.add("B01001e43");
+            age_19_65_colNames.add("B01001e8");
+            age_19_65_colNames.add("B01001e9");
+
+            ArrayList<String> age_66_inf_colNames = new ArrayList();
+            age_66_inf_colNames.add("B01001e20");
+            age_66_inf_colNames.add("B01001e21");
+            age_66_inf_colNames.add("B01001e22");
+            age_66_inf_colNames.add("B01001e23");
+            age_66_inf_colNames.add("B01001e24");
+            age_66_inf_colNames.add("B01001e25");
+            age_66_inf_colNames.add("B01001e44");
+            age_66_inf_colNames.add("B01001e45");
+            age_66_inf_colNames.add("B01001e46");
+            age_66_inf_colNames.add("B01001e47");
+            age_66_inf_colNames.add("B01001e48");
+            age_66_inf_colNames.add("B01001e49");
+            
+            int counter = 0;
+            int largerCounter = 0;
+            int counterInterval = 5000;
+            for (int i = 0; i < data.getRowCount(); i++) {
+                CsvRow row = data.getRow(i);
+
+//                String populationNumber = row.getField("");
+                String cBGString = row.getField("census_block_group");
+
+                long censusBlockGroupID = Long.parseLong(cBGString);
+                CensusBlockGroup cbg = countries.get(countries.size() - 1).findCBG(censusBlockGroupID);
+                if (cbg != null) {
+                    for (int m = 0; m < age_0_18_colNames.size(); m++) {
+                        String val = row.getField(age_0_18_colNames.get(m));
+                        if (val != null) {
+                            cbg.age0_18 = cbg.age0_18 + Integer.parseInt(val);
+                        }
+                    }
+                    for (int m = 0; m < age_19_65_colNames.size(); m++) {
+                        String val = row.getField(age_19_65_colNames.get(m));
+                        if (val != null) {
+                            cbg.age19_64 = cbg.age19_64 + Integer.parseInt(val);
+                        }
+                    }
+                    for (int m = 0; m < age_66_inf_colNames.size(); m++) {
+                        String val = row.getField(age_66_inf_colNames.get(m));
+                        if (val != null) {
+                            cbg.age65_inf = cbg.age65_inf + Integer.parseInt(val);
+                        }
+                    }
+                }
+                counter = counter + 1;
+                if (counter > counterInterval) {
+                    largerCounter = largerCounter + 1;
+                    counter = 0;
+                    System.out.println("Num rows read: " + largerCounter * counterInterval);
+                }
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(Patterns.class.getName()).log(Level.SEVERE, (String) null, ex);
+        }
+        
+        System.out.println("READING census block group occupation");
+        File cBGOccFile = new File(geographyDirectory + "/SafeGraph_Census/safegraph_open_census_data_2020/data/cbg_c24.csv");
+        try {
+            CsvReader cSVReader = new CsvReader();
+            cSVReader.setContainsHeader(true);
+            CsvContainer data = cSVReader.read(cBGOccFile, StandardCharsets.UTF_8);
+//            int counter = 0;
+//            int largerCounter = 0;
+//            int counterInterval = 1000;
+            OccupationCensusIDs ocIDs=new OccupationCensusIDs();
+            
+            int counter = 0;
+            int largerCounter = 0;
+            int counterInterval = 5000;
+            for (int i = 0; i < data.getRowCount(); i++) {
+                CsvRow row = data.getRow(i);
+
+//                String populationNumber = row.getField("");
+                String cBGString = row.getField("census_block_group");
+
+                long censusBlockGroupID = Long.parseLong(cBGString);
+                CensusBlockGroup cbg = countries.get(countries.size() - 1).findCBG(censusBlockGroupID);
+                if (cbg != null) {
+                    for (int m = 0; m < ocIDs.edu_colNames.size(); m++) {
+                        String val = row.getField(ocIDs.edu_colNames.get(m));
+                        if (val != null) {
+                            cbg.edu = cbg.edu + Integer.parseInt(val);
+                        }
+                    }
+                    for (int m = 0; m < ocIDs.service_colNames.size(); m++) {
+                        String val = row.getField(ocIDs.service_colNames.get(m));
+                        if (val != null) {
+                            cbg.service = cbg.service + Integer.parseInt(val);
+                        }
+                    }
+                    for (int m = 0; m < ocIDs.health_colNames.size(); m++) {
+                        String val = row.getField(ocIDs.health_colNames.get(m));
+                        if (val != null) {
+                            cbg.health = cbg.health + Integer.parseInt(val);
+                        }
+                    }
+                    for (int m = 0; m < ocIDs.driver_colNames.size(); m++) {
+                        String val = row.getField(ocIDs.driver_colNames.get(m));
+                        if (val != null) {
+                            cbg.driver = cbg.driver + Integer.parseInt(val);
+                        }
+                    }
+                }
+                counter = counter + 1;
+                if (counter > counterInterval) {
+                    largerCounter = largerCounter + 1;
+                    counter = 0;
+                    System.out.println("Num rows read: " + largerCounter * counterInterval);
+                }
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(Patterns.class.getName()).log(Level.SEVERE, (String) null, ex);
+        }
+
+        System.out.println("READING census block group population");
         File cBGPopulationFile = new File(geographyDirectory + "/USCensusBlockPopulation.csv");
         try {
             CsvReader cSVReader = new CsvReader();
@@ -377,7 +532,7 @@ public class AllGISData extends Dataset implements Serializable {
 
     public void readCensusBlockGroupPolygon(String geographyDirectory) {
         File censusBlockGroupFile = new File(geographyDirectory + "/US_CensusBlockGroup.json");
-        try ( BufferedReader br = new BufferedReader(new FileReader(censusBlockGroupFile))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(censusBlockGroupFile))) {
             String line;
             int deguggingCounter = 0;
             int counter = 0;
@@ -666,7 +821,7 @@ public class AllGISData extends Dataset implements Serializable {
         System.out.println("READING CENSUS BLOCK GROUPS");
         String geographyDirectory = "./datasets";
         File censusBlockGroupFile = new File(geographyDirectory + "/US_CensusBlockGroup.json");
-        try ( BufferedReader br = new BufferedReader(new FileReader(censusBlockGroupFile))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(censusBlockGroupFile))) {
             String line;
             int deguggingCounter = 0;
             int counter = 0;
@@ -679,23 +834,21 @@ public class AllGISData extends Dataset implements Serializable {
 
                     long censusBlockLong = Long.parseLong(properties.getString("GEOID"));
                     CensusBlockGroup foundCBG = scope.findCBG(censusBlockLong);
-                    
-                    
-                    
+
                     if (foundCBG != null) {
-                    JSONObject geometry = root.getJSONObject("geometry");
-                    JSONArray coordsT = geometry.getJSONArray("coordinates");
-                    String geomType = (String) (geometry.get("type"));
-                    MyPolygons polys=new MyPolygons();
-                    if (geomType.equals("Polygon")) {
-                        JSONArray coords = coordsT.getJSONArray(0);
-                        MyPolygon poly=new MyPolygon();
+                        JSONObject geometry = root.getJSONObject("geometry");
+                        JSONArray coordsT = geometry.getJSONArray("coordinates");
+                        String geomType = (String) (geometry.get("type"));
+                        MyPolygons polys = new MyPolygons();
+                        if (geomType.equals("Polygon")) {
+                            JSONArray coords = coordsT.getJSONArray(0);
+                            MyPolygon poly = new MyPolygon();
 //                        ArrayList<Coordinate> coordsArrayList = new ArrayList();
-                        for (int i = 0; i < coords.length(); i++) {
-                            poly.points.add(new Location(coords.getJSONArray(i).getDouble(1),coords.getJSONArray(i).getDouble(0)));
+                            for (int i = 0; i < coords.length(); i++) {
+                                poly.points.add(new Location(coords.getJSONArray(i).getDouble(1), coords.getJSONArray(i).getDouble(0)));
 //                            coordsArrayList.add(new Coordinate(coords.getJSONArray(i).getDouble(0), coords.getJSONArray(i).getDouble(1)));
-                        }
-                        polys.polygons.add(poly);
+                            }
+                            polys.polygons.add(poly);
 //                        Coordinate coordsArray[] = new Coordinate[coordsArrayList.size()];
 //                        for (int m = 0; m < coordsArrayList.size(); m++) {
 //                            coordsArray[m] = coordsArrayList.get(m);
@@ -709,24 +862,23 @@ public class AllGISData extends Dataset implements Serializable {
 //                        } catch (Exception ex) {
 //                            
 //                        }
-                        scope.cBGPolygons.put(censusBlockLong, polys);
-                    } else if (geomType.equals("MultiPolygon")) {
-                        for (int m = 0; m < coordsT.length(); m++) {
-                            JSONArray coords = coordsT.getJSONArray(m);
-                            
-                            MyPolygon poly=new MyPolygon();
-                            
-//                            ArrayList<Coordinate> coordsArrayList = new ArrayList();
-
-                            for (int i = 0; i < coords.getJSONArray(0).length(); i++) {
-                                poly.points.add(new Location(coords.getJSONArray(i).getDouble(0),coords.getJSONArray(i).getDouble(1)));
-//                                coordsArrayList.add(new Coordinate(coords.getJSONArray(0).getJSONArray(i).getDouble(0), coords.getJSONArray(0).getJSONArray(i).getDouble(1)));
-                            }
-                            
-                            polys.polygons.add(poly);
-                            
                             scope.cBGPolygons.put(censusBlockLong, polys);
-                            
+                        } else if (geomType.equals("MultiPolygon")) {
+                            for (int m = 0; m < coordsT.length(); m++) {
+                                JSONArray coords = coordsT.getJSONArray(m);
+
+                                MyPolygon poly = new MyPolygon();
+
+//                            ArrayList<Coordinate> coordsArrayList = new ArrayList();
+                                for (int i = 0; i < coords.getJSONArray(0).length(); i++) {
+                                    poly.points.add(new Location(coords.getJSONArray(i).getDouble(0), coords.getJSONArray(i).getDouble(1)));
+//                                coordsArrayList.add(new Coordinate(coords.getJSONArray(0).getJSONArray(i).getDouble(0), coords.getJSONArray(0).getJSONArray(i).getDouble(1)));
+                                }
+
+                                polys.polygons.add(poly);
+
+                                scope.cBGPolygons.put(censusBlockLong, polys);
+
 //                            Coordinate coordsArray[] = new Coordinate[coordsArrayList.size()];
 //                            for (int h = 0; h < coordsArrayList.size(); h++) {
 //                                coordsArray[h] = coordsArrayList.get(h);
@@ -740,12 +892,10 @@ public class AllGISData extends Dataset implements Serializable {
 //                            } catch (Exception ex) {
 //
 //                            }
-
+                            }
                         }
                     }
-                    }
-                    
-                    
+
 //                    if (foundCBG != null) {
 //                        foundCBG.polygon = new MyPolygon();
 //                        JSONArray coords = root.getJSONObject("geometry").getJSONArray("coordinates").getJSONArray(0);

@@ -9,14 +9,13 @@ import static COVID_AgentBasedSimulation.Model.MainModel.softwareVersion;
 import COVID_AgentBasedSimulation.Model.Structure.City;
 import java.io.Serializable;
 import java.util.ArrayList;
-import lombok.Getter;
-import lombok.Setter;
+//import lombok.Getter;
+//import lombok.Setter;
 
 /**
  *
  * @author Amir Mohammad Esmaieeli Sikaroudi
  */
-@Getter @Setter
 public class Categories implements Serializable {
     static final long serialVersionUID = softwareVersion;
     

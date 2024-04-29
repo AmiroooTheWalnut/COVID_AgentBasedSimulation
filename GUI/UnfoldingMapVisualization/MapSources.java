@@ -14,6 +14,7 @@ import de.fhpotsdam.unfolding.providers.OpenStreetMap;
 import de.fhpotsdam.unfolding.providers.StamenMapProvider;
 import de.fhpotsdam.unfolding.providers.ThunderforestProvider;
 import java.util.ArrayList;
+import processing.core.PApplet;
 
 /**
  *
@@ -21,9 +22,9 @@ import java.util.ArrayList;
  */
 public class MapSources {
 
-    ArrayList<MapSourse> maps = new ArrayList<>();
+    public ArrayList<MapSourse> maps = new ArrayList<>();
 
-    MapSources(ProcessingMapRenderer parent, int width, int height) {
+    public MapSources(PApplet parent, int width, int height) {
         try {
             UnfoldingMap microsoftMapRoads = new UnfoldingMap(parent, 0, 0, width, height, (AbstractMapProvider) new Microsoft.RoadProvider());
             this.maps.add(new MapSourse(microsoftMapRoads, "MicrosoftRoads"));
@@ -128,7 +129,7 @@ public class MapSources {
         }
     }
     
-    MapSources(ProcessingMapRenderer parent) {
+    public MapSources(PApplet parent) {
         try {
             UnfoldingMap microsoftMapRoads = new UnfoldingMap(parent, (AbstractMapProvider) new Microsoft.RoadProvider());
             this.maps.add(new MapSourse(microsoftMapRoads, "MicrosoftRoads"));
@@ -233,7 +234,7 @@ public class MapSources {
         }
     }
 
-    MapSources(COVIDGeoVisualization parent) {
+    public MapSources(COVIDGeoVisualization parent) {
         try {
             UnfoldingMap microsoftMapRoads = new UnfoldingMap(parent, (AbstractMapProvider) new Microsoft.RoadProvider());
             this.maps.add(new MapSourse(microsoftMapRoads, "MicrosoftRoads"));

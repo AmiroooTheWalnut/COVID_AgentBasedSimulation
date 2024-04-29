@@ -27,8 +27,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import lombok.Getter;
-import lombok.Setter;
+//import lombok.Getter;
+//import lombok.Setter;
 import org.jdom2.Content;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
@@ -43,8 +43,6 @@ import org.jdom2.Element;
  *
  * @author Amir Mohammad Esmaieeli Sikaroudi
  */
-@Getter
-@Setter
 public class SafegraphPlaces implements Serializable {
 
     static final long serialVersionUID = softwareVersion;

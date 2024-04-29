@@ -1,5 +1,6 @@
 package COVID_AgentBasedSimulation.GUI;
 
+import COVID_AgentBasedSimulation.GUI.GraphicalModel.GraphicalModelDetailsDialog;
 import COVID_AgentBasedSimulation.GUI.GraphicalModel.GraphicalModelDialog;
 import COVID_AgentBasedSimulation.GUI.SafegraphPreprocessor.SafeGraphNewPreprocessorDialog;
 import COVID_AgentBasedSimulation.GUI.Settings.SimulatorSettingsDialog;
@@ -136,6 +137,7 @@ public class MainFrame extends javax.swing.JFrame {
         jButton21 = new javax.swing.JButton();
         jPanel15 = new javax.swing.JPanel();
         jButton18 = new javax.swing.JButton();
+        jButton22 = new javax.swing.JButton();
         jPanel13 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         jButton5 = new javax.swing.JButton();
@@ -472,21 +474,32 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
+        jButton22.setText("Mobility details");
+        jButton22.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton22ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel15Layout = new javax.swing.GroupLayout(jPanel15);
         jPanel15.setLayout(jPanel15Layout);
         jPanel15Layout.setHorizontalGroup(
             jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel15Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jButton18)
+                .addGroup(jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButton18)
+                    .addComponent(jButton22))
                 .addContainerGap(70, Short.MAX_VALUE))
         );
         jPanel15Layout.setVerticalGroup(
             jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel15Layout.createSequentialGroup()
-                .addContainerGap(43, Short.MAX_VALUE)
+            .addGroup(jPanel15Layout.createSequentialGroup()
+                .addContainerGap()
                 .addComponent(jButton18)
-                .addContainerGap())
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton22)
+                .addContainerGap(13, Short.MAX_VALUE))
         );
 
         jPanel11.add(jPanel15);
@@ -875,6 +888,11 @@ public class MainFrame extends javax.swing.JFrame {
         safeGraphNewPreprocessorDialog.setVisible(true);
     }//GEN-LAST:event_jButton21ActionPerformed
 
+    private void jButton22ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton22ActionPerformed
+        GraphicalModelDetailsDialog graphicalModelDialog = new GraphicalModelDetailsDialog(this, false, mainModel.ABM.studyScope);
+        graphicalModelDialog.setVisible(true);
+    }//GEN-LAST:event_jButton22ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -925,6 +943,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton20;
     private javax.swing.JButton jButton21;
+    private javax.swing.JButton jButton22;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;

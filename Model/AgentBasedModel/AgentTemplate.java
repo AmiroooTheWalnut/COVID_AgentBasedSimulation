@@ -9,14 +9,13 @@ import COVID_AgentBasedSimulation.Model.Structure.Marker;
 import groovy.lang.Binding;
 import groovy.lang.Script;
 import java.util.ArrayList;
-import lombok.Getter;
-import lombok.Setter;
+//import lombok.Getter;
+//import lombok.Setter;
 
 /**
  *
  * @author Amir Mohammad Esmaieeli Sikaroudi
  */
-@Getter @Setter
 public class AgentTemplate {
     
     public AgentTemplate(){

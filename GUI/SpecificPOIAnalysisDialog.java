@@ -7,6 +7,7 @@ package COVID_AgentBasedSimulation.GUI;
 import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.ProcessingMapRenderer;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.AllPatterns;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.PatternsRecordProcessed;
+import COVID_AgentBasedSimulation.Model.Engines.PairObjectDouble;
 import COVID_AgentBasedSimulation.Model.Engines.SimplePair;
 import COVID_AgentBasedSimulation.Model.MainModel;
 import COVID_AgentBasedSimulation.Model.Structure.Marker;
@@ -28,17 +29,17 @@ import java.util.logging.Logger;
  * @author Amir Mohammad Esmaieeli Sikaroudi
  */
 public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
-    
+
     public MainFrame myParent;
     public MainModel mainModel;
     public String[] patternsList;
     String loadScope;
-    ArrayList<SimplePair<String, PatternsRecordProcessed>> brands;
-    ArrayList<SimplePair<String, PatternsRecordProcessed>> filteredBrands;
-    ArrayList<SimplePair<String, PatternsRecordProcessed>> finalBrands;
-    
-    ArrayList<SimplePair<String, PatternsRecordProcessed>> finalBrandsBehind;
-    ArrayList<SimplePair<String, PatternsRecordProcessed>> filteredBrandsBehind;
+    ArrayList<PairObjectDouble> brands;
+    ArrayList<PairObjectDouble> filteredBrands;
+    ArrayList<PairObjectDouble> finalBrands;
+
+    ArrayList<PairObjectDouble> finalBrandsBehind;
+    ArrayList<PairObjectDouble> filteredBrandsBehind;
 
     /**
      * Creates new form SpecificPOIAnalysisDialog
@@ -49,13 +50,13 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
         myParent = (MainFrame) parent;
         mainModel = myParent.mainModel;
         loadScope = passed_loadScope;
-        
+
         refreshYearMonthList();
-        
+
         ProcessingMapRenderer sketch = new ProcessingMapRenderer(myParent, jPanel8, this);
         sketch.startRendering();
     }
-    
+
     public void refreshYearMonthList() {
         patternsList = AllPatterns.detectAllPatterns("./datasets/Safegraph/" + loadScope);
         jList3.setModel(new javax.swing.AbstractListModel() {
@@ -63,7 +64,7 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
             public int getSize() {
                 return patternsList.length;
             }
-            
+
             @Override
             public Object getElementAt(int index) {
                 return patternsList[index];
@@ -80,6 +81,7 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        buttonGroup1 = new javax.swing.ButtonGroup();
         jPanel12 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
@@ -90,6 +92,8 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
         jLabel4 = new javax.swing.JLabel();
         jScrollPane4 = new javax.swing.JScrollPane();
         jList4 = new javax.swing.JList<>();
+        jRadioButton1 = new javax.swing.JRadioButton();
+        jRadioButton2 = new javax.swing.JRadioButton();
         jPanel10 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
@@ -158,7 +162,7 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel3)
-                .addContainerGap(54, Short.MAX_VALUE))
+                .addContainerGap(80, Short.MAX_VALUE))
             .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
         );
         jPanel4Layout.setVerticalGroup(
@@ -181,15 +185,35 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
         });
         jScrollPane4.setViewportView(jList4);
 
+        buttonGroup1.add(jRadioButton1);
+        jRadioButton1.setSelected(true);
+        jRadioButton1.setText("Sort by name");
+        jRadioButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton1ActionPerformed(evt);
+            }
+        });
+
+        buttonGroup1.add(jRadioButton2);
+        jRadioButton2.setText("Sort by visits");
+        jRadioButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton2ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel4)
-                .addContainerGap(71, Short.MAX_VALUE))
-            .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel4)
+                    .addComponent(jRadioButton1)
+                    .addComponent(jRadioButton2))
+                .addContainerGap(23, Short.MAX_VALUE))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -197,7 +221,12 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
                 .addContainerGap()
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE))
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 433, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jRadioButton1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jRadioButton2)
+                .addContainerGap())
         );
 
         jPanel1.add(jPanel5);
@@ -249,7 +278,7 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(9, Short.MAX_VALUE))
+                .addContainerGap(62, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -465,7 +494,7 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
                 .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel7Layout.createSequentialGroup()
                         .addComponent(jLabel30)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 66, Short.MAX_VALUE)
                         .addComponent(jLabel31))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
                         .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -561,7 +590,7 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
                     if (myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.brands != null) {
                         for (int k = 0; k < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.brands.size(); k++) {
 //                            if (myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.brands.get(k).name.toLowerCase().contains("target")) {
-                            brands.add(new SimplePair(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.brands.get(k).name, myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j)));
+                            brands.add(new PairObjectDouble(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j), myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.brands.get(k).name, myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).raw_visit_counts));
 //                                System.out.println("!!!!!!");
 //                            }
                         }
@@ -570,16 +599,20 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
                 totalMobility = totalMobility + myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).raw_visit_counts;
             }
         }
-        Collections.sort(brands);
+        if (jRadioButton1.isSelected()) {
+            Collections.sort(brands, PairObjectDouble.dataSrtingComparator);
+        }else{
+            Collections.sort(brands, PairObjectDouble.valueComparator);
+        }
         jList4.setModel(new javax.swing.AbstractListModel() {
             @Override
             public int getSize() {
                 return brands.size();
             }
-            
+
             @Override
             public Object getElementAt(int index) {
-                return brands.get(index).getKey();
+                return brands.get(index).getData();
             }
         });
         finalBrands = brands;
@@ -590,7 +623,7 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
         if (brands != null) {
             filteredBrands = new ArrayList();
             for (int i = 0; i < brands.size(); i++) {
-                if (((String) brands.get(i).getKey()).toLowerCase().contains(jTextField1.getText())) {
+                if (((String) brands.get(i).getData()).toLowerCase().contains(jTextField1.getText())) {
                     filteredBrands.add(brands.get(i));
                 }
             }
@@ -599,13 +632,13 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
                 public int getSize() {
                     return filteredBrands.size();
                 }
-                
+
                 @Override
                 public Object getElementAt(int index) {
-                    return filteredBrands.get(index).getKey() + ((PatternsRecordProcessed) (filteredBrands.get(index).getValue())).placeKey;
+                    return filteredBrands.get(index).getData() + ((PatternsRecordProcessed) (filteredBrands.get(index).getKey())).placeKey;
                 }
             });
-            finalBrands = brands;
+            finalBrands = filteredBrands;
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -620,10 +653,10 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
         int B61_240 = 0;
         int M240 = 0;
         if (finalBrands != null && jList4.getSelectedIndex() != -1) {
-            for (int i = 0; i < ((PatternsRecordProcessed) (finalBrands.get(jList4.getSelectedIndex()).getValue())).bucketed_dwell_times.size(); i++) {
-                short d1 = ((PatternsRecordProcessed) (finalBrands.get(jList4.getSelectedIndex()).getValue())).bucketed_dwell_times.get(i).dwellDuration[0];
-                short d2 = ((PatternsRecordProcessed) (finalBrands.get(jList4.getSelectedIndex()).getValue())).bucketed_dwell_times.get(i).dwellDuration[1];
-                int value = ((PatternsRecordProcessed) (finalBrands.get(jList4.getSelectedIndex()).getValue())).bucketed_dwell_times.get(i).number;
+            for (int i = 0; i < ((PatternsRecordProcessed) (finalBrands.get(jList4.getSelectedIndex()).getKey())).bucketed_dwell_times.size(); i++) {
+                short d1 = ((PatternsRecordProcessed) (finalBrands.get(jList4.getSelectedIndex()).getKey())).bucketed_dwell_times.get(i).dwellDuration[0];
+                short d2 = ((PatternsRecordProcessed) (finalBrands.get(jList4.getSelectedIndex()).getKey())).bucketed_dwell_times.get(i).dwellDuration[1];
+                int value = ((PatternsRecordProcessed) (finalBrands.get(jList4.getSelectedIndex()).getKey())).bucketed_dwell_times.get(i).number;
                 if (d1 == 0 && d2 == 5) {
                     L5 = L5 + value;
                 } else if (d1 == 5 && d2 == 20) {
@@ -657,12 +690,12 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
             jLabel25.setText(String.valueOf(B61_240));
             double avg = (L5 * 2.5 + B5_10 * 7.5 + B11_20 * 15 + B21_60 * 40 + B61_120 * 90 + B121_240 * 180 + M240 * 240 + B5_20 * 12.5 + B61_240 * 150) / (L5 + B5_10 + B11_20 + B21_60 + B61_120 + B121_240 + M240 + B5_20 + B61_240);
             jLabel21.setText(String.valueOf(avg));
-            jLabel29.setText(String.valueOf(((PatternsRecordProcessed) (finalBrands.get(jList4.getSelectedIndex()).getValue())).raw_visit_counts));
-            jLabel28.setText(String.valueOf(((PatternsRecordProcessed) (finalBrands.get(jList4.getSelectedIndex()).getValue())).raw_visitor_counts));
-            jLabel31.setText(String.valueOf(((PatternsRecordProcessed) (finalBrands.get(jList4.getSelectedIndex()).getValue())).distance_from_home));
+            jLabel29.setText(String.valueOf(((PatternsRecordProcessed) (finalBrands.get(jList4.getSelectedIndex()).getKey())).raw_visit_counts));
+            jLabel28.setText(String.valueOf(((PatternsRecordProcessed) (finalBrands.get(jList4.getSelectedIndex()).getKey())).raw_visitor_counts));
+            jLabel31.setText(String.valueOf(((PatternsRecordProcessed) (finalBrands.get(jList4.getSelectedIndex()).getKey())).distance_from_home));
             Marker temp = new Marker();
-            temp.lat = ((PatternsRecordProcessed) (finalBrands.get(jList4.getSelectedIndex()).getValue())).place.lat;
-            temp.lon = ((PatternsRecordProcessed) (finalBrands.get(jList4.getSelectedIndex()).getValue())).place.lon;
+            temp.lat = ((PatternsRecordProcessed) (finalBrands.get(jList4.getSelectedIndex()).getKey())).place.lat;
+            temp.lon = ((PatternsRecordProcessed) (finalBrands.get(jList4.getSelectedIndex()).getKey())).place.lon;
             myParent.child.setDrawingSimpleGISMarker(temp);
             myParent.child.isShowSimpleMarker = true;
             System.out.println("temp.lat: " + temp.lat);
@@ -689,10 +722,10 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
             }
             applyFilter(jTextField1.getText());
             for (int j = 0; j < filteredBrandsBehind.size(); j++) {
-                for (int i = 0; i < ((PatternsRecordProcessed) (filteredBrandsBehind.get(j).getValue())).bucketed_dwell_times.size(); i++) {
-                    short d1 = ((PatternsRecordProcessed) (filteredBrandsBehind.get(j).getValue())).bucketed_dwell_times.get(i).dwellDuration[0];
-                    short d2 = ((PatternsRecordProcessed) (filteredBrandsBehind.get(j).getValue())).bucketed_dwell_times.get(i).dwellDuration[1];
-                    int value = ((PatternsRecordProcessed) (filteredBrandsBehind.get(j).getValue())).bucketed_dwell_times.get(i).number;
+                for (int i = 0; i < ((PatternsRecordProcessed) (filteredBrandsBehind.get(j).getKey())).bucketed_dwell_times.size(); i++) {
+                    short d1 = ((PatternsRecordProcessed) (filteredBrandsBehind.get(j).getKey())).bucketed_dwell_times.get(i).dwellDuration[0];
+                    short d2 = ((PatternsRecordProcessed) (filteredBrandsBehind.get(j).getKey())).bucketed_dwell_times.get(i).dwellDuration[1];
+                    int value = ((PatternsRecordProcessed) (filteredBrandsBehind.get(j).getKey())).bucketed_dwell_times.get(i).number;
                     if (d1 == 0 && d2 == 5) {
                         L5 = L5 + value;
                     } else if (d1 == 5 && d2 == 20) {
@@ -747,7 +780,7 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
         row7[0] = nStrs[6];
         row7[1] = String.valueOf(M240);
         data.add(row7);
-        
+
         try {
             CSVWriter writer = new CSVWriter(new FileWriter("stayDuration_" + myParent.mainModel.ABM.studyScope + "_" + jTextField1.getText() + ".csv"));
             writer.writeAll(data);
@@ -757,7 +790,15 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
             Logger.getLogger(SpecificPOIAnalysisDialog.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButton2ActionPerformed
-    
+
+    private void jRadioButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton1ActionPerformed
+        jList3ValueChanged(null);
+    }//GEN-LAST:event_jRadioButton1ActionPerformed
+
+    private void jRadioButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton2ActionPerformed
+        jList3ValueChanged(null);
+    }//GEN-LAST:event_jRadioButton2ActionPerformed
+
     public void applyFilter(String filterName) {
         filteredBrandsBehind = new ArrayList();
         for (int i = 0; i < finalBrandsBehind.size(); i++) {
@@ -766,7 +807,7 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
             }
         }
     }
-    
+
     public boolean loadPatterns(String patternName) {
         myParent.mainModel.safegraph.clearPatternsPlaces();
         String temp[] = patternName.split("_");
@@ -784,7 +825,7 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
                     if (myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.brands != null) {
                         for (int k = 0; k < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.brands.size(); k++) {
 //                            if (myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.brands.get(k).name.toLowerCase().contains("target")) {
-                            brands.add(new SimplePair(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.brands.get(k).name, myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j)));
+                            brands.add(new PairObjectDouble(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j), myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).place.brands.get(k).name, myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(i).patternRecords.get(j).raw_visit_counts));
 //                                System.out.println("!!!!!!");
 //                            }
                         }
@@ -792,13 +833,18 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
                 }
             }
         }
-        Collections.sort(brands);
+        if (jRadioButton1.isSelected()) {
+            Collections.sort(brands, PairObjectDouble.dataSrtingComparator);
+        }else{
+            Collections.sort(brands, PairObjectDouble.valueComparator);
+        }
         finalBrandsBehind = brands;
         return true;
     }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
@@ -848,6 +894,8 @@ public class SpecificPOIAnalysisDialog extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
+    private javax.swing.JRadioButton jRadioButton1;
+    private javax.swing.JRadioButton jRadioButton2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;

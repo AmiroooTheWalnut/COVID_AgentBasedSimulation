@@ -39,8 +39,8 @@ import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.objenesis.strategy.StdInstantiatorStrategy;
-import lombok.Getter;
-import lombok.Setter;
+//import lombok.Getter;
+//import lombok.Setter;
 import org.objenesis.ObjenesisStd;
 import org.objenesis.strategy.SerializingInstantiatorStrategy;
 
@@ -48,8 +48,6 @@ import org.objenesis.strategy.SerializingInstantiatorStrategy;
  *
  * @author Amir Mohammad Esmaieeli Sikaroudi
  */
-@Getter
-@Setter
 public class Safegraph extends Dataset implements Serializable {
 
     static final long serialVersionUID = softwareVersion;

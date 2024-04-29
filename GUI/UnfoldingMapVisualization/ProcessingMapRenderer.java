@@ -18,6 +18,7 @@ import de.fhpotsdam.unfolding.geo.Location;
 import de.fhpotsdam.unfolding.marker.SimplePointMarker;
 import de.fhpotsdam.unfolding.utils.MapUtils;
 import de.fhpotsdam.unfolding.utils.ScreenPosition;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -54,6 +55,13 @@ public class ProcessingMapRenderer extends PApplet {
     String drawingName;
     String[] drawingChildrenNames;
     //FOR GIS STUFF
+
+    //FOR DRAWING DISTRIBUTION
+    ArrayList<Location> distributionLocations;
+    ArrayList<ArrayList<Float>> distribution;
+    public int targetCBG=-1;
+    boolean isDrawDistributions = false;
+    //FOR DRAWING DISTRIBUTION
 
     //FOR ONE POI
     Location drawingLocation;
@@ -223,6 +231,9 @@ public class ProcessingMapRenderer extends PApplet {
         }
         if (isDrawRandomArcs == true) {
             drawArcs();
+        }
+        if (isDrawDistributions == true) {
+            drawDistributions();
         }
 
 //        drawPolygons();
@@ -675,24 +686,24 @@ public class ProcessingMapRenderer extends PApplet {
         isDrawRandomArcReduced = new ArrayList();
         for (int j = 0; j < numCBGs; j++) {
             for (int k = j + 1; k < numCBGs; k++) {
-                boolean isFamous=false;
-                for (int m = 0; m < impCBGs.length; m++){
-                    if (j == impCBGs[m] || k == impCBGs[m]){
+                boolean isFamous = false;
+                for (int m = 0; m < impCBGs.length; m++) {
+                    if (j == impCBGs[m] || k == impCBGs[m]) {
                         if (rnd.nextDouble() < 0.04) {
                             isFamous = true;
                         }
                     }
                 }
-                if (isFamous == true){
+                if (isFamous == true) {
 //                    rawFlowData[j][k] = dataF[j][k]/500.0f + 0.4f+(rnd.nextFloat() * 0.8f);
-                    rawFlowData[j][k] = 0.01f+(rnd.nextFloat() * 0.7f);
-                }else{
+                    rawFlowData[j][k] = 0.01f + (rnd.nextFloat() * 0.7f);
+                } else {
 //                    rawFlowData[j][k] = dataF[j][k]/500.0f + 0.2f+(rnd.nextFloat() * 0.4f);
                     rawFlowData[j][k] = 0;
                 }
-                for (int m = 0; m < impCBGs.length; m++){
+                for (int m = 0; m < impCBGs.length; m++) {
                     if (j == impCBGs[m] || k == impCBGs[m]) {
-                        if (rawFlowData[j][k] <0.669) {
+                        if (rawFlowData[j][k] < 0.669) {
                             if (rnd.nextDouble() < 0.8) {
                                 isFamous = false;
                             }
@@ -703,7 +714,7 @@ public class ProcessingMapRenderer extends PApplet {
                         }
                     }
                 }
-                rawFlowData[j][k]=(float)Math.pow(rawFlowData[j][k],1.4);
+                rawFlowData[j][k] = (float) Math.pow(rawFlowData[j][k], 1.4);
                 sortedFlowIndices.add(new TupleIntFloat(j * (numCBGs) + k, this.rawFlowData[j][k]));
                 thirdPointDeviationPercentages[j][k] = (float) (minThirdPointCurveDeviationPercent + rnd.nextFloat() * (maxThirdPointCurveDeviationPercent - minThirdPointCurveDeviationPercent));
                 quarantinedFlowData[j][k] = rawFlowData[j][k] + ((rnd.nextFloat() - 0.5f) * 0.6f);
@@ -728,7 +739,7 @@ public class ProcessingMapRenderer extends PApplet {
                         isDrawRandomArc.add(true);
                         isDrawRandomArcReduced.add(true);
                     }
-                    
+
                 }
             }
         }
@@ -738,7 +749,7 @@ public class ProcessingMapRenderer extends PApplet {
             }
         }
     }
-    
+
     public void setRandomArcGMTucson(ArrayList<CensusBlockGroup> cBGs, int numCBGs, int seed, float[][] dataF, int testCBG, int[] impCBGs) {
         Random rnd = new Random(seed);
         latLons = new Location[numCBGs];
@@ -756,29 +767,29 @@ public class ProcessingMapRenderer extends PApplet {
         isDrawRandomArcReduced = new ArrayList();
         for (int j = 0; j < numCBGs; j++) {
             for (int k = j + 1; k < numCBGs; k++) {
-                rawFlowData[j][k] = 0.02f+(rnd.nextFloat() * 0.4f);
-                
+                rawFlowData[j][k] = 0.02f + (rnd.nextFloat() * 0.4f);
+
                 sortedFlowIndices.add(new TupleIntFloat(j * (numCBGs) + k, this.rawFlowData[j][k]));
                 thirdPointDeviationPercentages[j][k] = (float) (minThirdPointCurveDeviationPercent + rnd.nextFloat() * (maxThirdPointCurveDeviationPercent - minThirdPointCurveDeviationPercent));
                 quarantinedFlowData[j][k] = rawFlowData[j][k] + ((rnd.nextFloat() - 0.5f) * 0.6f);
                 sortedFlowIndicesReduced.add(new TupleIntFloat(j * (numCBGs) + k, this.quarantinedFlowData[j][k]));
                 if (rnd.nextDouble() < 0.00001) {
+                    isDrawRandomArc.add(true);
+                    isDrawRandomArcReduced.add(true);
+                } else {
+                    isDrawRandomArc.add(false);
+                    isDrawRandomArcReduced.add(false);
+                }
+                if (j == testCBG) {
+                    isDrawRandomArc.add(true);
+                    isDrawRandomArcReduced.add(true);
+                }
+                if (j == 27 || j == 43 || j == 88) {
+                    if (rnd.nextDouble() < 0.05) {
                         isDrawRandomArc.add(true);
                         isDrawRandomArcReduced.add(true);
-                    } else {
-                        isDrawRandomArc.add(false);
-                        isDrawRandomArcReduced.add(false);
                     }
-                    if (j == testCBG) {
-                        isDrawRandomArc.add(true);
-                        isDrawRandomArcReduced.add(true);
-                    }
-                    if (j == 27 || j == 43 || j == 88) {
-                        if (rnd.nextDouble() < 0.05) {
-                            isDrawRandomArc.add(true);
-                            isDrawRandomArcReduced.add(true);
-                        }
-                    }
+                }
             }
         }
         for (int j = 0; j < isDrawRandomArcReduced.size(); j++) {
@@ -823,7 +834,7 @@ public class ProcessingMapRenderer extends PApplet {
             int x = (int) (Math.floor(sortedFlowIndices.get(h).index / rawFlowData.length));
 //            strokeWeight(1 + quarantinedFlowData[x][y] * 6.7f);
             strokeWeight(1 + rawFlowData[x][y] * 6.7f);
-            stroke(40 + (float) Math.pow(rawFlowData[x][y], 0.4) * 220, 0, 0, Math.max(0, -1 + (float) Math.pow(rawFlowData[x][y] * 4, 5)+51f));
+            stroke(40 + (float) Math.pow(rawFlowData[x][y], 0.4) * 220, 0, 0, Math.max(0, -1 + (float) Math.pow(rawFlowData[x][y] * 4, 5) + 51f));
 //            stroke(40 + (float) Math.pow(rawFlowData[x][y], 0.4) * 220, 0, 0, 250);
             if (isDrawRandomArc.get(h) == true) {
                 drawArc(x, y, latLons[x], latLons[y], 0.00045f);
@@ -833,7 +844,7 @@ public class ProcessingMapRenderer extends PApplet {
             x = (int) (Math.floor(sortedFlowIndicesReduced.get(h).index / quarantinedFlowData.length));
 //            strokeWeight(1 + quarantinedFlowData[x][y] * 6.7f);
             strokeWeight(1 + quarantinedFlowData[x][y] * 6.7f);
-            stroke(0, 0, 40 + (float) Math.pow(quarantinedFlowData[x][y], 0.4) * 220, Math.max(0, -1 + (float) Math.pow(quarantinedFlowData[x][y] * 4, 3.9f)+51f));
+            stroke(0, 0, 40 + (float) Math.pow(quarantinedFlowData[x][y], 0.4) * 220, Math.max(0, -1 + (float) Math.pow(quarantinedFlowData[x][y] * 4, 3.9f) + 51f));
             if (isDrawRandomArcReduced.get(h) == true) {
                 drawArc(x, y, latLons[x], latLons[y], -0.00045f);
             }
@@ -903,6 +914,52 @@ public class ProcessingMapRenderer extends PApplet {
 
     public void saveFile() {
         isSave = true;
+    }
+
+    public void setDrawAgeRangeData(ArrayList<Marker> items, ArrayList<ArrayList<Float>> dists) {
+        ArrayList<Location> locations = new ArrayList();
+        for (int i = 0; i < items.size(); i++) {
+            locations.add(new Location(items.get(i).lon, items.get(i).lat));
+        }
+        distributionLocations = locations;
+        distribution = dists;
+        isDrawDistributions = true;
+        isShowGISMarkers = false;
+        isShowAgentMarkers = false;
+
+    }
+
+    private void drawDistributions() {
+        if (distributionLocations != null && distribution != null) {
+            float step = 1f / (distribution.get(0).size() + 1f);
+            Color[] colors = new Color[distribution.get(0).size()];
+            for(int i=0;i<colors.length;i++){
+                colors[i]=Color.getHSBColor(i*step, 1f, 1f);
+            }
+            for (int i = 0; i < distributionLocations.size(); i++) {
+                SimplePointMarker locSM = new SimplePointMarker(distributionLocations.get(i));
+                ScreenPosition scLocPos = locSM.getScreenPosition(map);
+                for(int j=0;j<colors.length;j++){
+                    if(i!=targetCBG){
+                        stroke(0,0,0);
+                        fill(colors[j].getRed(), colors[j].getGreen(), colors[j].getBlue(), 100.0F);
+                        rect(scLocPos.x+j*5, scLocPos.y,5,-distribution.get(i).get(j)*0.05f);
+                    }else{
+                        stroke(255,0,0);
+                        fill(colors[j].getRed(), colors[j].getGreen(), colors[j].getBlue(), 100.0F);
+                        rect(scLocPos.x+j*5, scLocPos.y,5,-distribution.get(i).get(j)*0.05f);
+                    }
+                }
+//                ellipse(scLocPos.x, scLocPos.y, 30, 30);
+//                if (isShowText == true) {
+//                    fill(200.0F, 0.0F, 0.0F, 256.0F);
+//                    text(drawingChildrenNames[i], scLocPos.x - textWidth(drawingChildrenNames[i]) / 2.0F, scLocPos.y + 4.0F);
+//                }
+                stroke(0,0,0);
+                fill(0,0,0);
+                text(String.valueOf(i),scLocPos.x,scLocPos.y+15);
+            }
+        }
     }
 
 }

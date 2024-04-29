@@ -4,14 +4,13 @@ import static COVID_AgentBasedSimulation.Model.MainModel.softwareVersion;
 import COVID_AgentBasedSimulation.Model.Structure.CensusBlockGroup;
 import java.io.Serializable;
 import java.util.ArrayList;
-import lombok.Getter;
-import lombok.Setter;
+//import lombok.Getter;
+//import lombok.Setter;
 
 /**
  *
  * @author Amir Mohammad Esmaieeli Sikaroudi
  */
-@Getter @Setter
 public class SafegraphPlace implements Serializable, Comparable<SafegraphPlace> {
     static final long serialVersionUID = softwareVersion;
     

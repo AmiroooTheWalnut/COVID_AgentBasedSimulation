@@ -32,16 +32,14 @@ import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import lombok.Getter;
-import lombok.Setter;
+//import lombok.Getter;
+//import lombok.Setter;
 import org.objenesis.strategy.StdInstantiatorStrategy;
 
 /**
  *
  * @author Amir Mohammad Esmaieeli Sikaroudi
  */
-@Getter
-@Setter
 public class CovidCsseJhu extends Dataset implements Serializable {
 
     static final long serialVersionUID = softwareVersion;

@@ -37,15 +37,13 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import lombok.Getter;
-import lombok.Setter;
+//import lombok.Getter;
+//import lombok.Setter;
 
 /**
  *
  * @author Amir Mohammad Esmaieeli Sikaroudi
  */
-@Getter
-@Setter
 public class AgentBasedModel {
 
     public transient String filePath;
@@ -669,4 +667,11 @@ public class AgentBasedModel {
         return -1;
     }
 
+    public Object getStudyScopeGeography(){
+        return studyScopeGeography;
+    }
+    
+    public ZonedDateTime getCurrentTime(){
+        return currentTime;
+    }
 }

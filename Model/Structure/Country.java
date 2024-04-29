@@ -3,14 +3,13 @@ package COVID_AgentBasedSimulation.Model.Structure;
 import static COVID_AgentBasedSimulation.Model.MainModel.softwareVersion;
 import java.io.Serializable;
 import java.util.ArrayList;
-import lombok.Getter;
-import lombok.Setter;
+//import lombok.Getter;
+//import lombok.Setter;
 
 /**
  *
  * @author Amir Mohammad Esmaieeli Sikaroudi
  */
-@Getter @Setter
 public class Country extends Scope implements Serializable {
     static final long serialVersionUID = softwareVersion;
     public String name;
@@ -145,6 +144,21 @@ public class Country extends Scope implements Serializable {
         temp.id = input;
         states.add(temp);
         return states.get(states.size()-1);
+    }
+    
+    public CensusBlockGroup findCBG(long input) {
+        for(int i=0;i<states.size();i++){
+            for(int j=0;j<states.get(i).counties.size();j++){
+                for(int k=0;k<states.get(i).counties.get(j).censusTracts.size();k++){
+                    for(int m=0;m<states.get(i).counties.get(j).censusTracts.get(k).censusBlocks.size();m++){
+                        if(states.get(i).counties.get(j).censusTracts.get(k).censusBlocks.get(m).id==input){
+                            return states.get(i).counties.get(j).censusTracts.get(k).censusBlocks.get(m);
+                        }
+                    }
+                }
+            }
+        }
+        return null;
     }
 
 }

@@ -7,15 +7,13 @@ package COVID_AgentBasedSimulation.Model.AgentBasedModel;
 
 import COVID_AgentBasedSimulation.Model.MainModel;
 import java.util.ArrayList;
-import lombok.Getter;
-import lombok.Setter;
+//import lombok.Getter;
+//import lombok.Setter;
 
 /**
  *
  * @author Amir Mohammad Esmaieeli Sikaroudi
  */
-@Getter
-@Setter
 public class Agent {
 
     public int myIndex;

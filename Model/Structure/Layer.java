@@ -4,14 +4,13 @@
  * and open the template in the editor.
  */
 package COVID_AgentBasedSimulation.Model.Structure;
-import lombok.Getter;
-import lombok.Setter;
+//import lombok.Getter;
+//import lombok.Setter;
 
 /**
  *
  * @author Amir Mohammad Esmaieeli Sikaroudi
  */
-@Getter @Setter
 public class Layer {
     String name;
 }

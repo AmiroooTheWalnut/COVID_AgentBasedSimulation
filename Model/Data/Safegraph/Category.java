@@ -7,14 +7,13 @@ package COVID_AgentBasedSimulation.Model.Data.Safegraph;
 
 import static COVID_AgentBasedSimulation.Model.MainModel.softwareVersion;
 import java.io.Serializable;
-import lombok.Getter;
-import lombok.Setter;
+//import lombok.Getter;
+//import lombok.Setter;
 
 /**
  *
  * @author Amir Mohammad Esmaieeli Sikaroudi
  */
-@Getter @Setter
 public class Category implements Serializable {
     static final long serialVersionUID = softwareVersion;
     

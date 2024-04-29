@@ -5,10 +5,23 @@
  */
 package COVID_AgentBasedSimulation.GUI;
 
+import COVID_AgentBasedSimulation.GUI.GraphicalModel.GraphicalModelDialog;
 import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.ProcessingMapRenderer;
+import COVID_AgentBasedSimulation.GUI.VoronoiGIS.GISLocationDialog;
+import COVID_AgentBasedSimulation.Model.Data.Safegraph.CensusBlockGroupIntegerTuple;
+import COVID_AgentBasedSimulation.Model.GraphicalModel.AgeOccupationDists;
+import COVID_AgentBasedSimulation.Model.Structure.CensusBlockGroup;
+import COVID_AgentBasedSimulation.Model.Structure.City;
 import COVID_AgentBasedSimulation.Model.Structure.Marker;
+import com.opencsv.CSVWriter;
 import de.fhpotsdam.unfolding.geo.Location;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import jdistlib.BetaBinomial;
 
 /**
  *
@@ -26,6 +39,10 @@ public class PreviewDialog extends javax.swing.JDialog {
     public PreviewDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+
+        jTextField1.setEditable(false);
+        jTextField2.setEditable(false);
+
         myParent = (MainFrame) parent;
         refreshLists();
         ArrayList<String> result = myParent.mainModel.safegraph.checkMonthAvailability();
@@ -81,6 +98,21 @@ public class PreviewDialog extends javax.swing.JDialog {
         jPanel8 = new javax.swing.JPanel();
         jScrollPane7 = new javax.swing.JScrollPane();
         jList7 = new javax.swing.JList<>();
+        jButton1 = new javax.swing.JButton();
+        jToggleButton1 = new javax.swing.JToggleButton();
+        jToggleButton2 = new javax.swing.JToggleButton();
+        jToggleButton3 = new javax.swing.JToggleButton();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        jTextField1 = new javax.swing.JTextField();
+        jTextField2 = new javax.swing.JTextField();
+        jButton2 = new javax.swing.JButton();
+        jToggleButton4 = new javax.swing.JToggleButton();
+        jToggleButton5 = new javax.swing.JToggleButton();
+        jToggleButton6 = new javax.swing.JToggleButton();
+        jToggleButton7 = new javax.swing.JToggleButton();
+        jButton3 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
         jList4 = new javax.swing.JList<>();
@@ -118,7 +150,7 @@ public class PreviewDialog extends javax.swing.JDialog {
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 652, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 585, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("Country", jPanel1);
@@ -141,7 +173,7 @@ public class PreviewDialog extends javax.swing.JDialog {
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 652, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 585, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("State/Province", jPanel2);
@@ -164,7 +196,7 @@ public class PreviewDialog extends javax.swing.JDialog {
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 652, Short.MAX_VALUE)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 585, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("County", jPanel3);
@@ -179,15 +211,160 @@ public class PreviewDialog extends javax.swing.JDialog {
         });
         jScrollPane7.setViewportView(jList7);
 
+        jButton1.setText("Show CBG age ranges");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        jToggleButton1.setText("Most pure 0-18");
+        jToggleButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButton1ActionPerformed(evt);
+            }
+        });
+
+        jToggleButton2.setText("Most pure 19-64");
+        jToggleButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButton2ActionPerformed(evt);
+            }
+        });
+
+        jToggleButton3.setText("Most pure 65-inf");
+        jToggleButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButton3ActionPerformed(evt);
+            }
+        });
+
+        jLabel4.setText("CBG id:");
+
+        jLabel6.setText("CBG purity:");
+
+        jTextField1.setText("Not selected");
+
+        jTextField2.setText("Not selected");
+
+        jButton2.setText("Show CBG occupation ranges");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
+        jToggleButton4.setText("Most pure edu");
+        jToggleButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButton4ActionPerformed(evt);
+            }
+        });
+
+        jToggleButton5.setText("Most pure driver");
+        jToggleButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButton5ActionPerformed(evt);
+            }
+        });
+
+        jToggleButton6.setText("Most pure health");
+        jToggleButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButton6ActionPerformed(evt);
+            }
+        });
+
+        jToggleButton7.setText("Most pure service");
+        jToggleButton7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButton7ActionPerformed(evt);
+            }
+        });
+
+        jButton3.setText("Find best age-occupation CBGs");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+
+        jButton4.setText("Find best age CBGs");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
         jPanel8.setLayout(jPanel8Layout);
         jPanel8Layout.setHorizontalGroup(
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)
+            .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 284, Short.MAX_VALUE)
+            .addGroup(jPanel8Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel8Layout.createSequentialGroup()
+                        .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel8Layout.createSequentialGroup()
+                                .addComponent(jLabel6)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTextField1))
+                            .addGroup(jPanel8Layout.createSequentialGroup()
+                                .addComponent(jLabel4)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTextField2)))
+                        .addContainerGap())
+                    .addGroup(jPanel8Layout.createSequentialGroup()
+                        .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jButton1)
+                            .addComponent(jToggleButton2)
+                            .addComponent(jToggleButton3)
+                            .addComponent(jToggleButton1)
+                            .addComponent(jButton2)
+                            .addComponent(jToggleButton4)
+                            .addComponent(jToggleButton5)
+                            .addComponent(jToggleButton6)
+                            .addComponent(jToggleButton7)
+                            .addComponent(jButton3)
+                            .addComponent(jButton4))
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         jPanel8Layout.setVerticalGroup(
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane7, javax.swing.GroupLayout.Alignment.TRAILING)
+            .addGroup(jPanel8Layout.createSequentialGroup()
+                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton4)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton3)
+                .addGap(18, 18, 18)
+                .addComponent(jButton2)
+                .addGap(18, 18, 18)
+                .addComponent(jToggleButton4)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jToggleButton7)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jToggleButton6)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jToggleButton5)
+                .addGap(18, 18, 18)
+                .addComponent(jButton1)
+                .addGap(18, 18, 18)
+                .addComponent(jToggleButton1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jToggleButton2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jToggleButton3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel6)
+                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
 
         jTabbedPane1.addTab("City", jPanel8);
@@ -211,7 +388,7 @@ public class PreviewDialog extends javax.swing.JDialog {
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 652, Short.MAX_VALUE)
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 585, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("Census tract", jPanel4);
@@ -386,7 +563,7 @@ public class PreviewDialog extends javax.swing.JDialog {
             String[] childrenNames = new String[myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.size()];
             ArrayList<Marker> markers = new ArrayList();
             for (int i = 0; i < childrenNames.length; i++) {
-                childrenNames[i] = myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(i).name+"_"+myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(i).population;
+                childrenNames[i] = myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(i).name + "_" + myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(i).population;
                 markers.add(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(i));
             }
             myParent.child.setDrawingGISMarkers(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()), markers, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).name, childrenNames);
@@ -427,7 +604,7 @@ public class PreviewDialog extends javax.swing.JDialog {
             String[] childrenNames = new String[myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.size()];
             ArrayList<Marker> markers = new ArrayList();
             for (int i = 0; i < childrenNames.length; i++) {
-                childrenNames[i] = myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(i).name+"_"+myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(i).population;
+                childrenNames[i] = myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(i).name + "_" + myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(i).population;
                 markers.add(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(i));
             }
             myParent.child.setDrawingGISMarkers(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()), markers, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).name, childrenNames);
@@ -493,7 +670,7 @@ public class PreviewDialog extends javax.swing.JDialog {
             String[] childrenNames = new String[myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.size()];
             ArrayList<Marker> markers = new ArrayList();
             for (int i = 0; i < childrenNames.length; i++) {
-                childrenNames[i] = String.valueOf(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(i).id)+"_"+myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(i).population;
+                childrenNames[i] = String.valueOf(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(i).id) + "_" + myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(i).population;
                 markers.add(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(i));
             }
             myParent.child.setDrawingGISMarkers(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()), markers, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).name, childrenNames);
@@ -529,7 +706,7 @@ public class PreviewDialog extends javax.swing.JDialog {
             String[] childrenNames = new String[myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.size()];
             ArrayList<Marker> markers = new ArrayList();
             for (int i = 0; i < childrenNames.length; i++) {
-                childrenNames[i] = String.valueOf(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.get(i).id)+"_"+myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.get(i).population;
+                childrenNames[i] = String.valueOf(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.get(i).id) + "_" + myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.get(i).population;
                 markers.add(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).censusBlocks.get(i));
             }
             myParent.child.setDrawingGISMarkers(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()), markers, String.valueOf(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).censusTracts.get(jList4.getSelectedIndex()).id), childrenNames);
@@ -588,7 +765,7 @@ public class PreviewDialog extends javax.swing.JDialog {
             String[] childrenNames = new String[myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList7.getSelectedIndex()).censusTracts.size()];
             ArrayList<Marker> markers = new ArrayList();
             for (int i = 0; i < childrenNames.length; i++) {
-                childrenNames[i] = String.valueOf(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList7.getSelectedIndex()).censusTracts.get(i).id)+"_"+myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList7.getSelectedIndex()).censusTracts.get(i).population;
+                childrenNames[i] = String.valueOf(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList7.getSelectedIndex()).censusTracts.get(i).id) + "_" + myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList7.getSelectedIndex()).censusTracts.get(i).population;
                 markers.add(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList7.getSelectedIndex()).censusTracts.get(i));
             }
             myParent.child.setDrawingGISMarkers(myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList7.getSelectedIndex()), markers, myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList7.getSelectedIndex()).name, childrenNames);
@@ -606,15 +783,660 @@ public class PreviewDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jPanel7AncestorResized
 
     private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
-        myParent.child.isShowText=jCheckBox1.isSelected();
+        myParent.child.isShowText = jCheckBox1.isSelected();
     }//GEN-LAST:event_jCheckBox1ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        if (jList7.getSelectedIndex() > -1) {
+            ArrayList<Marker> items = new ArrayList();
+            ArrayList<ArrayList<Float>> dists = new ArrayList();
+            City city = myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList7.getSelectedIndex());
+            for (int i = 0; i < city.censusTracts.size(); i++) {
+                for (int j = 0; j < city.censusTracts.get(i).censusBlocks.size(); j++) {
+                    items.add(city.censusTracts.get(i).censusBlocks.get(j));
+                    ArrayList<Float> internalDist = new ArrayList();
+                    internalDist.add((float) (city.censusTracts.get(i).censusBlocks.get(j).age0_18));
+                    internalDist.add((float) (city.censusTracts.get(i).censusBlocks.get(j).age19_64));
+                    internalDist.add((float) (city.censusTracts.get(i).censusBlocks.get(j).age65_inf));
+                    dists.add(internalDist);
+                }
+            }
+            myParent.child.setDrawAgeRangeData(items, dists);
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
+        if (jToggleButton1.isSelected()) {
+            jToggleButton2.setSelected(false);
+            jToggleButton3.setSelected(false);
+            if (jList7.getSelectedIndex() > -1) {
+                City city = myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList7.getSelectedIndex());
+                int bestCBGIndex = -1;
+                long bestCBGId = -1;
+                float maxPercentage = 0;
+                int counter = 0;
+                for (int i = 0; i < city.censusTracts.size(); i++) {
+                    for (int j = 0; j < city.censusTracts.get(i).censusBlocks.size(); j++) {
+                        float sum = 0;
+                        sum = sum + (float) (city.censusTracts.get(i).censusBlocks.get(j).age0_18);
+                        sum = sum + (float) (city.censusTracts.get(i).censusBlocks.get(j).age19_64);
+                        sum = sum + (float) (city.censusTracts.get(i).censusBlocks.get(j).age65_inf);
+                        float age0_18_percentage = ((float) (city.censusTracts.get(i).censusBlocks.get(j).age0_18) / sum) * 100;
+                        if (maxPercentage < age0_18_percentage) {
+                            maxPercentage = age0_18_percentage;
+                            bestCBGIndex = counter;
+                            bestCBGId = city.censusTracts.get(i).censusBlocks.get(j).id;
+                        }
+                        counter = counter + 1;
+                    }
+                }
+                myParent.child.targetCBG = bestCBGIndex;
+                jTextField2.setText(String.valueOf(bestCBGId));
+                jTextField1.setText(String.valueOf(maxPercentage));
+                System.out.println("BEST CBG FOR 0-18 IS: " + bestCBGIndex + " WITH PERCENTAGE OF: " + maxPercentage);
+            }
+        } else {
+            myParent.child.targetCBG = -1;
+            jTextField2.setText("Not selected");
+            jTextField1.setText("Not selected");
+        }
+    }//GEN-LAST:event_jToggleButton1ActionPerformed
+
+    private void jToggleButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton2ActionPerformed
+        if (jToggleButton2.isSelected()) {
+            jToggleButton1.setSelected(false);
+            jToggleButton3.setSelected(false);
+            if (jList7.getSelectedIndex() > -1) {
+                City city = myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList7.getSelectedIndex());
+                int bestCBGIndex = -1;
+                long bestCBGId = -1;
+                float maxPercentage = 0;
+                int counter = 0;
+                for (int i = 0; i < city.censusTracts.size(); i++) {
+                    for (int j = 0; j < city.censusTracts.get(i).censusBlocks.size(); j++) {
+                        float sum = 0;
+                        sum = sum + (float) (city.censusTracts.get(i).censusBlocks.get(j).age0_18);
+                        sum = sum + (float) (city.censusTracts.get(i).censusBlocks.get(j).age19_64);
+                        sum = sum + (float) (city.censusTracts.get(i).censusBlocks.get(j).age65_inf);
+                        float age19_64_percentage = ((float) (city.censusTracts.get(i).censusBlocks.get(j).age19_64) / sum) * 100;
+                        if (maxPercentage < age19_64_percentage) {
+                            maxPercentage = age19_64_percentage;
+                            bestCBGIndex = counter;
+                            bestCBGId = city.censusTracts.get(i).censusBlocks.get(j).id;
+                        }
+                        counter = counter + 1;
+                    }
+                }
+                myParent.child.targetCBG = bestCBGIndex;
+                jTextField2.setText(String.valueOf(bestCBGId));
+                jTextField1.setText(String.valueOf(maxPercentage));
+                System.out.println("BEST CBG FOR 19-64 IS: " + bestCBGIndex + " WITH PERCENTAGE OF: " + maxPercentage);
+            }
+        } else {
+            myParent.child.targetCBG = -1;
+            jTextField2.setText("Not selected");
+            jTextField1.setText("Not selected");
+        }
+    }//GEN-LAST:event_jToggleButton2ActionPerformed
+
+    private void jToggleButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton3ActionPerformed
+        if (jToggleButton3.isSelected()) {
+            jToggleButton1.setSelected(false);
+            jToggleButton2.setSelected(false);
+            if (jList7.getSelectedIndex() > -1) {
+                City city = myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList7.getSelectedIndex());
+                int bestCBGIndex = -1;
+                long bestCBGId = -1;
+                float maxPercentage = 0;
+                int counter = 0;
+                for (int i = 0; i < city.censusTracts.size(); i++) {
+                    for (int j = 0; j < city.censusTracts.get(i).censusBlocks.size(); j++) {
+                        float sum = 0;
+                        sum = sum + (float) (city.censusTracts.get(i).censusBlocks.get(j).age0_18);
+                        sum = sum + (float) (city.censusTracts.get(i).censusBlocks.get(j).age19_64);
+                        sum = sum + (float) (city.censusTracts.get(i).censusBlocks.get(j).age65_inf);
+                        float age65_inf_percentage = ((float) (city.censusTracts.get(i).censusBlocks.get(j).age65_inf) / sum) * 100;
+                        if (maxPercentage < age65_inf_percentage) {
+                            maxPercentage = age65_inf_percentage;
+                            bestCBGIndex = counter;
+                            bestCBGId = city.censusTracts.get(i).censusBlocks.get(j).id;
+                        }
+                        counter = counter + 1;
+                    }
+                }
+                myParent.child.targetCBG = bestCBGIndex;
+                jTextField2.setText(String.valueOf(bestCBGId));
+                jTextField1.setText(String.valueOf(maxPercentage));
+                System.out.println("BEST CBG FOR 65-INF IS: " + bestCBGIndex + " WITH PERCENTAGE OF: " + maxPercentage);
+            }
+        } else {
+            myParent.child.targetCBG = -1;
+            jTextField2.setText("Not selected");
+            jTextField1.setText("Not selected");
+        }
+    }//GEN-LAST:event_jToggleButton3ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        if (jList7.getSelectedIndex() > -1) {
+            ArrayList<Marker> items = new ArrayList();
+            ArrayList<ArrayList<Float>> dists = new ArrayList();
+            City city = myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList7.getSelectedIndex());
+            for (int i = 0; i < city.censusTracts.size(); i++) {
+                for (int j = 0; j < city.censusTracts.get(i).censusBlocks.size(); j++) {
+                    items.add(city.censusTracts.get(i).censusBlocks.get(j));
+                    ArrayList<Float> internalDist = new ArrayList();
+                    internalDist.add((float) (city.censusTracts.get(i).censusBlocks.get(j).edu));
+                    internalDist.add((float) (city.censusTracts.get(i).censusBlocks.get(j).service));
+                    internalDist.add((float) (city.censusTracts.get(i).censusBlocks.get(j).health));
+                    internalDist.add((float) (city.censusTracts.get(i).censusBlocks.get(j).driver));
+                    dists.add(internalDist);
+                }
+            }
+            myParent.child.setDrawAgeRangeData(items, dists);
+        }
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jToggleButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton4ActionPerformed
+        if (jToggleButton4.isSelected()) {
+            jToggleButton5.setSelected(false);
+            jToggleButton6.setSelected(false);
+            jToggleButton7.setSelected(false);
+            if (jList7.getSelectedIndex() > -1) {
+                City city = myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList7.getSelectedIndex());
+                int bestCBGIndex = -1;
+                long bestCBGId = -1;
+                float maxPercentage = 0;
+                int counter = 0;
+                for (int i = 0; i < city.censusTracts.size(); i++) {
+                    for (int j = 0; j < city.censusTracts.get(i).censusBlocks.size(); j++) {
+                        float sum = 0;
+                        sum = sum + (float) (city.censusTracts.get(i).censusBlocks.get(j).edu);
+                        sum = sum + (float) (city.censusTracts.get(i).censusBlocks.get(j).service);
+                        sum = sum + (float) (city.censusTracts.get(i).censusBlocks.get(j).health);
+                        sum = sum + (float) (city.censusTracts.get(i).censusBlocks.get(j).driver);
+                        float edu_percentage = ((float) (city.censusTracts.get(i).censusBlocks.get(j).edu) / sum) * 100;
+                        if (maxPercentage < edu_percentage) {
+                            maxPercentage = edu_percentage;
+                            bestCBGIndex = counter;
+                            bestCBGId = city.censusTracts.get(i).censusBlocks.get(j).id;
+                        }
+                        counter = counter + 1;
+                    }
+                }
+                myParent.child.targetCBG = bestCBGIndex;
+                jTextField2.setText(String.valueOf(bestCBGId));
+                jTextField1.setText(String.valueOf(maxPercentage));
+                System.out.println("BEST CBG FOR EDU IS: " + bestCBGIndex + " WITH PERCENTAGE OF: " + maxPercentage);
+            }
+        } else {
+            myParent.child.targetCBG = -1;
+            jTextField2.setText("Not selected");
+            jTextField1.setText("Not selected");
+        }
+    }//GEN-LAST:event_jToggleButton4ActionPerformed
+
+    private void jToggleButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton5ActionPerformed
+        if (jToggleButton5.isSelected()) {
+            jToggleButton4.setSelected(false);
+            jToggleButton6.setSelected(false);
+            jToggleButton7.setSelected(false);
+            if (jList7.getSelectedIndex() > -1) {
+                City city = myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList7.getSelectedIndex());
+                int bestCBGIndex = -1;
+                long bestCBGId = -1;
+                float maxPercentage = 0;
+                int counter = 0;
+                for (int i = 0; i < city.censusTracts.size(); i++) {
+                    for (int j = 0; j < city.censusTracts.get(i).censusBlocks.size(); j++) {
+                        float sum = 0;
+                        sum = sum + (float) (city.censusTracts.get(i).censusBlocks.get(j).edu);
+                        sum = sum + (float) (city.censusTracts.get(i).censusBlocks.get(j).service);
+                        sum = sum + (float) (city.censusTracts.get(i).censusBlocks.get(j).health);
+                        sum = sum + (float) (city.censusTracts.get(i).censusBlocks.get(j).driver);
+                        float edu_percentage = ((float) (city.censusTracts.get(i).censusBlocks.get(j).driver) / sum) * 100;
+                        if (maxPercentage < edu_percentage) {
+                            maxPercentage = edu_percentage;
+                            bestCBGIndex = counter;
+                            bestCBGId = city.censusTracts.get(i).censusBlocks.get(j).id;
+                        }
+                        counter = counter + 1;
+                    }
+                }
+                myParent.child.targetCBG = bestCBGIndex;
+                jTextField2.setText(String.valueOf(bestCBGId));
+                jTextField1.setText(String.valueOf(maxPercentage));
+                System.out.println("BEST CBG FOR DRIVER IS: " + bestCBGIndex + " WITH PERCENTAGE OF: " + maxPercentage);
+            }
+        } else {
+            myParent.child.targetCBG = -1;
+            jTextField2.setText("Not selected");
+            jTextField1.setText("Not selected");
+        }
+    }//GEN-LAST:event_jToggleButton5ActionPerformed
+
+    private void jToggleButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton6ActionPerformed
+        if (jToggleButton6.isSelected()) {
+            jToggleButton5.setSelected(false);
+            jToggleButton4.setSelected(false);
+            jToggleButton7.setSelected(false);
+            if (jList7.getSelectedIndex() > -1) {
+                City city = myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList7.getSelectedIndex());
+                int bestCBGIndex = -1;
+                long bestCBGId = -1;
+                float maxPercentage = 0;
+                int counter = 0;
+                for (int i = 0; i < city.censusTracts.size(); i++) {
+                    for (int j = 0; j < city.censusTracts.get(i).censusBlocks.size(); j++) {
+                        float sum = 0;
+                        sum = sum + (float) (city.censusTracts.get(i).censusBlocks.get(j).edu);
+                        sum = sum + (float) (city.censusTracts.get(i).censusBlocks.get(j).service);
+                        sum = sum + (float) (city.censusTracts.get(i).censusBlocks.get(j).health);
+                        sum = sum + (float) (city.censusTracts.get(i).censusBlocks.get(j).driver);
+                        float edu_percentage = ((float) (city.censusTracts.get(i).censusBlocks.get(j).health) / sum) * 100;
+                        if (maxPercentage < edu_percentage) {
+                            maxPercentage = edu_percentage;
+                            bestCBGIndex = counter;
+                            bestCBGId = city.censusTracts.get(i).censusBlocks.get(j).id;
+                        }
+                        counter = counter + 1;
+                    }
+                }
+                myParent.child.targetCBG = bestCBGIndex;
+                jTextField2.setText(String.valueOf(bestCBGId));
+                jTextField1.setText(String.valueOf(maxPercentage));
+                System.out.println("BEST CBG FOR HEALTH IS: " + bestCBGIndex + " WITH PERCENTAGE OF: " + maxPercentage);
+            }
+        } else {
+            myParent.child.targetCBG = -1;
+            jTextField2.setText("Not selected");
+            jTextField1.setText("Not selected");
+        }
+    }//GEN-LAST:event_jToggleButton6ActionPerformed
+
+    private void jToggleButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton7ActionPerformed
+        if (jToggleButton7.isSelected()) {
+            jToggleButton5.setSelected(false);
+            jToggleButton6.setSelected(false);
+            jToggleButton4.setSelected(false);
+            if (jList7.getSelectedIndex() > -1) {
+                City city = myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList7.getSelectedIndex());
+                int bestCBGIndex = -1;
+                long bestCBGId = -1;
+                float maxPercentage = 0;
+                int counter = 0;
+                for (int i = 0; i < city.censusTracts.size(); i++) {
+                    for (int j = 0; j < city.censusTracts.get(i).censusBlocks.size(); j++) {
+                        float sum = 0;
+                        sum = sum + (float) (city.censusTracts.get(i).censusBlocks.get(j).edu);
+                        sum = sum + (float) (city.censusTracts.get(i).censusBlocks.get(j).service);
+                        sum = sum + (float) (city.censusTracts.get(i).censusBlocks.get(j).health);
+                        sum = sum + (float) (city.censusTracts.get(i).censusBlocks.get(j).driver);
+                        float edu_percentage = ((float) (city.censusTracts.get(i).censusBlocks.get(j).service) / sum) * 100;
+                        if (maxPercentage < edu_percentage) {
+                            maxPercentage = edu_percentage;
+                            bestCBGIndex = counter;
+                            bestCBGId = city.censusTracts.get(i).censusBlocks.get(j).id;
+                        }
+                        counter = counter + 1;
+                    }
+                }
+                myParent.child.targetCBG = bestCBGIndex;
+                jTextField2.setText(String.valueOf(bestCBGId));
+                jTextField1.setText(String.valueOf(maxPercentage));
+                System.out.println("BEST CBG FOR SERVICE IS: " + bestCBGIndex + " WITH PERCENTAGE OF: " + maxPercentage);
+            }
+        } else {
+            myParent.child.targetCBG = -1;
+            jTextField2.setText("Not selected");
+            jTextField1.setText("Not selected");
+        }
+    }//GEN-LAST:event_jToggleButton7ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        if (jList7.getSelectedIndex() > -1) {
+            City city = myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList7.getSelectedIndex());
+            float[][] allAgeOccPurities = new float[3][4];
+            //              edu service health driver
+            //  age 1-18    
+            //  age 19-64       X
+            //  age 65-inf
+            CensusBlockGroup[][] ageOccCBGIDs = new CensusBlockGroup[3][4];
+            for (int i = 0; i < city.censusTracts.size(); i++) {
+                for (int j = 0; j < city.censusTracts.get(i).censusBlocks.size(); j++) {
+                    float[][] ageOccPurities = new float[3][4];
+                    float ageMostPure = 0;
+                    float ageMostPureIndex = -1;
+                    float sumAge = city.censusTracts.get(i).censusBlocks.get(j).age0_18 + city.censusTracts.get(i).censusBlocks.get(j).age19_64 + city.censusTracts.get(i).censusBlocks.get(j).age65_inf;
+                    float[] agePercentages = new float[3];
+
+                    agePercentages[0] = city.censusTracts.get(i).censusBlocks.get(j).age0_18 / sumAge;
+                    ageMostPure = agePercentages[0];
+                    ageMostPureIndex = 0;
+                    agePercentages[1] = city.censusTracts.get(i).censusBlocks.get(j).age19_64 / sumAge;
+                    if (agePercentages[1] > ageMostPure) {
+                        ageMostPure = agePercentages[1];
+                        ageMostPureIndex = 1;
+                    }
+                    agePercentages[2] = city.censusTracts.get(i).censusBlocks.get(j).age65_inf / sumAge;
+                    if (agePercentages[2] > ageMostPure) {
+                        ageMostPure = agePercentages[2];
+                        ageMostPureIndex = 2;
+                    }
+                    float occMostPure = 0;
+                    float occMostPureIndex = -1;
+                    float sumOcc = city.censusTracts.get(i).censusBlocks.get(j).edu + city.censusTracts.get(i).censusBlocks.get(j).service + city.censusTracts.get(i).censusBlocks.get(j).health + city.censusTracts.get(i).censusBlocks.get(j).driver;
+                    float[] occPercentages = new float[4];
+
+                    occPercentages[0] = city.censusTracts.get(i).censusBlocks.get(j).edu / sumOcc;
+                    occMostPure = occPercentages[0];
+                    occMostPureIndex = 0;
+                    occPercentages[1] = city.censusTracts.get(i).censusBlocks.get(j).service / sumOcc;
+                    if (occPercentages[1] > occMostPure) {
+                        occMostPure = occPercentages[1];
+                        occMostPureIndex = 1;
+                    }
+                    occPercentages[2] = city.censusTracts.get(i).censusBlocks.get(j).health / sumOcc;
+                    if (occPercentages[2] > occMostPure) {
+                        occMostPure = occPercentages[2];
+                        occMostPureIndex = 2;
+                    }
+                    occPercentages[3] = city.censusTracts.get(i).censusBlocks.get(j).driver / sumOcc;
+                    if (occPercentages[3] > occMostPure) {
+                        occMostPure = occPercentages[3];
+                        occMostPureIndex = 3;
+                    }
+                    for (int a = 0; a < agePercentages.length; a++) {
+                        for (int o = 0; o < occPercentages.length; o++) {
+                            if (((agePercentages[a] + occPercentages[o]) / 2f) > allAgeOccPurities[a][o]) {
+                                allAgeOccPurities[a][o] = ((agePercentages[a] + occPercentages[o]) / 2f);
+                                ageOccCBGIDs[a][o] = city.censusTracts.get(i).censusBlocks.get(j);
+                            }
+                        }
+                    }
+                }
+            }
+            AgeOccupationDists aod = new AgeOccupationDists();
+            float age_19_64_percentage = (float) (ageOccCBGIDs[1][1].age19_64) / (ageOccCBGIDs[1][1].age0_18 + ageOccCBGIDs[1][1].age19_64 + ageOccCBGIDs[1][1].age65_inf);
+            float age_edu_percentage = (float) (ageOccCBGIDs[1][1].edu) / (ageOccCBGIDs[1][1].edu + ageOccCBGIDs[1][1].service + ageOccCBGIDs[1][1].health + ageOccCBGIDs[1][1].driver);
+            float numOutwardEduVisits = (float) (aod.mean0_18_Service_Edu * age_19_64_percentage * age_edu_percentage * ageOccCBGIDs[1][1].population);
+            float[] cBGEduProbs = aod.getSchoolDistsFromCBG(43 - 1);
+            float[] genTrajectories = new float[cBGEduProbs.length];
+            float newSum = 0;
+            for (int i = 0; i < cBGEduProbs.length; i++) {
+                newSum = newSum + numOutwardEduVisits * cBGEduProbs[i];
+                genTrajectories[i] = numOutwardEduVisits * cBGEduProbs[i];
+            }
+            float diffPer = (newSum - numOutwardEduVisits) / cBGEduProbs.length;
+            for (int i = 0; i < cBGEduProbs.length; i++) {
+                genTrajectories[i] = Math.max(genTrajectories[i] - diffPer, 0);
+            }
+            myParent.mainModel.safegraph.clearPatternsPlaces();
+            String[] vals = jList6.getSelectedValue().split("_");
+            String patternName = vals[1] + "_" + vals[2];
+            myParent.mainModel.safegraph.loadPatternsPlacesSet(myParent.mainModel.datasetDirectory, patternName, myParent.mainModel.allGISData, myParent.mainModel.ABM.studyScope, true, myParent.numProcessors);
+
+            int numSchools = 0;
+            for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.size(); i++) {
+                if (GISLocationDialog.isSchool(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).place.naics_code) == true) {
+                    numSchools = numSchools + 1;
+                }
+            }
+            int[] outputCBGSchoolVis = new int[numSchools];
+            int schoolIndex = 0;
+            for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.size(); i++) {
+                if (GISLocationDialog.isSchool(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).place.naics_code) == true) {
+                    ArrayList<CensusBlockGroupIntegerTuple> hCBGs = myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).visitor_home_cbgs_place;
+                    if (hCBGs != null) {
+                        for (int j = 0; j < hCBGs.size(); j++) {
+//                        for (int m = 0; m < allCBGs.size(); m++) {
+                            if (hCBGs.get(j).key.id == ageOccCBGIDs[1][1].id) {
+                                outputCBGSchoolVis[schoolIndex] = outputCBGSchoolVis[schoolIndex] + hCBGs.get(j).value;
+                            }
+//                        }
+                        }
+                    }
+                    schoolIndex = schoolIndex + 1;
+                }
+            }
+//            int counter=1;
+//            for (int i = 0; i < ((City) (myParent.mainModel.ABM.studyScopeGeography)).censusTracts.size(); i++) {
+//                for (int j = 0; j < ((City) (myParent.mainModel.ABM.studyScopeGeography)).censusTracts.get(i).censusBlocks.size(); j++) {
+//                    if(((City) (myParent.mainModel.ABM.studyScopeGeography)).censusTracts.get(i).censusBlocks.get(j).id==ageOccCBGIDs[1][1].id){
+//                        System.out.println("FOUND CBG");
+//                    }
+//                    counter=counter+1;
+//                }
+//            }
+//                BetaBinomial bb=new BetaBinomial();
+
+            System.out.println("FINISHED!");
+        }
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        if (jList7.getSelectedIndex() > -1) {
+            City city = myParent.mainModel.allGISData.countries.get(jList1.getSelectedIndex()).states.get(jList2.getSelectedIndex()).counties.get(jList3.getSelectedIndex()).cities.get(jList7.getSelectedIndex());
+            float[] allAgePurities = new float[3];
+            //  age 1-18    
+            //  age 19-64       X
+            //  age 65-inf
+            CensusBlockGroup[] ageCBGIDs = new CensusBlockGroup[3];
+            for (int i = 0; i < city.censusTracts.size(); i++) {
+                for (int j = 0; j < city.censusTracts.get(i).censusBlocks.size(); j++) {
+                    float[][] ageOccPurities = new float[3][4];
+                    float ageMostPure = 0;
+                    float ageMostPureIndex = -1;
+                    float sumAge = city.censusTracts.get(i).censusBlocks.get(j).age0_18 + city.censusTracts.get(i).censusBlocks.get(j).age19_64 + city.censusTracts.get(i).censusBlocks.get(j).age65_inf;
+                    float[] agePercentages = new float[3];
+
+                    agePercentages[0] = city.censusTracts.get(i).censusBlocks.get(j).age0_18 / sumAge;
+                    if (agePercentages[0] > ageMostPure) {
+                        ageMostPure = agePercentages[0];
+                        ageMostPureIndex = 0;
+                    }
+                    agePercentages[1] = city.censusTracts.get(i).censusBlocks.get(j).age19_64 / sumAge;
+                    if (agePercentages[1] > ageMostPure) {
+                        ageMostPure = agePercentages[1];
+                        ageMostPureIndex = 1;
+                    }
+                    agePercentages[2] = city.censusTracts.get(i).censusBlocks.get(j).age65_inf / sumAge;
+                    if (agePercentages[2] > ageMostPure) {
+                        ageMostPure = agePercentages[2];
+                        ageMostPureIndex = 2;
+                    }
+                    for (int a = 0; a < agePercentages.length; a++) {
+                        if (((agePercentages[a])) > allAgePurities[a]) {
+                            allAgePurities[a] = (agePercentages[a]);
+                            ageCBGIDs[a] = city.censusTracts.get(i).censusBlocks.get(j);
+                        }
+                    }
+                }
+            }
+            AgeOccupationDists aod = new AgeOccupationDists();
+            float age_19_64_percentage = (float) (ageCBGIDs[1].age19_64) / (ageCBGIDs[1].age0_18 + ageCBGIDs[1].age19_64 + ageCBGIDs[1].age65_inf);
+//            float age_edu_percentage = (float) (ageOccCBGIDs[1][1].edu) / (ageOccCBGIDs[1][1].edu + ageOccCBGIDs[1][1].service + ageOccCBGIDs[1][1].health + ageOccCBGIDs[1][1].driver);
+            float numOutwardEduVisits_19_64 = (float) (aod.mean19_64_All_Shop * age_19_64_percentage * ageCBGIDs[1].population);
+            int counter = 1;
+            for (int i = 0; i < ((City) (myParent.mainModel.ABM.studyScopeGeography)).censusTracts.size(); i++) {
+                for (int j = 0; j < ((City) (myParent.mainModel.ABM.studyScopeGeography)).censusTracts.get(i).censusBlocks.size(); j++) {
+                    if (((City) (myParent.mainModel.ABM.studyScopeGeography)).censusTracts.get(i).censusBlocks.get(j).id == ageCBGIDs[1].id) {
+                        System.out.println("FOUND CBG");
+                    }
+                    counter = counter + 1;
+                }
+            }
+            float[] cBGShopProbs = aod.getShopDistsFromCBG(164 - 1);
+            float[] genTrajectories = new float[cBGShopProbs.length];
+            float newSum = 0;
+            for (int i = 0; i < cBGShopProbs.length; i++) {
+                newSum = newSum + numOutwardEduVisits_19_64 * cBGShopProbs[i];
+                genTrajectories[i] = numOutwardEduVisits_19_64 * cBGShopProbs[i];
+            }
+            String[] rowGen=new String[cBGShopProbs.length];
+            float diffPer = (newSum - numOutwardEduVisits_19_64) / cBGShopProbs.length;
+            for (int i = 0; i < cBGShopProbs.length; i++) {
+                genTrajectories[i] = Math.max(genTrajectories[i] - diffPer, 0);
+                rowGen[i]=String.valueOf(genTrajectories[i]);
+            }
+            ArrayList<String[]> dataGen=new ArrayList();
+            dataGen.add(rowGen);
+            try {
+                CSVWriter writer = new CSVWriter(new FileWriter("mobilityInference" + File.separator + "genCBGShopVis19_64.csv"));
+                writer.writeAll(dataGen);
+                writer.close();
+            } catch (IOException ex) {
+                Logger.getLogger(GraphicalModelDialog.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            myParent.mainModel.safegraph.clearPatternsPlaces();
+            String[] vals = jList6.getSelectedValue().split("_");
+            String patternName = vals[1] + "_" + vals[2];
+            myParent.mainModel.safegraph.loadPatternsPlacesSet(myParent.mainModel.datasetDirectory, patternName, myParent.mainModel.allGISData, myParent.mainModel.ABM.studyScope, true, myParent.numProcessors);
+
+            int numShops = 0;
+            for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.size(); i++) {
+                if (GISLocationDialog.isShop(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).place.naics_code) == true) {
+                    numShops = numShops + 1;
+                }
+            }
+            String[] row=new String[numShops];
+            int[] outputCBGShopVis19_64 = new int[numShops];
+            int shopIndex = 0;
+            for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.size(); i++) {
+                if (GISLocationDialog.isShop(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).place.naics_code) == true) {
+                    ArrayList<CensusBlockGroupIntegerTuple> hCBGs = myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).visitor_home_cbgs_place;
+                    if (hCBGs != null) {
+                        for (int j = 0; j < hCBGs.size(); j++) {
+//                        for (int m = 0; m < allCBGs.size(); m++) {
+                            if (hCBGs.get(j).key.id == ageCBGIDs[1].id) {
+                                outputCBGShopVis19_64[shopIndex] = outputCBGShopVis19_64[shopIndex] + hCBGs.get(j).value;
+                                row[shopIndex]=String.valueOf(outputCBGShopVis19_64[shopIndex]);
+                            }
+//                        }
+                        }
+                    }
+                    shopIndex = shopIndex + 1;
+                }
+            }
+            for(int i=0;i<row.length;i++){
+                if(row[i]==null){
+                    row[i]="0";
+                }
+            }
+            ArrayList<String[]> data=new ArrayList();
+            data.add(row);
+            try {
+                CSVWriter writer = new CSVWriter(new FileWriter("mobilityInference" + File.separator + "origCBGShopVis19_64.csv"));
+                writer.writeAll(data);
+                writer.close();
+            } catch (IOException ex) {
+                Logger.getLogger(GraphicalModelDialog.class.getName()).log(Level.SEVERE, null, ex);
+            }
+//            int counter=1;
+//            for (int i = 0; i < ((City) (myParent.mainModel.ABM.studyScopeGeography)).censusTracts.size(); i++) {
+//                for (int j = 0; j < ((City) (myParent.mainModel.ABM.studyScopeGeography)).censusTracts.get(i).censusBlocks.size(); j++) {
+//                    if(((City) (myParent.mainModel.ABM.studyScopeGeography)).censusTracts.get(i).censusBlocks.get(j).id==ageOccCBGIDs[1][1].id){
+//                        System.out.println("FOUND CBG");
+//                    }
+//                    counter=counter+1;
+//                }
+//            }
+//                BetaBinomial bb=new BetaBinomial();
+            
+            float age_65_inf_percentage = (float) (ageCBGIDs[2].age65_inf) / (ageCBGIDs[2].age0_18 + ageCBGIDs[2].age19_64 + ageCBGIDs[2].age65_inf);
+//            float age_edu_percentage = (float) (ageOccCBGIDs[1][1].edu) / (ageOccCBGIDs[1][1].edu + ageOccCBGIDs[1][1].service + ageOccCBGIDs[1][1].health + ageOccCBGIDs[1][1].driver);
+            float numOutwardEduVisits_65_inf = (float) (aod.mean65_inf_All_Shop * age_65_inf_percentage * ageCBGIDs[2].population);
+            int counter1 = 1;
+            for (int i = 0; i < ((City) (myParent.mainModel.ABM.studyScopeGeography)).censusTracts.size(); i++) {
+                for (int j = 0; j < ((City) (myParent.mainModel.ABM.studyScopeGeography)).censusTracts.get(i).censusBlocks.size(); j++) {
+                    if (((City) (myParent.mainModel.ABM.studyScopeGeography)).censusTracts.get(i).censusBlocks.get(j).id == ageCBGIDs[2].id) {
+                        System.out.println("FOUND CBG");
+                    }
+                    counter1 = counter1 + 1;
+                }
+            }
+            float[] cBGShopProbs1 = aod.getShopDistsFromCBG(70 - 1);
+            float[] genTrajectories1 = new float[cBGShopProbs1.length];
+            float newSum1 = 0;
+            for (int i = 0; i < cBGShopProbs1.length; i++) {
+                newSum1 = newSum1 + numOutwardEduVisits_65_inf * cBGShopProbs1[i];
+                genTrajectories1[i] = numOutwardEduVisits_65_inf * cBGShopProbs1[i];
+            }
+            String[] rowGen1=new String[cBGShopProbs.length];
+            float diffPer1 = (newSum1 - numOutwardEduVisits_65_inf) / cBGShopProbs1.length;
+            for (int i = 0; i < cBGShopProbs1.length; i++) {
+                genTrajectories1[i] = Math.max(genTrajectories1[i] - diffPer1, 0);
+                rowGen1[i]=String.valueOf(genTrajectories1[i]);
+            }
+            ArrayList<String[]> dataGen1=new ArrayList();
+            dataGen1.add(rowGen1);
+            try {
+                CSVWriter writer = new CSVWriter(new FileWriter("mobilityInference" + File.separator + "genCBGShopVis65_inf.csv"));
+                writer.writeAll(dataGen1);
+                writer.close();
+            } catch (IOException ex) {
+                Logger.getLogger(GraphicalModelDialog.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            myParent.mainModel.safegraph.clearPatternsPlaces();
+            String[] vals1 = jList6.getSelectedValue().split("_");
+            String patternName1 = vals1[1] + "_" + vals1[2];
+            myParent.mainModel.safegraph.loadPatternsPlacesSet(myParent.mainModel.datasetDirectory, patternName1, myParent.mainModel.allGISData, myParent.mainModel.ABM.studyScope, true, myParent.numProcessors);
+
+            int numShops1 = 0;
+            for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.size(); i++) {
+                if (GISLocationDialog.isShop(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).place.naics_code) == true) {
+                    numShops1 = numShops1 + 1;
+                }
+            }
+            String[] row1=new String[numShops1];
+            int[] outputCBGShopVis65_inf = new int[numShops1];
+            int shopIndex1 = 0;
+            for (int i = 0; i < myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.size(); i++) {
+                if (GISLocationDialog.isShop(myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).place.naics_code) == true) {
+                    ArrayList<CensusBlockGroupIntegerTuple> hCBGs = myParent.mainModel.safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).visitor_home_cbgs_place;
+                    if (hCBGs != null) {
+                        for (int j = 0; j < hCBGs.size(); j++) {
+//                        for (int m = 0; m < allCBGs.size(); m++) {
+                            if (hCBGs.get(j).key.id == ageCBGIDs[2].id) {
+                                outputCBGShopVis65_inf[shopIndex1] = outputCBGShopVis65_inf[shopIndex1] + hCBGs.get(j).value;
+                                row1[shopIndex1]=String.valueOf(outputCBGShopVis65_inf[shopIndex1]);
+                            }
+//                        }
+                        }
+                    }
+                    shopIndex1 = shopIndex1 + 1;
+                }
+            }
+            for(int i=0;i<row1.length;i++){
+                if(row1[i]==null){
+                    row1[i]="0";
+                }
+            }
+            ArrayList<String[]> data1=new ArrayList();
+            data1.add(row1);
+            try {
+                CSVWriter writer = new CSVWriter(new FileWriter("mobilityInference" + File.separator + "origCBGShopVis65_inf.csv"));
+                writer.writeAll(data1);
+                writer.close();
+            } catch (IOException ex) {
+                Logger.getLogger(GraphicalModelDialog.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            System.out.println("FINISHED!");
+        }
+    }//GEN-LAST:event_jButton4ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JList<String> jList1;
     private javax.swing.JList<String> jList2;
     private javax.swing.JList<String> jList3;
@@ -640,5 +1462,14 @@ public class PreviewDialog extends javax.swing.JDialog {
     private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JSlider jSlider1;
     private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField jTextField2;
+    private javax.swing.JToggleButton jToggleButton1;
+    private javax.swing.JToggleButton jToggleButton2;
+    private javax.swing.JToggleButton jToggleButton3;
+    private javax.swing.JToggleButton jToggleButton4;
+    private javax.swing.JToggleButton jToggleButton5;
+    private javax.swing.JToggleButton jToggleButton6;
+    private javax.swing.JToggleButton jToggleButton7;
     // End of variables declaration//GEN-END:variables
 }

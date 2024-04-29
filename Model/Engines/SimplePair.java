@@ -4,20 +4,27 @@
  */
 package COVID_AgentBasedSimulation.Model.Engines;
 
-import lombok.Getter;
-import lombok.Setter;
+//import lombok.Getter;
+//import lombok.Setter;
 
 /**
  *
  * @author Amir Mohammad Esmaieeli Sikaroudi
  */
-@Getter @Setter
 public class SimplePair<T extends Object, U extends Object> implements Comparable{
     private Object key;
     private Object value;
     public SimplePair(Object passed_key,Object passed_value){
         key=passed_key;
         value=passed_value;
+    }
+    
+    public Object getKey(){
+        return key;
+    }
+    
+    public Object getValue(){
+        return value;
     }
 
     @Override

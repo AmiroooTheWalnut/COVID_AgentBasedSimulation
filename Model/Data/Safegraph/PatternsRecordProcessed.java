@@ -7,14 +7,13 @@ import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
-import lombok.Getter;
-import lombok.Setter;
+//import lombok.Getter;
+//import lombok.Setter;
 
 /**
  *
  * @author Amir Mohammad Esmaieeli Sikaroudi
  */
-@Getter @Setter
 public class PatternsRecordProcessed implements Serializable, Comparable<PatternsRecordProcessed>{
     static final long serialVersionUID = softwareVersion;
     

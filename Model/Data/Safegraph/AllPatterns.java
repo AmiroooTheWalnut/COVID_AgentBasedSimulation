@@ -9,14 +9,13 @@ import static COVID_AgentBasedSimulation.Model.MainModel.softwareVersion;
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
-import lombok.Getter;
-import lombok.Setter;
+//import lombok.Getter;
+//import lombok.Setter;
 
 /**
  *
  * @author Amir Mohammad Esmaieeli Sikaroudi
  */
-@Getter @Setter
 public class AllPatterns implements Serializable {
     static final long serialVersionUID = softwareVersion;
     public ArrayList<Patterns> monthlyPatternsList;

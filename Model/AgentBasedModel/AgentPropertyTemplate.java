@@ -5,14 +5,13 @@
  */
 package COVID_AgentBasedSimulation.Model.AgentBasedModel;
 
-import lombok.Getter;
-import lombok.Setter;
+//import lombok.Getter;
+//import lombok.Setter;
 
 /**
  *
  * @author Amir Mohammad Esmaieeli Sikaroudi
  */
-@Getter @Setter
 public class AgentPropertyTemplate {
     
     public AgentPropertyTemplate(){

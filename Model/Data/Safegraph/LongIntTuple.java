@@ -6,14 +6,13 @@
 package COVID_AgentBasedSimulation.Model.Data.Safegraph;
 import static COVID_AgentBasedSimulation.Model.MainModel.softwareVersion;
 import java.io.Serializable;
-import lombok.Getter;
-import lombok.Setter;
+//import lombok.Getter;
+//import lombok.Setter;
 
 /**
  *
  * @author Amir Mohammad Esmaieeli Sikaroudi
  */
-@Getter @Setter
 public class LongIntTuple implements Serializable{
     static final long serialVersionUID = softwareVersion;
     
@@ -22,5 +21,9 @@ public class LongIntTuple implements Serializable{
     public LongIntTuple(long passed_key,int passed_value){
         key=passed_key;
         value=passed_value;
+    }
+    
+    public long getKey(){
+        return key;
     }
 }

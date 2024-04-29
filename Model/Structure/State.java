@@ -3,14 +3,13 @@ package COVID_AgentBasedSimulation.Model.Structure;
 import static COVID_AgentBasedSimulation.Model.MainModel.softwareVersion;
 import java.io.Serializable;
 import java.util.ArrayList;
-import lombok.Getter;
-import lombok.Setter;
+//import lombok.Getter;
+//import lombok.Setter;
 
 /**
  *
  * @author Amir Mohammad Esmaieeli Sikaroudi
  */
-@Getter @Setter
 public class State extends Scope implements Serializable, Comparable<State>{
     static final long serialVersionUID = softwareVersion;
     public String name;

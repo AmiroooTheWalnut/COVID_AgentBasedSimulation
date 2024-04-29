@@ -8,14 +8,13 @@ package COVID_AgentBasedSimulation.Model.Structure;
 import static COVID_AgentBasedSimulation.Model.MainModel.softwareVersion;
 import java.io.Serializable;
 import java.util.HashMap;
-import lombok.Getter;
-import lombok.Setter;
+//import lombok.Getter;
+//import lombok.Setter;
 
 /**
  *
  * @author Amir Mohammad Esmaieeli Sikaroudi
  */
-@Getter @Setter
 public class Marker implements Serializable {
     static final long serialVersionUID = softwareVersion;
     
@@ -24,4 +23,12 @@ public class Marker implements Serializable {
     public float size;
     public int population;
     public HashMap<Layer,Double> layers;
+    
+    public float getLat(){
+        return lat;
+    }
+    
+    public float getLon(){
+        return lon;
+    }
 }
