@@ -9,7 +9,15 @@ import COVID_AgentBasedSimulation.Model.AgentBasedModel.JavaScript;
 import COVID_AgentBasedSimulation.Model.AgentBasedModel.PythonScript;
 import COVID_AgentBasedSimulation.Model.AgentBasedModel.Scenario;
 import COVID_AgentBasedSimulation.Model.Data.CovidCsseJhu.CovidCsseJhu;
+import COVID_AgentBasedSimulation.Model.Data.Safegraph.AllSafegraphPlaces;
+import COVID_AgentBasedSimulation.Model.Data.Safegraph.DwellTime;
+import COVID_AgentBasedSimulation.Model.Data.Safegraph.LongIntTuple;
+import COVID_AgentBasedSimulation.Model.Data.Safegraph.Patterns;
+import COVID_AgentBasedSimulation.Model.Data.Safegraph.PatternsRecordProcessed;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.Safegraph;
+import COVID_AgentBasedSimulation.Model.Data.Safegraph.SafegraphPlace;
+import COVID_AgentBasedSimulation.Model.Data.Safegraph.SafegraphPlaces;
+import COVID_AgentBasedSimulation.Model.FACS_CHARM_compatible.RootFACS;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Region;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Root;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.RootArtificial;
@@ -22,6 +30,9 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryo.util.DefaultInstantiatorStrategy;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
+import com.opencsv.exceptions.CsvException;
 //import esmaieeli.gisFastLocationOptimization.Simulation.VectorToPolygon;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -29,10 +40,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -42,6 +55,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.SwingUtilities;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 //import lombok.Getter;
 //import lombok.Setter;
 import org.objenesis.strategy.StdInstantiatorStrategy;
@@ -99,11 +115,11 @@ public class MainModel extends Dataset {
     public double sparsifyFraction = 1;
     public int lastMonthLoaded;//NOT USED
     public int lastYearLoaded;//NOT USED
-    
+
     public String testPathB;//For BATCH RUNNING
     public String testPathName;//For BATCH RUNNING
-    public int batchCounter=0;//For BATCH RUNNING
-    public ArrayList<String> runs=new ArrayList();//For BATCH RUNNING
+    public int batchCounter = 0;//For BATCH RUNNING
+    public ArrayList<String> runs = new ArrayList();//For BATCH RUNNING
 
 //    private Thread fastForwardthread;
     public ExecutorService fastForwardPool = Executors.newSingleThreadExecutor();
@@ -119,8 +135,8 @@ public class MainModel extends Dataset {
     public boolean isDebugging = true;
 
     public transient double elapsed;
-    
-    public boolean isBatchRun=false;
+
+    public boolean isBatchRun = false;
 
     public void startScriptEngines() {
         javaEvaluationEngine = new JavaEvaluationEngine(this);
@@ -149,7 +165,16 @@ public class MainModel extends Dataset {
                         for (int j = 0; j < scsd.vDCells.get(i).cBGsIDsInvolved.size(); j++) {
                             CensusBlockGroup cbg = allGISData.findCensusBlockGroup(scsd.vDCells.get(i).cBGsIDsInvolved.get(j));
                             if (cbg == null) {
-                                System.out.println("SVERE ERROR WHILE CONNECTING SUPPLEMENTARY DATA: CBG IS NULL!");
+                                cbg = city.findCBG(scsd.vDCells.get(i).cBGsIDsInvolved.get(j));
+                                if (cbg == null) {
+                                    System.out.println("SVERE ERROR WHILE CONNECTING SUPPLEMENTARY DATA: CBG IS NULL!");
+                                } else {
+                                    avgLat = avgLat + cbg.lat;
+                                    avgLon = avgLon + cbg.lon;
+                                    counter += 1;
+                                    scsd.vDCells.get(i).cBGsInvolved.add(cbg);
+                                    scsd.vDCells.get(i).population += cbg.population * scsd.vDCells.get(i).cBGsPercentageInvolved.get(j);
+                                }
                             } else {
                                 avgLat = avgLat + cbg.lat;
                                 avgLon = avgLon + cbg.lon;
@@ -171,7 +196,25 @@ public class MainModel extends Dataset {
                         for (int j = 0; j < scsd.cBGVDCells.get(i).cBGsIDsInvolved.size(); j++) {
                             CensusBlockGroup cbg = allGISData.findCensusBlockGroup(scsd.cBGVDCells.get(i).cBGsIDsInvolved.get(j));
                             if (cbg == null) {
-                                System.out.println("SEVERE ERROR WHILE CONNECTING SUPPLEMENTARY DATA: CBG IS NULL!");
+                                cbg = city.findCBG(scsd.cBGVDCells.get(i).cBGsIDsInvolved.get(j));
+                                if (cbg == null) {
+                                    cbg = city.findCBG(scsd.cBGVDCells.get(i).cBGsIDsInvolved.get(j));
+                                    if (cbg == null) {
+                                        System.out.println("SEVERE ERROR WHILE CONNECTING SUPPLEMENTARY DATA: CBG IS NULL!");
+                                    } else {
+                                        avgLat = avgLat + cbg.lat;
+                                        avgLon = avgLon + cbg.lon;
+                                        counter += 1;
+                                        scsd.cBGVDCells.get(i).cBGsInvolved.add(cbg);
+                                        scsd.cBGVDCells.get(i).population += cbg.population * scsd.cBGVDCells.get(i).cBGsPercentageInvolved.get(j);
+                                    }
+                                } else {
+                                    avgLat = avgLat + cbg.lat;
+                                    avgLon = avgLon + cbg.lon;
+                                    counter += 1;
+                                    scsd.cBGVDCells.get(i).cBGsInvolved.add(cbg);
+                                    scsd.cBGVDCells.get(i).population += cbg.population * scsd.cBGVDCells.get(i).cBGsPercentageInvolved.get(j);
+                                }
                             } else {
                                 avgLat = avgLat + cbg.lat;
                                 avgLon = avgLon + cbg.lon;
@@ -194,7 +237,16 @@ public class MainModel extends Dataset {
                             for (int k = 0; k < scsd.tessellations.get(i).cells.get(j).cBGsIDsInvolved.size(); k++) {
                                 CensusBlockGroup cbg = allGISData.findCensusBlockGroup(scsd.tessellations.get(i).cells.get(j).cBGsIDsInvolved.get(k));
                                 if (cbg == null) {
-                                    System.out.println("SVERE ERROR WHILE CONNECTING SUPPLEMENTARY DATA: CBG IS NULL!");
+                                    cbg = city.findCBG(scsd.tessellations.get(i).cells.get(j).cBGsIDsInvolved.get(k));
+                                    if (cbg == null) {
+                                        System.out.println("SEVERE ERROR WHILE CONNECTING SUPPLEMENTARY DATA: CBG IS NULL!");
+                                    } else {
+                                        avgLat = avgLat + cbg.lat;
+                                        avgLon = avgLon + cbg.lon;
+                                        counter += 1;
+                                        scsd.tessellations.get(i).cells.get(j).cBGsInvolved.add(cbg);
+                                        scsd.tessellations.get(i).cells.get(j).population += cbg.population * scsd.tessellations.get(i).cells.get(j).cBGsPercentageInvolved.get(k);
+                                    }
                                 } else {
                                     avgLat = avgLat + cbg.lat;
                                     avgLon = avgLon + cbg.lon;
@@ -347,7 +399,7 @@ public class MainModel extends Dataset {
         ABM.agentTemplates.add(rootAgentTemplate);
     }
 
-    public void initModelHardCoded(boolean isRunFromGUI, boolean isParallelLoadingData, boolean isParallelBehaviorEvaluation, int numResidents, int numRegions, int numCPUs, boolean isCompleteInfection, boolean isInfectCBGOnly, ArrayList<Integer> initialInfectionRegionIndex, int fixedNumInfected) {
+    public void initModelHardCoded(boolean isRunFromGUI, boolean isParallelLoadingData, boolean isParallelBehaviorEvaluation, int numResidents, int numRegions, int numCPUs, boolean isCompleteInfection, boolean isInfectCBGOnly, ArrayList<Integer> initialInfectionRegionIndex, int fixedNumInfected, int numMinutesPerIterate) {
         isResultSavedAtTheEnd = false;
         int month = ABM.startTime.getMonthValue();
         currentMonth = month;
@@ -382,17 +434,17 @@ public class MainModel extends Dataset {
         } else if (scenario.scenarioName.equals("VDFMTH")) {
             ABM.root.constructor(this, numResidents, "VDFMTH", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex, fixedNumInfected);
         } else if (scenario.scenarioName.equals("CBGVDFMTH")) {
-            ABM.root.constructor(this, numResidents, "CBGVDFMTH", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex,fixedNumInfected);
+            ABM.root.constructor(this, numResidents, "CBGVDFMTH", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex, fixedNumInfected);
         } else if (scenario.scenarioName.equals("AVDFMTH")) {
-            ABM.root.constructor(this, numResidents, "AVDFMTH", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex,fixedNumInfected);
+            ABM.root.constructor(this, numResidents, "AVDFMTH", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex, fixedNumInfected);
         } else if (scenario.scenarioName.startsWith("RMCBG")) {
-            ABM.root.constructor(this, numResidents, "RMCBG", numRegions, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex,fixedNumInfected);
+            ABM.root.constructor(this, numResidents, "RMCBG", numRegions, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex, fixedNumInfected);
         } else if (scenario.scenarioName.startsWith("VDFNC")) {
             String[] temp = scenario.scenarioName.split("_");
             int numCells = Integer.valueOf(temp[1]);
-            ABM.root.constructor(this, numResidents, "VDFNC", numCells, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex,fixedNumInfected);
+            ABM.root.constructor(this, numResidents, "VDFNC", numCells, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex, fixedNumInfected);
         } else if (scenario.scenarioName.equals("OVD")) {
-            ABM.root.constructor(this, numResidents, "OVD", numRegions, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex,fixedNumInfected);
+            ABM.root.constructor(this, numResidents, "OVD", numRegions, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex, fixedNumInfected);
         }
         ABM.measureHolder.initializeMeasures((Scope) (ABM.studyScopeGeography), ABM.root.pOIs);
 
@@ -412,10 +464,10 @@ public class MainModel extends Dataset {
             passingNumCPU = 1;
         }
 //        pollBarrier = new CyclicBarrier(passingNumCPU);
-        resetTimerTask(isRunFromGUI, passingNumCPU, true, isInfectCBGOnly);
+        resetTimerTask(isRunFromGUI, passingNumCPU, true, isInfectCBGOnly, numMinutesPerIterate);
     }
 
-    public void initModelArtificial(boolean isRunFromGUI, boolean isParallelLoadingData, boolean isParallelBehaviorEvaluation, int numResidents, int numRegions, int numCPUs, boolean isCompleteInfection, boolean isInfectCBGOnly, ArrayList<Integer> initialInfectionRegionIndex, int numNoTessellation, int fixedNumInfected) {
+    public void initModelArtificial(boolean isRunFromGUI, boolean isParallelLoadingData, boolean isParallelBehaviorEvaluation, int numResidents, int numRegions, int numCPUs, boolean isCompleteInfection, boolean isInfectCBGOnly, ArrayList<Integer> initialInfectionRegionIndex, int numNoTessellation, int fixedNumInfected, int numMinutesPerIterate) {
         isResultSavedAtTheEnd = false;
         int month = ABM.startTime.getMonthValue();
         currentMonth = month;
@@ -453,29 +505,29 @@ public class MainModel extends Dataset {
         ((RootArtificial) (ABM.root)).numNoTessellation = numNoTessellation;
 
         if (scenario.scenarioName.equals("CBG")) {
-            ABM.root.constructor(this, numResidents, "CBG", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex,fixedNumInfected);
+            ABM.root.constructor(this, numResidents, "CBG", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex, fixedNumInfected);
         } else if (scenario.scenarioName.equals("VDFMTH")) {
-            ABM.root.constructor(this, numResidents, "VDFMTH", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex,fixedNumInfected);
+            ABM.root.constructor(this, numResidents, "VDFMTH", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex, fixedNumInfected);
         } else if (scenario.scenarioName.equals("CBGVDFMTH")) {
-            ABM.root.constructor(this, numResidents, "CBGVDFMTH", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex,fixedNumInfected);
+            ABM.root.constructor(this, numResidents, "CBGVDFMTH", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex, fixedNumInfected);
         } else if (scenario.scenarioName.equals("VD_CBG")) {
-            ABM.root.constructor(this, numResidents, "VD_CBG", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex,fixedNumInfected);
+            ABM.root.constructor(this, numResidents, "VD_CBG", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex, fixedNumInfected);
         } else if (scenario.scenarioName.equals("VD_CBGVD")) {
-            ABM.root.constructor(this, numResidents, "VD_CBGVD", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex,fixedNumInfected);
+            ABM.root.constructor(this, numResidents, "VD_CBGVD", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex, fixedNumInfected);
         } else if (scenario.scenarioName.equals("AVDFMTH")) {
-            ABM.root.constructor(this, numResidents, "AVDFMTH", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex,fixedNumInfected);
+            ABM.root.constructor(this, numResidents, "AVDFMTH", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex, fixedNumInfected);
         } else if (scenario.scenarioName.startsWith("RMCBG")) {
-            ABM.root.constructor(this, numResidents, "RMCBG", numRegions, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex,fixedNumInfected);
+            ABM.root.constructor(this, numResidents, "RMCBG", numRegions, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex, fixedNumInfected);
         } else if (scenario.scenarioName.startsWith("Xmeans")) {
-            ABM.root.constructor(this, numResidents, "Xmeans", numRegions, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex,fixedNumInfected);
+            ABM.root.constructor(this, numResidents, "Xmeans", numRegions, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex, fixedNumInfected);
         } else if (scenario.scenarioName.startsWith("VDFNC")) {
             String[] temp = scenario.scenarioName.split("_");
             int numCells = Integer.valueOf(temp[1]);
-            ABM.root.constructor(this, numResidents, "VDFNC", numCells, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex,fixedNumInfected);
+            ABM.root.constructor(this, numResidents, "VDFNC", numCells, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex, fixedNumInfected);
         } else if (scenario.scenarioName.equals("OVD")) {
-            ABM.root.constructor(this, numResidents, "OVD", numRegions, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex,fixedNumInfected);
+            ABM.root.constructor(this, numResidents, "OVD", numRegions, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex, fixedNumInfected);
         } else if (scenario.scenarioName.equals("noTessellation")) {
-            ABM.root.constructor(this, numResidents, "noTessellation", numRegions, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex,fixedNumInfected);
+            ABM.root.constructor(this, numResidents, "noTessellation", numRegions, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex, fixedNumInfected);
         }
         ABM.measureHolder.initializeMeasures((Scope) (ABM.studyScopeGeography), ABM.root.pOIs);
 
@@ -495,10 +547,207 @@ public class MainModel extends Dataset {
             passingNumCPU = 1;
         }
 //        pollBarrier = new CyclicBarrier(passingNumCPU);
-        resetTimerTask(isRunFromGUI, passingNumCPU, true, isInfectCBGOnly);
+        resetTimerTask(isRunFromGUI, passingNumCPU, true, isInfectCBGOnly, numMinutesPerIterate);
     }
 
-    public void initModel(boolean isRunFromGUI, boolean isParallelLoadingData, boolean isParallelBehaviorEvaluation, int numCPUs) {
+    public void initModelHardCodedFACS(boolean isRunFromGUI, boolean isParallelLoadingData, boolean isParallelBehaviorEvaluation, int numResidents, int numRegions, int numCPUs, boolean isCompleteInfection, boolean isInfectCBGOnly, ArrayList<Integer> initialInfectionRegionIndex, int fixedNumInfected, int numMinutesPerIterate) {
+        isResultSavedAtTheEnd = false;
+        int month = ABM.startTime.getMonthValue();
+        currentMonth = month;
+        String monthString = String.valueOf(month);
+        if (monthString.length() < 2) {
+            monthString = "0" + monthString;
+        }
+        String dateName = ABM.startTime.getYear() + "_" + monthString;
+        safegraph.clearPatternsPlaces();
+        System.gc();
+//        safegraph.loadPatternsPlacesSet(datasetDirectory, dateName, allGISData, ABM.studyScope, isParallelLoadingData, numCPUs);
+        safegraph.allPatterns.monthlyPatternsList = new ArrayList();
+        safegraph.allSafegraphPlaces = new AllSafegraphPlaces();
+        safegraph.allSafegraphPlaces.monthlySafegraphPlacesList = new ArrayList();
+        safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.add(new SafegraphPlaces());
+        safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(0).placesRecords=new ArrayList();
+        City city = (City) (ABM.studyScopeGeography);
+        Patterns patterns = new Patterns();
+        patterns.patternRecords = new ArrayList();
+        allGISData.readBrentPolygons(city);
+
+        try {
+            FileReader filereader;
+            filereader = new FileReader("./datasets/brent_buildings.csv");
+            CSVReader csvReader = new CSVReaderBuilder(filereader)
+                    .withSkipLines(0)
+                    .build();
+            List<String[]> allData = csvReader.readAll();
+            for (int i = 1; i < allData.size(); i++) {
+//                System.out.println("I: " + i);
+                if (allData.get(i)[0].equals("house")) {
+                    continue;
+                }
+
+                PatternsRecordProcessed r = new PatternsRecordProcessed();
+                r.raw_visit_counts = Integer.parseInt(allData.get(i)[3]);
+                r.raw_visitor_counts= (int)(r.raw_visit_counts*(Math.random()*0.6+0.2));
+                r.placeKey = String.valueOf(i);
+                SafegraphPlace p = new SafegraphPlace();
+                p.lat = Float.parseFloat(allData.get(i)[1]);
+                p.lon = Float.parseFloat(allData.get(i)[2]);
+                p.buldingLevels = 1;
+                p.landArea = (int) (Math.random() * 400 + 50);
+                if (allData.get(i)[0].equals("hospital")) {
+                    p.naics_code = 6221;
+                } else if (allData.get(i)[0].equals("school")) {
+                    p.naics_code = 61;
+                } else if (allData.get(i)[0].equals("office")) {
+                    p.naics_code = 561;
+                } else if (allData.get(i)[0].equals("leisure")) {
+                    p.naics_code = 71;
+                } else if (allData.get(i)[0].equals("park")) {
+                    p.naics_code = 712190;
+                } else if (allData.get(i)[0].equals("supermarket")) {
+                    p.naics_code = 4451;
+                } else if (allData.get(i)[0].equals("shopping")) {
+                    p.naics_code = 45;
+                } else if (allData.get(i)[0].equals("house")) {
+                    continue;
+                }
+//                boolean isCBGFound = false;
+//                for (int m = 0; m < city.censusTracts.size(); m++) {
+                for (int n = 0; n < city.censusTracts.get(0).censusBlocks.size(); n++) {
+                    GeometryFactory geomFactory = new GeometryFactory();
+                    Point point = geomFactory.createPoint(new Coordinate(p.lat, p.lon));
+                    if (city.censusTracts.get(0).censusBlocks.get(n).shape.get(0).covers(point)) {
+                        p.censusBlock = city.censusTracts.get(0).censusBlocks.get(n);
+                        r.poi_cbg=p.censusBlock.id;
+//                            isCBGFound = true;
+                        break;
+                    }
+                }
+//                    if (isCBGFound == true) {
+//                        break;
+//                    }
+//                }
+                p.placeKey=String.valueOf(i);
+                r.place = p;
+                safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(0).placesRecords.add(p);
+                r.bucketed_dwell_times = new ArrayList();
+                DwellTime dt1 = new DwellTime();
+                dt1.dwellDuration = new short[2];
+                dt1.dwellDuration[0] = 1;
+                dt1.dwellDuration[1] = 5;
+                dt1.number = (int) (Math.random() * 10);
+                DwellTime dt2 = new DwellTime();
+                dt2.dwellDuration = new short[2];
+                dt2.dwellDuration[0] = 5;
+                dt2.dwellDuration[1] = 10;
+                dt2.number = (int) (Math.random() * 20);
+                DwellTime dt3 = new DwellTime();
+                dt3.dwellDuration = new short[2];
+                dt3.dwellDuration[0] = 10;
+                dt3.dwellDuration[1] = 20;
+                dt3.number = (int) (Math.random() * 30);
+                DwellTime dt4 = new DwellTime();
+                dt4.dwellDuration = new short[2];
+                dt4.dwellDuration[0] = 20;
+                dt4.dwellDuration[1] = 60;
+                dt4.number = (int) (Math.random() * 30);
+                DwellTime dt5 = new DwellTime();
+                dt5.dwellDuration = new short[2];
+                dt5.dwellDuration[0] = 60;
+                dt5.dwellDuration[1] = 240;
+                dt5.number = (int) (Math.random() * 10);
+
+                r.bucketed_dwell_times.add(dt1);
+                r.bucketed_dwell_times.add(dt2);
+                r.bucketed_dwell_times.add(dt3);
+                r.bucketed_dwell_times.add(dt4);
+                r.bucketed_dwell_times.add(dt5);
+                r.visitor_home_cbgs = new ArrayList();
+                r.visitor_daytime_cbgs = new ArrayList();
+//                for (int m = 0; m < city.censusTracts.size(); m++) {
+                for (int n = 0; n < city.censusTracts.get(0).censusBlocks.size(); n++) {
+                    float cBGLat = city.censusTracts.get(0).censusBlocks.get(n).lat;
+                    float cBGLon = city.censusTracts.get(0).censusBlocks.get(n).lon;
+                    float pLat = p.lat;
+                    float pLon = p.lon;
+                    float dist = (float) (Math.sqrt(Math.pow(cBGLat - pLat, 2) + Math.pow(cBGLon - pLon, 2)));
+//                    System.out.println("DISTS: "+(int)(dist*100));
+                    LongIntTuple pairHome = new LongIntTuple(city.censusTracts.get(0).censusBlocks.get(n).id, (int) (dist * 100));
+                    r.visitor_home_cbgs.add(pairHome);
+                    LongIntTuple pairWork = new LongIntTuple(city.censusTracts.get(0).censusBlocks.get(n).id, (int)(Math.max(0, Math.random()-0.5*5+(int) (dist * 100))));
+                    r.visitor_daytime_cbgs.add(pairWork);
+                }
+//                }
+                patterns.patternRecords.add(r);
+            }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(MainModel.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(MainModel.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (CsvException ex) {
+            Logger.getLogger(MainModel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        safegraph.allPatterns.monthlyPatternsList.add(patterns);
+
+        safegraph.connectPatternsAndPlaces(safegraph.allPatterns.monthlyPatternsList.get(0), safegraph.allSafegraphPlaces.monthlySafegraphPlacesList.get(0), allGISData, false, numCPUs);
+
+//        ABM.agents = new CopyOnWriteArrayList();
+        ABM.agentsRaw = new ArrayList(numResidents);
+
+        ABM.currentTime = ABM.startTime;
+
+//        ABM.rootAgent = ABM.makeRootAgentHardCoded();
+        ABM.root = new RootFACS(this);
+
+        //\/\/\/ get the total travels for the month from SafeGraph
+        for (int i = 0; i < safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.size(); i++) {
+            ABM.root.calcCumulativeMonthWeekHour(safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i));// COULD BE AVOIDED IF ALL DATA BE PREPROCESSED AND TRANSIENTS ARE REMOVED
+            ABM.root.numRealTravels = ABM.root.numRealTravels + safegraph.allPatterns.monthlyPatternsList.get(0).patternRecords.get(i).sumVisitsByDayOfMonth;
+        }
+        //^^^
+
+        ABM.root.numAgents = numResidents;
+
+        if (scenario.scenarioName.equals("CBG")) {
+            ABM.root.constructor(this, numResidents, "CBG", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex, fixedNumInfected);
+        } else if (scenario.scenarioName.equals("VDFMTH")) {
+            ABM.root.constructor(this, numResidents, "VDFMTH", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex, fixedNumInfected);
+        } else if (scenario.scenarioName.equals("CBGVDFMTH")) {
+            ABM.root.constructor(this, numResidents, "CBGVDFMTH", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex, fixedNumInfected);
+        } else if (scenario.scenarioName.equals("AVDFMTH")) {
+            ABM.root.constructor(this, numResidents, "AVDFMTH", -1, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex, fixedNumInfected);
+        } else if (scenario.scenarioName.startsWith("RMCBG")) {
+            ABM.root.constructor(this, numResidents, "RMCBG", numRegions, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex, fixedNumInfected);
+        } else if (scenario.scenarioName.startsWith("VDFNC")) {
+            String[] temp = scenario.scenarioName.split("_");
+            int numCells = Integer.valueOf(temp[1]);
+            ABM.root.constructor(this, numResidents, "VDFNC", numCells, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex, fixedNumInfected);
+        } else if (scenario.scenarioName.equals("OVD")) {
+            ABM.root.constructor(this, numResidents, "OVD", numRegions, isCompleteInfection, isInfectCBGOnly, initialInfectionRegionIndex, fixedNumInfected);
+        }
+        ABM.measureHolder.initializeMeasures((Scope) (ABM.studyScopeGeography), ABM.root.pOIs);
+
+//        if (scenario.equals("CBG")) {
+//            ((Root) (ABM.rootAgent)).constructorCBG(this, sparsifyFraction);
+//        } else if (scenario.equals("VD")) {
+//            ((Root) (ABM.rootAgent)).constructorVD(this);
+//        } else if (scenario.equals("CBGVD")) {
+//            ((Root) (ABM.rootAgent)).constructorCBGVD(this);
+//        } else if (scenario.equals("ABSVD")) {
+//            ((Root) (ABM.rootAgent)).constructorABSVD(this);
+//        }
+        int passingNumCPU;
+        if (isParallelBehaviorEvaluation == true) {
+            passingNumCPU = numCPUs;
+        } else {
+            passingNumCPU = 1;
+        }
+//        pollBarrier = new CyclicBarrier(passingNumCPU);
+        resetTimerTask(isRunFromGUI, passingNumCPU, true, isInfectCBGOnly, numMinutesPerIterate);
+    }
+
+    public void initModel(boolean isRunFromGUI, boolean isParallelLoadingData, boolean isParallelBehaviorEvaluation, int numCPUs, int numMinutesPerIterate) {
         isResultSavedAtTheEnd = false;
         //\/\/\/ THIS IS FOR ERROR CHECKING ONLY!
         javaEvaluationEngine.parseAllScripts(ABM.agentTemplates);
@@ -550,7 +799,7 @@ public class MainModel extends Dataset {
 //            System.out.println("!!!!");
 //        }
 //        ABM.rootAgent = new Agent(ABM.agentTemplates.get(0));
-        resetTimerTask(isRunFromGUI, passingNumCPU, false, false);
+        resetTimerTask(isRunFromGUI, passingNumCPU, false, false, numMinutesPerIterate);
 
 //        if (ABM.rootAgent.myTemplate.constructor.isJavaScriptActive == true) {
 //
@@ -561,16 +810,16 @@ public class MainModel extends Dataset {
 //        }
     }
 
-    public void resetTimerTask(boolean isRunFromGUI, int numCPUs, boolean isHardCoded, boolean isInfectCBGOnly) {
+    public void resetTimerTask(boolean isRunFromGUI, int numCPUs, boolean isHardCoded, boolean isInfectCBGOnly, int numMinutesPerIterate) {
         runTask = new TimerTask() {
             @Override
             public void run() {
-                iterate(isRunFromGUI, numCPUs, isHardCoded, isInfectCBGOnly);
+                iterate(isRunFromGUI, numCPUs, isHardCoded, isInfectCBGOnly, numMinutesPerIterate);
             }
         };
     }
 
-    public void fastForward(boolean isRunFromGUI, boolean isParallel, int numCPUs, boolean isHardCoded, boolean isInfectCBGOnly) {
+    public void fastForward(boolean isRunFromGUI, boolean isParallel, int numCPUs, boolean isHardCoded, boolean isInfectCBGOnly, int numMinutesPerIterate) {
 
 //        fastForwardthread = new Thread(new Runnable() {
 //            @Override
@@ -591,7 +840,7 @@ public class MainModel extends Dataset {
                         @Override
                         public void run() {
                             while (isPause == false) {
-                                iterate(isRunFromGUI, numCPUs, isHardCoded, isInfectCBGOnly);
+                                iterate(isRunFromGUI, numCPUs, isHardCoded, isInfectCBGOnly, numMinutesPerIterate);
 //                    System.out.println(isPause);
                             }
                             isPause = false;
@@ -608,7 +857,7 @@ public class MainModel extends Dataset {
                 @Override
                 public void run() {
                     while (isPause == false) {
-                        iterate(isRunFromGUI, numCPUs, isHardCoded, isInfectCBGOnly);
+                        iterate(isRunFromGUI, numCPUs, isHardCoded, isInfectCBGOnly, numMinutesPerIterate);
 //                    System.out.println(isPause);
                     }
                     isPause = false;
@@ -619,7 +868,7 @@ public class MainModel extends Dataset {
 
     }
 
-    public void iterate(boolean isRunFromGUI, int numCPUs, boolean isHardCoded, boolean isInfectCBGOnly) {
+    public void iterate(boolean isRunFromGUI, int numCPUs, boolean isHardCoded, boolean isInfectCBGOnly, int numMinutesPerIterate) {
         if (isResultSavedAtTheEnd == false) {
             if (ABM.currentTime.isEqual(ABM.endTime) || ABM.currentTime.isAfter(ABM.endTime)) {
                 isRunning = false;
@@ -640,10 +889,10 @@ public class MainModel extends Dataset {
                     fastForwardPool.shutdown();
                     agentEvalPool.shutdown();
                     groupInteractionEvalPool.shutdown();
-                    isReadyForBatchRun=true;
+                    isReadyForBatchRun = true;
                     return;
                 } else {
-                    isReadyForBatchRun=true;
+                    isReadyForBatchRun = true;
                     return;
                 }
             }
@@ -671,10 +920,10 @@ public class MainModel extends Dataset {
         }
         //^^^ DYNAMICALLY ADD NEW PATTERNS OF THE NEW MONTH AND GENERATE SCHEDULES
         ABM.evaluateAllAgents(numCPUs, isHardCoded);
-        ABM.currentTime = ABM.currentTime.plusMinutes(1);
+        ABM.currentTime = ABM.currentTime.plusMinutes(numMinutesPerIterate);
     }
 
-    public void resume(boolean isRunFromGUI, boolean isParallel, int numCPUs, boolean isHardCoded, boolean isInfectCBGOnly) {
+    public void resume(boolean isRunFromGUI, boolean isParallel, int numCPUs, boolean isHardCoded, boolean isInfectCBGOnly, int numMinutesPerIterate) {
         if (agentEvalPool == null) {
             agentEvalPool = Executors.newFixedThreadPool(numCPUs);
         }
@@ -684,19 +933,19 @@ public class MainModel extends Dataset {
         if (isHardCoded == true) {
             if (simulationDelayTime > -1) {
                 simulationTimer = new Timer();
-                resetTimerTask(isRunFromGUI, numCPUs, isHardCoded, isHardCoded);
+                resetTimerTask(isRunFromGUI, numCPUs, isHardCoded, isHardCoded, numMinutesPerIterate);
                 simulationTimer.schedule(runTask, 0, simulationDelayTime);
             } else {
-                fastForward(isRunFromGUI, isParallel, numCPUs, isHardCoded, isInfectCBGOnly);
+                fastForward(isRunFromGUI, isParallel, numCPUs, isHardCoded, isInfectCBGOnly, numMinutesPerIterate);
             }
             isRunning = true;
         } else {
             if (simulationDelayTime > -1) {
                 simulationTimer = new Timer();
-                resetTimerTask(isRunFromGUI, numCPUs, isHardCoded, isHardCoded);
+                resetTimerTask(isRunFromGUI, numCPUs, isHardCoded, isHardCoded, numMinutesPerIterate);
                 simulationTimer.schedule(runTask, 0, simulationDelayTime);
             } else {
-                fastForward(isRunFromGUI, isParallel, numCPUs, isHardCoded, isInfectCBGOnly);
+                fastForward(isRunFromGUI, isParallel, numCPUs, isHardCoded, isInfectCBGOnly, numMinutesPerIterate);
             }
             isRunning = true;
         }
@@ -853,33 +1102,33 @@ public class MainModel extends Dataset {
             String scName = "";
             try {
                 int v = Integer.parseInt(strs[strs.length - 1]);
-                for (int i = 0; i < strs.length-1; i++) {
+                for (int i = 0; i < strs.length - 1; i++) {
                     scName = scName + strs[i];
                 }
-                scenario.scenarioName=scName;
+                scenario.scenarioName = scName;
             } catch (NumberFormatException nfe) {
             }
             scenario.scenarioName = scenario.scenarioName + "_" + regions.size();
         }
         String testPath;
-        if(ABM.isMatching==true){
-            testPath = "projects" + File.separator + ABM.filePath.substring(ABM.filePath.lastIndexOf(File.separator) + 1, ABM.filePath.length()) + File.separator + formatter.format(date) + "_NumPeople_" + ABM.root.people.size() + "_" + scenario.scenarioName+"_MATCHING";
-        }else{
+        if (ABM.isMatching == true) {
+            testPath = "projects" + File.separator + ABM.filePath.substring(ABM.filePath.lastIndexOf(File.separator) + 1, ABM.filePath.length()) + File.separator + formatter.format(date) + "_NumPeople_" + ABM.root.people.size() + "_" + scenario.scenarioName + "_MATCHING";
+        } else {
             testPath = "projects" + File.separator + ABM.filePath.substring(ABM.filePath.lastIndexOf(File.separator) + 1, ABM.filePath.length()) + File.separator + formatter.format(date) + "_NumPeople_" + ABM.root.people.size() + "_" + scenario.scenarioName;
         }
-        
-        if(isBatchRun==true){
-            testPathB=testPath;
-            testPathName=formatter.format(date) + "_NumPeople_" + ABM.root.people.size() + "_" + scenario.scenarioName;
-            testPath=testPath+"_B"+batchCounter;
-            batchCounter=batchCounter+1;
+
+        if (isBatchRun == true) {
+            testPathB = testPath;
+            testPathName = formatter.format(date) + "_NumPeople_" + ABM.root.people.size() + "_" + scenario.scenarioName;
+            testPath = testPath + "_B" + batchCounter;
+            batchCounter = batchCounter + 1;
             runs.add(testPath);
         }
         File testDirectory = new File(testPath);
         if (!testDirectory.exists()) {
             testDirectory.mkdirs();
         }
-        
+
         if (ABM.isSaveHistoricalRun == true) {
             HistoricalRun historicalRun = new HistoricalRun();
             historicalRun.regions = regions;
@@ -1071,11 +1320,11 @@ public class MainModel extends Dataset {
         return index;
     }
 
-    public Safegraph getSafegraph(){
+    public Safegraph getSafegraph() {
         return safegraph;
     }
-    
-    public AgentBasedModel getABM(){
+
+    public AgentBasedModel getABM() {
         return ABM;
     }
 }

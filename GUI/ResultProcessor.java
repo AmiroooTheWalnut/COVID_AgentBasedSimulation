@@ -471,7 +471,7 @@ public class ResultProcessor extends javax.swing.JDialog {
                         init(scenario, numAgents, numRegions);
                         myParent.mainModel.isPause = false;
                         myParent.mainModel.startTimeNanoSecond = System.nanoTime();
-                        myParent.mainModel.resume(true, true, myParent.numProcessors, true, false);
+                        myParent.mainModel.resume(true, true, myParent.numProcessors, true, false, 1);
                     }
                 }
             }
@@ -509,7 +509,7 @@ public class ResultProcessor extends javax.swing.JDialog {
 //            noTessellationNumResidents = -1;
 //        }
         int noTessellationNumResidents = -1;//FULL SCALE
-        myParent.mainModel.initModelArtificial(true, true, true, numAgents, numRegions, myParent.numProcessors, true, isSpecialScenarioActive, null, noTessellationNumResidents,-1);
+        myParent.mainModel.initModelArtificial(true, true, true, numAgents, numRegions, myParent.numProcessors, true, isSpecialScenarioActive, null, noTessellationNumResidents,-1, 1);
 //        ClustererManager clustererManager = new ClustererManager();
 //        if (jToggleButton2.isSelected()) {
 //            ClustererManager.ClustererInfo cf = new ClustererManager.ClustererInfo();

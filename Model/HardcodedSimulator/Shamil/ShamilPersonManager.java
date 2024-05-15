@@ -22,12 +22,12 @@ public class ShamilPersonManager {
 
     //static Random rnd = new Random();
 
-    static double smartphone_owner_percentage = 0.75;
+    public static double smartphone_owner_percentage = 0.75;
 //    static double tracing_percentage = 0.3;//ORIGINAL
-    static double tracing_percentage = 0.3;
+    public static double tracing_percentage = 0.3;
 //    static int quarantine_days = 14;//ORIGINAL
-    static int quarantine_days = 14;
-    static int trace_days = 2;
+    public static int quarantine_days = 14;
+    public static int trace_days = 2;
 
     static HashMap<String, Double> preference_def = new HashMap<String, Double>() {
         {

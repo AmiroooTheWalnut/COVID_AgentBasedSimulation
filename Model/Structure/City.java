@@ -15,8 +15,6 @@ public class City extends Scope implements Serializable, Comparable<City> {
     static final long serialVersionUID = softwareVersion;
     public String name;
     
-    
-    
     public transient boolean isLatLonCalculated = false;
     
     public Object[] getVDTessellationFromCBG(int tessellationIndex, CensusBlockGroup input, boolean noNull) {
@@ -186,7 +184,12 @@ public class City extends Scope implements Serializable, Comparable<City> {
     public void calcPopulation() {
         population = 0;
         for (int i = 0; i < censusTracts.size(); i++) {
-            population = population + censusTracts.get(i).population;
+            int ctPop=0;
+            for (int j = 0; j < censusTracts.get(i).censusBlocks.size(); j++) {
+                population = population + censusTracts.get(i).censusBlocks.get(j).population;
+                ctPop=ctPop+censusTracts.get(i).censusBlocks.get(j).population;
+            }
+            censusTracts.get(i).population=ctPop;
         }
     }
 

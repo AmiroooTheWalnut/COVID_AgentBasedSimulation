@@ -15,6 +15,9 @@ import COVID_AgentBasedSimulation.Model.RecordTemplate;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryo.util.DefaultInstantiatorStrategy;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
+import com.opencsv.exceptions.CsvException;
 import de.fhpotsdam.unfolding.geo.Location;
 import de.siegmar.fastcsv.reader.CsvContainer;
 import de.siegmar.fastcsv.reader.CsvReader;
@@ -28,6 +31,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.json.JSONArray;
@@ -38,6 +42,7 @@ import org.objenesis.strategy.StdInstantiatorStrategy;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LinearRing;
+import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
 
 /**
@@ -98,7 +103,22 @@ public class AllGISData extends Dataset implements Serializable {
                 CensusBlockGroup censusBlockGroup = censusTract.findCensusBlock(id);
                 return censusBlockGroup;
             } catch (Exception ex) {
-                System.out.println("^^^^^^^^^^");
+//                System.out.println("^^^^^^^^^^");
+            }
+        }
+        for (int i = 0; i < countries.size(); i++) {
+            if (countries.get(i).states.size() < 2) {
+                for (int j = 0; j < countries.get(i).states.size(); j++) {
+                    for (int k = 0; k < countries.get(i).states.get(j).counties.size(); k++) {
+                        for (int m = 0; m < countries.get(i).states.get(j).counties.get(k).censusTracts.size(); m++) {
+                            for (int n = 0; n < countries.get(i).states.get(j).counties.get(k).censusTracts.get(m).censusBlocks.size(); n++) {
+                                if (countries.get(i).states.get(j).counties.get(k).censusTracts.get(m).censusBlocks.get(n).id == id) {
+                                    return countries.get(i).states.get(j).counties.get(k).censusTracts.get(m).censusBlocks.get(n);
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
         return null;
@@ -330,7 +350,7 @@ public class AllGISData extends Dataset implements Serializable {
             age_66_inf_colNames.add("B01001e47");
             age_66_inf_colNames.add("B01001e48");
             age_66_inf_colNames.add("B01001e49");
-            
+
             int counter = 0;
             int largerCounter = 0;
             int counterInterval = 5000;
@@ -372,7 +392,7 @@ public class AllGISData extends Dataset implements Serializable {
         } catch (IOException ex) {
             Logger.getLogger(Patterns.class.getName()).log(Level.SEVERE, (String) null, ex);
         }
-        
+
         System.out.println("READING census block group occupation");
         File cBGOccFile = new File(geographyDirectory + "/SafeGraph_Census/safegraph_open_census_data_2020/data/cbg_c24.csv");
         try {
@@ -382,8 +402,8 @@ public class AllGISData extends Dataset implements Serializable {
 //            int counter = 0;
 //            int largerCounter = 0;
 //            int counterInterval = 1000;
-            OccupationCensusIDs ocIDs=new OccupationCensusIDs();
-            
+            OccupationCensusIDs ocIDs = new OccupationCensusIDs();
+
             int counter = 0;
             int largerCounter = 0;
             int counterInterval = 5000;
@@ -913,6 +933,138 @@ public class AllGISData extends Dataset implements Serializable {
                     largerCounter = largerCounter + 1;
                     counter = 0;
                     System.out.println("Num rows read: " + largerCounter * counterInterval);
+                }
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(AllGISData.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void processBrentData() {
+        System.out.println("READING BRENT");
+//        File statesFile = new File("./datasets/BrentPolygons.json");
+//        File cBGPopulationFile = new File("./datasets/brent_CBGs.csv");
+        try {
+//            if (countries == null) {
+//                countries = new ArrayList();
+//            }
+//            countries = new ArrayList();
+            Country england = findAndInsertCountry("England");
+            england.states = new ArrayList();
+            byte stateID = 0;
+            State state = england.findAndInsertState(stateID);
+            state.name = "LondonState";
+            state.country = england;
+            state.counties = new ArrayList();
+            County county = state.findAndInsertCounty("LondonCounty");
+            City city = new City();
+            city.name = "London";
+            county.cities = new ArrayList();
+            county.cities.add(city);
+            county.country = england;
+            county.state = state;
+            county.censusTracts = new ArrayList();
+            city.censusTracts = new ArrayList();
+            CensusTract ct = city.findAndInsertCensusTract(0);
+            county.censusTracts.add(ct);
+
+            FileReader filereader = new FileReader("./datasets/brent_CBGs.csv");
+            CSVReader csvReader = new CSVReaderBuilder(filereader)
+                    .withSkipLines(0)
+                    .build();
+            List<String[]> allData = csvReader.readAll();
+            int counter = 0;
+            int largerCounter = 0;
+            int counterInterval = 1000;
+            for (int i = 1; i < allData.size(); i++) {
+                long id = Long.parseLong(allData.get(i)[0].substring(1));
+                CensusBlockGroup cbg = ct.findAndInsertCensusBlock(id);
+                cbg.population = Integer.parseInt(allData.get(i)[3]);
+                cbg.country = england;
+                cbg.state = state;
+                cbg.county = county;
+                cbg.censusTract = ct;
+
+            }
+            city.calcPopulation();
+            AllGISData.saveAllGISDataKryo("./datasets/ProcessedGeoData", this);
+        } catch (IOException ex) {
+            Logger.getLogger(AllGISData.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (CsvException ex) {
+            Logger.getLogger(AllGISData.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void readBrentPolygons(City city) {
+        File censusBlockGroupFile = new File("./datasets/BrentPolygons.json");
+        try (BufferedReader br = new BufferedReader(new FileReader(censusBlockGroupFile))) {
+            String line;
+//            int deguggingCounter = 0;
+//            int counter = 0;
+//            int largerCounter = 0;
+//            int counterInterval = 1000;
+//            int debugCounter = 0;
+//            int CBGIndex = 0;
+            while ((line = br.readLine()) != null) {
+//                CBGIndex = CBGIndex + 1;
+                JSONObject root = new JSONObject(line);
+                JSONObject properties = root.getJSONObject("properties");
+                String value = properties.getString("WD21CD");
+                long id = Long.parseLong(value.substring(1));
+                CensusBlockGroup censusBlockGroup = city.findCBG(id);
+                JSONObject geometry = root.getJSONObject("geometry");
+                JSONArray coordsT = geometry.getJSONArray("coordinates");
+                String geomType = (String) (geometry.get("type"));
+                if (geomType.equals("Polygon")) {
+                    JSONArray coords = coordsT.getJSONArray(0);
+                    ArrayList<Coordinate> coordsArrayList = new ArrayList();
+                    for (int i = 0; i < coords.length(); i++) {
+                        coordsArrayList.add(new Coordinate(coords.getJSONArray(i).getDouble(0), coords.getJSONArray(i).getDouble(1)));
+                    }
+                    Coordinate coordsArray[] = new Coordinate[coordsArrayList.size()];
+                    for (int m = 0; m < coordsArrayList.size(); m++) {
+                        coordsArray[m] = coordsArrayList.get(m);
+                    }
+                    GeometryFactory geomFactory = new GeometryFactory();
+                    try {
+                        LinearRing linearRing = geomFactory.createLinearRing(coordsArray);
+                        Polygon poly = geomFactory.createPolygon(linearRing);
+                        if (censusBlockGroup.shape == null) {
+                            censusBlockGroup.shape = new ArrayList();
+                        }
+                        censusBlockGroup.shape.add(poly);
+                        Point center = poly.getCentroid();
+                        censusBlockGroup.lat = (float) (center.getX());
+                        censusBlockGroup.lon = (float) (center.getY());
+                    } catch (Exception ex) {
+                        System.out.println("ISSUE IN READING SHAPES!!!");
+                    }
+                } else if (geomType.equals("MultiPolygon")) {
+                    for (int m = 0; m < coordsT.length(); m++) {
+                        JSONArray coords = coordsT.getJSONArray(m);
+                        ArrayList<Coordinate> coordsArrayList = new ArrayList();
+
+                        for (int i = 0; i < coords.getJSONArray(0).length(); i++) {
+                            coordsArrayList.add(new Coordinate(coords.getJSONArray(0).getJSONArray(i).getDouble(0), coords.getJSONArray(0).getJSONArray(i).getDouble(1)));
+                        }
+                        Coordinate coordsArray[] = new Coordinate[coordsArrayList.size()];
+                        for (int h = 0; h < coordsArrayList.size(); h++) {
+                            coordsArray[h] = coordsArrayList.get(h);
+                        }
+                        GeometryFactory geomFactory = new GeometryFactory();
+                        try {
+                            LinearRing linearRing = geomFactory.createLinearRing(coordsArray);
+                            Polygon poly = geomFactory.createPolygon(linearRing);
+
+                            censusBlockGroup.shape.add(poly);
+                            Point center = poly.getCentroid();
+                            censusBlockGroup.lat = (float) (center.getX());
+                            censusBlockGroup.lon = (float) (center.getY());
+                        } catch (Exception ex) {
+                            System.out.println("ISSUE IN READING MULTI-SHAPES!!!");
+                        }
+
+                    }
                 }
             }
         } catch (IOException ex) {

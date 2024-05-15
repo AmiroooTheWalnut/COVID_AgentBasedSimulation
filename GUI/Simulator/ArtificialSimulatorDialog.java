@@ -711,12 +711,12 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
         }
         if (jRadioButton18.isSelected()) {
             myParent.mainModel.scenario.scenarioName = "VDFNC_" + jSpinner3.getValue();
-            myParent.mainModel.initModelArtificial(true, true, isParallelCheckBox.isSelected(), (int) (jSpinner2.getValue()), (int) (jSpinner3.getValue()), myParent.numProcessors, jRadioButton15.isSelected(), isSpecialScenarioActive, infectionIndices, noTessellationNumResidents,fixedNumInfected);
+            myParent.mainModel.initModelArtificial(true, true, isParallelCheckBox.isSelected(), (int) (jSpinner2.getValue()), (int) (jSpinner3.getValue()), myParent.numProcessors, jRadioButton15.isSelected(), isSpecialScenarioActive, infectionIndices, noTessellationNumResidents,fixedNumInfected, 1);
         } else if (jRadioButton6.isSelected()) {
             myParent.mainModel.scenario.scenarioName = "RMCBG_" + jSpinner3.getValue();
-            myParent.mainModel.initModelArtificial(true, true, isParallelCheckBox.isSelected(), (int) (jSpinner2.getValue()), (int) (jSpinner3.getValue()), myParent.numProcessors, jRadioButton15.isSelected(), isSpecialScenarioActive, infectionIndices, noTessellationNumResidents,fixedNumInfected);
+            myParent.mainModel.initModelArtificial(true, true, isParallelCheckBox.isSelected(), (int) (jSpinner2.getValue()), (int) (jSpinner3.getValue()), myParent.numProcessors, jRadioButton15.isSelected(), isSpecialScenarioActive, infectionIndices, noTessellationNumResidents,fixedNumInfected, 1);
         } else {
-            myParent.mainModel.initModelArtificial(true, true, isParallelCheckBox.isSelected(), (int) (jSpinner2.getValue()), (int) (jSpinner3.getValue()), myParent.numProcessors, jRadioButton15.isSelected(), isSpecialScenarioActive, infectionIndices, noTessellationNumResidents,fixedNumInfected);
+            myParent.mainModel.initModelArtificial(true, true, isParallelCheckBox.isSelected(), (int) (jSpinner2.getValue()), (int) (jSpinner3.getValue()), myParent.numProcessors, jRadioButton15.isSelected(), isSpecialScenarioActive, infectionIndices, noTessellationNumResidents,fixedNumInfected, 1);
         }
         ClustererManager clustererManager = new ClustererManager();
         if (jToggleButton2.isSelected()) {
@@ -746,7 +746,7 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
                 if (isRateChanged == true) {
                     myParent.mainModel.pause();
                     if (jToggleButton1.getText().equals("Pause")) {
-                        myParent.mainModel.resume(true, isParallelCheckBox.isSelected(), myParent.numProcessors, true, isSpecialScenarioActive);
+                        myParent.mainModel.resume(true, isParallelCheckBox.isSelected(), myParent.numProcessors, true, isSpecialScenarioActive, 1);
                     }
                     //else if (jToggleButton1.getText().equals("Pause")) {
                     //    myParent.mainModel.resume(true, jCheckBox1.isSelected(), myParent.numProcessors, false, isSpecialScenarioActive);
@@ -764,7 +764,7 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
             myParent.mainModel.isBatchRun = false;
             myParent.mainModel.isPause = false;
             myParent.mainModel.startTimeNanoSecond = System.nanoTime();
-            myParent.mainModel.resume(true, jCheckBox2.isSelected(), myParent.numProcessors, true, isSpecialScenarioActive);
+            myParent.mainModel.resume(true, jCheckBox2.isSelected(), myParent.numProcessors, true, isSpecialScenarioActive, 1);
             jToggleButton1.setText("Pause");
 //            jButton4.setEnabled(false);
         } else if (jToggleButton1.getText().equals("Pause")) {
@@ -828,12 +828,12 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
         }
         if (jRadioButton18.isSelected()) {
             myParent.mainModel.scenario.scenarioName = "VDFNC_" + jSpinner3.getValue();
-            myParent.mainModel.initModelArtificial(true, true, isParallelCheckBox.isSelected(), (int) (jSpinner2.getValue()), (int) (jSpinner3.getValue()), myParent.numProcessors, jRadioButton15.isSelected(), isSpecialScenarioActive, infectionIndices, noTessellationNumResidents,fixedNumInfected);
+            myParent.mainModel.initModelArtificial(true, true, isParallelCheckBox.isSelected(), (int) (jSpinner2.getValue()), (int) (jSpinner3.getValue()), myParent.numProcessors, jRadioButton15.isSelected(), isSpecialScenarioActive, infectionIndices, noTessellationNumResidents,fixedNumInfected, 1);
         } else if (jRadioButton6.isSelected()) {
             myParent.mainModel.scenario.scenarioName = "RMCBG_" + jSpinner3.getValue();
-            myParent.mainModel.initModelArtificial(true, true, isParallelCheckBox.isSelected(), (int) (jSpinner2.getValue()), (int) (jSpinner3.getValue()), myParent.numProcessors, jRadioButton15.isSelected(), isSpecialScenarioActive, infectionIndices, noTessellationNumResidents,fixedNumInfected);
+            myParent.mainModel.initModelArtificial(true, true, isParallelCheckBox.isSelected(), (int) (jSpinner2.getValue()), (int) (jSpinner3.getValue()), myParent.numProcessors, jRadioButton15.isSelected(), isSpecialScenarioActive, infectionIndices, noTessellationNumResidents,fixedNumInfected, 1);
         } else {
-            myParent.mainModel.initModelArtificial(true, true, isParallelCheckBox.isSelected(), (int) (jSpinner2.getValue()), (int) (jSpinner3.getValue()), myParent.numProcessors, jRadioButton15.isSelected(), isSpecialScenarioActive, infectionIndices, noTessellationNumResidents,fixedNumInfected);
+            myParent.mainModel.initModelArtificial(true, true, isParallelCheckBox.isSelected(), (int) (jSpinner2.getValue()), (int) (jSpinner3.getValue()), myParent.numProcessors, jRadioButton15.isSelected(), isSpecialScenarioActive, infectionIndices, noTessellationNumResidents,fixedNumInfected, 1);
         }
 
         jLabel5.setText(myParent.mainModel.ABM.startTime.toString());
@@ -852,7 +852,7 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
                 if (isRateChanged == true) {
                     myParent.mainModel.pause();
                     if (jToggleButton1.getText().equals("Pause")) {
-                        myParent.mainModel.resume(true, isParallelCheckBox.isSelected(), myParent.numProcessors, true, isSpecialScenarioActive);
+                        myParent.mainModel.resume(true, isParallelCheckBox.isSelected(), myParent.numProcessors, true, isSpecialScenarioActive, 1);
                     }
                     //else if (jToggleButton1.getText().equals("Pause")) {
                     //    myParent.mainModel.resume(true, jCheckBox1.isSelected(), myParent.numProcessors, false, isSpecialScenarioActive);
@@ -970,7 +970,7 @@ public class ArtificialSimulatorDialog extends javax.swing.JDialog {
                         jButton1ActionPerformed(null);
                         myParent.mainModel.isPause = false;
                         myParent.mainModel.startTimeNanoSecond = System.nanoTime();
-                        myParent.mainModel.resume(true, isParallelCheckBox.isSelected(), myParent.numProcessors, true, isSpecialScenarioActive);
+                        myParent.mainModel.resume(true, isParallelCheckBox.isSelected(), myParent.numProcessors, true, isSpecialScenarioActive, 1);
                     }
                 }
             }
