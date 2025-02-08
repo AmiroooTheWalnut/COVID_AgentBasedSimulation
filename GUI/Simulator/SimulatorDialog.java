@@ -45,8 +45,8 @@ public class SimulatorDialog extends javax.swing.JDialog {
 
         refreshLists();
 
-        ProcessingMapRenderer sketch = new ProcessingMapRenderer(myParent, jPanel14, null);
-        sketch.startRendering();
+//        ProcessingMapRenderer sketch = new ProcessingMapRenderer(myParent, jPanel14, null);
+//        sketch.startRendering();
         
         boolean isDefaultMatchingFound = myParent.mainModel.ABM.matchingConfig.loadMatchConfig();
         if(isDefaultMatchingFound==true){
@@ -609,7 +609,7 @@ public class SimulatorDialog extends javax.swing.JDialog {
         buttonGroup4.add(jRadioButton23);
         jRadioButton23.setText("Fixed num infections");
 
-        jSpinner5.setModel(new javax.swing.SpinnerNumberModel(500, 1, null, 1));
+        jSpinner5.setModel(new javax.swing.SpinnerNumberModel(-1, null, null, 1));
 
         javax.swing.GroupLayout jPanel24Layout = new javax.swing.GroupLayout(jPanel24);
         jPanel24.setLayout(jPanel24Layout);
@@ -1002,7 +1002,7 @@ public class SimulatorDialog extends javax.swing.JDialog {
 
         jLabel4.setText("CBG index to infect:");
 
-        jSpinner4.setModel(new javax.swing.SpinnerNumberModel(345, 0, null, 1));
+        jSpinner4.setModel(new javax.swing.SpinnerNumberModel(365, 0, null, 1));
 
         jCheckBox7.setSelected(true);
         jCheckBox7.setText("POI building logic");
@@ -1770,7 +1770,8 @@ public class SimulatorDialog extends javax.swing.JDialog {
         myParent.mainModel.loadAndConnectSupplementaryCaseStudyDataKryo("./datasets/Safegraph/" + myParent.mainModel.ABM.studyScope + "/supplementaryGIS.bin");
 //        myParent.mainModel.allGISData.loadScopeCBGPolygons((Scope)(myParent.mainModel.ABM.studyScopeGeography));//THIS IS NOW IN SUPPLAMENTARY DATA
         ArrayList<Integer> infectionIndices = new ArrayList();
-        int fixedNumInfected=-1;
+//        int fixedNumInfected=-1;
+        int fixedNumInfected=(int) (jSpinner5.getValue());
         if (isSpecialScenarioActive == false) {
             if (jRadioButton22.isSelected()) {
                 String[] indices = jTextArea3.getText().split(",");

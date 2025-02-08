@@ -11,6 +11,7 @@ import COVID_AgentBasedSimulation.GUI.VoronoiGIS.GISLocationDialog;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.CensusBlockGroupIntegerTuple;
 import COVID_AgentBasedSimulation.Model.GraphicalModel.AgeOccupationDists;
 import COVID_AgentBasedSimulation.Model.Structure.CensusBlockGroup;
+import COVID_AgentBasedSimulation.Model.Structure.CensusTract;
 import COVID_AgentBasedSimulation.Model.Structure.City;
 import COVID_AgentBasedSimulation.Model.Structure.Marker;
 import com.opencsv.CSVWriter;
@@ -116,6 +117,7 @@ public class PreviewDialog extends javax.swing.JDialog {
         jPanel4 = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
         jList4 = new javax.swing.JList<>();
+        jButton5 = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
         jScrollPane5 = new javax.swing.JScrollPane();
         jList5 = new javax.swing.JList<>();
@@ -150,7 +152,7 @@ public class PreviewDialog extends javax.swing.JDialog {
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 585, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 584, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("Country", jPanel1);
@@ -173,7 +175,7 @@ public class PreviewDialog extends javax.swing.JDialog {
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 585, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 584, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("State/Province", jPanel2);
@@ -196,7 +198,7 @@ public class PreviewDialog extends javax.swing.JDialog {
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 585, Short.MAX_VALUE)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 584, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("County", jPanel3);
@@ -333,7 +335,7 @@ public class PreviewDialog extends javax.swing.JDialog {
         jPanel8Layout.setVerticalGroup(
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel8Layout.createSequentialGroup()
-                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE)
+                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 101, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -380,15 +382,30 @@ public class PreviewDialog extends javax.swing.JDialog {
         });
         jScrollPane4.setViewportView(jList4);
 
+        jButton5.setText("Save GIS data");
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 284, Short.MAX_VALUE)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jButton5)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 585, Short.MAX_VALUE)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 545, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton5)
+                .addContainerGap())
         );
 
         jTabbedPane1.addTab("Census tract", jPanel4);
@@ -1425,12 +1442,42 @@ public class PreviewDialog extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_jButton4ActionPerformed
 
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        ArrayList<String[]> data1=new ArrayList();
+        String[] row1=new String[5];
+        row1[0]="Tract";
+        row1[1]="Lat";
+        row1[2]="Lon";
+        row1[3]="Population";
+        row1[4]="Density per acre";
+        data1.add(row1);
+        for (int i = 0; i < ((City) (myParent.mainModel.ABM.studyScopeGeography)).censusTracts.size(); i++) {
+            String[] row=new String[5];
+            row[0]="T"+i;
+            CensusTract ct=((City) (myParent.mainModel.ABM.studyScopeGeography)).censusTracts.get(i);
+            row[1]=String.valueOf(ct.lat);
+            row[2]=String.valueOf(ct.lon);
+            row[3]=String.valueOf(ct.population);
+            row[4]=String.valueOf(ct.population/Math.max(1,ct.size));
+            data1.add(row);
+        }
+        
+        try {
+            CSVWriter writer = new CSVWriter(new FileWriter(((City) (myParent.mainModel.ABM.studyScopeGeography)).name + "_GIS_data.csv"));
+            writer.writeAll(data1);
+            writer.close();
+        } catch (IOException ex) {
+            Logger.getLogger(GraphicalModelDialog.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton5ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

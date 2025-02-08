@@ -1349,7 +1349,7 @@ public class RootFACS extends Root {
                             infectedVisits = pOIInfectedVisits.get(pOI);
                         }
                         if (Math.random() < (double) infectedVisits / (double) totalVisits) {
-                            if (Math.random() < 0.1) {
+                            if (Math.random() < 0.05) {
                                 if (Math.random() < 0.05) {
                                     people.get(i).insidePeople.get(m).fpp.status = statusEnum.DEAD.ordinal();
                                     people.get(i).insidePeople.get(m).sfpp.state = "Dead";
@@ -1411,7 +1411,7 @@ public class RootFACS extends Root {
                 for (int m = 0; m < groups.get(g).persons.get(p).insidePeople.size(); m++) {
                     if (groups.get(g).persons.get(p).insidePeople.get(m).fpp.status == statusEnum.SUSCEPTIBLE.ordinal()) {
                         if (Math.random() < (double) (numInfected) / (double) (groups.get(g).persons.size())) {
-                            if (Math.random() < 0.05) {
+                            if (Math.random() < 0.01) {
                                 if (Math.random() < 0.05) {
                                     groups.get(g).persons.get(p).insidePeople.get(m).fpp.status = statusEnum.DEAD.ordinal();
                                     groups.get(g).persons.get(p).insidePeople.get(m).sfpp.state = "Dead";
@@ -1496,7 +1496,7 @@ public class RootFACS extends Root {
                 for (int m = 0; m < groups.get(g).persons.get(p).insidePeople.size(); m++) {
                     if (groups.get(g).persons.get(p).insidePeople.get(m).fpp.status == statusEnum.SUSCEPTIBLE.ordinal()) {
                         if (Math.random() < (double) (numInfected) / (double) (groups.get(g).persons.size())) {
-                            if (Math.random() < 0.05) {
+                            if (Math.random() < 0.01) {
                                 if (Math.random() < 0.05) {
                                     groups.get(g).persons.get(p).insidePeople.get(m).fpp.status = statusEnum.DEAD.ordinal();
                                     groups.get(g).persons.get(p).insidePeople.get(m).sfpp.state = "Dead";

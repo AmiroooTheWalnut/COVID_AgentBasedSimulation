@@ -149,6 +149,9 @@ public class Person extends Agent {
     public void travelFromWork(ZonedDateTime currentTime, boolean isArtifical, boolean isTessellationBuilt) {
         if (isArtifical == false) {
             PatternsRecordProcessed dest = chooseDestination(properties.workRegion);
+            if (dest == null) {
+                return;
+            }
             if (myModelRoot.ABM.isMatching == true) {
                 boolean isFoundValidType1 = false;
                 boolean isFoundValidType2 = false;

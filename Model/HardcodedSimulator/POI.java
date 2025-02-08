@@ -136,7 +136,7 @@ public class POI {
             for (int m = 0; m < person.insidePeople.size(); m++) {
                 if (mainModel.ABM.root.rnd.nextDouble() < CONTACT_RATE) {
                     double v = mainModel.ABM.root.rnd.nextDouble();
-                    if (v < 0.001) {
+                    if (v < 0.0001) {
                         double r = mainModel.ABM.root.rnd.nextDouble();
                         if (r < person.shamilPersonProperties.protectionLevel) {
 //                      if (r < (1 - person.shamilPersonProperties.protectionLevel) * 0.00085) {
@@ -163,6 +163,8 @@ public class POI {
 //            System.out.println("awarenessLevel: "+person.shamilPersonProperties.awarenessLevel);
 //            System.out.println("protectionLevel: "+person.shamilPersonProperties.protectionLevel);
             for (int m = 0; m < person.insidePeople.size(); m++) {
+                double val = mainModel.ABM.root.rnd.nextDouble();
+                if(val<0.2){
                 double r = mainModel.ABM.root.rnd.nextDouble();
                 if (r < person.shamilPersonProperties.protectionLevel) {
                     if (person.insidePeople.get(m).fpp.status == statusEnum.SUSCEPTIBLE.ordinal()) {
@@ -176,6 +178,7 @@ public class POI {
                             mainModel.ABM.infectedByPOISuperspreadDaily += 1;
                         }
                     }
+                }
                 }
             }
         }

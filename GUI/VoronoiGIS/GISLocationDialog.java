@@ -3759,7 +3759,8 @@ public class GISLocationDialog extends javax.swing.JDialog {
         sampleRate = Float.parseFloat(jFormattedTextField1.getText());
         for (int i = 0; i < mainFParent.allData.all_Nodes.length; i++) {
             if (rnd.nextDouble() < sampleRate) {
-                if (!(i == 293800 || i == 357731 || i == 320050 || i == 59047)) {
+//                if (!(i == 293800 || i == 357731 || i == 320050 || i == 59047)) {
+                if (!(i == -1)) {
                     subSample.add(true);
                 } else {
                     subSample.add(false);

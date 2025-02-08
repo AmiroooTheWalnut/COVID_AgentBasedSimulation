@@ -411,6 +411,7 @@ public class Root extends Agent {
             modelRoot.ABM.agentsRaw.add(person);
             person.constructor(modelRoot);
             people.add(person);
+            System.out.println("generateAgents: "+i);
         }
     }
 
@@ -443,10 +444,10 @@ public class Root extends Agent {
         for (int i = 0; i < 30; i++) {
             workRegion = sampleWorkRegion(scheduleList, person, homeRegion);
             if (workRegion != null) {
-                if (workRegion.sumWorkFreqs > 0) {
+//                if (workRegion.sumWorkFreqs > 0) {
                     person.properties.workRegion = workRegion;
                     break;
-                }
+//                }
             }
         }
         if (person.properties.workRegion == null) {
@@ -894,7 +895,7 @@ public class Root extends Agent {
                     expectedInfectionInScope = fixedNumInfected;
                 }
                 double expectedInfectionPercentage = (double) (expectedInfectionInScope) / (double) (scope.population);
-                initialRecovered(expectedInfectionPercentage);
+                initialRecovered(expectedInfectionPercentage*0.8);
                 double currentInfections = 0;
                 double currentInfectionPercentage = 0;
                 int maxTry = 2000;
@@ -918,6 +919,7 @@ public class Root extends Agent {
                                             //regions.get(j).residents.get(selectedResident).shamilPersonProperties.infectedDays = 4 + (int) (rnd.nextDouble() * 10);
                                             currentInfections = currentInfections + 1;
                                             currentInfectionPercentage = currentInfections / (people.size() * pTSFraction);
+                                            currentNumTry=0;
                                             //break;
                                         }
 //                                        }
@@ -931,6 +933,7 @@ public class Root extends Agent {
                                             //regions.get(j).residents.get(selectedResident).shamilPersonProperties.infectedDays = 3 + (int) (rnd.nextDouble() * 3);
                                             currentInfections = currentInfections + 1;
                                             currentInfectionPercentage = currentInfections / (people.size() * pTSFraction);
+                                            currentNumTry=0;
                                             //break;
                                         }
 //                                        }
@@ -968,10 +971,16 @@ public class Root extends Agent {
                         sumRelevantCountiesInfection += relevantDailyConfirmedCases.get(i).numActiveCases * (10f / 3f);
                     }
                 }
-                int expectedInfectionInScope = (int) (((double) sumRelevantCountiesInfection / (double) sumRelevantCountiesPopulation) * (double) (scope.population));
+                int expectedInfectionInScope = -1;
+                if (fixedNumInfected == -1) {
+                    expectedInfectionInScope = (int) (((double) sumRelevantCountiesInfection / (double) sumRelevantCountiesPopulation) * (double) (scope.population));
+                } else {
+                    expectedInfectionInScope = fixedNumInfected;
+                }
+//                int expectedInfectionInScope = (int) (((double) sumRelevantCountiesInfection / (double) sumRelevantCountiesPopulation) * (double) (scope.population));
 //                double expectedInfectionPercentage = ((double) (expectedInfectionInScope) / (double) (scope.population)) * ((double) (regionPopulation) / (double) (scope.population));
                 double expectedInfectionPercentage = ((double) (expectedInfectionInScope) / (double) (scope.population));
-                initialRecovered(expectedInfectionPercentage);
+                initialRecovered(expectedInfectionPercentage*0.8);
                 double currentInfections = 0;
                 double currentInfectionPercentage = 0;
                 int maxRetry = 60;

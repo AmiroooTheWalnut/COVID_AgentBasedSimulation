@@ -11,16 +11,23 @@ import COVID_AgentBasedSimulation.GUI.SafegraphPreprocessor.SafeGraphPreprocessD
 import COVID_AgentBasedSimulation.GUI.Simulator.ArtificialSimulatorDialog;
 import COVID_AgentBasedSimulation.GUI.Simulator.SimulatorFACSDialog;
 import COVID_AgentBasedSimulation.Model.Data.CovidCsseJhu.CovidCsseJhu;
+import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Root;
 import COVID_AgentBasedSimulation.Model.MainModel;
 import COVID_AgentBasedSimulation.Model.ProjectManager;
 import COVID_AgentBasedSimulation.Model.Structure.AllGISData;
+import COVID_AgentBasedSimulation.Model.Structure.Scope;
 import com.esotericsoftware.minlog.Log;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.opencsv.CSVWriter;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
@@ -42,14 +49,18 @@ public class MainFrame extends javax.swing.JFrame {
     public ProcessingMapRenderer child;
     public int numProcessors;
 
+    ZonedDateTime startTimeJH;
+    String startTimeStringJH;
+
+    ZonedDateTime endTimeJH;
+    String endTimeStringJH;
+
     //public esmaieeli.gisFastLocationOptimization.GUI.MainFrame OSMGISMainFrame;
     /**
      * Creates new form MainFrame
      */
     public MainFrame() {
         initComponents();
-        
-        
 
         projectManager = new ProjectManager();
 
@@ -150,6 +161,11 @@ public class MainFrame extends javax.swing.JFrame {
         jPanel2 = new javax.swing.JPanel();
         jButton2 = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
+        jButton26 = new javax.swing.JButton();
+        jFormattedTextField1 = new javax.swing.JFormattedTextField();
+        jLabel9 = new javax.swing.JLabel();
+        jFormattedTextField2 = new javax.swing.JFormattedTextField();
+        jLabel10 = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
         jPanel16 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
@@ -610,6 +626,29 @@ public class MainFrame extends javax.swing.JFrame {
 
         jLabel5.setText("Infection data status");
 
+        jButton26.setText("Save range");
+        jButton26.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton26ActionPerformed(evt);
+            }
+        });
+
+        jFormattedTextField1.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                jFormattedTextField1PropertyChange(evt);
+            }
+        });
+
+        jLabel9.setText("End date:");
+
+        jFormattedTextField2.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                jFormattedTextField2PropertyChange(evt);
+            }
+        });
+
+        jLabel10.setText("Start date:");
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -617,18 +656,34 @@ public class MainFrame extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jFormattedTextField1)
                     .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel5)
-                        .addGap(0, 84, Short.MAX_VALUE)))
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel5)
+                            .addComponent(jButton26)
+                            .addComponent(jLabel9)
+                            .addComponent(jLabel10))
+                        .addGap(0, 84, Short.MAX_VALUE))
+                    .addComponent(jFormattedTextField2))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addComponent(jLabel5)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 194, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 53, Short.MAX_VALUE)
+                .addComponent(jLabel10)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jFormattedTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel9)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jFormattedTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton26)
                 .addContainerGap())
         );
 
@@ -865,7 +920,7 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        
+
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
@@ -928,7 +983,7 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton22ActionPerformed
 
     private void jButton23ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton23ActionPerformed
-        
+
     }//GEN-LAST:event_jButton23ActionPerformed
 
     private void jButton24ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton24ActionPerformed
@@ -940,8 +995,67 @@ public class MainFrame extends javax.swing.JFrame {
         if (mainModel.allGISData != null) {
             mainModel.allGISData.processBrentData();
         }
-        
+
     }//GEN-LAST:event_jButton25ActionPerformed
+
+    private void jFormattedTextField2PropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jFormattedTextField2PropertyChange
+        try{
+            if (jFormattedTextField2.getText().length() > 0) {
+                ZonedDateTime zonedDateTime = ZonedDateTime.parse(jFormattedTextField2.getText() + "+00:00");
+                startTimeJH = zonedDateTime;
+                startTimeStringJH = zonedDateTime.toString() + "[UTC]";
+            }
+        }catch(Exception ex){}
+    }//GEN-LAST:event_jFormattedTextField2PropertyChange
+
+    private void jFormattedTextField1PropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jFormattedTextField1PropertyChange
+        try{
+            if (jFormattedTextField1.getText().length() > 0) {
+                ZonedDateTime zonedDateTime = ZonedDateTime.parse(jFormattedTextField1.getText() + "+00:00");
+                endTimeJH = zonedDateTime;
+                endTimeStringJH = zonedDateTime.toString() + "[UTC]";
+            }
+        }catch(Exception ex){}
+    }//GEN-LAST:event_jFormattedTextField1PropertyChange
+
+    private void jButton26ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton26ActionPerformed
+        Scope scope = (Scope) (mainModel.ABM.studyScopeGeography);
+        Root root = new Root(mainModel);
+        root.myModelRoot=mainModel;
+        root.detectRelevantCounties(scope);
+        int numDays = endTimeJH.getDayOfYear() - startTimeJH.getDayOfYear();
+        ZonedDateTime currentTime = startTimeJH;
+
+        ArrayList<Double> numbers = new ArrayList();
+        List<String[]> numbersStr = new ArrayList();
+        for (int d = 0; d < numDays; d++) {
+            int sumRelevantCountiesPopulation = 0;
+            int sumRelevantCountiesInfection = 0;
+            for (int i = 0; i < root.relevantDailyConfirmedCases.size(); i++) {
+                if ((currentTime).truncatedTo(ChronoUnit.DAYS).isEqual(root.relevantDailyConfirmedCases.get(i).date.truncatedTo(ChronoUnit.DAYS)) == true) {
+                    sumRelevantCountiesPopulation += root.relevantDailyConfirmedCases.get(i).county.population;
+//                    sumRelevantCountiesInfection += root.relevantDailyConfirmedCases.get(i).numActiveCases * (10f / 3f);
+                    sumRelevantCountiesInfection += root.relevantDailyConfirmedCases.get(i).numActiveCases;
+                }
+            }
+            numbers.add((double) sumRelevantCountiesInfection / (double) sumRelevantCountiesPopulation);
+//            numbers.add((double) sumRelevantCountiesInfection);
+            String[] row = new String[4];
+            row[0] = String.valueOf(currentTime.getYear());
+            row[1] = String.valueOf(currentTime.getMonth());
+            row[2] = String.valueOf(currentTime.getDayOfMonth());
+            row[3] = String.valueOf(numbers.get(numbers.size() - 1));
+            numbersStr.add(row);
+            currentTime = currentTime.plusDays(1);
+        }
+        try {
+            CSVWriter writer = new CSVWriter(new FileWriter("JHDataExport.csv"));
+            writer.writeAll(numbersStr);
+            writer.close();
+        } catch (IOException ex) {
+            Logger.getLogger(GraphicalModelDialog.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton26ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -997,6 +1111,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JButton jButton23;
     private javax.swing.JButton jButton24;
     private javax.swing.JButton jButton25;
+    private javax.swing.JButton jButton26;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
@@ -1004,7 +1119,10 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton8;
     private javax.swing.JButton jButton9;
+    private javax.swing.JFormattedTextField jFormattedTextField1;
+    private javax.swing.JFormattedTextField jFormattedTextField2;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     public javax.swing.JLabel jLabel4;
@@ -1012,6 +1130,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel6;
     public javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
