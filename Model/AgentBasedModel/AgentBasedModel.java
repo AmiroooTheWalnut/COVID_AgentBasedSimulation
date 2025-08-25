@@ -9,6 +9,7 @@ import COVID_AgentBasedSimulation.GUI.MainFrame;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Measures.MeasureHolder;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Root;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.RootArtificial;
+import COVID_AgentBasedSimulation.Model.HistoricalMobility;
 import COVID_AgentBasedSimulation.Model.MainModel;
 import COVID_AgentBasedSimulation.Model.Matching.MatchingConfig;
 import COVID_AgentBasedSimulation.Model.Matching.MatchingData;
@@ -64,6 +65,7 @@ public class AgentBasedModel {
     public boolean isReportContactRate = false;
     public boolean isBuildingLogicActive = true;
     public boolean isSaveHistoricalRun = false;
+    public boolean isSaveMobility = false;
 
     public boolean isOurABMActive = false;
     public boolean isShamilABMActive = false;
@@ -103,6 +105,8 @@ public class AgentBasedModel {
     public MatchingConfig matchingConfig=new MatchingConfig();
     
     public MatchingData matchingData;
+    
+    public HistoricalMobility historicalMobility=new HistoricalMobility();
 
     public AgentBasedModel(MainModel mainModel) {
         myMainModel = mainModel;

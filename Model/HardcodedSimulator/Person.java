@@ -15,6 +15,14 @@ import COVID_AgentBasedSimulation.Model.MainModel;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import COVID_AgentBasedSimulation.GUI.VoronoiGIS.GISLocationDialog;
+import esmaieeli.gisFastLocationOptimization.GIS3D.LayerDefinition;
+import esmaieeli.gisFastLocationOptimization.GIS3D.LocationNode;
+import esmaieeli.gisFastLocationOptimization.Simulation.NeighborNode;
+import esmaieeli.gisFastLocationOptimization.Simulation.Routing;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 
 /**
  *
@@ -65,14 +73,87 @@ public class Person extends Agent {
                         if (myModelRoot.isArtificialExact == true) {
                             travelFromHome(myModelRoot.ABM.currentTime, myModelRoot.isArtificialExact, ((RootArtificial) (myModelRoot.ABM.root)).isTessellationBuilt);
                         } else {
-                            travelFromHome(myModelRoot.ABM.currentTime, myModelRoot.isArtificialExact, true);
+                            float sourceLat = -1;
+                            float sourceLon = -1;
+                            if (myModelRoot.ABM.isSaveMobility == true) {
+                                sourceLat = lat;
+                                sourceLon = lon;
+                            }
+                            boolean isMoved = travelFromHome(myModelRoot.ABM.currentTime, myModelRoot.isArtificialExact, true);
+                            if (myModelRoot.ABM.isSaveMobility == true && isMoved == true) {
+                                float destLat = lat;
+                                float destLon = lon;
+                                LocationNode srcNode = GISLocationDialog.getNearestNode(myModelRoot.ABM.allData, sourceLon, sourceLat, null);
+                                LocationNode dstNode = GISLocationDialog.getNearestNode(myModelRoot.ABM.allData, destLat, destLon, null);
+                                int trafficLayerIndex = -1;
+                                for (int i = 0; i < myModelRoot.ABM.allData.all_Layers.size(); i++) {
+                                    if (((LayerDefinition) myModelRoot.ABM.allData.all_Layers.get(i)).layerName.toLowerCase().contains("traffic")) {
+                                        trafficLayerIndex = i;
+                                    }
+                                }
+                                Routing routing = new Routing(myModelRoot.ABM.allData, trafficLayerIndex, 0);
+                                myModelRoot.ABM.allData.setParallelLayers(1, -1);
+                                try {
+                                    routing.findPath(srcNode, dstNode);
+                                    if (routing.path.size() > 2) {
+                                        GeometryFactory geomFactory = new GeometryFactory();
+                                        ArrayList<Point> pathPoints = new ArrayList();
+                                        for (int i = 0; i < routing.path.size(); i++) {
+                                            LocationNode t = ((NeighborNode) (routing.path.get(i))).myNode;
+                                            Point p = geomFactory.createPoint(new Coordinate(t.lon, t.lat));
+                                            pathPoints.add(p);
+                                        }
+                                        myModelRoot.ABM.historicalMobility.pathedTrajectory.add(pathPoints);
+                                    }
+                                } catch (Exception ex) {
+                                    System.out.println("Failed routing");
+                                }
+
+                                System.out.println("DEBUG!");
+                            }
                         }
                     }
                     if (properties.isAtWork == true) {
                         if (myModelRoot.isArtificialExact == true) {
                             travelFromWork(myModelRoot.ABM.currentTime, myModelRoot.isArtificialExact, ((RootArtificial) (myModelRoot.ABM.root)).isTessellationBuilt);
                         } else {
-                            travelFromWork(myModelRoot.ABM.currentTime, myModelRoot.isArtificialExact, true);
+                            float sourceLat = -1;
+                            float sourceLon = -1;
+                            if (myModelRoot.ABM.isSaveMobility == true) {
+                                sourceLat = lat;
+                                sourceLon = lon;
+                            }
+                            boolean isMoved = travelFromWork(myModelRoot.ABM.currentTime, myModelRoot.isArtificialExact, true);
+                            if (myModelRoot.ABM.isSaveMobility == true && isMoved == true) {
+                                float destLat = lat;
+                                float destLon = lon;
+                                LocationNode srcNode = GISLocationDialog.getNearestNode(myModelRoot.ABM.allData, sourceLon, sourceLat, null);
+                                LocationNode dstNode = GISLocationDialog.getNearestNode(myModelRoot.ABM.allData, destLat, destLon, null);
+                                int trafficLayerIndex = -1;
+                                for (int i = 0; i < myModelRoot.ABM.allData.all_Layers.size(); i++) {
+                                    if (((LayerDefinition) myModelRoot.ABM.allData.all_Layers.get(i)).layerName.toLowerCase().contains("traffic")) {
+                                        trafficLayerIndex = i;
+                                    }
+                                }
+                                Routing routing = new Routing(myModelRoot.ABM.allData, trafficLayerIndex, 0);
+                                myModelRoot.ABM.allData.setParallelLayers(1, -1);
+                                try {
+                                    routing.findPath(srcNode, dstNode);
+                                    if (routing.path.size() > 2) {
+                                        GeometryFactory geomFactory = new GeometryFactory();
+                                        ArrayList<Point> pathPoints = new ArrayList();
+                                        for (int i = 0; i < routing.path.size(); i++) {
+                                            LocationNode t = ((NeighborNode) (routing.path.get(i))).myNode;
+                                            Point p = geomFactory.createPoint(new Coordinate(t.lon, t.lat));
+                                            pathPoints.add(p);
+                                        }
+                                        myModelRoot.ABM.historicalMobility.pathedTrajectory.add(pathPoints);
+                                    }
+                                } catch (Exception ex) {
+                                    System.out.println("Failed routing");
+                                }
+                                System.out.println("DEBUG!");
+                            }
                         }
                     }
                     if (properties.isInTravel == true) {
@@ -92,6 +173,11 @@ public class Person extends Agent {
         if (properties.minutesStayed > properties.dwellTime.dwellDuration[0]) {
             if (myModelRoot.ABM.root.rnd.nextDouble() < (float) (properties.minutesStayed - properties.dwellTime.dwellDuration[0]) / (float) (properties.dwellTime.dwellDuration[1] - properties.dwellTime.dwellDuration[0])) {
                 returnAction();
+                if (myModelRoot.ABM.isSaveMobility == true) {
+                    float destLat = lat;
+                    float destLon = lon;
+                    GISLocationDialog.getNearestNode(myModelRoot.ABM.allData, destLat, destLon, null);
+                }
             }
         }
     }
@@ -146,11 +232,11 @@ public class Person extends Agent {
         isPolledPTAVSP = false;
     }
 
-    public void travelFromWork(ZonedDateTime currentTime, boolean isArtifical, boolean isTessellationBuilt) {
+    public boolean travelFromWork(ZonedDateTime currentTime, boolean isArtifical, boolean isTessellationBuilt) {
         if (isArtifical == false) {
             PatternsRecordProcessed dest = chooseDestination(properties.workRegion);
             if (dest == null) {
-                return;
+                return false;
             }
             if (myModelRoot.ABM.isMatching == true) {
                 boolean isFoundValidType1 = false;
@@ -198,7 +284,7 @@ public class Person extends Agent {
                     }
                     int index = (int) (Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * myModelRoot.ABM.matchingData.foundType1POIs[directFoundIndexType1].size()));
 //                    System.out.println("directFoundIndexType1: "+directFoundIndexType1);
-                    POI tempPoi=myModelRoot.ABM.root.pOIs.get(myModelRoot.ABM.matchingData.foundType1POIs[directFoundIndexType1].get(index).placeKey);
+                    POI tempPoi = myModelRoot.ABM.root.pOIs.get(myModelRoot.ABM.matchingData.foundType1POIs[directFoundIndexType1].get(index).placeKey);
                     if (tempPoi.peopleInPOI.size() < maxAgentsToChangeDest) {
                         dest = myModelRoot.ABM.matchingData.foundType1POIs[directFoundIndexType1].get(index);
                     }
@@ -222,7 +308,7 @@ public class Person extends Agent {
                     }
                     int index = (int) (Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * myModelRoot.ABM.matchingData.foundType2POIs[directFoundIndexType2].size()));
 //                    System.out.println("directFoundIndexType2: "+directFoundIndexType2);
-                    POI tempPoi=myModelRoot.ABM.root.pOIs.get(myModelRoot.ABM.matchingData.foundType2POIs[directFoundIndexType2].get(index).placeKey);
+                    POI tempPoi = myModelRoot.ABM.root.pOIs.get(myModelRoot.ABM.matchingData.foundType2POIs[directFoundIndexType2].get(index).placeKey);
                     if (tempPoi.peopleInPOI.size() < maxAgentsToChangeDest) {
                         dest = myModelRoot.ABM.matchingData.foundType2POIs[directFoundIndexType2].get(index);
                     }
@@ -287,6 +373,8 @@ public class Person extends Agent {
                     }
                 }
                 myModelRoot.ABM.measureHolder.handleNOV(myModelRoot, properties);
+
+                return true;
             }
         } else {
             POI dest;
@@ -345,12 +433,15 @@ public class Person extends Agent {
                         }
                     }
                     myModelRoot.ABM.measureHolder.handleNOV(myModelRoot, properties);
+
+                    return true;
                 }
             }
         }
+        return false;
     }
 
-    public void travelFromHome(ZonedDateTime currentTime, boolean isArtifical, boolean isTessellationBuilt) {
+    public boolean travelFromHome(ZonedDateTime currentTime, boolean isArtifical, boolean isTessellationBuilt) {
         if (isArtifical == false) {
             PatternsRecordProcessed dest = chooseDestination(properties.homeRegion);
             if (myModelRoot.ABM.isMatching == true) {
@@ -400,7 +491,7 @@ public class Person extends Agent {
                     }
                     int index = (int) (Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * myModelRoot.ABM.matchingData.foundType1POIs[directFoundIndexType1].size()));
 //                    System.out.println("directFoundIndexType1: "+directFoundIndexType1);
-                    POI tempPoi=myModelRoot.ABM.root.pOIs.get(myModelRoot.ABM.matchingData.foundType1POIs[directFoundIndexType1].get(index).placeKey);
+                    POI tempPoi = myModelRoot.ABM.root.pOIs.get(myModelRoot.ABM.matchingData.foundType1POIs[directFoundIndexType1].get(index).placeKey);
                     if (tempPoi.peopleInPOI.size() < maxAgentsToChangeDest) {
                         dest = myModelRoot.ABM.matchingData.foundType1POIs[directFoundIndexType1].get(index);
                     }
@@ -424,7 +515,7 @@ public class Person extends Agent {
                     }
                     int index = (int) (Math.floor(myModelRoot.ABM.root.rnd.nextDouble() * myModelRoot.ABM.matchingData.foundType2POIs[directFoundIndexType2].size()));
 //                    System.out.println("directFoundIndexType2: "+directFoundIndexType2);
-                    POI tempPoi=myModelRoot.ABM.root.pOIs.get(myModelRoot.ABM.matchingData.foundType2POIs[directFoundIndexType2].get(index).placeKey);
+                    POI tempPoi = myModelRoot.ABM.root.pOIs.get(myModelRoot.ABM.matchingData.foundType2POIs[directFoundIndexType2].get(index).placeKey);
                     if (tempPoi.peopleInPOI.size() < maxAgentsToChangeDest) {
                         dest = myModelRoot.ABM.matchingData.foundType2POIs[directFoundIndexType2].get(index);
                     }
@@ -479,6 +570,8 @@ public class Person extends Agent {
                 Long oldVal = myModelRoot.ABM.root.travelsToAllPOIsFreqs.get(pOI.patternsRecord.placeKey);
                 myModelRoot.ABM.root.travelsToAllPOIsFreqs.put(pOI.patternsRecord.placeKey, oldVal + 1);
                 myModelRoot.ABM.measureHolder.handleNOV(myModelRoot, properties);
+
+                return true;
             }
         } else {
             POI dest;
@@ -539,9 +632,12 @@ public class Person extends Agent {
                     Long oldVal = myModelRoot.ABM.root.travelsToAllPOIsFreqs.get(pOI.patternsRecord.placeKey);
                     myModelRoot.ABM.root.travelsToAllPOIsFreqs.put(pOI.patternsRecord.placeKey, oldVal + 1);
                     myModelRoot.ABM.measureHolder.handleNOV(myModelRoot, properties);
+
+                    return true;
                 }
             }
         }
+        return false;
     }
 
     public DwellTime decideDwellTime(PatternsRecordProcessed record) {

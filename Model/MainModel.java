@@ -1138,6 +1138,11 @@ public class MainModel extends Dataset {
 //        historicalRun.saveHistoricalRunJson("./projects/" + ABM.filePath + "/" + formatter.format(date)+"/data.json");
             HistoricalRun.saveHistoricalRunKryo(testPath + File.separator + "data", historicalRun);
         }
+        
+        if(ABM.isSaveMobility == true){
+            ABM.historicalMobility.saveHistoricalMobilityJunctionSampledCSV(testPath + File.separator + "mobilityJunctionSample.csv");
+            ABM.historicalMobility.saveStreetNodes(ABM.allData,testPath + File.separator + "allowableNodes.csv");
+        }
 
 //        for (int i = 0; i < historicalRun.regions.size(); i++) {
 //            for (int j = 0; j < historicalRun.regions.get(i).hourlyRegionSnapshot.size(); j++) {

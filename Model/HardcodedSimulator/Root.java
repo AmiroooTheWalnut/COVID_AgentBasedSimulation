@@ -106,6 +106,7 @@ public class Root extends Agent {
 //    ShamilSimulatorController shamilSimulatorController;
     public Root(MainModel modelRoot) {
         myType = "root";
+//        myModelRoot = modelRoot;
     }
 
     /**
@@ -345,8 +346,7 @@ public class Root extends Agent {
                         tempPOI.patternsRecord = patternRecordsTemp.get(j);
                         pOIs.put(patternRecordsTemp.get(j).placeKey, tempPOI);
                     }
-                }
-                else {
+                } else {
                     if (Math.random() > 0.9) {
                         patternRecords.add(patternRecordsTemp.get(j));
                         if (pOIs.containsKey(patternRecordsTemp.get(j).placeKey)) {
@@ -411,7 +411,20 @@ public class Root extends Agent {
             modelRoot.ABM.agentsRaw.add(person);
             person.constructor(modelRoot);
             people.add(person);
-            System.out.println("generateAgents: "+i);
+            System.out.println("generateAgents: " + i);
+        }
+
+        if (myModelRoot.ABM.isSaveMobility == true) {
+            //Added exact location extracter
+            RootArtificial tempRoot = new RootArtificial(myModelRoot);
+            tempRoot.myModelRoot = myModelRoot;
+            myModelRoot.ABM.loadExactGeoData(tempRoot);
+            tempRoot.allDataGIS=myModelRoot.ABM.allData;
+            tempRoot.preprocessNodesInRegions(regions);
+//            tempRoot.preprocessNodesInRegions(cBGregions);
+//            tempRoot.preprocessNodesInRegionsParallel(cBGregions);
+            tempRoot.selectExactLocations(people);
+            System.out.println("Finished selecting exact home and work locations");
         }
     }
 
@@ -445,8 +458,8 @@ public class Root extends Agent {
             workRegion = sampleWorkRegion(scheduleList, person, homeRegion);
             if (workRegion != null) {
 //                if (workRegion.sumWorkFreqs > 0) {
-                    person.properties.workRegion = workRegion;
-                    break;
+                person.properties.workRegion = workRegion;
+                break;
 //                }
             }
         }
@@ -895,7 +908,7 @@ public class Root extends Agent {
                     expectedInfectionInScope = fixedNumInfected;
                 }
                 double expectedInfectionPercentage = (double) (expectedInfectionInScope) / (double) (scope.population);
-                initialRecovered(expectedInfectionPercentage*0.8);
+                initialRecovered(expectedInfectionPercentage * 0.8);
                 double currentInfections = 0;
                 double currentInfectionPercentage = 0;
                 int maxTry = 2000;
@@ -919,7 +932,7 @@ public class Root extends Agent {
                                             //regions.get(j).residents.get(selectedResident).shamilPersonProperties.infectedDays = 4 + (int) (rnd.nextDouble() * 10);
                                             currentInfections = currentInfections + 1;
                                             currentInfectionPercentage = currentInfections / (people.size() * pTSFraction);
-                                            currentNumTry=0;
+                                            currentNumTry = 0;
                                             //break;
                                         }
 //                                        }
@@ -933,7 +946,7 @@ public class Root extends Agent {
                                             //regions.get(j).residents.get(selectedResident).shamilPersonProperties.infectedDays = 3 + (int) (rnd.nextDouble() * 3);
                                             currentInfections = currentInfections + 1;
                                             currentInfectionPercentage = currentInfections / (people.size() * pTSFraction);
-                                            currentNumTry=0;
+                                            currentNumTry = 0;
                                             //break;
                                         }
 //                                        }
@@ -980,7 +993,7 @@ public class Root extends Agent {
 //                int expectedInfectionInScope = (int) (((double) sumRelevantCountiesInfection / (double) sumRelevantCountiesPopulation) * (double) (scope.population));
 //                double expectedInfectionPercentage = ((double) (expectedInfectionInScope) / (double) (scope.population)) * ((double) (regionPopulation) / (double) (scope.population));
                 double expectedInfectionPercentage = ((double) (expectedInfectionInScope) / (double) (scope.population));
-                initialRecovered(expectedInfectionPercentage*0.8);
+                initialRecovered(expectedInfectionPercentage * 0.8);
                 double currentInfections = 0;
                 double currentInfectionPercentage = 0;
                 int maxRetry = 60;
@@ -1725,7 +1738,7 @@ public class Root extends Agent {
         if (myModelRoot.ABM.currentTime.getMinute() == 0) {
             for (int i = 0; i < regions.size(); i++) {
                 RegionSnapshot snapshot = new RegionSnapshot();
-                snapshot.population=regions.get(i).population;
+                snapshot.population = regions.get(i).population;
                 if (regions.get(i).hourlyRegionSnapshot.size() > 0) {
                     snapshot.rate = regions.get(i).hourlyRegionSnapshot.get(regions.get(i).hourlyRegionSnapshot.size() - 1).rate;
                 }

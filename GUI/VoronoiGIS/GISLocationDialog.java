@@ -11,10 +11,8 @@ import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.COVIDGeoVisualiz
 import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.MyPolygons;
 import COVID_AgentBasedSimulation.GUI.UnfoldingMapVisualization.RegionImageLayer;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.LocationNodeSafegraph;
-import COVID_AgentBasedSimulation.Model.Data.Safegraph.Patterns;
 import COVID_AgentBasedSimulation.Model.Data.Safegraph.PatternsRecordProcessed;
 import static COVID_AgentBasedSimulation.Model.Data.Safegraph.SafegraphPlaces.getBuildingAreaLevelsOnline;
-import COVID_AgentBasedSimulation.Model.HardcodedSimulator.Person;
 import COVID_AgentBasedSimulation.Model.HardcodedSimulator.RootArtificial;
 import COVID_AgentBasedSimulation.Model.MainModel;
 import COVID_AgentBasedSimulation.Model.Structure.AllGISData;
@@ -29,6 +27,7 @@ import COVID_AgentBasedSimulation.Model.Structure.SupplementaryCaseStudyData;
 import COVID_AgentBasedSimulation.Model.Structure.Tessellation;
 import COVID_AgentBasedSimulation.Model.Structure.TessellationCell;
 import COVID_AgentBasedSimulation.Model.Structure.VDCell;
+import com.jme3.math.Vector3f;
 import esmaieeli.gisFastLocationOptimization.GIS3D.Grid;
 import esmaieeli.gisFastLocationOptimization.GIS3D.LayerDefinition;
 import esmaieeli.gisFastLocationOptimization.GIS3D.LocationNode;
@@ -57,8 +56,13 @@ import de.siegmar.fastcsv.reader.CsvReader;
 import de.siegmar.fastcsv.writer.CsvWriter;
 import esmaieeli.gisFastLocationOptimization.GIS3D.AllData;
 import esmaieeli.gisFastLocationOptimization.GIS3D.NumericLayer;
+import esmaieeli.gisFastLocationOptimization.GIS3D.ParallelInternalProcessWays;
+import esmaieeli.gisFastLocationOptimization.GIS3D.ParallelPreProcessorNodes;
+import esmaieeli.gisFastLocationOptimization.GIS3D.PreProcessor;
+import esmaieeli.gisFastLocationOptimization.GIS3D.Scaling;
 import esmaieeli.gisFastLocationOptimization.GIS3D.StoreProcessedData;
-import esmaieeli.gisFastLocationOptimization.Simulation.SimplePolygons;
+import esmaieeli.gisFastLocationOptimization.GIS3D.Way;
+import esmaieeli.gisFastLocationOptimization.GUI.ImageControllerDefaults;
 import esmaieeli.gisFastLocationOptimization.Simulation.VectorToPolygon;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -201,13 +205,14 @@ public class GISLocationDialog extends javax.swing.JDialog {
         jButton40 = new javax.swing.JButton();
         jButton42 = new javax.swing.JButton();
         jButton43 = new javax.swing.JButton();
+        jButton44 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jPanel1.setLayout(new javax.swing.BoxLayout(jPanel1, javax.swing.BoxLayout.LINE_AXIS));
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jButton1.setText("Generate shops voronoi");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -314,7 +319,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
             }
         });
 
-        jPanel4.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jPanel4.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jButton21.setText("CBGs infections");
         jButton21.addActionListener(new java.awt.event.ActionListener() {
@@ -506,7 +511,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
-        jPanel5.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jPanel5.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jButton24.setText("Update city sup by app");
         jButton24.addActionListener(new java.awt.event.ActionListener() {
@@ -699,9 +704,15 @@ public class GISLocationDialog extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton42)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton43)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addComponent(jButton43))
         );
+
+        jButton44.setText("Refine kryo data (only streets)");
+        jButton44.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton44ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
@@ -736,7 +747,8 @@ public class GISLocationDialog extends javax.swing.JDialog {
                             .addComponent(jButton35)
                             .addComponent(jButton38)
                             .addComponent(jButton39)
-                            .addComponent(jButton41))
+                            .addComponent(jButton41)
+                            .addComponent(jButton44))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -777,8 +789,10 @@ public class GISLocationDialog extends javax.swing.JDialog {
                 .addComponent(jButton41)
                 .addGap(18, 18, 18)
                 .addComponent(jButton39)
-                .addGap(47, 47, 47)
-                .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addComponent(jButton44)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton38)
                 .addContainerGap())
@@ -4363,6 +4377,197 @@ public class GISLocationDialog extends javax.swing.JDialog {
         mainFParent.refreshLayersList();
     }//GEN-LAST:event_jButton42ActionPerformed
 
+    private void jButton44ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton44ActionPerformed
+        ArrayList<LocationNode> nodes = new ArrayList();
+        ArrayList<Way> ways = new ArrayList();
+        for (int i = 0; i < mainFParent.allData.all_Ways.length; i++) {
+            String nodeTypeStr = mainFParent.allData.all_Ways[i].type;
+            if (nodeTypeStr != null) {
+                boolean isValid = false;
+                if (nodeTypeStr.contains("motorway")) {
+                    isValid = true;
+                } else if (nodeTypeStr.contains("trunk")) {
+                    isValid = true;
+                } else if (nodeTypeStr.contains("primary")) {
+                    isValid = true;
+                } else if (nodeTypeStr.contains("secondary")) {
+                    isValid = true;
+                } else if (nodeTypeStr.contains("tertiary")) {
+                    isValid = true;
+                } else if (nodeTypeStr.contains("unclassified")) {
+                    isValid = false;//KICK OUT FROM GIS DATA
+                } else if (nodeTypeStr.contains("residential")) {
+                    isValid = true;
+                } else if (nodeTypeStr.contains("service")) {
+                    isValid = true;
+                } else if (nodeTypeStr.contains("footway")) {
+                    isValid = false;//KICK OUT FROM GIS DATA
+                } else if (nodeTypeStr.contains("path")) {
+                    isValid = false;//KICK OUT FROM GIS DATA
+                } else if (nodeTypeStr.contains("cycleway")) {
+                    isValid = false;//KICK OUT FROM GIS DATA
+                } else if (nodeTypeStr.contains("track")) {
+                    isValid = false;//KICK OUT FROM GIS DATA
+                } else if (nodeTypeStr.contains("steps")) {
+                    isValid = false;//KICK OUT FROM GIS DATA
+                } else if (nodeTypeStr.contains("pedestrian")) {
+                    isValid = false;//KICK OUT FROM GIS DATA
+                } else {
+                    isValid = false;//KICK OUT FROM GIS DATA
+                    System.out.println(nodeTypeStr);
+                }
+                if (isValid == true) {
+                    for (int j = 0; j < mainFParent.allData.all_Ways[i].myNodes.length; j++) {
+                        nodes.add(mainFParent.allData.all_Ways[i].myNodes[j]);
+//                        for (int m = 0; m < mainFParent.allData.all_Nodes.length; m++) {
+//                            
+////                            if(mainFParent.allData.all_Nodes[m].id==mainFParent.allData.all_Ways[i].myNodes[j].id){
+////                                
+////                                break;
+////                            }
+//                        }
+                    }
+                    ways.add(mainFParent.allData.all_Ways[i]);
+                }
+            }
+        }
+
+        LocationNode[] newNodes = new LocationNode[nodes.size()];
+        Way[] newWays = new Way[ways.size()];
+        for (int i = 0; i < nodes.size(); i++) {
+//            nodes.get(i).
+            newNodes[i] = new LocationNode(nodes.get(i).id, nodes.get(i).lat, nodes.get(i).lon, nodes.get(i).myOrder);
+        }
+        for (int i = 0; i < ways.size(); i++) {
+            newWays[i] = new Way(ways.get(i).id);
+            newWays[i].Length = ways.get(i).Length;
+            newWays[i].color = new float[ways.get(i).color.length];
+            for (int m = 0; m < ways.get(i).color.length; m++) {
+                newWays[i].color[m] = ways.get(i).color[m];
+            }
+            newWays[i].isOneWay = ways.get(i).isOneWay;
+            newWays[i].type = new String(ways.get(i).type);
+            newWays[i].typeWeight = ways.get(i).typeWeight;
+            if (newWays[i].typeWeight == 0) {
+                newWays[i].typeWeight = 1;
+            }
+            newWays[i].lines = new Vector3f[ways.get(i).lines.length];
+            for (int m = 0; m < ways.get(i).lines.length; m++) {
+                newWays[i].lines[m] = new Vector3f(ways.get(i).lines[m]);
+            }
+            newWays[i].myNodesTemporaryID = new ArrayList();
+            for (int m = 0; m < ways.get(i).myNodesTemporaryID.size(); m++) {
+                newWays[i].myNodesTemporaryID.add(ways.get(i).myNodesTemporaryID.get(m));
+            }
+        }
+        System.out.println("Finished getting raw nodes and ways");
+
+        AllData newAllData = new AllData();
+        newAllData.all_Nodes = newNodes;
+        newAllData.all_Ways = newWays;
+        boolean isAllwaysChecked = false;
+        int h_grid_num=10;
+        int v_grid_num=10;
+        PreProcessor preProcessor=new PreProcessor();
+        
+
+        mainFParent.allData = newAllData;
+        mainFParent.allData.myScale = new Scaling(mainFParent.allData.all_Nodes);
+        mainFParent.allData.myScale.calculate();
+        mainFParent.allData.grid = new Grid[h_grid_num][v_grid_num];
+        for (int i = 0; i < h_grid_num; i++) {
+            for (int j = 0; j < v_grid_num; j++) {
+                mainFParent.allData.grid[i][j] = new Grid(i, j, mainFParent.allData.myScale.min_x + i * ((mainFParent.allData.myScale.max_x - mainFParent.allData.myScale.min_x) / (double) mainFParent.allData.grid.length), mainFParent.allData.myScale.min_x + (i + 1) * ((mainFParent.allData.myScale.max_x - mainFParent.allData.myScale.min_x) / (double) mainFParent.allData.grid.length), mainFParent.allData.myScale.min_y + j * ((mainFParent.allData.myScale.max_y - mainFParent.allData.myScale.min_y) / (double) mainFParent.allData.grid[0].length), mainFParent.allData.myScale.min_y + (j + 1) * ((mainFParent.allData.myScale.max_y - mainFParent.allData.myScale.min_y) / (double) mainFParent.allData.grid[0].length), "Simple equal-width grid");
+            }
+        }
+
+        int numProcessors = myParent.numProcessors;
+        if (numProcessors > Runtime.getRuntime().availableProcessors()) {
+            numProcessors = Runtime.getRuntime().availableProcessors();
+        }
+
+        //\/\/\/ This part is for the new XML reader but not for old XML reader
+        ParallelInternalProcessWays parallelForWays[] = new ParallelInternalProcessWays[numProcessors];
+
+        for (int i = 0; i < numProcessors - 1; i++) {
+            parallelForWays[i] = new ParallelInternalProcessWays(preProcessor, mainFParent.allData, (int) Math.floor(i * ((mainFParent.allData.all_Ways.length) / numProcessors)), (int) Math.floor((i + 1) * ((mainFParent.allData.all_Ways.length) / numProcessors)));
+        }
+        parallelForWays[numProcessors - 1] = new ParallelInternalProcessWays(preProcessor, mainFParent.allData, (int) Math.floor((numProcessors - 1) * ((mainFParent.allData.all_Ways.length) / numProcessors)), mainFParent.allData.all_Ways.length);
+
+        for (int i = 0; i < numProcessors; i++) {
+            //parallelFor[i].myThread.start();
+            parallelForWays[i].myThread.start();
+        }
+        for (int i = 0; i < numProcessors; i++) {
+            try {
+                parallelForWays[i].myThread.join();
+                System.out.println("thread " + i + "finished for ways!");
+            } catch (InterruptedException ie) {
+                System.out.println(ie.toString());
+            }
+        }
+        //^^^ This part is for the new XML reader but not for old XML reader
+
+        isAllwaysChecked = false;
+
+        ParallelPreProcessorNodes parallelForNodes[] = new ParallelPreProcessorNodes[numProcessors];
+
+        for (int i = 0; i < numProcessors - 1; i++) {
+            parallelForNodes[i] = new ParallelPreProcessorNodes(preProcessor, mainFParent.allData, (int) Math.floor(i * ((mainFParent.allData.all_Nodes.length) / numProcessors)), (int) Math.floor((i + 1) * ((mainFParent.allData.all_Nodes.length) / numProcessors)));
+        }
+        parallelForNodes[numProcessors - 1] = new ParallelPreProcessorNodes(preProcessor, mainFParent.allData, (int) Math.floor((numProcessors - 1) * ((mainFParent.allData.all_Nodes.length) / numProcessors)), mainFParent.allData.all_Nodes.length);
+
+        for (int i = 0; i < numProcessors; i++) {
+            //parallelFor[i].myThread.start();
+            parallelForNodes[i].myThread.start();
+        }
+        for (int i = 0; i < numProcessors; i++) {
+            try {
+                parallelForNodes[i].myThread.join();
+                System.out.println("thread " + i + "finished for nodes!");
+            } catch (InterruptedException ie) {
+                System.out.println(ie.toString());
+            }
+        }
+        int numRefinedNodes = 0;
+        for (int i = 0; i < numProcessors; i++) {
+            numRefinedNodes = numRefinedNodes + parallelForNodes[i].myRefinedDataNumber;
+        }
+
+        System.out.println("refine data");
+        LocationNode refinedNodes[] = new LocationNode[numRefinedNodes];
+        int counter = 0;
+        for (int i = 0; i < mainFParent.allData.all_Nodes.length; i++) {
+            if (mainFParent.allData.all_Nodes[i].myWays.length > 0) {
+                refinedNodes[counter] = mainFParent.allData.all_Nodes[i];
+                counter = counter + 1;
+            }
+        }
+        mainFParent.allData.all_Nodes = refinedNodes;
+        preProcessor.setWaysColorLayerBased(mainFParent.allData, 0);
+        System.out.println("make 3d");
+
+        for (int i = 0; i < mainFParent.allData.grid.length; i++) {
+            for (int j = 0; j < mainFParent.allData.grid[0].length; j++) {
+                mainFParent.allData.grid[i][j].myNodes = new LocationNode[mainFParent.allData.grid[i][j].temporaryNodes.size()];
+                for (int s = 0; s < mainFParent.allData.grid[i][j].temporaryNodes.size(); s++) {
+                    mainFParent.allData.grid[i][j].myNodes[s] = (LocationNode) mainFParent.allData.grid[i][j].temporaryNodes.get(s);
+                }
+            }
+        }
+        
+        
+        mainFParent.refreshReportList();
+        mainFParent.make_lists();
+        mainFParent.refreshLayersList();
+        mainFParent.imageControllerDefaults = new ImageControllerDefaults(mainFParent);
+
+        //reserve_data();
+        System.out.println("finished");
+
+
+    }//GEN-LAST:event_jButton44ActionPerformed
+
     public static void writeDoubleArrayList(ArrayList<ArrayList<Double>> input, String path) {
         ArrayList<String[]> data = new ArrayList();
         for (int i = 0; i < input.size(); i++) {
@@ -5426,6 +5631,91 @@ public class GISLocationDialog extends javax.swing.JDialog {
 
     }
 
+    public static LocationNode getNearestNode(AllData allData, float collisionPositionx, float collisionPositiony, ArrayList<LocationNode> bannedNodes) {
+        boolean isValidCollition = false;
+        Grid outputGrid = new Grid(0, 0, 0, 0, 0, 0, "");
+        for (int i = 0; i < allData.grid.length; i++) {
+            for (int j = 0; j < allData.grid[0].length; j++) {
+                if (collisionPositiony < allData.grid[i][j].max_y_val && collisionPositiony > allData.grid[i][j].min_y_val && collisionPositionx < allData.grid[i][j].max_x_val && collisionPositionx > allData.grid[i][j].min_x_val) {
+                    if (allData.grid[i][j].myNodes.length > 0) {
+                        isValidCollition = true;
+//                                System.out.println("grid x: "+i);
+//                                System.out.println("grid y: "+j);
+                        outputGrid = allData.grid[i][j];
+                        break;
+                    }
+                }
+            }
+            if (isValidCollition == true) {
+                break;
+            }
+        }
+        LocationNode nearestNode = null;
+        if (bannedNodes != null) {
+            if (bannedNodes.size() > 0) {
+                if (isValidCollition == true) {
+                    double leastDistance = Double.POSITIVE_INFINITY;
+                    nearestNode = outputGrid.myNodes[0];
+                    for (int i = 0; i < outputGrid.myNodes.length; i++) {
+                        //System.out.println(outputGrid.myNodes[i]);//WARNING, NULL POINTER SPOTTED, A GRID HAS A NULL LOCATIONNODE
+                        if (outputGrid.myNodes[i] != null) {
+                            if (((short[]) (outputGrid.myNodes[i].layers.get(0)))[0] != 9 && ((short[]) (outputGrid.myNodes[i].layers.get(0)))[0] != 10) {//ADDED AS EXTREMEM MEASURE
+                                double dist = Math.sqrt(Math.pow(collisionPositionx - outputGrid.myNodes[i].lat, 2) + Math.pow(collisionPositiony - outputGrid.myNodes[i].lon, 2));
+                                if (dist < leastDistance) {
+                                    boolean isFound = false;
+                                    for (int h = 0; h < bannedNodes.size(); h++) {
+                                        if (outputGrid.myNodes[i].id == bannedNodes.get(h).id) {
+                                            isFound = true;
+                                        }
+                                    }
+                                    if (isFound == false) {
+                                        nearestNode = outputGrid.myNodes[i];
+                                        leastDistance = dist;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                if (isValidCollition == true) {
+                    double leastDistance = Double.POSITIVE_INFINITY;
+                    nearestNode = outputGrid.myNodes[0];
+                    for (int i = 0; i < outputGrid.myNodes.length; i++) {
+                        //System.out.println(outputGrid.myNodes[i]);//WARNING, NULL POINTER SPOTTED, A GRID HAS A NULL LOCATIONNODE
+                        if (outputGrid.myNodes[i] != null) {
+                            if (((short[]) (outputGrid.myNodes[i].layers.get(0)))[0] != 9 && ((short[]) (outputGrid.myNodes[i].layers.get(0)))[0] != 10) {//ADDED AS EXTREMEM MEASURE
+                                double dist = Math.sqrt(Math.pow(collisionPositionx - outputGrid.myNodes[i].lat, 2) + Math.pow(collisionPositiony - outputGrid.myNodes[i].lon, 2));
+                                if (dist < leastDistance) {
+                                    nearestNode = outputGrid.myNodes[i];
+                                    leastDistance = dist;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            if (isValidCollition == true) {
+                double leastDistance = Double.POSITIVE_INFINITY;
+                nearestNode = outputGrid.myNodes[0];
+                for (int i = 0; i < outputGrid.myNodes.length; i++) {
+                    //System.out.println(outputGrid.myNodes[i]);//WARNING, NULL POINTER SPOTTED, A GRID HAS A NULL LOCATIONNODE
+                    if (outputGrid.myNodes[i] != null) {
+                        double dist = Math.sqrt(Math.pow(collisionPositionx - outputGrid.myNodes[i].lat, 2) + Math.pow(collisionPositiony - outputGrid.myNodes[i].lon, 2));
+                        if (dist < leastDistance) {
+                            nearestNode = outputGrid.myNodes[i];
+                            leastDistance = dist;
+                        }
+                    }
+                }
+            }
+        }
+
+        return nearestNode;
+
+    }
+
     public static LocationNode getExhaustiveNearestNode(MainFramePanel mainFParent, float lat, float lon) {
         LocationNode nearestNode = null;
         double leastDistance = Double.POSITIVE_INFINITY;
@@ -5989,6 +6279,7 @@ public class GISLocationDialog extends javax.swing.JDialog {
     private javax.swing.JButton jButton41;
     private javax.swing.JButton jButton42;
     private javax.swing.JButton jButton43;
+    private javax.swing.JButton jButton44;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
     private javax.swing.JButton jButton7;
