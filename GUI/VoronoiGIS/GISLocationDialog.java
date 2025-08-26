@@ -4396,10 +4396,12 @@ public class GISLocationDialog extends javax.swing.JDialog {
                     isValid = true;
                 } else if (nodeTypeStr.contains("unclassified")) {
                     isValid = false;//KICK OUT FROM GIS DATA
+                } else if (nodeTypeStr.contains("unknown")) {
+                    isValid = false;//KICK OUT FROM GIS DATA
                 } else if (nodeTypeStr.contains("residential")) {
                     isValid = true;
                 } else if (nodeTypeStr.contains("service")) {
-                    isValid = true;
+                    isValid = false;//KICK OUT FROM GIS DATA
                 } else if (nodeTypeStr.contains("footway")) {
                     isValid = false;//KICK OUT FROM GIS DATA
                 } else if (nodeTypeStr.contains("path")) {
@@ -4456,8 +4458,8 @@ public class GISLocationDialog extends javax.swing.JDialog {
                 newWays[i].lines[m] = new Vector3f(ways.get(i).lines[m]);
             }
             newWays[i].myNodesTemporaryID = new ArrayList();
-            for (int m = 0; m < ways.get(i).myNodesTemporaryID.size(); m++) {
-                newWays[i].myNodesTemporaryID.add(ways.get(i).myNodesTemporaryID.get(m));
+            for (int m = 0; m < ways.get(i).myNodes.length; m++) {
+                newWays[i].myNodesTemporaryID.add(ways.get(i).myNodes[m].id);
             }
         }
         System.out.println("Finished getting raw nodes and ways");
